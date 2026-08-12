@@ -11,7 +11,7 @@ from app.models.audit import ApiKey, Webhook
 from app.core.auth import require_scope
 
 # Setup slowapi globally in main.py, import limiter here
-from app.main import limiter
+from app.core.limiter import limiter
 
 router = APIRouter(tags=["developer"])
 
