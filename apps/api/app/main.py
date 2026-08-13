@@ -92,3 +92,7 @@ async def health_check(request: Request):
         response["checks"]["redis"] = f"error: {str(e)}"
 
     return response
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    raise Exception("Test Sentry error")
