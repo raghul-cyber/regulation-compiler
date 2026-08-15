@@ -28,8 +28,8 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
                     {#each data.regulations as reg}
-                        <tr class="hover:bg-zinc-50">
-                            <td class="px-6 py-4 font-medium text-zinc-900">{reg.name}</td>
+                        <tr class="hover:bg-zinc-50 cursor-pointer" onclick={() => goto('/regulations/' + reg.id)}>
+                            <td class="px-6 py-4 font-medium text-blue-600 hover:underline">{reg.name}</td>
                             <td class="px-6 py-4">{reg.jurisdiction}</td>
                             <td class="px-6 py-4">{new Date(reg.created_at).toLocaleDateString()}</td>
                         </tr>
