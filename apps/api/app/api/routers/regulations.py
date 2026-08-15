@@ -269,3 +269,13 @@ def get_recent_activity(
         })
         
     return {"data": data}
+
+
+@router.get("")
+def list_regulations(
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.legal_counsel, RoleEnum.developer])),
+    db: Session = Depends(get_db)
+):
+    regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
+    return [{"id": str(r.id), "name": r.name, "jurisdiction": r.jurisdiction, "created_at": r.created_at.isoformat()} for r in regs]
+
