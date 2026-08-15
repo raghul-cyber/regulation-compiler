@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import { invalidateAll } from '$app/navigation';
 
@@ -31,7 +31,7 @@
 		isCreating = true;
 		
 		try {
-			const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8000'}/v1/api-keys`, {
+			const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8080'}/v1/api-keys`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ name: keyName, scopes: selectedScopes })
@@ -56,7 +56,7 @@
 		if (!confirm('Are you sure you want to revoke this key? It will immediately stop working.')) return;
 		
 		try {
-			const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8000'}/v1/api-keys/${id}`, {
+			const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8080'}/v1/api-keys/${id}`, {
 				method: 'DELETE'
 			});
 			if (!res.ok) throw new Error('Failed to revoke key');
@@ -266,3 +266,4 @@
 		</div>
 	</div>
 {/if}
+

@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount, onDestroy } from 'svelte'
   import { Canvas } from '@threlte/core'
   import Scene from './Scene.svelte'
@@ -30,9 +30,9 @@
   {/if}
 
   <!-- Content Overlay -->
-  <div class="relative z-10">
+  <div class="relative z-10 pointer-events-none">
     <!-- Navbar -->
-    <nav class="absolute top-0 w-full p-6 flex justify-between items-center border-b border-white/5 bg-[#0a0a0c]/80 backdrop-blur-md">
+    <nav class="absolute top-0 w-full p-6 flex justify-between items-center border-b border-white/5 bg-[#0a0a0c]/80 backdrop-blur-md pointer-events-auto">
       <div class="text-xl font-bold tracking-tight">Antigravity<span class="text-blue-500">RAC</span></div>
       <div class="space-x-4">
         <a href="/sign-in" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Sign In</a>
@@ -41,7 +41,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
+    <section class="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 pointer-events-auto">
       <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter max-w-4xl leading-[1.1] bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">
         The Future of <br/> Regulation as Code.
       </h1>
@@ -60,10 +60,11 @@
       <div class="max-w-xl">
         <h2 class="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Semantic Processing</h2>
         <p class="text-gray-400 text-lg">
-          Powered by state-of-the-art vector embeddings, our engine doesn't just read words—it understands intent.
+          Powered by state-of-the-art vector embeddings, our engine doesn't just read wordsâ€”it understands intent.
           Automatically diff laws and trigger zero-downtime compliance pipelines.
         </p>
       </div>
     </section>
   </div>
 </main>
+

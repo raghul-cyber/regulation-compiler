@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
     import { env } from '$env/dynamic/public';
     import { slide, fade } from 'svelte/transition';
 
@@ -23,7 +23,7 @@
                 throw new Error("Invalid JSON payload");
             }
 
-            const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/check-compliance`, {
+            const res = await fetch(`${env.PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/check-compliance`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -134,3 +134,4 @@
         </div>
     </div>
 </div>
+

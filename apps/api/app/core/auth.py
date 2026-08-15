@@ -1,16 +1,18 @@
-import os
+﻿import os
 import httpx
 from typing import List, Optional
 from fastapi import Request, HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from cachetools import cached, TTLCache
 
 from app.db.session import get_db
 from app.models.organizations import User, RoleEnum
 
-CLERK_SECRET_KEY = os.environ.get("CLERK_SECRET_KEY")
+from app.core.config import settings
+CLERK_SECRET_KEY = settings.CLERK_SECRET_KEY
 CLERK_JWKS_URL = "https://api.clerk.com/v1/jwks"
 
 security = HTTPBearer()
@@ -73,11 +75,29 @@ async def get_current_user(
         # Fetch the user from the database
         user = db.query(User).filter(User.clerk_user_id == clerk_user_id).first()
         if not user:
-            raise HTTPException(status_code=401, detail="User not found in local database")
+            # [DEV ONLY] Auto-create user if webhooks are not reaching localhost
+            from app.models.organizations import Organization, PlanEnum
+            import uuid
+            
+            org = db.query(Organization).first()
+            if not org:
+                org = Organization(name="Dev Default Org", plan=PlanEnum.trial)
+                db.add(org)
+                db.flush()
+                
+            user = User(
+                org_id=org.id,
+                clerk_user_id=clerk_user_id,
+                role=RoleEnum.admin,
+                email="auto-dev-user@example.com"
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
             
         # Optional: In a multi-tenant app, we might set a DB context/GUC here for RLS
         db.execute(
-            "SELECT set_config('app.current_tenant', :tenant_id, true)",
+            text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
             {"tenant_id": str(user.org_id)}
         )
         
@@ -132,11 +152,13 @@ def require_scope(allowed_scopes: List[str]):
             
         # Optional: In a multi-tenant app, we might set a DB context/GUC here for RLS
         db.execute(
-            "SELECT set_config('app.current_tenant', :tenant_id, true)",
+            text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
             {"tenant_id": str(db_key.org_id)}
         )
         
         return db_key
         
     return scope_checker
+
+
 

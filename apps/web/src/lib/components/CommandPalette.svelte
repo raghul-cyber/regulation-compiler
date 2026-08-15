@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -47,7 +47,7 @@
 		if (search.length > 2 && regulationId) {
 			isSearching = true;
 			// Call the real GET /requirements endpoint with the search filter
-			fetch(`${env.PUBLIC_API_URL || 'http://localhost:8000'}/v1/regulations/${regulationId}/requirements?search=${encodeURIComponent(search)}&limit=5`, {
+			fetch(`${env.PUBLIC_API_URL || 'http://localhost:8080'}/v1/regulations/${regulationId}/requirements?search=${encodeURIComponent(search)}&limit=5`, {
 				headers: {
 					// We'd pass the auth token here in a real client setup via a store
 					// For demonstration of the palette wiring, assuming public/mock auth allows it or relying on cookie
@@ -147,3 +147,4 @@
 		</div>
 	</div>
 {/if}
+

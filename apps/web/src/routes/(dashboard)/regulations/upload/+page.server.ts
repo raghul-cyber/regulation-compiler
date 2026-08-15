@@ -1,10 +1,10 @@
-import { fail, redirect } from '@sveltejs/kit';
+﻿import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const actions = {
     default: async ({ request, locals }) => {
-        const auth = locals.auth as any;
-        if (!auth.userId) {
+        const auth = typeof locals.auth === 'function' ? locals.auth() : locals.auth;
+        if (!auth?.userId) {
             return fail(401, { error: 'Unauthorized' });
         }
         
@@ -28,10 +28,10 @@ export const actions = {
             
             // Using absolute URL to bypass the vite proxy, or use 127.0.0.1 directly 
             // since this runs on the server side
-            const response = await fetch('http://127.0.0.1:8000/api/v1/regulations/upload', {
+            const response = await fetch('http://127.0.0.1:8080/api/v1/regulations/upload', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': 'Bearer ' + token
                 },
                 body: backendFormData
             });
@@ -52,3 +52,5 @@ export const actions = {
         }
     }
 } satisfies Actions;
+
+
