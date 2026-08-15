@@ -1,20 +1,20 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ params, url, fetch, locals }) => {
 	const regulationId = params.id;
 	
-	if (!locals.auth?.userId) {
+	const auth = typeof locals.auth === 'function' ? locals.auth() : locals.auth;
+	if (!auth?.userId) {
 		throw error(401, 'Unauthorized');
 	}
 
 	const reqId = url.searchParams.get('req_id');
 
 	try {
-		const token = locals.auth.getToken ? await locals.auth.getToken() : '';
+		const token = auth?.getToken ? await auth.getToken() : '';
 		
-		const res = await fetch(`${env.API_BASE_URL}/v1/regulations/${regulationId}/requirements?limit=50`, {
+		const res = await fetch(`http://127.0.0.1:8080/api/v1/regulations/${regulationId}/requirements?limit=50`, {
 			headers: { Authorization: `Bearer ${token}` }
 		});
 		
