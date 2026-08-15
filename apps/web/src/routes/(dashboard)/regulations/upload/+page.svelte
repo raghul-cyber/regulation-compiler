@@ -18,7 +18,7 @@
         
         pollInterval = setInterval(async () => {
             try {
-                const res = await fetch(`/api/jobs/${jobId}`);
+                const res = await fetch(`/api/v1/jobs/${jobId}`);
                 if (res.ok) {
                     const data = await res.json();
                     jobStatus = data.status;
@@ -159,4 +159,5 @@
         </button>
     </form>
 </div>
+
 
