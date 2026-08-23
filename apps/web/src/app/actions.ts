@@ -97,6 +97,26 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
     } catch (e) {
+      console.error("Cleanup failed:", e);
+    }
+  }
+}
+
+export async function generateReport(regulationId: string, type: string) {
+  const { auth } = await import('@clerk/nextjs/server');
+  const session = await auth();
+  const token = await session.getToken();
+  if (!token) throw new Error("Unauthorized");
+  
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  
+  const res = await fetch(`${API_BASE}/reports`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ regulation_id: regulationId, report_type: type })
   });
 
   if (!res.ok) {
@@ -106,6 +126,7 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
   const data = await res.json();
   return { success: true, data };
 }
+
 
 export async function createApiKey(name: string, scopes: string[]) {
   const { auth } = await import('@clerk/nextjs/server');

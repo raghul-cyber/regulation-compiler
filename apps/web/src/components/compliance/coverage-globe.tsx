@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRef, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -133,6 +133,7 @@ function AnimatedArc({ start, end }: { start: THREE.Vector3; end: THREE.Vector3 
   });
 
   return (
+    // @ts-ignore: R3F and SVG intrinsic elements collision
     <line ref={lineRef} geometry={geometry}>
       <lineBasicMaterial color="#60a5fa" transparent opacity={0.3} linewidth={1} />
     </line>
