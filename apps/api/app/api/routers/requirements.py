@@ -44,7 +44,11 @@ def list_requirements(
         from google.genai import types
 
         # 1. Get embedding for the query
-        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "mock-key-for-local"))
+        gemini_key = os.environ.get("GEMINI_API_KEY")
+        if not gemini_key:
+            raise HTTPException(status_code=500, detail="Semantic search is unavailable. Missing GEMINI_API_KEY.")
+            
+        client = genai.Client(api_key=gemini_key)
         try:
             emb_res = client.models.embed_content(
                 model='gemini-embedding-2',
@@ -53,9 +57,8 @@ def list_requirements(
             )
             query_vector = emb_res.embeddings[0].values
             vector_str = "[" + ",".join(map(str, query_vector)) + "]"
-        except Exception:
-            # Fallback mock embedding if API fails
-            vector_str = "[" + ",".join(["0.0"] * 768) + "]"
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Semantic search failed: {str(e)}")
 
         # 2. Execute Hybrid Query
         sql = text("""

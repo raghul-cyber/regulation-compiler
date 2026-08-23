@@ -16,6 +16,13 @@ from app.pipelines.extraction import run_extraction_pipeline
 logger = logging.getLogger(__name__)
 
 def update_job_status(db: Session, job_id: uuid.UUID, status: JobStatusEnum, result: dict = None, error: str = None):
+    # Merge existing result_data if present to not overwrite the stages
+    job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
+    if job and result and job.result_data:
+        merged = job.result_data.copy()
+        merged.update(result)
+        result = merged
+
     job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
     if job:
         job.status = status
@@ -36,15 +43,8 @@ def process_ingestion_pipeline(self, job_id: str, source_doc_id: str):
     try:
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
         
-        # 1. Extraction (PDF parsing, OCR, chunking)
-        run_extraction_pipeline(db, uuid.UUID(source_doc_id))
-        
-        # 2. LLM Requirement Extraction (mock call for now)
-        # run_llm_extraction_pipeline(db, uuid.UUID(source_doc_id))
-        
-        # 3. Embeddings (mock call for now)
-        # run_embeddings_pipeline(db, uuid.UUID(source_doc_id))
-
+        # Stages 1-3 handled during initialization and here
+        run_extraction_pipeline(db, uuid.UUID(source_doc_id), job_id)
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {"message": "Pipeline completed successfully"})
     except Exception as e:
         logger.error(f"Ingestion pipeline failed: {str(e)}")
@@ -111,9 +111,9 @@ def generate_report_task(self, job_id: str, report_id: str):
     try:
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
         
-        # generate_report(db, uuid.UUID(report_id))
+        from app.services.reporting import generate_pdf_report_task
+        generate_pdf_report_task(report_id, job_id)
         
-        update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {"url": f"https://mock-s3.com/{report_id}.pdf"})
     except Exception as e:
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.failed, error=str(e))
         raise

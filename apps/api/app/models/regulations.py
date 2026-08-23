@@ -1,4 +1,4 @@
-import enum
+﻿import enum
 import uuid
 from datetime import date, datetime
 from sqlalchemy import String, ForeignKey, Date, DateTime, JSON, Boolean, Integer
@@ -61,3 +61,14 @@ class DocumentSection(BaseModel):
     order_index: Mapped[int] = mapped_column(Integer, nullable=False)
 
     source_document: Mapped["SourceDocument"] = relationship("SourceDocument", back_populates="sections")
+
+class FrameworkCatalog(BaseModel):
+    __tablename__ = "framework_catalog"
+
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    acronym: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    jurisdiction: Mapped[str] = mapped_column(String, nullable=False)
+    source_url: Mapped[str] = mapped_column(String, nullable=False)
+    is_fetchable: Mapped[bool] = mapped_column(Boolean, default=False)
+    description: Mapped[str] = mapped_column(String, nullable=True)
+

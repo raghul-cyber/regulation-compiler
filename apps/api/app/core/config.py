@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: str | None = None
     S3_SECRET_KEY: str | None = None
     S3_BUCKET_NAME: str | None = "regulations-storage"
+    OPENAI_API_KEY: str | None = None
+    GEMINI_API_KEY: str | None = None
     
     # App-level config
     CLERK_SECRET_KEY: str | None = None

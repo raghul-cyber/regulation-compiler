@@ -1,4 +1,4 @@
-import enum
+﻿import enum
 import uuid
 from datetime import datetime
 from sqlalchemy import String, ForeignKey, Numeric, DateTime, Index
@@ -33,6 +33,7 @@ class ComplianceResultEnum(str, enum.Enum):
     pass_ = "pass"
     fail = "fail"
     partial = "partial"
+    unknown = "unknown"
 
 
 class Requirement(BaseModel):
@@ -105,3 +106,4 @@ class ImpactRecord(BaseModel):
     change_type: Mapped[str] = mapped_column(String, nullable=False) # 'modified' or 'removed'
     severity: Mapped[SeverityEnum] = mapped_column(nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+

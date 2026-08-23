@@ -1,6 +1,8 @@
 {
   "python.defaultInterpreterPath": "${workspaceFolder}/apps/api/.venv/Scripts/python.exe",
   "python.analysis.extraPaths": [
-    "${workspaceFolder}/apps/api"
-  ]
+    "${workspaceFolder}/apps/api",
+    "${workspaceFolder}/apps/api/.venv/Lib/site-packages"
+  ],
+  "github-actions.workflows.pinned.workflows": []
 }

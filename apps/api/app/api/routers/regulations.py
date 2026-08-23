@@ -279,3 +279,91 @@ def list_regulations(
     regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
     return [{"id": str(r.id), "name": r.name, "jurisdiction": r.jurisdiction, "created_at": r.created_at.isoformat()} for r in regs]
 
+
+from app.models.regulations import FrameworkCatalog
+from app.services.fetcher import FrameworkFetcher
+
+@router.get("/frameworks")
+def list_frameworks(db: Session = Depends(get_db)):
+    frameworks = db.query(FrameworkCatalog).order_by(FrameworkCatalog.name).all()
+    return [{"id": str(f.id), "name": f.name, "acronym": f.acronym, "jurisdiction": f.jurisdiction, "source_url": f.source_url, "is_fetchable": f.is_fetchable, "description": f.description} for f in frameworks]
+
+@router.post("/frameworks/{acronym}/ingest")
+async def ingest_framework(
+    acronym: str,
+    db: Session = Depends(get_db)
+):
+    framework = db.query(FrameworkCatalog).filter(FrameworkCatalog.acronym == acronym).first()
+    if not framework:
+        raise HTTPException(status_code=404, detail="Framework not found")
+        
+    if not framework.is_fetchable:
+        raise HTTPException(status_code=400, detail=f"{framework.name} requires a licensed custom upload.")
+        
+    fetcher = FrameworkFetcher()
+    html_bytes, filename = await fetcher.fetch_html(framework.source_url)
+    
+    import io
+    path = storage_service.upload_file(io.BytesIO(html_bytes), filename, content_type="text/html")
+    
+    # 1. Regulation
+    from app.core.config import settings
+    is_local = not all([settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY, settings.S3_BUCKET_NAME])
+    prefix = "file://" if is_local else f"s3://{settings.S3_BUCKET_NAME}/"
+    regulation = db.query(Regulation).filter(Regulation.name == framework.name).first()
+    if not regulation:
+        regulation = Regulation(
+            name=framework.name,
+            jurisdiction=framework.jurisdiction,
+            source_url=f"{prefix}{path}"
+        )
+        db.add(regulation)
+        db.flush()
+        
+    # 2. SourceDocument
+    source_doc = SourceDocument(
+        file_type=FileTypeEnum.html,
+        storage_path=path,
+        raw_text="",
+        ocr_used=False,
+        page_count=1
+    )
+    db.add(source_doc)
+    db.flush()
+    
+    # 3. Version
+    version = RegulationVersion(
+        regulation_id=regulation.id,
+        version_label="1.0",
+        published_date=datetime.now(timezone.utc).date(),
+        ingested_at=datetime.now(timezone.utc),
+        source_document_id=source_doc.id
+    )
+    db.add(version)
+    db.flush()
+    
+    source_doc.regulation_version_id = version.id
+    regulation.current_version_id = version.id
+    db.commit()
+    
+    from app.models.jobs import BackgroundJob, JobTypeEnum
+    job = BackgroundJob(
+        job_type=JobTypeEnum.ingestion,
+        entity_id=str(version.id)
+    )
+    db.add(job)
+    db.commit()
+
+    from app.workers.tasks import process_ingestion_pipeline
+    task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
+    
+    job.task_id = task.id
+    db.commit()
+
+    return {
+        "regulation_id": str(regulation.id),
+        "regulation_version_id": str(version.id),
+        "job_id": str(job.id),
+        "message": f"Started ingestion pipeline for {framework.name}"
+    }
+

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from celery import Celery
 
 redis_url = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
@@ -6,7 +6,7 @@ redis_url = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 celery_app = Celery(
     "rac_tasks",
     broker=redis_url,
-    backend=redis_url
+    backend=redis_url, imports=["app.services.reporting"]
 )
 
 celery_app.conf.update(
@@ -19,7 +19,8 @@ celery_app.conf.update(
     task_routes={
         "app.workers.tasks.dispatch_webhook_task": {"queue": "notifications"},
         "app.workers.tasks.generate_report_task": {"queue": "reports"},
-        "app.workers.tasks.*": {"queue": "ingestion"},  # Default fallback for ingestion/amendment
+        "app.workers.tasks.*": {"queue": "ingestion"},
+        "app.services.reporting.*": {"queue": "ingestion"},  # Default fallback for ingestion/amendment
     },
     # Ensure notifications don't get blocked by long tasks
     task_default_queue="ingestion",
@@ -34,4 +35,8 @@ celery_app.conf.update(
 )
 
 # Optional: ensure we can discover tasks
-celery_app.autodiscover_tasks(["app.workers"])
+celery_app.autodiscover_tasks(["app.workers", "app.services"])
+
+
+
+

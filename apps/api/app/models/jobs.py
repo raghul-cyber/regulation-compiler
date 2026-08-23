@@ -34,3 +34,14 @@ class BackgroundJob(BaseModel):
     
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class JobEvent(BaseModel):
+    __tablename__ = "job_events"
+
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("background_jobs.id", ondelete="CASCADE"), index=True, nullable=False)
+    stage_number: Mapped[int] = mapped_column(nullable=False)
+    stage_name: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, nullable=False) # "started", "completed", "failed"
+    details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

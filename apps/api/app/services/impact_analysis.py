@@ -1,10 +1,14 @@
 import logging
 import httpx
+import json
 from typing import Dict, Any
 from sqlalchemy.orm import Session
+import uuid
 
-from app.models.requirements import Requirement, SystemMapping, ImpactRecord
+from app.models.requirements import Requirement, Policy, PolicyStatusEnum
+from app.models.customer import CustomerControl, CustomerSystem
 from app.models.audit import Notification, NotificationTypeEnum, Webhook
+from app.services.compliance import evaluate_policy_compliance
 
 logger = logging.getLogger(__name__)
 
@@ -12,74 +16,92 @@ class ImpactAnalysisService:
     def __init__(self, db: Session):
         self.db = db
 
-    def analyze_diff_impacts(self, org_id: str, diff_summary: Dict[str, Any]):
+    def analyze_diff_impacts(self, old_version_id: uuid.UUID, new_version_id: uuid.UUID, diff_summary: Dict[str, Any]):
         """
-        Analyzes the diff_summary for removed and modified requirements,
-        checks if any internal systems are mapped to the old requirement IDs,
-        and generates ImpactRecords and Notifications.
+        W18 Continuous Compliance Loop:
+        1. Find all active Policies tracking old_version_id.
+        2. Identify changed requirements.
+        3. Trigger W11 re-evaluation for those customers on a new Policy instance.
         """
         impacted_items = diff_summary.get("modified", []) + diff_summary.get("removed", [])
-        if not impacted_items:
+        added_items = diff_summary.get("added", [])
+        if not impacted_items and not added_items:
+            logger.info("No modifications to track for impact.")
             return
+
+        # Find all organizations actively using the old version
+        policies = self.db.query(Policy).filter(
+            Policy.regulation_version_id == old_version_id,
+            Policy.status == PolicyStatusEnum.deployed
+        ).all()
+        
+        if not policies:
+            logger.info("No deployed policies affected by this regulation change.")
+            return
+
+        # Extract new requirement IDs to attach to the new policy
+        new_reqs = self.db.query(Requirement).filter(
+            Requirement.regulation_version_id == new_version_id,
+            Requirement.validation_status.in_(["approved", "enforceable"])
+        ).all()
+        new_req_ids = [r.id for r in new_reqs]
+
+        for old_policy in policies:
+            org_id = old_policy.org_id
+            logger.info(f"Triggering W18 Loop for Org {org_id} (Policy {old_policy.id})")
             
-        # Get all system mappings for this org
-        # In a very large DB, we might query this more specifically, but for now we fetch all mappings
-        mappings = self.db.query(SystemMapping).filter(SystemMapping.org_id == org_id).all()
-        
-        impacts_created = 0
-        
-        for item in impacted_items:
-            old_req_id_str = item.get("old_requirement_id")
-            if not old_req_id_str:
-                continue
+            # Archive old policy
+            old_policy.status = PolicyStatusEnum.draft
+            
+            # Create new Policy pointing to new_version_id
+            new_policy = Policy(
+                org_id=org_id,
+                regulation_version_id=new_version_id,
+                requirement_ids=new_req_ids,
+                status=PolicyStatusEnum.deployed
+            )
+            self.db.add(new_policy)
+            self.db.flush()
+            
+            # Extract customer's latest state (W10 payload)
+            payload = {}
+            controls = self.db.query(CustomerControl).filter(CustomerControl.org_id == org_id).all()
+            for c in controls:
+                val = c.description
+                if val == "True": val = True
+                elif val == "False": val = False
+                elif val.isdigit(): val = int(val)
+                payload[c.name] = val
                 
-            change_type = "modified" if "new_data" in item else "removed"
-            severity = item.get("new_data", {}).get("severity") or item.get("old_data", {}).get("severity") or "high"
+            # W11 Trigger: Run evaluate_policy_compliance automatically against new policy
+            check = evaluate_policy_compliance(self.db, new_policy.id, payload, org_id)
             
-            # Find any system that mapped to this old requirement
-            for mapping in mappings:
-                if old_req_id_str in [str(u) for u in mapping.mapped_requirement_ids]:
-                    # Generate impact record
-                    record = ImpactRecord(
-                        org_id=org_id,
-                        system_mapping_id=mapping.id,
-                        requirement_id=old_req_id_str, # In reality we'd link to the new req id for modified, but sticking to old for trace
-                        change_type=change_type,
-                        severity=severity
-                    )
-                    self.db.add(record)
-                    impacts_created += 1
-                    
-                    # Create notification
-                    notif = Notification(
-                        org_id=org_id,
-                        type=NotificationTypeEnum.impact_alert,
-                        payload={
-                            "system_name": mapping.system_name,
-                            "change_type": change_type,
-                            "requirement_title": item.get("title", "Unknown Requirement"),
-                            "severity": severity
-                        }
-                    )
-                    self.db.add(notif)
-                    self.db.commit()
-                    
-                    # Dispatch Webhook
-                    self._dispatch_webhooks(org_id, notif.payload)
-                    
-        logger.info(f"Generated {impacts_created} impact records from amendment.")
+            # Alert Customer (Notification & Webhook)
+            msg = f"Regulation update detected! {len(impacted_items)} requirements changed, {len(added_items)} added."
+            notif = Notification(
+                org_id=org_id,
+                type=NotificationTypeEnum.impact_alert,
+                payload={
+                    "message": msg,
+                    "old_policy_id": str(old_policy.id),
+                    "new_policy_id": str(new_policy.id),
+                    "new_compliance_result": check.result.value if hasattr(check.result, 'value') else check.result
+                }
+            )
+            self.db.add(notif)
+            self.db.commit()
+            
+            self._dispatch_webhooks(org_id, notif.payload)
 
     def _dispatch_webhooks(self, org_id: str, payload: dict):
         webhooks = self.db.query(Webhook).filter(Webhook.org_id == org_id).all()
         for wh in webhooks:
-            # Check if this webhook subscribes to impact_alerts
             if "impact_alert" in wh.event_types or "*" in wh.event_types:
                 try:
-                    # Sync dispatch for simplicity. Production would use Celery.
                     httpx.post(
                         wh.target_url, 
                         json={"event": "impact_alert", "data": payload},
-                        headers={"X-Rac-Signature": wh.secret_key}, # Simple sig
+                        headers={"X-Rac-Signature": wh.secret_key},
                         timeout=5.0
                     )
                 except Exception as e:

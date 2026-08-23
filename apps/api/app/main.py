@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request
+﻿from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from app.api.routers import webhooks, test_rbac, regulations, requirements, reports, developer, api_keys, system_mappings, jobs
+from app.api.routers import team, webhooks, test_rbac, regulations, requirements, reports, developer, api_keys, system_mappings, jobs, policies, compliance
 from app.core.limiter import limiter
 
 import os
@@ -39,6 +39,8 @@ if sentry_dsn:
         profiles_sample_rate=1.0,
     )
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Regulation-as-Code Compiler API",
     description="API for the Regulation-as-Code Compiler",
@@ -47,6 +49,13 @@ app = FastAPI(
 
 # Add Middlewares
 app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:3000', 'http://127.0.0.1:3000'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -54,12 +63,15 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.include_router(webhooks.router, prefix="/api")
 app.include_router(test_rbac.router, prefix="/api")
 app.include_router(regulations.router, prefix="/api/v1/regulations")
+app.include_router(team.router, prefix="/api/v1/team")
 app.include_router(requirements.router, prefix="/api")
 app.include_router(reports.router, prefix="/api/v1")
 app.include_router(developer.router, prefix="/api/v1")
 app.include_router(api_keys.router, prefix="/api/v1")
 app.include_router(system_mappings.router, prefix="/api")
 app.include_router(jobs.router, prefix="/api/v1")
+app.include_router(policies.router, prefix="/api/v1")
+app.include_router(compliance.router, prefix="/api/v1")
 
 from sqlalchemy import text
 from app.db.session import SessionLocal
@@ -96,3 +108,6 @@ async def health_check(request: Request):
 @app.get("/sentry-debug")
 async def trigger_error():
     raise Exception("Test Sentry error")
+
+
+

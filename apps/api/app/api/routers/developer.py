@@ -141,7 +141,7 @@ def check_compliance(
     submitted_keys = [k.lower() for k in payload.controls_implemented.keys()]
     
     for reg_id in payload.regulation_ids:
-        reg = db.query(Regulation).filter(Regulation.id == reg_id, Regulation.org_id == api_key.org_id).first()
+        reg = db.query(Regulation).filter(Regulation.id == reg_id).first()
         if not reg or not reg.current_version_id:
             continue
             

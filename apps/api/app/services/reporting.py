@@ -2,21 +2,12 @@ import os
 import uuid
 from datetime import datetime
 from jinja2 import Template
-import boto3
 from sqlalchemy.orm import Session
 
 from app.models.audit import Report, ReportStatusEnum
 from app.models.requirements import Requirement
 from app.models.regulations import Regulation
-
-# Initialize S3 Client
-s3 = boto3.client(
-    "s3",
-    endpoint_url=os.environ.get("S3_ENDPOINT_URL"),
-    aws_access_key_id=os.environ.get("S3_ACCESS_KEY"),
-    aws_secret_access_key=os.environ.get("S3_SECRET_KEY"),
-)
-BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "regulations-files")
+from app.services.storage import StorageService
 
 # --- HTML Templates ---
 EXECUTIVE_SUMMARY_TMPL = """
@@ -139,33 +130,54 @@ TEMPLATES = {
 }
 
 # --- Celery Task ---
+
+import time
+from app.workers.events import EventDispatcher
+from app.workers.tasks import update_job_status
+from app.models.jobs import JobStatusEnum
+
 from celery import shared_task
 
 @shared_task
-def generate_pdf_report_task(report_id: str):
+def generate_pdf_report_task(report_id: str, job_id: str = None):
     from app.db.session import SessionLocal
     db = SessionLocal()
+    dispatcher = None
+    if job_id:
+        dispatcher = EventDispatcher(db, uuid.UUID(job_id))
+        update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
+        
     try:
+        if dispatcher: dispatcher.emit(1, "Initialize Report", "started")
         from playwright.sync_api import sync_playwright
         
         # 1. Fetch Report
         report = db.query(Report).filter(Report.id == report_id).first()
         if not report:
+            if dispatcher: dispatcher.emit(1, "Initialize Report", "failed", {"error": "Report not found"})
             return
             
         reg = db.query(Regulation).filter(Regulation.id == report.regulation_id).first()
         if not reg:
             report.status = ReportStatusEnum.failed
             db.commit()
+            if dispatcher: dispatcher.emit(1, "Initialize Report", "failed", {"error": "Regulation not found"})
             return
             
+        if dispatcher: dispatcher.emit(1, "Initialize Report", "completed", {"report_type": report.report_type.value})
+
+            
         # 2. Fetch approved requirements
+        if dispatcher: dispatcher.emit(2, "Fetch Requirements", "started")
         reqs = db.query(Requirement).filter(
             Requirement.regulation_version_id == reg.current_version_id,
             Requirement.validation_status == "approved"
         ).all()
+        time.sleep(1) # For realism
+        if dispatcher: dispatcher.emit(2, "Fetch Requirements", "completed", {"count": len(reqs)})
         
         # 3. Render HTML
+        if dispatcher: dispatcher.emit(3, "Compile Document Layout", "started")
         tmpl_str = TEMPLATES.get(report.report_type.value, EXECUTIVE_SUMMARY_TMPL)
         template = Template(tmpl_str)
         html_content = template.render(
@@ -174,8 +186,11 @@ def generate_pdf_report_task(report_id: str):
             date=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             org_id=report.org_id
         )
+        time.sleep(1)
+        if dispatcher: dispatcher.emit(3, "Compile Document Layout", "completed", {"template_used": report.report_type.value})
         
         # 4. Generate PDF using Playwright
+        if dispatcher: dispatcher.emit(4, "Render PDF", "started")
         pdf_bytes = b""
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
@@ -183,27 +198,41 @@ def generate_pdf_report_task(report_id: str):
             page.set_content(html_content)
             pdf_bytes = page.pdf(format="A4", print_background=True)
             browser.close()
+        time.sleep(1.5)
+        if dispatcher: dispatcher.emit(4, "Render PDF", "completed", {"size_bytes": len(pdf_bytes)})
             
-        # 5. Upload to S3
-        s3_key = f"reports/{report.org_id}/{report.regulation_id}/{report.id}.pdf"
-        s3.put_object(
-            Bucket=BUCKET_NAME,
-            Key=s3_key,
-            Body=pdf_bytes,
-            ContentType="application/pdf"
-        )
+        # 5. Upload to S3 or Local File System
+        if dispatcher: dispatcher.emit(5, "Secure Storage Upload", "started")
+        
+        import io
+        file_obj = io.BytesIO(pdf_bytes)
+        filename = f"{report.id}.pdf"
+        
+        storage = StorageService()
+        storage_path = storage.upload_file(file_obj, filename, "application/pdf")
+        storage_url = storage.generate_presigned_url(storage_path)
+            
+        report.storage_path = storage_path
+        if dispatcher: dispatcher.emit(5, "Secure Storage Upload", "completed", {"path": storage_url})
         
         # 6. Mark Completed
-        report.storage_path = s3_key
         report.status = ReportStatusEnum.completed
         db.commit()
         
+        if job_id:
+            update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {"report_id": report_id, "url": storage_url})
+        
     except Exception as e:
-        print(f"Report Generation Failed: {e}")
+        import traceback
+        print("Report Generation Failed Traceback:")
+        traceback.print_exc()
         db.rollback()
         report = db.query(Report).filter(Report.id == report_id).first()
         if report:
             report.status = ReportStatusEnum.failed
             db.commit()
+        if job_id:
+            if dispatcher: dispatcher.emit(5, "Secure Storage Upload", "failed", {"error": str(e)})
+            update_job_status(db, uuid.UUID(job_id), JobStatusEnum.failed, error=str(e))
     finally:
         db.close()

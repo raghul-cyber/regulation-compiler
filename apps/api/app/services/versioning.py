@@ -112,25 +112,10 @@ class VersioningService:
             new_version.diff_summary = diff_summary
             self.db.commit()
             
-            # Phase 13: Trigger Impact Analysis
+            # Phase 13/Phase 6 W18: Trigger Impact Analysis for all affected customers
             from app.services.impact_analysis import ImpactAnalysisService
-            # We assume the regulation has an org_id via current context, but since this might run in a worker,
-            # we can fetch the org_id from the regulation.
-            reg = new_version.regulation
-            if reg and hasattr(reg, 'org_id'): # Note: Regulation does not have org_id directly, need to check how it's linked
-                org_id = reg.org_id
-            else:
-                # If org_id is not directly on regulation, we'd need to find it.
-                # Assuming single tenant for local or it's passed down.
-                # Just placeholder for now:
-                # Let's query any user to get org_id as hack for single-tenant local demo, or if it exists.
-                from app.models.organizations import Organization
-                org = self.db.query(Organization).first()
-                org_id = org.id if org else None
-
-            if org_id:
-                impact_svc = ImpactAnalysisService(self.db)
-                impact_svc.analyze_diff_impacts(org_id, diff_summary)
+            impact_svc = ImpactAnalysisService(self.db)
+            impact_svc.analyze_diff_impacts(old_version_id, new_version_id, diff_summary)
 
         return diff_summary
 

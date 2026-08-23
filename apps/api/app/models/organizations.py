@@ -1,4 +1,4 @@
-import enum
+﻿import enum
 import uuid
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -36,3 +36,13 @@ class User(BaseModel):
     email: Mapped[str] = mapped_column(String, nullable=False)
 
     organization: Mapped["Organization"] = relationship("Organization", back_populates="users")
+
+class TeamInvite(BaseModel):
+    __tablename__ = "team_invites"
+
+    email: Mapped[str] = mapped_column(String, nullable=False)
+    role: Mapped[RoleEnum] = mapped_column(nullable=False)
+    org_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    token: Mapped[str] = mapped_column(String, nullable=False, unique=True, index=True)
+    status: Mapped[str] = mapped_column(String, default="pending")
+

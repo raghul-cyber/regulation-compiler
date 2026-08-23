@@ -13,7 +13,7 @@
 
 <div align="center">
   <br />
-  <img src="https://skillicons.dev/icons?i=svelte,ts,tailwind,threejs,python,fastapi,postgres,redis,docker" alt="Tech Stack" />
+  <img src="https://skillicons.dev/icons?i=nextjs,ts,tailwind,threejs,python,fastapi,postgres,redis,docker" alt="Tech Stack" />
 </div>
 
 <div align="center">
@@ -66,7 +66,7 @@ flowchart TD
 ```mermaid
 flowchart TB
     subgraph Client [Client Layer]
-        UI[SvelteKit Web App]
+        UI[Next.js Web App]
     end
 
     subgraph API [API Layer]
@@ -119,7 +119,7 @@ erDiagram
 
 | Layer | Technology |
 | :--- | :--- |
-| **Frontend** | SvelteKit, TypeScript, TailwindCSS, shadcn-svelte, Threlte/Three.js* |
+| **Frontend** | Next.js, TypeScript, TailwindCSS, React Three Fiber |
 | **Backend** | Python, FastAPI, Pydantic |
 | **Database** | PostgreSQL, pgvector (Semantic Search), SQLAlchemy, Alembic |
 | **Workers** | Celery, Redis |
@@ -127,7 +127,7 @@ erDiagram
 | **Hosting** | Vercel (Frontend), Docker/Railway (Backend) |
 | **Observability** | Sentry, Python JSON Logger |
 
-*\*Note: The originally drafted Next.js stack was replaced with SvelteKit + Threlte to achieve higher performance 3D rendering natively inside Svelte components.*
+*\
 
 ### Deployment Tiers
 
@@ -142,7 +142,7 @@ erDiagram
 ## Features
 
 ### MVP Scope (Phase 1)
-- [x] **Project Scaffolding**: Monorepo setup with SvelteKit & FastAPI.
+- [x] **Project Scaffolding**: Monorepo setup with Next.js & FastAPI.
 - [x] **Database & ORM**: PostgreSQL schemas, Alembic migrations, pgvector setup.
 - [x] **Authentication**: NextAuth/Clerk integration with JWT validation.
 - [x] **Document Upload**: S3-compatible presigned uploads for PDFs.
@@ -150,15 +150,15 @@ erDiagram
 - [x] **NLP Extraction**: Basic chunking and LLM-driven requirement isolation.
 - [x] **Semantic Search**: Vector indexing of requirements for "similar rules" lookups.
 - [x] **API Endpoints**: CRUD endpoints for regulations and requirements.
-- [x] **Dashboard UI**: Basic SvelteKit dashboard for viewing processed text.
+- [x] **Dashboard UI**: Next.js dashboard for viewing processed text.
 - [x] **Compliance Checker**: Simple POST endpoint to validate JSON payloads against rules.
 
 ### Roadmap Features (Phase 2+)
 - [x] **Async Workers**: Moved heavy NLP pipelines into Celery.
 - [x] **Webhooks**: Event-driven architecture for rule updates.
 - [x] **Observability**: Sentry and correlation IDs.
-- [x] **3D Premium UI**: Scroll-driven Threlte data-pipeline visualization.
-- [x] **CI/CD**: Fully automated Vercel & Docker GHCR deployments.
+- [x] **3D Premium UI**: React Three Fiber data-pipeline visualization.
+- [x] **CI/CD**: Fully automated Vercel & Docker GHCR deployments. Environment-mapped deployment secrets are securely configured for the Next.js frontend pipeline to resolve strict IDE schema validations.
 
 ## Data Model
 
@@ -291,11 +291,11 @@ regulation-compiler/
 │   │   ├── alembic/         # Database migrations
 │   │   ├── app/             # Application source (routers, services, pipelines)
 │   │   └── requirements.txt
-│   └── web/                 # SvelteKit Frontend
+│   └── web/                 # Next.js Frontend
 │       ├── src/
-│       │   ├── lib/         # Reusable Svelte components (Threlte scenes)
-│       │   └── routes/      # File-based routing
-│       └── vite.config.ts
+│       │   ├── lib/         # React UI & 3D Components
+│       │   └── routes/      # Next.js App Router
+│       └── next.config.ts
 ├── infra/                   # Docker & Deployment configuration
 │   ├── docker-compose.yml   
 │   ├── Dockerfile.api

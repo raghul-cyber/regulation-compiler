@@ -12,7 +12,8 @@ from app.models.regulations import Regulation
 from app.models.requirements import Requirement
 from app.models.audit import Report, ReportTypeEnum, ReportStatusEnum
 from app.core.auth import require_role
-from app.services.reporting import generate_pdf_report_task, s3, BUCKET_NAME
+from app.services.reporting import generate_pdf_report_task
+from app.services.storage import StorageService
 
 router = APIRouter()
 
@@ -78,10 +79,20 @@ def create_report(
     db.commit()
     db.refresh(report)
 
-    # Trigger Celery Task
-    generate_pdf_report_task.delay(str(report.id))
+    from app.models.jobs import BackgroundJob, JobTypeEnum, JobStatusEnum
+    job = BackgroundJob(
+        job_type=JobTypeEnum.report,
+        status=JobStatusEnum.queued,
+        entity_id=str(report.id)
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
 
-    return {"message": "Report generation started", "report_id": str(report.id)}
+    # Trigger Celery Task
+    generate_pdf_report_task.delay(str(report.id), str(job.id))
+
+    return {"message": "Report generation started", "report_id": str(report.id), "job_id": str(job.id)}
 
 @router.get("/reports/{regulation_id}")
 def list_reports(
@@ -99,15 +110,8 @@ def list_reports(
         if r.status == ReportStatusEnum.completed and r.storage_path:
             # Generate presigned URL valid for 1 hour
             try:
-                download_url = s3.generate_presigned_url(
-                    ClientMethod='get_object',
-                    Params={
-                        'Bucket': BUCKET_NAME,
-                        'Key': r.storage_path,
-                        'ResponseContentDisposition': f'attachment; filename="report_{r.report_type.value}.pdf"'
-                    },
-                    ExpiresIn=3600
-                )
+                storage = StorageService()
+                download_url = storage.generate_presigned_url(r.storage_path, expiration=3600)
             except Exception as e:
                 print(f"Failed to generate presigned URL: {e}")
                 
