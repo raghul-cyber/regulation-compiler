@@ -155,15 +155,24 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
             <div className="p-6 overflow-y-auto">
               {!jobId ? (
                 <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-300">Select Report Type</label>
-                    <div className="grid gap-3">
+                  <fieldset className="space-y-2">
+                    <legend className="text-sm font-medium text-zinc-300">Select Report Type</legend>
+                    <div className="grid gap-3 mt-2">
                       {REPORT_TYPES.map(type => (
-                        <div 
+                        <label 
                           key={type.id}
-                          onClick={() => setSelectedType(type.id)}
+                          htmlFor={`report-type-${type.id}`}
                           className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedType === type.id ? 'bg-purple-900/20 border-purple-500/50' : 'bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700'}`}
                         >
+                          <input 
+                            type="radio"
+                            name="report_type"
+                            id={`report-type-${type.id}`}
+                            value={type.id}
+                            checked={selectedType === type.id}
+                            onChange={() => setSelectedType(type.id)}
+                            className="sr-only"
+                          />
                           <div className="flex items-center justify-between">
                             <div>
                               <div className={`font-medium ${selectedType === type.id ? 'text-purple-300' : 'text-zinc-200'}`}>
@@ -175,10 +184,10 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                               {selectedType === type.id && <div className="w-2.5 h-2.5 rounded-full bg-purple-500" />}
                             </div>
                           </div>
-                        </div>
+                        </label>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
 
                   <button 
                     onClick={handleStartGeneration}
