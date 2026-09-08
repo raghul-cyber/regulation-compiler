@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('coverage');
 
   const tabs = [
-    { id: 'coverage', label: 'Coverage Map' },
+    { id: 'coverage', label: 'Global Monitoring' },
     { id: 'policies', label: 'Policies & Evaluation' },
     { id: 'dashboard', label: 'Compliance Dashboard' },
     { id: 'gaps', label: 'Gap Analysis' },
@@ -18,7 +18,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto py-8">
+    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto py-8 px-4 sm:px-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-white">Compliance Hub</h1>
         <p className="mt-1 text-zinc-500">

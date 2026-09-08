@@ -1,4 +1,4 @@
-﻿import os
+import os
 import httpx
 from typing import List, Optional
 from fastapi import Request, HTTPException, Security, Depends
@@ -107,6 +107,20 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail=f"Could not validate credentials: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Authentication error: {str(e)}")
+
+security_optional = HTTPBearer(auto_error=False)
+
+async def get_optional_current_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security_optional),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    if not credentials:
+        return None
+    try:
+        return await get_current_user(request, credentials, db)
+    except Exception:
+        return None
 
 def require_role(allowed_roles: List[RoleEnum]):
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:

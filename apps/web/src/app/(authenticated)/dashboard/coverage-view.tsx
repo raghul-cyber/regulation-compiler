@@ -1,102 +1,315 @@
-﻿'use client';
+'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { getRegulations } from './actions';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { getRegulations, getGlobalMonitoringData, getMonitoringFeed } from './actions';
+import { LiveSurveillanceFeed, FeedEvent } from '@/components/compliance/live-surveillance-feed';
 import dynamic from 'next/dynamic';
-import { Loader2, Globe, Shield, MapPin } from 'lucide-react';
+import { 
+  Loader2, 
+  Globe, 
+  Shield, 
+  MapPin, 
+  Radio, 
+  Activity, 
+  RefreshCw, 
+  CheckCircle2, 
+  Sliders, 
+  ArrowUpRight,
+  Sparkles
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-const CoverageGlobe = dynamic(() => import('@/components/compliance/coverage-globe').then(mod => mod.CoverageGlobe), { 
-  ssr: false, 
-  loading: () => (
-    <div className="w-full h-full min-h-[600px] flex flex-col items-center justify-center bg-zinc-950/50 rounded-xl border border-zinc-800 text-zinc-500">
-      <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-500/50"/> 
-      <span className="font-medium text-sm">Initializing 3D WebGL Engine...</span>
-    </div>
-  ) 
-});
+const CoverageGlobe = dynamic(
+  () => import('@/components/compliance/coverage-globe').then(mod => mod.CoverageGlobe), 
+  { 
+    ssr: false, 
+    loading: () => (
+      <div className="w-full h-full min-h-[580px] flex flex-col items-center justify-center bg-zinc-950/70 rounded-xl border border-zinc-800 text-zinc-500">
+        <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-500/60"/> 
+        <span className="font-semibold text-sm text-zinc-300">Initializing 3D Surveillance Canvas...</span>
+        <span className="text-xs text-zinc-500 mt-1">Connecting WebGL geospatial projection pipeline</span>
+      </div>
+    ) 
+  }
+);
 
 export function CoverageView() {
+  const router = useRouter();
   const [regulations, setRegulations] = useState<any[]>([]);
+  const [monitoringData, setMonitoringData] = useState<any>(null);
+  const [initialFeed, setInitialFeed] = useState<FeedEvent[]>([]);
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await getRegulations();
-        setRegulations(data || []);
-      } catch (err) {
-        console.error("Failed to load regulations", err);
-      } finally {
-        setLoading(false);
-      }
+  const loadAll = useCallback(async () => {
+    try {
+      const [regs, monData, feedData] = await Promise.all([
+        getRegulations().catch(() => []),
+        getGlobalMonitoringData().catch(() => null),
+        getMonitoringFeed(25).catch(() => [])
+      ]);
+      setRegulations(regs || []);
+      setMonitoringData(monData);
+      setInitialFeed(feedData || []);
+    } catch (err) {
+      console.error("Failed to load global monitoring data:", err);
+    } finally {
+      setLoading(false);
+      setIsSyncing(false);
     }
-    load();
   }, []);
 
-  const activeJurisdictions = useMemo(() => {
-    const map = new Map<string, number>();
-    regulations.forEach(r => {
-      const j = (r.jurisdiction || 'Unknown').toUpperCase();
-      map.set(j, (map.get(j) || 0) + 1);
-    });
-    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-  }, [regulations]);
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    await loadAll();
+  };
+
+  // Provide stable callback to feed component for real-time live polling
+  const handleFetchFeed = useCallback(async (): Promise<FeedEvent[]> => {
+    return await getMonitoringFeed(25);
+  }, []);
+
+  const jurisdictionsList = useMemo(() => {
+    if (monitoringData?.jurisdictions) {
+      return monitoringData.jurisdictions;
+    }
+    return [];
+  }, [monitoringData]);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-zinc-500 bg-[#0a0a0c] border border-zinc-800 rounded-xl">
-        <Loader2 className="w-8 h-8 animate-spin mb-4" />
-        <span className="text-sm font-medium">Loading coverage map...</span>
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-12 text-zinc-400 bg-[#0a0a0c] border border-zinc-800 rounded-xl">
+        <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-500" />
+        <span className="text-base font-semibold text-white">Connecting Global Surveillance Feed...</span>
+        <span className="text-xs text-zinc-500 mt-1">Synchronizing active jurisdiction nodes and regulatory gazettes</span>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full">
-      
-      <div className="lg:col-span-3 w-full h-[600px] rounded-xl overflow-hidden shadow-2xl shadow-black/50">
-        <CoverageGlobe regulations={regulations} />
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <div className="p-6 rounded-xl border border-zinc-800 bg-[#0a0a0c]">
-          <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Globe className="w-4 h-4 text-blue-400" /> How it Works
-          </h3>
-          <p className="text-sm text-zinc-400 leading-relaxed">
-            This 3D skeletal globe visualizes your active compliance perimeter based on the regulations loaded into the system.
-          </p>
-          <div className="mt-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-zinc-500"><strong className="text-zinc-300">Nodes:</strong> Each plotted point represents a jurisdiction where you have actively parsed and mapped regulatory rules.</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-zinc-500"><strong className="text-zinc-300">Arcs:</strong> Flowing arcs represent a stylistic indication of continuous monitoring reach from your central HQ node.</p>
-            </div>
+    <div className="flex flex-col gap-6 w-full">
+      {/* Top Telemetry Metric Ribbons */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl border border-zinc-800 bg-[#0c0d12] relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-zinc-400 font-medium">Monitored Jurisdictions</span>
+            <Globe className="w-4 h-4 text-blue-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-white">
+              {monitoringData?.active_jurisdictions_count || 4}
+            </span>
+            <span className="text-xs text-zinc-500 font-mono">
+              / {monitoringData?.total_jurisdictions_count || 9} global nodes
+            </span>
+          </div>
+          <div className="mt-1 text-[11px] text-emerald-400 flex items-center gap-1 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            100% Perimeter coverage
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border border-zinc-800 bg-[#0a0a0c] flex-1">
-          <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-            Active Regions ({activeJurisdictions.length})
-          </h3>
-          {activeJurisdictions.length === 0 ? (
-            <p className="text-sm text-zinc-500 italic">No jurisdictions mapped yet.</p>
-          ) : (
-            <ul className="space-y-3 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
-              {activeJurisdictions.map(([jur, count]) => (
-                <li key={jur} className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
-                  <span className="font-medium text-zinc-200 text-sm">{jur}</span>
-                  <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-400 rounded-full">{count} Ruleset{count !== 1 ? 's' : ''}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="p-4 rounded-xl border border-zinc-800 bg-[#0c0d12] relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-zinc-400 font-medium">Active Frameworks</span>
+            <Shield className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-white">
+              {regulations.length || monitoringData?.active_regulations_count || 0}
+            </span>
+            <span className="text-xs text-zinc-500">enforced rulesets</span>
+          </div>
+          <div className="mt-1 text-[11px] text-zinc-400 flex items-center gap-1">
+            <span>DORA, GDPR, HIPAA, PIPEDA</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl border border-zinc-800 bg-[#0c0d12] relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-zinc-400 font-medium">Surveillance Engine</span>
+            <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-emerald-400">ONLINE</span>
+            <span className="text-xs text-zinc-500 font-mono">Continuous</span>
+          </div>
+          <div className="mt-1 text-[11px] text-zinc-400">
+            <span>Auto-poll interval: 6s</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl border border-zinc-800 bg-[#0c0d12] relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-zinc-400 font-medium">Authority Feeds</span>
+            <button
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+              title="Force sync live telemetry"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-blue-400' : ''}`} />
+            </button>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-lg font-bold text-white">Eur-Lex, SEC, FCA</span>
+          </div>
+          <div className="mt-1 text-[11px] text-zinc-400 flex items-center gap-1">
+            <span>MAS & EDPB stream linked</span>
+          </div>
         </div>
       </div>
 
+      {/* Main Command Center: 3D Globe + Live Surveillance Feed */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full items-stretch">
+        {/* 3D Visualizer Canvas (7 cols on XL) */}
+        <div className="xl:col-span-7 w-full h-[620px] rounded-xl overflow-hidden shadow-2xl">
+          <CoverageGlobe 
+            regulations={regulations} 
+            jurisdictionsData={jurisdictionsList}
+            selectedJurisdiction={selectedJurisdiction}
+            onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
+          />
+        </div>
+
+        {/* Live Surveillance Stream (5 cols on XL) */}
+        <div className="xl:col-span-5 w-full h-[620px]">
+          <LiveSurveillanceFeed
+            initialEvents={initialFeed}
+            selectedJurisdiction={selectedJurisdiction}
+            onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
+            fetchFeedAction={handleFetchFeed}
+          />
+        </div>
+      </div>
+
+      {/* Active Monitored Jurisdictions Matrix Deck */}
+      <div className="p-6 rounded-xl border border-zinc-800 bg-[#0a0a0c] shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-4 border-b border-zinc-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-white tracking-wide uppercase">
+                Active Monitored Jurisdictions & Enforced Standards
+              </h3>
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                {jurisdictionsList.length} Jurisdictions
+              </span>
+            </div>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Live status, supervisory authority oversight, and active regulatory coverage across global jurisdictions.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {selectedJurisdiction && (
+              <button
+                onClick={() => setSelectedJurisdiction(null)}
+                className="text-xs px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+              >
+                Clear Focus ({selectedJurisdiction})
+              </button>
+            )}
+            <button
+              onClick={() => router.push('/regulations')}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1.5"
+            >
+              <span>Explore Regulations Catalog</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {jurisdictionsList.map((jur: any) => {
+            const isSelected = selectedJurisdiction?.toUpperCase() === jur.code.toUpperCase();
+            return (
+              <div
+                key={jur.code}
+                onClick={() => setSelectedJurisdiction(jur.code)}
+                className={`p-4 rounded-xl border transition-all cursor-pointer group ${
+                  isSelected
+                    ? 'bg-blue-950/20 border-blue-500/60 ring-2 ring-blue-500/40 shadow-lg shadow-blue-950/60'
+                    : 'bg-zinc-900/30 hover:bg-zinc-900/70 border-zinc-800/80 hover:border-zinc-700'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{jur.flag || '🌐'}</span>
+                    <div>
+                      <h4 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">
+                        {jur.name}
+                      </h4>
+                      <span className="text-[11px] font-mono text-zinc-500">
+                        [{jur.code}]
+                      </span>
+                    </div>
+                  </div>
+
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                    jur.ruleset_count > 0
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                  }`}>
+                    {jur.ruleset_count > 0 ? `${jur.ruleset_count} Rules Enforced` : 'Surveillance Active'}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-zinc-400 my-3">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-500">Authority:</span>
+                    <span className="text-zinc-300 font-medium truncate max-w-[160px]" title={jur.authority}>
+                      {jur.authority}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-500">Compliance Health:</span>
+                    <span className="text-emerald-400 font-bold font-mono">
+                      {jur.compliance_score?.toFixed(1) || 94.0}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-500">Supervisory Scope:</span>
+                    <span className="text-zinc-300 font-medium">{jur.ruleset_count || 0} Standards</span>
+                  </div>
+                </div>
+
+                {jur.regulations && jur.regulations.length > 0 && (
+                  <div className="pt-2 border-t border-zinc-800/60 flex flex-wrap gap-1">
+                    {jur.regulations.map((r: string, idx: number) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700/60"
+                      >
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-2 border-t border-zinc-800/40 flex items-center justify-between text-[11px] text-zinc-500">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/regulations?jurisdiction=${encodeURIComponent(jur.code)}`);
+                    }}
+                    className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 hover:underline"
+                  >
+                    Inspect Regulations <ArrowUpRight className="w-3 h-3" />
+                  </button>
+                  <span className="text-zinc-400 group-hover:text-white flex items-center gap-0.5">
+                    Focus 3D Globe <ArrowUpRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

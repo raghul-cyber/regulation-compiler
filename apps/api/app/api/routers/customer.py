@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 import uuid
 from typing import List, Optional
@@ -68,8 +68,13 @@ def upload_evidence(
     if not ctrl:
         raise HTTPException(status_code=404, detail="Control not found")
         
-    # Mocking storage for MVP - in reality this would use StorageService
-    storage_path = f"org_{current_user.org_id}/evidence/{uuid.uuid4()}_{file.filename}"
+    from app.services.storage import StorageService
+    storage_service = StorageService()
+    
+    try:
+        storage_path = storage_service.upload_file(file.file, file.filename, file.content_type)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to upload evidence file")
     
     evidence = CustomerEvidence(
         org_id=current_user.org_id,

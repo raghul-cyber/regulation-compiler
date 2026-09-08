@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getComplianceDashboard } from '@/app/(authenticated)/dashboard/actions';
+import { getComplianceDashboard, getComplianceActivity } from '@/app/(authenticated)/dashboard/actions';
 import { Loader2, ShieldAlert, Activity, CheckCircle2, AlertTriangle, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function ComplianceDashboard() {
   const [data, setData] = useState<any>(null);
+  const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,8 +15,12 @@ export function ComplianceDashboard() {
 
   async function loadDashboard() {
     try {
-      const res = await getComplianceDashboard();
+      const [res, actRes] = await Promise.all([
+        getComplianceDashboard(),
+        getComplianceActivity()
+      ]);
       setData(res);
+      setActivity(actRes || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -114,18 +119,18 @@ export function ComplianceDashboard() {
         <div className="p-6 rounded-xl border border-zinc-800 bg-[#0a0a0c]">
            <h3 className="text-lg font-medium text-white mb-6">Latest Activity</h3>
            <div className="space-y-6">
-             <div className="relative pl-4 border-l border-zinc-800">
-               <div className="absolute w-2 h-2 bg-blue-500 rounded-full -left-[4.5px] top-1" />
-               <p className="text-sm text-zinc-300">System Evaluation Completed</p>
-               <p className="text-xs text-zinc-500 mt-1">Analyzed payload against 3 policies.</p>
-               <p className="text-xs text-zinc-600 mt-2">Just now</p>
-             </div>
-             <div className="relative pl-4 border-l border-zinc-800">
-               <div className="absolute w-2 h-2 bg-emerald-500 rounded-full -left-[4.5px] top-1" />
-               <p className="text-sm text-zinc-300">GDPR Policy Deployed</p>
-               <p className="text-xs text-zinc-500 mt-1">45 controls activated.</p>
-               <p className="text-xs text-zinc-600 mt-2">2 hours ago</p>
-             </div>
+             {activity.length === 0 ? (
+               <div className="text-sm text-zinc-500 italic">No recent activity.</div>
+             ) : (
+               activity.map((item: any) => (
+                 <div key={item.id} className="relative pl-4 border-l border-zinc-800">
+                   <div className="absolute w-2 h-2 bg-blue-500 rounded-full -left-[4.5px] top-1" />
+                   <p className="text-sm text-zinc-300">{item.action.replace(/_/g, ' ')}</p>
+                   <p className="text-xs text-zinc-500 mt-1">{item.entity_type}: {item.entity_id.substring(0,8)}...</p>
+                   <p className="text-xs text-zinc-600 mt-2">{new Date(item.timestamp).toLocaleString()}</p>
+                 </div>
+               ))
+             )}
            </div>
         </div>
       </div>

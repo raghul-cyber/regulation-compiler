@@ -35,6 +35,7 @@ export default function NewRegulationPage() {
   const [error, setError] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [regulationId, setRegulationId] = useState<string | null>(null);
+  const [ingesting, setIngesting] = useState<string | null>(null);
 
   // Standard Framework State
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
@@ -49,7 +50,8 @@ export default function NewRegulationPage() {
   const fetchFrameworks = async () => {
     try {
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/regulations/frameworks`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const res = await fetch(`${apiUrl}/regulations/frameworks`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error("Failed to load frameworks");
@@ -122,8 +124,10 @@ export default function NewRegulationPage() {
     setIsUploading(true);
     setError(null);
     try {
+      setIngesting(acronym);
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/regulations/frameworks/${acronym}/ingest`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const res = await fetch(`${apiUrl}/regulations/frameworks/${acronym}/ingest`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -136,6 +140,7 @@ export default function NewRegulationPage() {
       setError(err.message);
     } finally {
       setIsUploading(false);
+      setIngesting(null);
     }
   };
 

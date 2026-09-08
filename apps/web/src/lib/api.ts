@@ -1,42 +1,52 @@
 import { auth } from '@clerk/nextjs/server';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
 async function getAuthToken() {
-  const { getToken } = await auth();
-  const token = await getToken();
-  if (!token) throw new Error("Unauthorized");
-  return token;
+  try {
+    const session = await auth();
+    if (session && typeof session.getToken === 'function') {
+      return await session.getToken();
+    }
+  } catch {
+    // Session unavailable in current context
+  }
+  return null;
 }
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
-  const { getToken } = await auth();
-  const token = await getToken();
-  
-  if (!token) {
-    throw new Error("Unauthorized");
-  }
+  const token = await getAuthToken();
 
-  const headers = {
-    ...options.headers,
-    'Authorization': `Bearer ${token}`,
+  const headers: Record<string, string> = {
+    ...((options.headers as Record<string, string>) || {}),
     'Content-Type': 'application/json',
   };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
+    cache: 'no-store'
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    console.warn(`API Error [${endpoint}]: ${response.status} ${response.statusText}`);
+    return null;
   }
 
   return response.json();
 }
 
 export async function getRegulations() {
-  return fetchWithAuth('/regulations');
+  const res = await fetchWithAuth('/regulations');
+  return res || [];
+}
+
+export async function getRegulation(regulationId: string) {
+  return fetchWithAuth(`/regulations/${regulationId}`);
 }
 
 export async function getDashboardSummary(regulationId: string) {

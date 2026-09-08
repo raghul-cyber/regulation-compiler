@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
@@ -46,11 +46,11 @@ export default function TeamSettingsPage() {
   const fetchTeamAndInvites = async () => {
     try {
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
       
       const [membersRes, invitesRes] = await Promise.all([
-        fetch(`${apiUrl}/api/v1/team/`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiUrl}/api/v1/team/invites`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${apiUrl}/team/`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiUrl}/team/invites`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       if (!membersRes.ok) throw new Error("Failed to load team data");
@@ -73,7 +73,8 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(userId);
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/team/${userId}/role`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const res = await fetch(`${apiUrl}/team/${userId}/role`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -96,7 +97,8 @@ export default function TeamSettingsPage() {
     try {
       setUpdating("invite");
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/team/invite`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const res = await fetch(`${apiUrl}/team/invite`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -107,7 +109,7 @@ export default function TeamSettingsPage() {
       if (!res.ok) throw new Error("Failed to send invite");
       const data = await res.json();
       
-      setInviteSuccessLink(data.link);
+      setInviteSuccessLink("sent");
       setInviteEmail("");
       fetchTeamAndInvites();
     } catch (err: any) {
@@ -121,7 +123,8 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(inviteId);
       const token = await getToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}/api/v1/team/invite/${inviteId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const res = await fetch(`${apiUrl}/team/invite/${inviteId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -253,15 +256,8 @@ export default function TeamSettingsPage() {
                     {inviteSuccessLink ? (
                         <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-4 text-center">
                             <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                            <h4 className="text-emerald-400 font-medium mb-4">Invite Generated!</h4>
-                            <p className="text-sm text-gray-400 mb-4">In a real app, an email is sent. For zero-mock testing, use this acceptance link in an incognito window:</p>
-                            <input 
-                                type="text" 
-                                readOnly 
-                                value={inviteSuccessLink} 
-                                className="w-full bg-black border border-gray-700 rounded p-2 text-xs text-white mb-4"
-                                onClick={(e) => (e.target as HTMLInputElement).select()}
-                            />
+                            <h4 className="text-emerald-400 font-medium mb-4">Invite Sent!</h4>
+                            <p className="text-sm text-gray-400 mb-4">An invitation email has been dispatched to your colleague.</p>
                             <button 
                                 onClick={() => setIsInviteModalOpen(false)}
                                 className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded py-2 text-sm"

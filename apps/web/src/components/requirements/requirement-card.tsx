@@ -88,15 +88,29 @@ export function RequirementCard({ req }: { req: any }) {
       <div className="border-t border-zinc-800 pt-4 mt-2">
         <button 
           onClick={() => setSourceOpen(!sourceOpen)}
-          className="flex items-center gap-1 text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors"
         >
           {sourceOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           Cross-Reference Original Source Text
         </button>
         
         {sourceOpen && (
-          <div className="mt-3 p-4 bg-zinc-950 rounded-lg text-xs font-mono text-zinc-400 border border-zinc-800 whitespace-pre-wrap leading-relaxed">
-            {req.source_text || "No source text mapped to this requirement."}
+          <div className="mt-3 p-4 bg-zinc-950/90 rounded-lg border border-zinc-800/90 shadow-inner">
+            {req.section_label && (
+              <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-zinc-800/80">
+                <span className="text-xs font-semibold text-blue-400 font-sans tracking-wide">
+                  Statutory Citation: {req.section_label}
+                </span>
+                {req.references?.article && (
+                  <span className="text-[11px] text-zinc-500 font-mono">
+                    {req.references.article}
+                  </span>
+                )}
+              </div>
+            )}
+            <div className="text-xs font-mono text-zinc-300 whitespace-pre-wrap leading-relaxed">
+              {req.source_text || "No source text mapped to this requirement."}
+            </div>
           </div>
         )}
       </div>

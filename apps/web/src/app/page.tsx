@@ -36,7 +36,7 @@ export default function LandingPage() {
             Instantly compile archaic legal text into executable, highly-structured enforcement policies.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4 pointer-events-auto">
-            <Link href="/regulations">
+            <Link href="/dashboard">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all px-8 h-12">
                 Explore Dashboard
               </Button>

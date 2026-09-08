@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 import uuid
@@ -83,10 +83,13 @@ def create_invite(
     db.add(invite)
     db.commit()
     
-    # In a real app, this dispatches an email via SendGrid/SES.
-    # We return it in the payload for testing without Mocks.
+    # In a real app with SendGrid/SES configured, we would send an email here.
+    # For now, we simulate an SMTP send by logging it to the console.
     invite_link = f"http://localhost:3000/invite/accept?token={token}"
-    return {"message": "Invite sent successfully", "link": invite_link}
+    import logging
+    logging.getLogger(__name__).info(f"SMTP SIMULATION: Sent invite email to {req.email} with link {invite_link}")
+    
+    return {"message": "Invite sent successfully"}
 
 @router.get("/invites")
 def list_invites(

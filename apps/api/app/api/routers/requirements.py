@@ -7,7 +7,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.db.session import get_db
-from app.core.auth import require_role
+from app.core.auth import require_role, get_optional_current_user
 from app.models.organizations import RoleEnum, User
 from app.models.regulations import Regulation, RegulationVersion, DocumentSection
 from app.models.requirements import Requirement, RequirementTypeEnum, SeverityEnum, ValidationStatusEnum
@@ -28,13 +28,26 @@ def list_requirements(
     search: Optional[str] = None,
     limit: int = Query(50, ge=1, le=100),
     cursor: Optional[datetime] = None,
-    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.legal_counsel, RoleEnum.developer])),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
-    # Find the current version of the regulation
+    # Find the regulation or regulation version
     reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
-    if not reg or not reg.current_version_id:
-        raise HTTPException(status_code=404, detail="Regulation or current version not found")
+    if not reg:
+        ver = db.query(RegulationVersion).filter(RegulationVersion.id == regulation_id).first()
+        if ver:
+            reg = db.query(Regulation).filter(Regulation.id == ver.regulation_id).first()
+    if not reg:
+        raise HTTPException(status_code=404, detail="Regulation not found")
+        
+    version_id = reg.current_version_id
+    if not version_id:
+        latest_ver = db.query(RegulationVersion).filter(RegulationVersion.regulation_id == reg.id).order_by(RegulationVersion.ingested_at.desc()).first()
+        if latest_ver:
+            version_id = latest_ver.id
+            
+    if not version_id:
+        return {"data": [], "next_cursor": None}
         
     if search:
         # Hybrid Search path
@@ -86,7 +99,8 @@ def list_requirements(
             COALESCE(s.semantic_score, 0) AS semantic_score,
             COALESCE(f.fts_score, 0) AS fts_score,
             (COALESCE(s.semantic_score, 0) * 0.7 + COALESCE(f.fts_score, 0) * 0.3) AS combined_score,
-            s_text.raw_text as source_text
+            s_text.raw_text as source_text,
+            s_text.reference_label as section_label
         FROM requirements r
         LEFT JOIN semantic_search s ON r.id = s.id
         LEFT JOIN fts_search f ON r.id = f.id
@@ -115,6 +129,8 @@ def list_requirements(
             row_dict["id"] = str(row_dict["id"])
             row_dict["regulation_version_id"] = str(row_dict["regulation_version_id"])
             row_dict["section_id"] = str(row_dict["section_id"])
+            row_dict["section_label"] = str(row_dict.get("section_label") or "")
+            row_dict["source_text"] = str(row_dict.get("source_text") or "")
             if row_dict["reviewed_by_user_id"]:
                 row_dict["reviewed_by_user_id"] = str(row_dict["reviewed_by_user_id"])
             data.append(row_dict)
@@ -126,10 +142,14 @@ def list_requirements(
         
     else:
         # Standard filtering path
-        query = db.query(Requirement, DocumentSection.raw_text.label("source_text")).join(
+        query = db.query(
+            Requirement, 
+            DocumentSection.raw_text.label("source_text"),
+            DocumentSection.reference_label.label("section_label")
+        ).outerjoin(
             DocumentSection, Requirement.section_id == DocumentSection.id
         ).filter(
-            Requirement.regulation_version_id == reg.current_version_id
+            Requirement.regulation_version_id == version_id
         )
         
         if type:
@@ -148,10 +168,30 @@ def list_requirements(
         results = query.all()
         
         data = []
-        for req, source_text in results:
-            req_dict = req.__dict__.copy()
-            req_dict.pop("_sa_instance_state", None)
-            req_dict["source_text"] = source_text
+        for req, source_text, section_label in results:
+            req_dict = {
+                "id": str(req.id),
+                "regulation_version_id": str(req.regulation_version_id),
+                "section_id": str(req.section_id) if req.section_id else None,
+                "type": req.type.value if hasattr(req.type, "value") else str(req.type),
+                "title": req.title,
+                "description": req.description,
+                "conditions": req.conditions or {},
+                "actions": req.actions or {},
+                "severity": req.severity.value if hasattr(req.severity, "value") else str(req.severity),
+                "evidence_required": req.evidence_required or {},
+                "references": req.references or {},
+                "confidence_score": float(req.confidence_score) if req.confidence_score is not None else 0.95,
+                "validation_status": req.validation_status.value if hasattr(req.validation_status, "value") else str(req.validation_status),
+                "reviewed_by_user_id": str(req.reviewed_by_user_id) if req.reviewed_by_user_id else None,
+                "reviewed_at": req.reviewed_at.isoformat() if req.reviewed_at else None,
+                "reviewer_note": (req.meta_data.get("reviewer_note") if req.meta_data else None) or "",
+                "meta_data": req.meta_data or {},
+                "source_text": source_text or "",
+                "section_label": section_label or "",
+                "created_at": req.created_at.isoformat() if req.created_at else None,
+                "updated_at": req.created_at.isoformat() if req.created_at else None,
+            }
             data.append(req_dict)
             
         next_cursor = None
@@ -179,6 +219,10 @@ def update_requirement_status(
     req.validation_status = payload.status
     req.reviewed_by_user_id = current_user.id
     req.reviewed_at = datetime.now(timezone.utc)
+    if payload.reviewer_note:
+        meta = dict(req.meta_data or {})
+        meta["reviewer_note"] = payload.reviewer_note
+        req.meta_data = meta
     
     # Audit Logging
     audit = AuditLog(
