@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { getRegulations, getGlobalMonitoringData, getMonitoringFeed } from './actions';
+import { getRegulations, getGlobalMonitoringData, getMonitoringFeed, triggerSurveillanceProbe } from './actions';
 import { LiveSurveillanceFeed, FeedEvent } from '@/components/compliance/live-surveillance-feed';
 import dynamic from 'next/dynamic';
 import { 
@@ -15,7 +15,8 @@ import {
   CheckCircle2, 
   Sliders, 
   ArrowUpRight,
-  Sparkles
+  Sparkles,
+  Zap
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -39,6 +40,7 @@ export function CoverageView() {
   const [monitoringData, setMonitoringData] = useState<any>(null);
   const [initialFeed, setInitialFeed] = useState<FeedEvent[]>([]);
   const [selectedJurisdiction, setSelectedJurisdiction] = useState<string | null>(null);
+  const [activeSignalJurisdiction, setActiveSignalJurisdiction] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -173,6 +175,7 @@ export function CoverageView() {
             regulations={regulations} 
             jurisdictionsData={jurisdictionsList}
             selectedJurisdiction={selectedJurisdiction}
+            activeSignalJurisdiction={activeSignalJurisdiction}
             onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
           />
         </div>
@@ -183,7 +186,15 @@ export function CoverageView() {
             initialEvents={initialFeed}
             selectedJurisdiction={selectedJurisdiction}
             onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
+            onNewSignal={(code) => {
+              setActiveSignalJurisdiction(code);
+              setTimeout(() => setActiveSignalJurisdiction(null), 3000);
+            }}
             fetchFeedAction={handleFetchFeed}
+            onTriggerProbe={async (jur) => {
+              const res = await triggerSurveillanceProbe(jur);
+              return res;
+            }}
           />
         </div>
       </div>
@@ -227,14 +238,17 @@ export function CoverageView() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {jurisdictionsList.map((jur: any) => {
             const isSelected = selectedJurisdiction?.toUpperCase() === jur.code.toUpperCase();
+            const isLiveSignal = activeSignalJurisdiction?.toUpperCase() === jur.code.toUpperCase();
             return (
               <div
                 key={jur.code}
                 onClick={() => setSelectedJurisdiction(jur.code)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer group ${
+                className={`p-4 rounded-xl border transition-all cursor-pointer group relative ${
                   isSelected
-                    ? 'bg-blue-950/20 border-blue-500/60 ring-2 ring-blue-500/40 shadow-lg shadow-blue-950/60'
-                    : 'bg-zinc-900/30 hover:bg-zinc-900/70 border-zinc-800/80 hover:border-zinc-700'
+                    ? 'bg-blue-950/30 border-blue-500/80 ring-2 ring-blue-500/50 shadow-lg shadow-blue-950/60'
+                    : (isLiveSignal
+                        ? 'bg-cyan-950/30 border-cyan-400/80 ring-2 ring-cyan-400/60 shadow-lg shadow-cyan-950/70 scale-[1.01]'
+                        : 'bg-zinc-900/30 hover:bg-zinc-900/70 border-zinc-800/80 hover:border-zinc-700')
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -250,13 +264,21 @@ export function CoverageView() {
                     </div>
                   </div>
 
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
-                    jur.ruleset_count > 0
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-                  }`}>
-                    {jur.ruleset_count > 0 ? `${jur.ruleset_count} Rules Enforced` : 'Surveillance Active'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {isLiveSignal && (
+                      <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 animate-pulse flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                        LIVE PING
+                      </span>
+                    )}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                      jur.ruleset_count > 0
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                    }`}>
+                      {jur.ruleset_count > 0 ? `${jur.ruleset_count} Rules Enforced` : 'Surveillance Active'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5 text-xs text-zinc-400 my-3">

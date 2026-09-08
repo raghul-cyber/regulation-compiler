@@ -29,19 +29,24 @@ export interface FeedEvent {
 interface LiveSurveillanceFeedProps {
   initialEvents?: FeedEvent[];
   onSelectJurisdiction?: (code: string) => void;
+  onNewSignal?: (jurisdiction: string) => void;
   selectedJurisdiction?: string | null;
   fetchFeedAction: () => Promise<FeedEvent[]>;
+  onTriggerProbe?: (jurisdiction?: string) => Promise<any>;
 }
 
 export function LiveSurveillanceFeed({
   initialEvents = [],
   onSelectJurisdiction,
+  onNewSignal,
   selectedJurisdiction,
   fetchFeedAction,
+  onTriggerProbe,
 }: LiveSurveillanceFeedProps) {
   const [events, setEvents] = useState<FeedEvent[]>(initialEvents);
   const [isLive, setIsLive] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isProbing, setIsProbing] = useState(false);
   const [filterJurisdiction, setFilterJurisdiction] = useState<string>('ALL');
   const [filterSeverity, setFilterSeverity] = useState<string>('ALL');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -61,7 +66,7 @@ export function LiveSurveillanceFeed({
     }
   }, [selectedJurisdiction]);
 
-  // Continuous live stream polling every 6 seconds
+  // Continuous live stream polling every 5 seconds
   useEffect(() => {
     if (!isLive) return;
 
@@ -71,10 +76,13 @@ export function LiveSurveillanceFeed({
         if (fresh && fresh.length > 0) {
           setEvents(prev => {
             const prevIds = new Set(prev.map(e => e.id));
-            const hasNew = fresh.some(e => !prevIds.has(e.id));
-            if (hasNew) {
+            const newSignals = fresh.filter(e => !prevIds.has(e.id));
+            if (newSignals.length > 0) {
               setNewEventFlash(true);
-              setTimeout(() => setNewEventFlash(false), 1200);
+              setTimeout(() => setNewEventFlash(false), 1500);
+              if (onNewSignal) {
+                onNewSignal(newSignals[0].jurisdiction);
+              }
             }
             return fresh;
           });
@@ -83,10 +91,10 @@ export function LiveSurveillanceFeed({
       } catch (err) {
         console.warn("Live feed sync check:", err);
       }
-    }, 6000);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [isLive, fetchFeedAction]);
+  }, [isLive, fetchFeedAction, onNewSignal]);
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
@@ -98,6 +106,26 @@ export function LiveSurveillanceFeed({
       }
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  const handleTriggerProbe = async () => {
+    if (!onTriggerProbe || isProbing) return;
+    setIsProbing(true);
+    try {
+      const targetJur = filterJurisdiction !== 'ALL' ? filterJurisdiction : 'GLOBAL';
+      const result = await onTriggerProbe(targetJur);
+      if (result?.event) {
+        setEvents(prev => [result.event, ...prev]);
+        setNewEventFlash(true);
+        setTimeout(() => setNewEventFlash(false), 1500);
+        if (onNewSignal) {
+          onNewSignal(result.event.jurisdiction);
+        }
+      }
+      setLastUpdated(new Date());
+    } finally {
+      setIsProbing(false);
     }
   };
 
@@ -200,6 +228,18 @@ export function LiveSurveillanceFeed({
 
         {/* Controls */}
         <div className="flex items-center gap-2">
+          {onTriggerProbe && (
+            <button
+              onClick={handleTriggerProbe}
+              disabled={isProbing}
+              className="p-1.5 text-xs font-semibold rounded-lg border border-blue-500/40 hover:border-blue-400 bg-blue-600/20 text-blue-300 hover:text-white transition-all flex items-center gap-1.5 shadow-sm shadow-blue-500/20"
+              title="Launch on-demand statutory surveillance probe"
+            >
+              <Zap className={`w-3.5 h-3.5 text-blue-400 ${isProbing ? 'animate-bounce' : ''}`} />
+              <span className="hidden sm:inline">{isProbing ? 'Probing...' : 'Live Probe'}</span>
+            </button>
+          )}
+
           <button
             onClick={() => setIsLive(!isLive)}
             className="p-1.5 text-xs font-medium rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5"
