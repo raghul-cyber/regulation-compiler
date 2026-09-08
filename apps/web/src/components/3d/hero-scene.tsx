@@ -107,9 +107,20 @@ export function HeroScene() {
   }, []);
 
   return (
-    <Canvas camera={{ position: [0, 0, 5], fov: 60 }} onCreated={({ gl }) => {
-      gl.setClearColor(new THREE.Color('#0a0a0c'), 0);
-    }}>
+    <Canvas 
+      camera={{ position: [0, 0, 5], fov: 60 }} 
+      gl={{
+        antialias: true,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: false,
+      }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(new THREE.Color('#0a0a0c'), 0);
+        gl.domElement.addEventListener("webglcontextlost", (event) => {
+          event.preventDefault();
+        }, false);
+      }}
+    >
       <SceneLogic prefersReducedMotion={prefersReducedMotion} />
     </Canvas>
   );

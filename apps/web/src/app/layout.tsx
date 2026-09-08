@@ -5,6 +5,7 @@ import "./globals.css";
 import { TopNav } from "@/components/layout/top-nav";
 import { Footer } from "@/components/layout/footer";
 import { PageContainer } from "@/components/layout/page-container";
+import { ConsoleGuard } from "@/components/common/console-guard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         style={{ colorScheme: 'dark' }}
       >
         <body className="min-h-full flex flex-col bg-[#0a0a0c] text-gray-100">
+          <ConsoleGuard />
           <TopNav />
           <main className="flex-1 w-full py-8">
             <PageContainer>

@@ -550,7 +550,20 @@ export function CoverageGlobe({
       </div>
 
       {/* 3D Canvas */}
-      <Canvas camera={{ position: [0, 0, 5.8], fov: 45 }} dpr={[1, 2]}>
+      <Canvas 
+        camera={{ position: [0, 0, 5.8], fov: 45 }} 
+        dpr={[1, 2]}
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          failIfMajorPerformanceCaveat: false,
+        }}
+        onCreated={({ gl }) => {
+          gl.domElement.addEventListener("webglcontextlost", (event) => {
+            event.preventDefault();
+          }, false);
+        }}
+      >
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={1.2} />
         <pointLight position={[-10, -10, -10]} intensity={0.4} color="#1d4ed8" />

@@ -50,10 +50,12 @@ export default function NewRegulationPage() {
   const fetchFrameworks = async () => {
     try {
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
-      const res = await fetch(`${apiUrl}/regulations/frameworks`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${apiUrl}/regulations/frameworks`, { headers });
       if (!res.ok) throw new Error("Failed to load frameworks");
       const data = await res.json();
       setFrameworks(data);
@@ -126,10 +128,14 @@ export default function NewRegulationPage() {
     try {
       setIngesting(acronym);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       const res = await fetch(`${apiUrl}/regulations/frameworks/${acronym}/ingest`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Failed to ingest framework");

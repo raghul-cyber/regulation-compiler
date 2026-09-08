@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { Loader2, CheckCircle2, XCircle, Target, CheckSquare, ChevronRight, ChevronDown, RotateCcw, ArrowRight, FileText } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Loader2, CheckCircle2, XCircle, Target, CheckSquare, ChevronRight, ChevronDown, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { ReportGenerator } from './report-generator';
 
@@ -37,14 +37,14 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
   const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
-    let reconnectTimeout: any;
     let abortController = new AbortController();
 
     const connectSSE = async () => {
       try {
         const token = await getToken();
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
         
-        const response = await fetch(`http://127.0.0.1:8000/api/v1/jobs/${jobId}/events`, {
+        const response = await fetch(`${API_BASE}/jobs/${jobId}/events`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },
@@ -108,7 +108,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     };
     
     connectSSE();
-    
+
     return () => {
       abortController.abort();
     };
@@ -127,7 +127,8 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     try {
       setIsRetrying(true);
       const token = await getToken();
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/jobs/${jobId}/retry`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const res = await fetch(`${API_BASE}/jobs/${jobId}/retry`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -219,7 +220,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
         <div className="absolute left-[31px] top-6 bottom-6 w-px bg-zinc-800" />
 
         <div className="space-y-8">
-          {STAGES.map((stage, idx) => {
+          {STAGES.map((stage) => {
             const state = getStageState(stage.num);
             const isPending = state === 'pending';
             const isActive = state === 'active';
@@ -374,7 +375,3 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     </div>
   );
 }
-
-
-
-

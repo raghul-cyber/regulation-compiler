@@ -163,9 +163,20 @@ export default function DashboardCanvas() {
         </h3>
         <p className="text-xs text-zinc-500">Live processing pipeline</p>
       </div>
-      <Canvas camera={{ position: [0, 5, 15], fov: 45 }} onCreated={({ gl }) => {
-        gl.setClearColor(new THREE.Color('#0a0a0c'), 0);
-      }}>
+      <Canvas 
+        camera={{ position: [0, 5, 15], fov: 45 }} 
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          failIfMajorPerformanceCaveat: false,
+        }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color('#0a0a0c'), 0);
+          gl.domElement.addEventListener("webglcontextlost", (event) => {
+            event.preventDefault();
+          }, false);
+        }}
+      >
         <PipelineLogic prefersReducedMotion={prefersReducedMotion} />
         {!prefersReducedMotion && (
           <OrbitControls 

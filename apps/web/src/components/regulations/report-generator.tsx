@@ -61,7 +61,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
       const token = await getToken();
       if (!token) return;
 
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       eventSource = new EventSource(`${API_BASE}/jobs/${jobId}/events?token=${token}`);
 
       eventSource.onmessage = (event) => {
