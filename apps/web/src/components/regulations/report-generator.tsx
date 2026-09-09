@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FileText, ArrowRight, Loader2, X, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import { FileText, ArrowRight, Loader2, X, CheckCircle2, Circle, ChevronRight, Check } from 'lucide-react';
 import { generateReport, pollReports } from '@/app/actions';
 
 const REPORT_TYPES = [
@@ -22,7 +22,7 @@ const REPORT_STAGES = [
 
 export function ReportGenerator({ regulationId, getToken }: { regulationId: string, getToken: () => Promise<string | null> }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState(REPORT_TYPES[0].id);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([REPORT_TYPES[0].id]);
   
   const [jobId, setJobId] = useState<string | null>(null);
   const [reportId, setReportId] = useState<string | null>(null);
@@ -31,6 +31,20 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
   const [completedStages, setCompletedStages] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const toggleType = (id: string) => {
+    setSelectedTypes(prev => 
+      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    setSelectedTypes(REPORT_TYPES.map(t => t.id));
+  };
+
+  const clearAll = () => {
+    setSelectedTypes([]);
+  };
 
   const handleReset = () => {
     setJobId(null);
@@ -47,10 +61,11 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
   };
 
   const handleStartGeneration = async () => {
+    if (selectedTypes.length === 0) return;
     try {
       handleReset();
 
-      const res = await generateReport(regulationId, selectedType);
+      const res = await generateReport(regulationId, selectedTypes);
       if (!res.success) throw new Error(res.error);
       
       setJobId(res.data.job_id);
@@ -185,45 +200,99 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
             <div className="p-6 overflow-y-auto">
               {!jobId ? (
                 <div className="space-y-6">
-                  <fieldset className="space-y-2">
-                    <legend className="text-sm font-medium text-zinc-300">Select Report Type</legend>
-                    <div className="grid gap-3 mt-2">
-                      {REPORT_TYPES.map(type => (
-                        <label 
-                          key={type.id}
-                          htmlFor={`report-type-${type.id}`}
-                          className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedType === type.id ? 'bg-purple-900/20 border-purple-500/50' : 'bg-zinc-900/50 border-zinc-800/50 hover:border-zinc-700'}`}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <span className="text-sm font-semibold text-zinc-200">
+                          Select Report Sections
+                        </span>
+                        <p className="text-xs text-zinc-400 mt-0.5">
+                          Select one or more modules to compile a unified, comprehensive audit report.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <button
+                          type="button"
+                          onClick={selectAll}
+                          className="text-purple-400 hover:text-purple-300 font-medium px-2 py-1 rounded hover:bg-purple-950/40 transition-colors"
                         >
-                          <input 
-                            type="radio"
-                            name="report_type"
-                            id={`report-type-${type.id}`}
-                            value={type.id}
-                            checked={selectedType === type.id}
-                            onChange={() => setSelectedType(type.id)}
-                            className="sr-only"
-                          />
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className={`font-medium ${selectedType === type.id ? 'text-purple-300' : 'text-zinc-200'}`}>
+                          Select All
+                        </button>
+                        <span className="text-zinc-700">•</span>
+                        <button
+                          type="button"
+                          onClick={clearAll}
+                          className="text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded hover:bg-zinc-800/40 transition-colors"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between px-3.5 py-2 bg-zinc-900/60 border border-zinc-800/70 rounded-lg text-xs mb-3">
+                      <span className="text-zinc-400">Included Modules:</span>
+                      <span className="font-semibold text-purple-400">
+                        {selectedTypes.length} of {REPORT_TYPES.length} selected
+                      </span>
+                    </div>
+
+                    <div className="grid gap-2.5">
+                      {REPORT_TYPES.map(type => {
+                        const isChecked = selectedTypes.includes(type.id);
+                        return (
+                          <label 
+                            key={type.id}
+                            htmlFor={`report-type-${type.id}`}
+                            className={`group p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                              isChecked 
+                                ? 'bg-purple-950/25 border-purple-500/50 shadow-[0_0_15px_rgba(147,51,234,0.08)]' 
+                                : 'bg-zinc-900/50 border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900/80'
+                            }`}
+                          >
+                            <input 
+                              type="checkbox"
+                              name="report_sections"
+                              id={`report-type-${type.id}`}
+                              value={type.id}
+                              checked={isChecked}
+                              onChange={() => toggleType(type.id)}
+                              className="sr-only"
+                            />
+                            <div className="pr-4">
+                              <div className={`font-medium text-sm transition-colors ${isChecked ? 'text-purple-200' : 'text-zinc-200 group-hover:text-white'}`}>
                                 {type.title}
                               </div>
-                              <div className="text-xs text-zinc-500 mt-1">{type.description}</div>
+                              <div className="text-xs text-zinc-400 mt-0.5">{type.description}</div>
                             </div>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedType === type.id ? 'border-purple-500' : 'border-zinc-700'}`}>
-                              {selectedType === type.id && <div className="w-2.5 h-2.5 rounded-full bg-purple-500" />}
+                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all ${
+                              isChecked 
+                                ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]' 
+                                : 'border-zinc-700 bg-zinc-900 group-hover:border-zinc-500'
+                            }`}>
+                              {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                             </div>
-                          </div>
-                        </label>
-                      ))}
+                          </label>
+                        );
+                      })}
                     </div>
-                  </fieldset>
+                  </div>
 
                   <button 
                     onClick={handleStartGeneration}
-                    className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-xl transition-colors shadow-[0_0_20px_rgba(147,51,234,0.2)] flex items-center justify-center gap-2"
+                    disabled={selectedTypes.length === 0}
+                    className={`w-full py-3.5 font-medium rounded-xl transition-all flex items-center justify-center gap-2 ${
+                      selectedTypes.length === 0
+                        ? 'bg-zinc-800/70 text-zinc-500 cursor-not-allowed border border-zinc-800'
+                        : 'bg-purple-600 hover:bg-purple-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.25)] cursor-pointer'
+                    }`}
                   >
-                    Start Generation <ChevronRight className="w-4 h-4" />
+                    {selectedTypes.length === 0 ? (
+                      'Select at least 1 section'
+                    ) : (
+                      <>
+                        Start Generation ({selectedTypes.length} {selectedTypes.length === 1 ? 'Section' : 'Sections'}) <ChevronRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
 
                   {error && (
@@ -284,7 +353,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3.5 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-colors"
                       >
                         <FileText className="w-5 h-5" />
-                        Download Generated Report
+                        Download Unified Report ({selectedTypes.length} {selectedTypes.length === 1 ? 'Section' : 'Sections'})
                       </a>
                       <button
                         onClick={handleReset}

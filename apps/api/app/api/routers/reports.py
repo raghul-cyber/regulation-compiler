@@ -68,7 +68,8 @@ def export_requirements(
 
 class ReportCreate(BaseModel):
     regulation_id: uuid.UUID
-    report_type: ReportTypeEnum
+    report_type: Optional[ReportTypeEnum] = None
+    report_types: Optional[list[str]] = None
 
 @router.post("/reports")
 def create_report(
@@ -85,6 +86,26 @@ def create_report(
     if not reg:
         raise HTTPException(status_code=404, detail="Regulation not found")
 
+    # Determine requested sections
+    from app.services.reporting import SECTION_NAMES
+    requested_sections: list[str] = []
+    if payload.report_types:
+        requested_sections = [s for s in payload.report_types if s in SECTION_NAMES]
+    elif payload.report_type:
+        val = payload.report_type.value if hasattr(payload.report_type, 'value') else str(payload.report_type)
+        if val == 'composite':
+            requested_sections = list(SECTION_NAMES.keys())
+        elif val in SECTION_NAMES:
+            requested_sections = [val]
+
+    if not requested_sections:
+        requested_sections = ['executive_summary']
+
+    if len(requested_sections) > 1:
+        chosen_type = ReportTypeEnum.composite
+    else:
+        chosen_type = ReportTypeEnum(requested_sections[0])
+
     # Determine organization
     org_id = current_user.org_id if current_user else None
     if not org_id:
@@ -94,7 +115,7 @@ def create_report(
     report = Report(
         org_id=org_id,
         regulation_id=reg.id,
-        report_type=payload.report_type,
+        report_type=chosen_type,
         status=ReportStatusEnum.generating
     )
     db.add(report)
@@ -104,7 +125,8 @@ def create_report(
     job = BackgroundJob(
         job_type=JobTypeEnum.report,
         status=JobStatusEnum.queued,
-        entity_id=str(report.id)
+        entity_id=str(report.id),
+        result_data={"sections": requested_sections}
     )
     db.add(job)
     db.commit()
@@ -113,21 +135,22 @@ def create_report(
     # Attempt Celery task dispatch with reliable BackgroundTasks fallback
     dispatched = False
     try:
-        task = generate_pdf_report_task.delay(str(report.id), str(job.id))
+        task = generate_pdf_report_task.delay(str(report.id), str(job.id), sections=requested_sections)
         job.task_id = task.id
         db.commit()
         dispatched = True
-        logger.info(f"Dispatched Celery task {task.id} for report {report.id}")
+        logger.info(f"Dispatched Celery task {task.id} for report {report.id} with sections {requested_sections}")
     except Exception as exc:
         logger.warning(f"Celery dispatch failed ({exc}). Falling back to asynchronous BackgroundTasks.")
         
     if not dispatched:
-        background_tasks.add_task(generate_pdf_report_task, str(report.id), str(job.id))
+        background_tasks.add_task(generate_pdf_report_task, str(report.id), str(job.id), sections=requested_sections)
 
     return {
         "message": "Report generation started",
         "report_id": str(report.id),
-        "job_id": str(job.id)
+        "job_id": str(job.id),
+        "sections": requested_sections
     }
 
 @router.get("/reports/{regulation_id}")
@@ -204,7 +227,10 @@ def download_report(
     reg = db.query(Regulation).filter(Regulation.id == report.regulation_id).first()
     clean_name = re.sub(r'[^a-zA-Z0-9_\-]', '_', (reg.name if reg else "regulation").lower())[:30]
     type_str = report.report_type.value if hasattr(report.report_type, 'value') else str(report.report_type)
-    filename = f"{clean_name}_{type_str}.pdf"
+    if type_str == 'composite':
+        filename = f"{clean_name}_compliance_report.pdf"
+    else:
+        filename = f"{clean_name}_{type_str}.pdf"
     
     return Response(
         content=pdf_bytes,

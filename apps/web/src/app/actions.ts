@@ -102,7 +102,7 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
   }
 }
 
-export async function generateReport(regulationId: string, type: string) {
+export async function generateReport(regulationId: string, typeOrTypes: string | string[]) {
   let token: string | null = null;
   try {
     const { auth } = await import('@clerk/nextjs/server');
@@ -119,11 +119,19 @@ export async function generateReport(regulationId: string, type: string) {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
+  const selectedTypes = Array.isArray(typeOrTypes) ? typeOrTypes : [typeOrTypes];
+  const primaryType = selectedTypes.length === 1 ? selectedTypes[0] : (selectedTypes[0] || 'executive_summary');
+  const isMulti = selectedTypes.length > 1;
+
   const res = await fetch(`${API_BASE}/reports`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ regulation_id: regulationId, report_type: type })
+    body: JSON.stringify({
+      regulation_id: regulationId,
+      report_type: isMulti ? 'composite' : primaryType,
+      report_types: selectedTypes
+    })
   });
 
   if (!res.ok) {

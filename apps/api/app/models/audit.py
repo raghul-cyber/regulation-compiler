@@ -13,6 +13,7 @@ class ReportTypeEnum(str, enum.Enum):
     audit_evidence = "audit_evidence"
     gap_analysis = "gap_analysis"
     checklist = "checklist"
+    composite = "composite"
 
 class NotificationTypeEnum(str, enum.Enum):
     impact_alert = "impact_alert"
