@@ -120,11 +120,19 @@ async def upload_regulation(
 
 @router.get("")
 def list_regulations(
-    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
-    regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
-    framework_map = {f.name: f.description for f in db.query(FrameworkCatalog).all()}
+    try:
+        regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
+    except Exception as query_err:
+        import logging
+        logging.getLogger(__name__).warning(f"Could not order by created_at, falling back: {query_err}")
+        regs = db.query(Regulation).all()
+
+    try:
+        framework_map = {f.name: f.description for f in db.query(FrameworkCatalog).all()}
+    except Exception:
+        framework_map = {}
 
     default_descriptions = {
         "General Data Protection Regulation (GDPR)": "Comprehensive EU privacy legislation establishing stringent principles for lawful personal data processing, data subject rights, and cross-border data transfer controls.",
@@ -141,7 +149,16 @@ def list_regulations(
         desc = framework_map.get(r.name) or default_descriptions.get(r.name) or "Official canonical compliance regulation framework."
         req_count = 0
         if r.current_version_id:
-            req_count = db.query(func.count(Requirement.id)).filter(Requirement.regulation_version_id == r.current_version_id).scalar() or 0
+            try:
+                req_count = db.query(func.count(Requirement.id)).filter(Requirement.regulation_version_id == r.current_version_id).scalar() or 0
+            except Exception:
+                req_count = 0
+        
+        created_str = (
+            r.created_at.isoformat() 
+            if hasattr(r, "created_at") and r.created_at is not None 
+            else datetime.now(timezone.utc).isoformat()
+        )
         
         result.append({
             "id": str(r.id),
@@ -151,7 +168,7 @@ def list_regulations(
             "requirements_count": req_count,
             "current_version_id": str(r.current_version_id) if r.current_version_id else None,
             "source_url": r.source_url,
-            "created_at": r.created_at.isoformat()
+            "created_at": created_str
         })
     return result
 

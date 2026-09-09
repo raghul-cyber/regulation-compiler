@@ -67,6 +67,14 @@ app.add_middleware(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception on {request.method} {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal Server Error", "detail": str(exc), "path": request.url.path}
+    )
+
 app.include_router(webhooks.router, prefix="/api")
 app.include_router(test_rbac.router, prefix="/api")
 app.include_router(regulations.router, prefix="/api/v1/regulations")
