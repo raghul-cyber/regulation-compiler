@@ -1,0 +1,10 @@
+{
+  "include": [
+    "apps/api",
+    "scratch"
+  ],
+  "extraPaths": [
+    "apps/api",
+    "."
+  ]
+}

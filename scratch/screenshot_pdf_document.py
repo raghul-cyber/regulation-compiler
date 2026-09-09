@@ -1,14 +1,29 @@
 import asyncio
+import importlib
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("apps/api"))
+# Ensure apps/api is in sys.path for runtime execution
+api_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "apps", "api"))
+if api_path not in sys.path:
+    sys.path.insert(0, api_path)
+
 from jinja2 import Template
 from playwright.async_api import async_playwright
-from app.db.session import SessionLocal
-from app.models.regulations import Regulation
-from app.models.requirements import Requirement
-from app.services.reporting import BASE_CSS, COMPOSITE_REPORT_TMPL, SECTION_NAMES
+
+db_session = importlib.import_module("app.db.session")
+SessionLocal = getattr(db_session, "SessionLocal")
+
+models_reg = importlib.import_module("app.models.regulations")
+Regulation = getattr(models_reg, "Regulation")
+
+models_req = importlib.import_module("app.models.requirements")
+Requirement = getattr(models_req, "Requirement")
+
+reporting_svc = importlib.import_module("app.services.reporting")
+BASE_CSS = getattr(reporting_svc, "BASE_CSS")
+COMPOSITE_REPORT_TMPL = getattr(reporting_svc, "COMPOSITE_REPORT_TMPL")
+SECTION_NAMES = getattr(reporting_svc, "SECTION_NAMES")
 
 ARTIFACT_DIR = "C:/Users/rcrag/.gemini/antigravity-ide/brain/fcae8e30-6301-4069-a84b-9b626f1b3aeb"
 
