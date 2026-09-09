@@ -17,6 +17,9 @@ uvicorn
 
 svix
 httpx
+python-jose[cryptography]
+beautifulsoup4
+tqdm
 
 cachetools
 boto3
