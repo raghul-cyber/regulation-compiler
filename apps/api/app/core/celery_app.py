@@ -1,7 +1,8 @@
 import os
+import ssl
 from celery import Celery
 
-redis_url = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+redis_url = os.getenv("CELERY_BROKER_URL") or os.getenv("REDIS_URL") or "redis://localhost:6379/0"
 
 celery_app = Celery(
     "rac_tasks",
@@ -13,6 +14,8 @@ celery_app = Celery(
 # Set as global default so any Celery tasks use this instance
 celery_app.set_default()
 
+ssl_options = {"ssl_cert_reqs": ssl.CERT_NONE} if redis_url.startswith("rediss://") else None
+
 celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],
@@ -20,6 +23,8 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
     broker_connection_retry_on_startup=True,
+    broker_use_ssl=ssl_options,
+    redis_backend_use_ssl=ssl_options,
     # Route tasks so active worker processes them reliably
     task_routes={
         "app.workers.tasks.dispatch_webhook_task": {"queue": "notifications"},
