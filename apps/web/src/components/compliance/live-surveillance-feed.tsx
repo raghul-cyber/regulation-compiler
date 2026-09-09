@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Radio, 
   ExternalLink, 
@@ -51,6 +51,11 @@ export function LiveSurveillanceFeed({
   const [filterSeverity, setFilterSeverity] = useState<string>('ALL');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [newEventFlash, setNewEventFlash] = useState(false);
+  const eventsRef = useRef<FeedEvent[]>(events);
+
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
 
   // Sync initial events
   useEffect(() => {
@@ -74,19 +79,20 @@ export function LiveSurveillanceFeed({
       try {
         const fresh = await fetchFeedAction();
         if (fresh && fresh.length > 0) {
-          setEvents(prev => {
-            const prevIds = new Set(prev.map(e => e.id));
-            const newSignals = fresh.filter(e => !prevIds.has(e.id));
-            if (newSignals.length > 0) {
-              setNewEventFlash(true);
-              setTimeout(() => setNewEventFlash(false), 1500);
-              if (onNewSignal) {
-                onNewSignal(newSignals[0].jurisdiction);
-              }
-            }
-            return fresh;
-          });
+          const currentEvents = eventsRef.current;
+          const prevIds = new Set(currentEvents.map(e => e.id));
+          const newSignals = fresh.filter(e => !prevIds.has(e.id));
+          
+          setEvents(fresh);
           setLastUpdated(new Date());
+
+          if (newSignals.length > 0) {
+            setNewEventFlash(true);
+            setTimeout(() => setNewEventFlash(false), 1500);
+            if (onNewSignal) {
+              onNewSignal(newSignals[0].jurisdiction);
+            }
+          }
         }
       } catch (err) {
         console.warn("Live feed sync check:", err);

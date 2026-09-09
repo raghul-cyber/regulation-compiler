@@ -187,8 +187,14 @@ export function CoverageView() {
             selectedJurisdiction={selectedJurisdiction}
             onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
             onNewSignal={(code) => {
-              setActiveSignalJurisdiction(code);
-              setTimeout(() => setActiveSignalJurisdiction(null), 3000);
+              if (typeof window !== 'undefined') {
+                window.requestAnimationFrame(() => {
+                  setActiveSignalJurisdiction(code);
+                  setTimeout(() => setActiveSignalJurisdiction(null), 3000);
+                });
+              } else {
+                setActiveSignalJurisdiction(code);
+              }
             }}
             fetchFeedAction={handleFetchFeed}
             onTriggerProbe={async (jur) => {
