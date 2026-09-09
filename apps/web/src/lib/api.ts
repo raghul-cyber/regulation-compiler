@@ -31,8 +31,12 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
 
   try {
     const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
+      cache: 'no-store',
       ...options,
-      headers,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
     });
 
     if (!response.ok) {
@@ -41,16 +45,23 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     }
 
     return await response.json();
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.digest === 'DYNAMIC_SERVER_USAGE') {
+      throw err;
+    }
     console.warn(`Fetch error for [${endpoint}]:`, err);
     return null;
   }
 }
 
+
 export async function getRegulations() {
   const res = await fetchWithAuth('/regulations');
-  return res || [];
+  if (Array.isArray(res)) return res;
+  if (res && Array.isArray(res.data)) return res.data;
+  return [];
 }
+
 
 export async function getRegulation(regulationId: string) {
   return fetchWithAuth(`/regulations/${regulationId}`);

@@ -184,8 +184,10 @@ export function CoverageView() {
         <div className="xl:col-span-5 w-full h-[620px]">
           <LiveSurveillanceFeed
             initialEvents={initialFeed}
+            regulations={regulations}
             selectedJurisdiction={selectedJurisdiction}
             onSelectJurisdiction={(code) => setSelectedJurisdiction(code)}
+
             onNewSignal={(code) => {
               if (typeof window !== 'undefined') {
                 window.requestAnimationFrame(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -17,8 +17,11 @@ import {
   FileText, 
   Search, 
   X, 
-  Filter 
+  Filter,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
+import { getRegulations } from '@/app/(authenticated)/dashboard/actions';
 
 interface Regulation {
   id: string;
@@ -43,6 +46,10 @@ function getJurisdictionBadge(jurisdiction: string) {
       return { label: 'US • United States', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
     case 'CA':
       return { label: 'CA • Canada', color: 'bg-rose-500/15 text-rose-400 border-rose-500/30' };
+    case 'UK':
+      return { label: 'UK • United Kingdom', color: 'bg-sky-500/15 text-sky-400 border-sky-500/30' };
+    case 'SG':
+      return { label: 'SG • Singapore', color: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
     case 'GLOBAL':
     default:
       return { label: 'GLOBAL • International', color: 'bg-purple-500/15 text-purple-400 border-purple-500/30' };
@@ -54,11 +61,44 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
   const searchParams = useSearchParams();
   const initialJurisdiction = searchParams.get('jurisdiction')?.toUpperCase() || 'ALL';
 
+  const [regulations, setRegulations] = useState<Regulation[]>(initialRegulations || []);
+  const [isLoading, setIsLoading] = useState(initialRegulations.length === 0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJurisdiction, setSelectedJurisdiction] = useState<string>(initialJurisdiction);
 
+  // Sync state if initialRegulations changes
+  useEffect(() => {
+    if (initialRegulations && initialRegulations.length > 0) {
+      setRegulations(initialRegulations);
+      setIsLoading(false);
+    }
+  }, [initialRegulations]);
+
+  // Client-side auto-sync if initial fetch had 0 regulations (e.g. cold start)
+  const syncRegulations = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const fresh = await getRegulations();
+      if (fresh && fresh.length > 0) {
+        setRegulations(fresh);
+      }
+    } catch (e) {
+      console.error("Failed to sync regulations:", e);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (regulations.length === 0) {
+      syncRegulations();
+    }
+  }, [regulations.length, syncRegulations]);
+
   // Sync state if URL changes
-  React.useEffect(() => {
+  useEffect(() => {
     const jur = searchParams.get('jurisdiction')?.toUpperCase();
     if (jur) {
       setSelectedJurisdiction(jur);
@@ -67,13 +107,13 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
 
   // Unique jurisdictions present in dataset
   const availableJurisdictions = useMemo(() => {
-    const list = Array.from(new Set(initialRegulations.map(r => r.jurisdiction.toUpperCase()))).sort();
+    const list = Array.from(new Set(regulations.map(r => r.jurisdiction.toUpperCase()))).sort();
     return list;
-  }, [initialRegulations]);
+  }, [regulations]);
 
   // Filtered regulations
   const filteredRegulations = useMemo(() => {
-    return initialRegulations.filter(reg => {
+    return regulations.filter(reg => {
       // Jurisdiction match
       if (selectedJurisdiction !== 'ALL') {
         if (reg.jurisdiction.toUpperCase() !== selectedJurisdiction) {
@@ -93,7 +133,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
 
       return true;
     });
-  }, [initialRegulations, selectedJurisdiction, searchQuery]);
+  }, [regulations, selectedJurisdiction, searchQuery]);
 
   const totalRequirements = useMemo(() => {
     return filteredRegulations.reduce((acc, r) => acc + (r.requirements_count || 0), 0);
@@ -113,6 +153,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
     setSelectedJurisdiction('ALL');
     router.push('/regulations');
   };
+
 
   return (
     <div className="space-y-8">
@@ -209,10 +250,10 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                 : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
             }`}
           >
-            ALL ({initialRegulations.length})
+            ALL ({regulations.length})
           </button>
           {availableJurisdictions.map((jur) => {
-            const count = initialRegulations.filter(r => r.jurisdiction.toUpperCase() === jur).length;
+            const count = regulations.filter(r => r.jurisdiction.toUpperCase() === jur).length;
             const isSelected = selectedJurisdiction === jur;
             return (
               <button
@@ -238,16 +279,56 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
               Reset
             </Button>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={syncRegulations}
+            disabled={isRefreshing}
+            className="text-xs text-zinc-400 hover:text-white h-8 px-2 ml-auto"
+            title="Force Synchronize Regulations"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-400' : ''}`} />
+          </Button>
         </div>
       </div>
 
       {/* Regulations Grid */}
-      {filteredRegulations.length === 0 ? (
+      {regulations.length === 0 ? (
+        <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/40 p-12 text-center">
+          {isLoading || isRefreshing ? (
+            <>
+              <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-4" />
+              <h3 className="text-base font-semibold text-zinc-200">Synchronizing Canonical Regulations...</h3>
+              <p className="mt-1 text-xs text-zinc-400 max-w-sm mx-auto">
+                Establishing direct connection to PostgreSQL repository and loading official statutory frameworks.
+              </p>
+            </>
+          ) : (
+            <>
+              <Shield className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+              <h3 className="text-base font-semibold text-zinc-200">Database Synchronization Pending</h3>
+              <p className="mt-1 text-xs text-zinc-400 max-w-sm mx-auto">
+                No statutory frameworks currently synchronized. Click below to force synchronizing canonical regulations.
+              </p>
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={syncRegulations}
+                disabled={isRefreshing}
+                className="mt-4 bg-blue-600 hover:bg-blue-500 text-xs text-white"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Force Refresh Synchronization
+              </Button>
+            </>
+          )}
+        </div>
+      ) : filteredRegulations.length === 0 ? (
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/40 p-12 text-center">
           <Shield className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-          <h3 className="text-base font-semibold text-zinc-200">No regulations match your filter</h3>
+          <h3 className="text-base font-semibold text-zinc-200">No regulations match "{selectedJurisdiction}" filter</h3>
           <p className="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">
-            Try adjusting your search query or clear the jurisdiction filter to view all canonical frameworks.
+            {searchQuery ? `No results matching query "${searchQuery}".` : `No active frameworks configured for ${selectedJurisdiction}.`}
           </p>
           <Button 
             variant="outline" 
@@ -255,10 +336,11 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
             onClick={handleClearFilters}
             className="mt-4 border-zinc-800 text-xs text-zinc-300 hover:text-white"
           >
-            Clear Filters
+            View All {regulations.length} Regulations
           </Button>
         </div>
       ) : (
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRegulations.map((reg) => {
             const badge = getJurisdictionBadge(reg.jurisdiction);

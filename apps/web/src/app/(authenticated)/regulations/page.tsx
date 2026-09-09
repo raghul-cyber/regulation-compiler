@@ -10,21 +10,14 @@ export const metadata = {
   title: 'Canonical Regulations Directory | Regulation Compiler',
 };
 
+export const dynamic = 'force-dynamic';
+
+
 async function RegulationsDataLoader() {
-  const regulations = await getRegulations();
-
-  if (!regulations || regulations.length === 0) {
-    return (
-      <div className="rounded-xl border border-zinc-800 bg-[#0c0c0e] p-12 text-center shadow-lg">
-        <Shield className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-zinc-100">No regulations loaded</h3>
-        <p className="mt-2 text-sm text-zinc-400">Database synchronization in progress. Please refresh momentarily.</p>
-      </div>
-    );
-  }
-
-  return <RegulationsClient initialRegulations={regulations} />;
+  const regulations = await getRegulations().catch(() => []);
+  return <RegulationsClient initialRegulations={regulations || []} />;
 }
+
 
 export default function RegulationsPage() {
   return (

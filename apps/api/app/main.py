@@ -89,7 +89,8 @@ app.include_router(policies.router, prefix="/api/v1")
 app.include_router(compliance.router, prefix="/api/v1")
 
 from sqlalchemy import text
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, engine
+
 
 @app.get("/health", response_class=JSONResponse)
 async def health_check(request: Request):

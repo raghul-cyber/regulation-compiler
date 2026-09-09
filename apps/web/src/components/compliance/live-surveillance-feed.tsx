@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Radio, 
   ExternalLink, 
@@ -11,7 +12,8 @@ import {
   Globe2, 
   Activity, 
   Zap,
-  ArrowUpRight
+  ArrowUpRight,
+  Shield
 } from 'lucide-react';
 
 export interface FeedEvent {
@@ -33,6 +35,7 @@ interface LiveSurveillanceFeedProps {
   selectedJurisdiction?: string | null;
   fetchFeedAction: () => Promise<FeedEvent[]>;
   onTriggerProbe?: (jurisdiction?: string) => Promise<any>;
+  regulations?: any[];
 }
 
 export function LiveSurveillanceFeed({
@@ -42,7 +45,10 @@ export function LiveSurveillanceFeed({
   selectedJurisdiction,
   fetchFeedAction,
   onTriggerProbe,
+  regulations = [],
 }: LiveSurveillanceFeedProps) {
+  const router = useRouter();
+
   const [events, setEvents] = useState<FeedEvent[]>(initialEvents);
   const [isLive, setIsLive] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -367,13 +373,63 @@ export function LiveSurveillanceFeed({
                 </p>
 
                 {/* Footer / Actions */}
-                <div className="mt-2.5 pt-2 border-t border-zinc-800/40 flex items-center justify-between text-[11px]">
+                <div className="mt-2.5 pt-2 border-t border-zinc-800/40 flex flex-wrap items-center justify-between gap-2 text-[11px]">
                   <span className="text-zinc-500 flex items-center gap-1">
                     <Globe2 className="w-3 h-3 text-zinc-400" />
                     {evt.authority}
                   </span>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    {(() => {
+                      const title = (evt.title || '').toUpperCase();
+                      const summary = (evt.summary || '').toUpperCase();
+                      const jur = (evt.jurisdiction || '').toUpperCase();
+                      
+                      let match = null;
+                      if (regulations && regulations.length > 0) {
+                        if (title.includes('DORA') || summary.includes('DORA')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('DORA'));
+                        } else if (title.includes('GDPR') || summary.includes('GDPR') || title.includes('EDPB') || summary.includes('EDPB')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('GDPR'));
+                        } else if (title.includes('HIPAA') || summary.includes('HIPAA')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('HIPAA'));
+                        } else if (title.includes('CCPA') || summary.includes('CCPA') || title.includes('CPRA') || title.includes('CPPA')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('CCPA') || r.name.toUpperCase().includes('CALIFORNIA'));
+                        } else if (title.includes('PIPEDA') || summary.includes('PIPEDA') || title.includes('OPC')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('PIPEDA'));
+                        } else if (title.includes('PCI DSS') || summary.includes('PCI DSS') || title.includes('PCI SSC') || title.includes('PAYMENT CARD')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('PCI DSS') || r.name.toUpperCase().includes('PAYMENT CARD'));
+                        } else if (title.includes('ISO') || summary.includes('ISO') || title.includes('27001')) {
+                          match = regulations.find(r => r.name.toUpperCase().includes('27001'));
+                        }
+                        if (!match) {
+                          match = regulations.find(r => r.jurisdiction.toUpperCase() === jur);
+                        }
+                      }
+
+                      const label = match 
+                        ? (match.name.includes('(') ? match.name.split('(')[1].replace(')', '') : match.name.split(' ')[0])
+                        : `${evt.jurisdiction} Regulation`;
+
+                      return (
+                        <button
+                          onClick={() => {
+                            if (match?.id) {
+                              router.push(`/regulations/${match.id}/requirements`);
+                            } else {
+                              router.push(`/regulations?jurisdiction=${encodeURIComponent(evt.jurisdiction)}`);
+                            }
+                          }}
+                          className="text-emerald-400 hover:text-emerald-300 font-semibold text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 transition-all flex items-center gap-1 border border-emerald-500/30 hover:border-emerald-400/50 shadow-sm"
+                          title={match ? `Inspect extracted requirements for ${match.name}` : `Inspect ${evt.jurisdiction} regulations`}
+                        >
+                          <Shield className="w-2.5 h-2.5 text-emerald-400" />
+                          <span>Inspect {label}</span>
+                          <ArrowUpRight className="w-2.5 h-2.5" />
+                        </button>
+                      );
+                    })()}
+
                     {onSelectJurisdiction && (
                       <button
                         onClick={() => onSelectJurisdiction(evt.jurisdiction)}
@@ -400,6 +456,7 @@ export function LiveSurveillanceFeed({
               </div>
             );
           })
+
         )}
       </div>
 
