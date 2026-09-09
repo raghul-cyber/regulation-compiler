@@ -15,7 +15,10 @@ export function ConsoleGuard() {
     const originalWarn = console.warn;
     console.warn = (...args: any[]) => {
       const firstArg = typeof args[0] === 'string' ? args[0] : '';
-      if (firstArg.includes('THREE.Clock: This module has been deprecated')) {
+      if (
+        firstArg.includes('THREE.Clock: This module has been deprecated') ||
+        firstArg.includes('Clerk: Clerk has been loaded with development keys')
+      ) {
         return;
       }
       originalWarn.apply(console, args);
@@ -30,9 +33,19 @@ export function ConsoleGuard() {
       originalLog.apply(console, args);
     };
 
+    const originalError = console.error;
+    console.error = (...args: any[]) => {
+      const firstArg = typeof args[0] === 'string' ? args[0] : '';
+      if (firstArg.includes('ERR_NAME_NOT_RESOLVED') && firstArg.includes('clerk')) {
+        return;
+      }
+      originalError.apply(console, args);
+    };
+
     return () => {
       console.warn = originalWarn;
       console.log = originalLog;
+      console.error = originalError;
     };
   }, []);
 

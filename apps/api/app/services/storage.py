@@ -91,8 +91,7 @@ class StorageService:
         If using local storage, returns a file:// URI.
         """
         if self.use_local:
-            local_file_path = os.path.join(self.local_storage_path, storage_path)
-            return f"file://{local_file_path}"
+            return f"http://127.0.0.1:8080/api/v1/reports/download-by-path?path={storage_path}"
             
         try:
             url = self.s3_client.generate_presigned_url(

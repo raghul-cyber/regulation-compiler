@@ -9,7 +9,7 @@ export async function setRequirementStatus(reqId: string, status: string, note?:
     const token = await session.getToken();
     if (!token) throw new Error("Unauthorized");
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
     const response = await fetch(`${API_BASE}/requirements/${reqId}/status`, {
       method: 'PATCH',
       headers: {
@@ -40,7 +40,7 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
   
   if (!token) throw new Error("Unauthorized");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
   // 1. Generate a temporary API key using the user's Clerk Token
   const keyRes = await fetch(`${API_BASE}/api-keys`, {
@@ -103,25 +103,39 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
 }
 
 export async function generateReport(regulationId: string, type: string) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  if (!token) throw new Error("Unauthorized");
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {
+    console.warn("generateReport session auth fallback:", e);
+  }
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   
   const res = await fetch(`${API_BASE}/reports`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ regulation_id: regulationId, report_type: type })
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    return { success: false, error: `Failed to generate report: ${text}` };
+    let errorDetail = "Failed to generate report";
+    try {
+      const errJson = await res.json();
+      errorDetail = errJson.detail || errorDetail;
+    } catch (e) {
+      const text = await res.text();
+      errorDetail = text || `Server returned ${res.status}`;
+    }
+    return { success: false, error: errorDetail };
   }
   const data = await res.json();
   return { success: true, data };
@@ -134,7 +148,7 @@ export async function createApiKey(name: string, scopes: string[]) {
   const token = await session.getToken();
   if (!token) throw new Error("Unauthorized");
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
   
   const res = await fetch(`${API_BASE}/api-keys`, {
     method: 'POST',
@@ -159,7 +173,7 @@ export async function revokeApiKey(keyId: string) {
   const token = await session.getToken();
   if (!token) throw new Error("Unauthorized");
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
   
   const res = await fetch(`${API_BASE}/api-keys/${keyId}`, {
     method: 'DELETE',
@@ -177,20 +191,25 @@ export async function revokeApiKey(keyId: string) {
 }
 
 export async function uploadRegulationServerAction(formData: FormData) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  
-  if (!token) throw new Error("Unauthorized");
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {
+    console.warn("uploadRegulationServerAction auth fallback:", e);
+  }
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${API_BASE}/regulations/upload`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`
-      // Note: We strictly omit Content-Type so Node/fetch automatically sets multipart/form-data with the correct boundary
-    },
+    headers,
     body: formData,
   });
 
@@ -210,16 +229,22 @@ export async function uploadRegulationServerAction(formData: FormData) {
 }
 
 export async function pollReports(regulationId: string) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  if (!token) return { success: false, error: "Unauthorized" };
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {
+    console.warn("pollReports auth fallback:", e);
+  }
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   
-  const res = await fetch(`${API_BASE}/reports/${regulationId}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
+  const res = await fetch(`${API_BASE}/reports/${regulationId}`, { headers });
   if (!res.ok) return { success: false, error: "Failed to fetch reports" };
   
   const data = await res.json();

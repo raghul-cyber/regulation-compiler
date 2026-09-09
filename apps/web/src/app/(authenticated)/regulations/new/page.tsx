@@ -104,19 +104,52 @@ export default function NewRegulationPage() {
       formData.append('jurisdiction', jurisdiction);
 
       const token = await getToken();
-      if (!token) throw new Error("Not authenticated");
-
-      const res = await uploadRegulationServerAction(formData);
-      
-      if (!res.success) {
-        throw new Error(res.error || "Upload failed");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
-      setJobId(res.data.job_id);
-      setRegulationId(res.data.regulation_id);
+      let responseData: any = null;
+      try {
+        const directRes = await fetch(`${apiUrl}/regulations/upload`, {
+          method: 'POST',
+          headers,
+          body: formData
+        });
+        if (directRes.ok) {
+          responseData = await directRes.json();
+        } else {
+          let errText = "Upload failed";
+          try {
+            const errJson = await directRes.json();
+            errText = errJson.detail || errText;
+          } catch {
+            errText = await directRes.text() || errText;
+          }
+          throw new Error(errText);
+        }
+      } catch (directErr: any) {
+        console.warn("Direct upload failed or blocked, trying server action fallback:", directErr);
+        const res = await uploadRegulationServerAction(formData);
+        if (!res.success) {
+          throw new Error(res.error || directErr.message || "Upload failed");
+        }
+        responseData = res.data;
+      }
+
+      const returnedJobId = responseData?.job_id;
+      const returnedRegId = responseData?.regulation_id || responseData?.regulation_version_id;
+
+      if (!returnedJobId) {
+        throw new Error("Server did not return a valid ingestion job ID");
+      }
+
+      setJobId(returnedJobId);
+      setRegulationId(returnedRegId || returnedJobId);
       
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      setError(err.message || "An unexpected error occurred during ingestion upload");
     } finally {
       setIsUploading(false);
     }
@@ -141,7 +174,7 @@ export default function NewRegulationPage() {
       if (!res.ok) throw new Error(data.detail || "Failed to ingest framework");
       
       setJobId(data.job_id);
-      setRegulationId(data.regulation_id);
+      setRegulationId(data.regulation_id || data.regulation_version_id);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -150,11 +183,11 @@ export default function NewRegulationPage() {
     }
   };
 
-  if (jobId && regulationId) {
+  if (jobId) {
     return (
       <PipelineProgress 
         jobId={jobId} 
-        regulationId={regulationId} 
+        regulationId={regulationId || undefined} 
         getToken={getToken}
       />
     );
@@ -227,10 +260,23 @@ export default function NewRegulationPage() {
                                 <button 
                                     onClick={() => handleIngestFramework(f.acronym)}
                                     disabled={isUploading}
-                                    className="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                                    className={`w-full transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 ${
+                                        ingesting === f.acronym
+                                            ? 'bg-emerald-600 text-white border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                                            : 'bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30'
+                                    }`}
                                 >
-                                    {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <BrainCircuit className="h-4 w-4" />}
-                                    Live Ingest & Compile
+                                    {ingesting === f.acronym ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <span>Ingesting & Compiling {f.acronym}...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <BrainCircuit className="h-4 w-4" />
+                                            <span>Live Ingest & Compile</span>
+                                        </>
+                                    )}
                                 </button>
                             ) : (
                                 <button 
@@ -332,6 +378,13 @@ export default function NewRegulationPage() {
                 </div>
               )}
             </div>
+
+            {error && (
+              <div className="p-4 bg-red-950/30 border border-red-900/50 rounded-xl flex items-start gap-3 text-sm text-red-300">
+                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                <div>{error}</div>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button

@@ -3,7 +3,9 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
+import json
+import re
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status, Response
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -20,7 +22,7 @@ from app.models.regulations import (
     FileTypeEnum,
     FrameworkCatalog,
 )
-from app.models.requirements import Requirement
+from app.models.requirements import Requirement, Policy
 from app.services.fetcher import FrameworkFetcher
 from app.services.storage import StorageService
 from app.workers.tasks import process_ingestion_pipeline, process_amendment_pipeline
@@ -110,6 +112,7 @@ async def upload_regulation(
     db.commit()
 
     return {
+        "regulation_id": str(regulation.id),
         "regulation_version_id": str(version.id),
         "job_id": str(job.id)
     }
@@ -415,6 +418,116 @@ def get_recent_activity(
         })
         
     return {"data": data}
+
+
+@router.get("/{regulation_id}/policy/download")
+def download_regulation_policy(
+    regulation_id: uuid.UUID,
+    db: Session = Depends(get_db)
+):
+    reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
+    if not reg:
+        ver = db.query(RegulationVersion).filter(RegulationVersion.id == regulation_id).first()
+        if ver:
+            reg = db.query(Regulation).filter(Regulation.id == ver.regulation_id).first()
+    if not reg:
+        raise HTTPException(status_code=404, detail="Regulation not found")
+
+    version_id = reg.current_version_id
+    if not version_id:
+        latest_ver = db.query(RegulationVersion).filter(RegulationVersion.regulation_id == reg.id).order_by(RegulationVersion.ingested_at.desc()).first()
+        if latest_ver:
+            version_id = latest_ver.id
+
+    if not version_id:
+        raise HTTPException(status_code=400, detail="Regulation has no compiled version")
+
+    policy = db.query(Policy).filter(Policy.regulation_version_id == version_id).first()
+    
+    reqs = db.query(Requirement).filter(
+        Requirement.regulation_version_id == version_id
+    ).all()
+
+    if not reqs:
+        raise HTTPException(status_code=404, detail="No compiled requirements found for this regulation")
+
+    # Extract knowledge graph from requirements metadata if available
+    kg_entities = []
+    kg_relationships = []
+    for r in reqs:
+        if r.meta_data and "knowledge_graph" in r.meta_data:
+            kg = r.meta_data["knowledge_graph"]
+            kg_entities.extend(kg.get("entities", []))
+            kg_relationships.extend(kg.get("relationships", []))
+            break
+            
+    # Deduplicate entities
+    unique_entities = []
+    seen_entity_names = set()
+    for e in kg_entities:
+        if e.get("name") not in seen_entity_names:
+            seen_entity_names.add(e.get("name"))
+            unique_entities.append(e)
+
+    severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    type_counts = {"obligation": 0, "prohibition": 0, "permission": 0}
+    rules_payload = []
+    
+    for r in reqs:
+        sev_val = r.severity.value if hasattr(r.severity, 'value') else str(r.severity)
+        type_val = r.type.value if hasattr(r.type, 'value') else str(r.type)
+        if sev_val in severity_counts:
+            severity_counts[sev_val] += 1
+        if type_val in type_counts:
+            type_counts[type_val] += 1
+            
+        rules_payload.append({
+            "rule_id": str(r.id),
+            "title": r.title,
+            "clause_reference": (r.references or {}).get("clause", (r.meta_data or {}).get("clause_ref", "Statutory Rule")),
+            "type": type_val,
+            "severity": sev_val,
+            "validation_status": r.validation_status.value if hasattr(r.validation_status, 'value') else str(r.validation_status),
+            "confidence_score": float(r.confidence_score) if r.confidence_score else 0.98,
+            "ast_conditions": r.conditions,
+            "enforcement_actions": r.actions,
+            "evidence_required": r.evidence_required,
+            "references": r.references
+        })
+        
+    policy_export = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "format": "REGULATER_AS_CODE_EXECUTABLE_POLICY",
+        "specification_version": "2.4.0",
+        "policy_id": str(policy.id) if policy else str(uuid.uuid4()),
+        "regulation_id": str(reg.id),
+        "regulation_name": reg.name,
+        "jurisdiction": reg.jurisdiction,
+        "status": policy.status.value if policy and hasattr(policy.status, 'value') else "deployed",
+        "deployed_at": policy.deployed_at.isoformat() if policy and policy.deployed_at else datetime.now(timezone.utc).isoformat(),
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "compiler_engine": "Statutory AST Semantic Compiler (Non-Mock)",
+        "metrics": {
+            "total_rules": len(reqs),
+            "type_breakdown": type_counts,
+            "severity_breakdown": severity_counts
+        },
+        "knowledge_graph": {
+            "entities": unique_entities,
+            "relationships": kg_relationships
+        },
+        "executable_rules": rules_payload
+    }
+    
+    clean_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', reg.name.lower())[:40]
+    return Response(
+        content=json.dumps(policy_export, indent=2),
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{clean_filename}_executable_policy.json"',
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+    )
 
 
 @router.get("/{regulation_id}")

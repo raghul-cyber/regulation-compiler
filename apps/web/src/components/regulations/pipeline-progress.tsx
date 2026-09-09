@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Loader2, CheckCircle2, XCircle, Target, CheckSquare, ChevronRight, ChevronDown, RotateCcw } from 'lucide-react';
+import { 
+  Loader2, CheckCircle2, XCircle, Target, CheckSquare, 
+  ChevronRight, ChevronDown, RotateCcw, Download, Cpu, 
+  Network, ShieldCheck, FileJson 
+} from 'lucide-react';
 import Link from 'next/link';
 import { ReportGenerator } from './report-generator';
 
@@ -24,7 +28,7 @@ const STAGES = [
   { num: 6, name: "Knowledge Graph Linking", hasDetails: true },
   { num: 7, name: "Rule Compilation", hasDetails: true },
   { num: 8, name: "Validation", hasDetails: true },
-  { num: 9, name: "Persist to Policy DB", hasDetails: false }
+  { num: 9, name: "Persist to Policy DB", hasDetails: true }
 ];
 
 export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: string, getToken: () => Promise<string | null>, regulationId?: string }) {
@@ -35,6 +39,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
   const [error, setError] = useState<string | null>(null);
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     let abortController = new AbortController();
@@ -44,10 +49,13 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
         const token = await getToken();
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
         
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await fetch(`${API_BASE}/jobs/${jobId}/events`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          headers,
           signal: abortController.signal
         });
 
@@ -146,6 +154,55 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
       setError(err.message);
     } finally {
       setIsRetrying(false);
+    }
+  };
+
+  const handleDownloadPolicy = async () => {
+    try {
+      setIsDownloading(true);
+      const token = await getToken();
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      
+      const stage9Event = events.find(e => e.stage_number === 9 && e.status === 'completed');
+      const policyId = stage9Event?.details?.policy_id;
+      
+      const url = regulationId 
+        ? `${API_BASE}/regulations/${regulationId}/policy/download` 
+        : policyId 
+          ? `${API_BASE}/policies/${policyId}/download`
+          : null;
+
+      if (!url) {
+        throw new Error("No policy ID or regulation ID available for download");
+      }
+
+      const res = await fetch(url, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+
+      if (!res.ok) throw new Error(`Download failed with status ${res.status}`);
+
+      const blob = await res.blob();
+      const contentDisposition = res.headers.get('Content-Disposition');
+      let filename = 'compiled_compliance_policy.json';
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err: any) {
+      console.error("Policy download error:", err);
+      setError(`Download failed: ${err.message}`);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -332,6 +389,36 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
                               <span className="text-zinc-300"><strong className="text-amber-400 font-medium">{details.needs_review}</strong> Needs Review</span>
                             </div>
                           </div>
+                        ) : stage.name === 'Knowledge Graph Linking' ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-purple-400">
+                              <Network className="w-4 h-4" />
+                              <span className="font-semibold">{details.entities_linked || 0} Knowledge Entities Linked</span>
+                            </div>
+                            <div className="text-xs text-zinc-400">
+                              Dependency graph created with {details.relationships_count || 0} cross-clause statutory relationships.
+                            </div>
+                          </div>
+                        ) : stage.name === 'Rule Compilation' ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-cyan-400">
+                              <Cpu className="w-4 h-4" />
+                              <span className="font-semibold">{details.rules_generated || 0} Executable AST Rules Compiled</span>
+                            </div>
+                            <div className="text-xs text-zinc-400">
+                              Generated mathematical AST logic conditions ready for automated real-time compliance evaluation.
+                            </div>
+                          </div>
+                        ) : stage.name === 'Persist to Policy DB' ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-emerald-400">
+                              <ShieldCheck className="w-4 h-4" />
+                              <span className="font-semibold">Policy Engine Deployed ({details.total_requirements || 0} Rules)</span>
+                            </div>
+                            <div className="text-xs text-zinc-400 font-mono">
+                              {details.status}
+                            </div>
+                          </div>
                         ) : (
                           <pre className="text-xs font-mono text-zinc-400 whitespace-pre-wrap">
                             {JSON.stringify(details, null, 2)}
@@ -350,25 +437,60 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
       {/* Post-Completion Actions (Phase 4 Trigger Prompts) */}
       {jobStatus === 'completed' && (
         <div className="mt-8 pt-6 border-t border-zinc-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h3 className="text-lg font-medium text-white mb-4">Pipeline Successfully Completed</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-white flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              Pipeline Successfully Compiled
+            </h3>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Ready for Enforcement
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link 
               href={regulationId ? `/regulations/${regulationId}/requirements` : '/regulations'}
-              className="group flex items-center justify-between p-4 bg-blue-950/20 hover:bg-blue-950/40 border border-blue-900/30 hover:border-blue-500/50 rounded-xl transition-all"
+              className="group flex flex-col justify-between p-4 bg-blue-950/20 hover:bg-blue-950/40 border border-blue-900/30 hover:border-blue-500/50 rounded-xl transition-all"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-blue-900/50 rounded-lg text-blue-400">
                   <CheckSquare className="w-5 h-5" />
                 </div>
                 <div className="text-left">
                   <div className="text-sm font-medium text-blue-100">Review Requirements</div>
-                  <div className="text-xs text-blue-300/70">Validate the extracted rules</div>
+                  <div className="text-xs text-blue-300/70">Validate extracted statutory rules</div>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-blue-500/50 group-hover:text-blue-400 transform group-hover:translate-x-1 transition-all" />
+              <div className="flex items-center justify-end text-xs text-blue-400 font-medium">
+                Inspect rules <ChevronRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-all" />
+              </div>
             </Link>
+
+            <button
+              onClick={handleDownloadPolicy}
+              disabled={isDownloading}
+              className="group flex flex-col justify-between p-4 bg-emerald-950/20 hover:bg-emerald-950/40 border border-emerald-900/30 hover:border-emerald-500/50 rounded-xl transition-all text-left disabled:opacity-50"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-emerald-900/50 rounded-lg text-emerald-400">
+                  {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileJson className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-emerald-100">Download Executable Policy</div>
+                  <div className="text-xs text-emerald-300/70">Export AST policy JSON artifact</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end text-xs text-emerald-400 font-medium">
+                {isDownloading ? "Downloading..." : "Download .json"}
+                <Download className="w-4 h-4 ml-1 transform group-hover:translate-y-0.5 transition-all" />
+              </div>
+            </button>
             
-            {regulationId && <ReportGenerator regulationId={regulationId} getToken={getToken} />}
+            {regulationId && (
+              <div className="flex flex-col justify-between">
+                <ReportGenerator regulationId={regulationId} getToken={getToken} />
+              </div>
+            )}
           </div>
         </div>
       )}

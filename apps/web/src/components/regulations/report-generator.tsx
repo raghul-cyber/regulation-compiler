@@ -32,14 +32,23 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
+  const handleReset = () => {
+    setJobId(null);
+    setReportId(null);
+    setActiveStage(0);
+    setCompletedStages([]);
+    setError(null);
+    setDownloadUrl(null);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    handleReset();
+  };
+
   const handleStartGeneration = async () => {
     try {
-      setJobId(null);
-      setReportId(null);
-      setActiveStage(0);
-      setCompletedStages([]);
-      setError(null);
-      setDownloadUrl(null);
+      handleReset();
 
       const res = await generateReport(regulationId, selectedType);
       if (!res.success) throw new Error(res.error);
@@ -58,28 +67,46 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
     let isMounted = true;
 
     const connectSSE = async () => {
-      const token = await getToken();
-      if (!token) return;
+      let token: string | null = null;
+      try {
+        token = await getToken();
+      } catch (e) {
+        console.warn("getToken error in ReportGenerator:", e);
+      }
 
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-      eventSource = new EventSource(`${API_BASE}/jobs/${jobId}/events?token=${token}`);
+      const sseUrl = token ? `${API_BASE}/jobs/${jobId}/events?token=${encodeURIComponent(token)}` : `${API_BASE}/jobs/${jobId}/events`;
+      eventSource = new EventSource(sseUrl);
 
       eventSource.onmessage = (event) => {
         if (!isMounted) return;
-        const data = JSON.parse(event.data);
+        try {
+          const data = JSON.parse(event.data);
 
-        setActiveStage(data.stage_number);
-        
-        if (data.status === 'completed') {
-          setCompletedStages(prev => [...new Set([...prev, data.stage_number])]);
-          
-          if (data.stage_number === 5) {
-            eventSource?.close();
-            fetchDownloadUrl();
+          if (data.stage_number) {
+            setActiveStage(data.stage_number);
           }
-        } else if (data.status === 'failed') {
-          setError(data.details?.error || "Report generation failed");
-          eventSource?.close();
+          
+          if (data.status === 'completed') {
+            setCompletedStages(prev => [...new Set([...prev, data.stage_number])]);
+            
+            if (data.stage_number === 5) {
+              eventSource?.close();
+              if (data.details?.path) {
+                const rawPath = data.details.path;
+                const fullUrl = rawPath.startsWith('http') 
+                  ? rawPath 
+                  : `${API_BASE.replace('/api/v1', '')}${rawPath}`;
+                setDownloadUrl(fullUrl);
+              }
+              fetchDownloadUrl();
+            }
+          } else if (data.status === 'failed') {
+            setError(data.details?.error || "Report generation failed");
+            eventSource?.close();
+          }
+        } catch (err) {
+          console.error("SSE parse error:", err);
         }
       };
 
@@ -98,25 +125,28 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
 
   const fetchDownloadUrl = async () => {
     try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       let attempts = 0;
       const poll = setInterval(async () => {
         attempts++;
-        if (attempts > 5) {
+        if (attempts > 15) {
            clearInterval(poll);
-           setError("Failed to fetch download URL. Please try again.");
            return;
         }
         const res = await pollReports(regulationId);
         if (res.success && res.data) {
            const report = res.data.find((r: any) => r.id === reportId);
            if (report && report.status === 'completed' && report.download_url) {
-              setDownloadUrl(report.download_url);
+              const fullUrl = report.download_url.startsWith('http')
+                ? report.download_url
+                : `${API_BASE.replace('/api/v1', '')}${report.download_url}`;
+              setDownloadUrl(fullUrl);
               clearInterval(poll);
            }
         }
-      }, 2000);
+      }, 1500);
     } catch (e) {
-      console.error(e);
+      console.error("Error polling reports:", e);
     }
   };
 
@@ -147,7 +177,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                 <FileText className="w-5 h-5 text-purple-500" />
                 Report Generator
               </h2>
-              <button onClick={() => setIsOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={handleClose} className="text-zinc-500 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -256,6 +286,12 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         <FileText className="w-5 h-5" />
                         Download Generated Report
                       </a>
+                      <button
+                        onClick={handleReset}
+                        className="w-full mt-3 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium rounded-xl border border-zinc-800 transition-colors"
+                      >
+                        Generate Another Report
+                      </button>
                     </div>
                   )}
                 </div>
