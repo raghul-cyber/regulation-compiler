@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '');
 
 async function getAuthToken() {
   try {
@@ -26,18 +27,24 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-    cache: 'no-store'
-  });
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
-  if (!response.ok) {
-    console.warn(`API Error [${endpoint}]: ${response.status} ${response.statusText}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      console.warn(`API Error [${endpoint}]: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.warn(`Fetch error for [${endpoint}]:`, err);
     return null;
   }
-
-  return response.json();
 }
 
 export async function getRegulations() {
@@ -57,7 +64,6 @@ export async function getRecentActivity(regulationId: string) {
   return fetchWithAuth(`/regulations/${regulationId}/activity`);
 }
 
-
 export async function getRequirements(regulationId: string, searchParams?: Record<string, string>) {
   const query = new URLSearchParams();
   if (searchParams) {
@@ -70,27 +76,11 @@ export async function getRequirements(regulationId: string, searchParams?: Recor
 }
 
 export async function updateRequirementStatus(requirementId: string, status: string, note?: string) {
-  const { getToken } = await auth();
-  const token = await getToken();
-  
-  if (!token) throw new Error("Unauthorized");
-
-  const response = await fetch(`${API_BASE_URL}/requirements/${requirementId}/status`, {
+  return fetchWithAuth(`/requirements/${requirementId}/status`, {
     method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({ status, reviewer_note: note }),
   });
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
 }
-
 
 export async function getRegulationDiff(regulationId: string, oldVersionId?: string, newVersionId?: string) {
   const query = new URLSearchParams();
@@ -101,111 +91,54 @@ export async function getRegulationDiff(regulationId: string, oldVersionId?: str
   return fetchWithAuth(`/regulations/${regulationId}/diff${queryString}`);
 }
 
-
 export async function getReports(regulationId: string) {
   return fetchWithAuth(`/reports/${regulationId}`);
 }
 
 export async function getApiKeys() {
-  return fetchWithAuth(`/api-keys`);
+  return fetchWithAuth('/api-keys');
 }
 
-
-// --- Compliance Hub API Methods ---
-
 export async function getPolicies() {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/policies`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error("Failed to fetch policies");
-  const data = await res.json();
-  return data.data;
+  const res = await fetchWithAuth('/policies');
+  return res?.data || [];
 }
 
 export async function createPolicy(regulation_version_id: string) {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/policies`, {
+  const res = await fetchWithAuth('/policies', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
     body: JSON.stringify({ regulation_version_id })
   });
-  if (!res.ok) throw new Error("Failed to create policy");
-  const data = await res.json();
-  return data.data;
+  return res?.data || null;
 }
 
 export async function getComplianceDashboard() {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/compliance/dashboard`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error("Failed to fetch dashboard");
-  const data = await res.json();
-  return data.data;
+  const res = await fetchWithAuth('/compliance/dashboard');
+  return res?.data || null;
 }
 
 export async function getGapAnalysis() {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/compliance/gap-analysis`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error("Failed to fetch gap analysis");
-  const data = await res.json();
-  return data.data;
+  const res = await fetchWithAuth('/compliance/gap-analysis');
+  return res?.data || [];
 }
 
 export async function getComplianceChecklist() {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/compliance/checklist`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error("Failed to fetch checklist");
-  const data = await res.json();
-  return data.data;
+  const res = await fetchWithAuth('/compliance/checklist');
+  return res?.data || [];
 }
 
 export async function remediateCompliance(compliance_check_id: string, requirement_id: string, remediation_payload: any) {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/compliance/remediate`, {
+  const res = await fetchWithAuth('/compliance/remediate', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
     body: JSON.stringify({ compliance_check_id, requirement_id, remediation_payload })
   });
-  if (!res.ok) throw new Error("Failed to remediate violation");
-  const data = await res.json();
-  return data.data;
+  return res?.data || null;
 }
 
 export async function evaluateCompliance(policy_id: string, system_payload: any) {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/v1/compliance/evaluate`, {
+  const res = await fetchWithAuth('/compliance/evaluate', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
     body: JSON.stringify({ policy_id, system_payload })
   });
-  if (!res.ok) throw new Error("Failed to evaluate compliance");
-  const data = await res.json();
-  return data.data;
+  return res?.data || null;
 }

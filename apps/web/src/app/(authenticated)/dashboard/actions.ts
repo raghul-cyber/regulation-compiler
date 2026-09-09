@@ -25,9 +25,12 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const cleanBaseUrl = API_BASE_URL.replace(/\/+$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const response = await fetch(`${cleanBaseUrl}${cleanEndpoint}`, {
       ...options,
       headers,
+      cache: 'no-store', // Always fetch fresh live surveillance telemetry
     });
 
     if (!response.ok) {

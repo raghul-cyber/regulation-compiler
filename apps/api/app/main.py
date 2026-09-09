@@ -101,6 +101,8 @@ async def health_check(request: Request):
         db = SessionLocal()
         db.execute(text("SELECT 1"))
         response["checks"]["database"] = "ok"
+        response["checks"]["db_host"] = str(engine.url.host)
+        response["checks"]["db_name"] = str(engine.url.database)
     except Exception as e:
         response["status"] = "degraded"
         response["checks"]["database"] = f"error: {str(e)}"
