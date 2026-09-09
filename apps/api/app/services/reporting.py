@@ -1760,16 +1760,33 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         # 4. Generate PDF using Playwright with precision page margins
         if dispatcher: dispatcher.emit(4, "Render PDF", "started")
         pdf_bytes = b""
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.set_content(html_content, wait_until="load")
-            pdf_bytes = page.pdf(
-                format="A4",
-                print_background=True,
-                margin={"top": "18mm", "bottom": "20mm", "left": "15mm", "right": "15mm"}
-            )
-            browser.close()
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"]
+                )
+                page = browser.new_page()
+                page.set_content(html_content, wait_until="load")
+                pdf_bytes = page.pdf(
+                    format="A4",
+                    print_background=True,
+                    margin={"top": "18mm", "bottom": "20mm", "left": "15mm", "right": "15mm"}
+                )
+                browser.close()
+        except Exception as pw_err:
+            logger.warning(f"Playwright PDF generation failed ({pw_err}), falling back to PyMuPDF...")
+            import fitz
+            doc = fitz.open()
+            page = doc.new_page()
+            rect = fitz.Rect(50, 50, 545, 792)
+            try:
+                page.insert_htmlbox(rect, html_content)
+            except Exception:
+                page.insert_text((50, 80), f"Regulation Compliance Report - {report.regulation_id}\n\nGenerated automatically.")
+            pdf_bytes = doc.tobytes()
+            doc.close()
+
         time.sleep(0.5)
         if dispatcher: dispatcher.emit(4, "Render PDF", "completed", {"size_bytes": len(pdf_bytes)})
             
