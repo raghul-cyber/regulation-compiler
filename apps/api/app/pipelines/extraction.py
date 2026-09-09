@@ -61,7 +61,18 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
             for page in doc:
                 raw_text += page.get_text() + "\n"
         else:
-            raw_text = file_bytes.decode('utf-8')
+            raw_content = file_bytes.decode('utf-8', errors='ignore')
+            if "<html" in raw_content.lower() or "<div" in raw_content.lower() or "<body" in raw_content.lower() or "<table" in raw_content.lower():
+                try:
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(raw_content, "html.parser")
+                    for s in soup(["script", "style", "nav", "header", "footer"]):
+                        s.extract()
+                    raw_text = soup.get_text(separator="\n", strip=True)
+                except Exception:
+                    raw_text = re.sub(r'<[^>]+>', ' ', raw_content)
+            else:
+                raw_text = raw_content
             
         source_doc.raw_text = raw_text
         source_doc.page_count = page_count
