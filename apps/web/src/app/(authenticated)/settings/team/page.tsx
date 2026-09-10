@@ -46,7 +46,7 @@ export default function TeamSettingsPage() {
   const fetchTeamAndInvites = async () => {
     try {
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       
       const [membersRes, invitesRes] = await Promise.all([
         fetch(`${apiUrl}/team/`, { headers: { 'Authorization': `Bearer ${token}` } }),
@@ -73,9 +73,9 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(userId);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       const res = await fetch(`${apiUrl}/team/${userId}/role`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ export default function TeamSettingsPage() {
     try {
       setUpdating("invite");
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       const res = await fetch(`${apiUrl}/team/invite`, {
         method: 'POST',
         headers: { 
@@ -123,7 +123,7 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(inviteId);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       const res = await fetch(`${apiUrl}/team/invite/${inviteId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

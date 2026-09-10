@@ -40,7 +40,7 @@ async def upload_regulation(
     file: UploadFile = File(...),
     jurisdiction: str = Form(...),
     name: str = Form(...),
-    # current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer])),
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.developer])),
     db: Session = Depends(get_db)
 ):
     # Validate file extension
@@ -54,6 +54,16 @@ async def upload_regulation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only PDF and HTML files are supported."
         )
+
+    # Validate file size (max 50MB)
+    MAX_FILE_SIZE = 50 * 1024 * 1024
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size exceeds the 50MB maximum limit."
+        )
+    await file.seek(0)
 
     # 1. Upload file to S3
     try:
@@ -275,7 +285,7 @@ async def amend_regulation(
     regulation_id: uuid.UUID,
     file: UploadFile = File(...),
     version_label: str = Form(...),
-    # current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer])),
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.developer])),
     db: Session = Depends(get_db)
 ):
     reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
@@ -289,6 +299,16 @@ async def amend_regulation(
         file_type = FileTypeEnum.html
     else:
         raise HTTPException(status_code=400, detail="Only PDF and HTML supported.")
+
+    # Validate file size (max 50MB)
+    MAX_FILE_SIZE = 50 * 1024 * 1024
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size exceeds the 50MB maximum limit."
+        )
+    await file.seek(0)
 
     try:
         storage_path = storage_service.upload_file(file.file, file.filename, file.content_type)

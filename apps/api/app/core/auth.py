@@ -85,21 +85,26 @@ async def get_current_user(
                 db.add(org)
                 db.flush()
                 
+            # Extract email if present in payload or fallback
+            user_email = payload.get("email") or payload.get("email_address") or f"{clerk_user_id}@user.clerk"
             user = User(
                 org_id=org.id,
                 clerk_user_id=clerk_user_id,
                 role=RoleEnum.admin,
-                email="auto-dev-user@example.com"
+                email=user_email
             )
             db.add(user)
             db.commit()
             db.refresh(user)
             
         # Optional: In a multi-tenant app, we might set a DB context/GUC here for RLS
-        db.execute(
-            text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
-            {"tenant_id": str(user.org_id)}
-        )
+        try:
+            db.execute(
+                text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
+                {"tenant_id": str(user.org_id)}
+            )
+        except Exception:
+            pass
         
         return user
         
@@ -165,10 +170,13 @@ def require_scope(allowed_scopes: List[str]):
             raise HTTPException(status_code=403, detail="Insufficient permissions")
             
         # Optional: In a multi-tenant app, we might set a DB context/GUC here for RLS
-        db.execute(
-            text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
-            {"tenant_id": str(db_key.org_id)}
-        )
+        try:
+            db.execute(
+                text("SELECT set_config('app.current_tenant', :tenant_id, true)"),
+                {"tenant_id": str(db_key.org_id)}
+            )
+        except Exception:
+            pass
         
         return db_key
         

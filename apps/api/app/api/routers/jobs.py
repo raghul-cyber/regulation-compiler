@@ -8,7 +8,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.organizations import User, RoleEnum
-from app.core.auth import require_role
+from typing import Optional
+from app.core.auth import require_role, get_optional_current_user
 from app.models.jobs import BackgroundJob, JobEvent
 from app.core.celery_app import celery_app
 
@@ -17,7 +18,7 @@ router = APIRouter(tags=["jobs"])
 @router.get("/jobs/{job_id}")
 def get_job_status(
     job_id: uuid.UUID,
-    # current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.developer, RoleEnum.compliance_officer])),
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.developer, RoleEnum.compliance_officer, RoleEnum.legal_counsel, RoleEnum.auditor])),
     db: Session = Depends(get_db)
 ):
     job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
@@ -37,6 +38,7 @@ def get_job_status(
 @router.get("/jobs/{job_id}/events")
 async def get_job_events(
     job_id: uuid.UUID,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
@@ -102,6 +104,7 @@ async def get_job_events(
 @router.post("/jobs/{job_id}/retry")
 def retry_job(
     job_id: uuid.UUID,
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.developer, RoleEnum.compliance_officer])),
     db: Session = Depends(get_db)
 ):
     from app.models.regulations import RegulationVersion
