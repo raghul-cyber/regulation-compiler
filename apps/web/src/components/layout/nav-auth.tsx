@@ -31,11 +31,19 @@ export function NavAuth() {
       )}
       
       {/* Global persistent CTA */}
-      <Link href="/dashboard">
-        <Button size="sm" className="bg-white text-black hover:bg-gray-200 rounded-full font-medium">
-          {userId ? "Dashboard" : "Launch Compiler"}
-        </Button>
-      </Link>
+      {userId ? (
+        <Link href="/dashboard">
+          <Button size="sm" className="bg-white text-black hover:bg-gray-200 rounded-full font-medium">
+            Dashboard
+          </Button>
+        </Link>
+      ) : (
+        <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+          <Button size="sm" className="bg-white text-black hover:bg-gray-200 rounded-full font-medium cursor-pointer">
+            Launch Compiler
+          </Button>
+        </SignInButton>
+      )}
     </div>
   );
 }

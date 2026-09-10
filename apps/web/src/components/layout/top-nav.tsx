@@ -1,6 +1,9 @@
-﻿import Link from 'next/link';
+'use client';
+
+import Link from 'next/link';
 import { NavAuth } from './nav-auth';
 import { UploadCloud } from 'lucide-react';
+import { Show, SignInButton } from '@clerk/nextjs';
 
 export function TopNav() {
   return (
@@ -15,19 +18,44 @@ export function TopNav() {
           
           {/* Center: Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/regulations" className="text-zinc-400 hover:text-white transition-colors">
-              Regulations
-            </Link>
-            <Link href="/compliance-check" className="text-zinc-400 hover:text-white transition-colors">
-              Compliance
-            </Link>
-            <Link href="/regulations/new" className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4">
-              <UploadCloud className="w-4 h-4" />
-              Upload
-            </Link>
+            <Show when="signed-in">
+              <Link href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/regulations" className="text-zinc-400 hover:text-white transition-colors">
+                Regulations
+              </Link>
+              <Link href="/compliance-check" className="text-zinc-400 hover:text-white transition-colors">
+                Compliance
+              </Link>
+              <Link href="/regulations/new" className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4">
+                <UploadCloud className="w-4 h-4" />
+                Upload
+              </Link>
+            </Show>
+            <Show when="signed-out">
+              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                  Dashboard
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal" fallbackRedirectUrl="/regulations">
+                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                  Regulations
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check">
+                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                  Compliance
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal" fallbackRedirectUrl="/regulations/new">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4 cursor-pointer">
+                  <UploadCloud className="w-4 h-4" />
+                  Upload
+                </button>
+              </SignInButton>
+            </Show>
           </nav>
         </div>
 
@@ -37,5 +65,3 @@ export function TopNav() {
     </header>
   );
 }
-
-

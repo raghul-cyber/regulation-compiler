@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Show, SignInButton } from '@clerk/nextjs';
 
 import { HeroScene } from '@/components/3d/hero-scene-lazy';
 
@@ -36,16 +37,30 @@ export default function LandingPage() {
             Instantly compile archaic legal text into executable, highly-structured enforcement policies.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4 pointer-events-auto">
-            <Link href="/dashboard">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all px-8 h-12">
-                Explore Dashboard
-              </Button>
-            </Link>
-            <Link href="/regulations">
-              <Button size="lg" variant="secondary" className="rounded-full font-semibold px-8 h-12">
-                Launch Compiler
-              </Button>
-            </Link>
+            <Show when="signed-in">
+              <Link href="/dashboard">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all px-8 h-12">
+                  Explore Dashboard
+                </Button>
+              </Link>
+              <Link href="/regulations">
+                <Button size="lg" variant="secondary" className="rounded-full font-semibold px-8 h-12">
+                  Launch Compiler
+                </Button>
+              </Link>
+            </Show>
+            <Show when="signed-out">
+              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all px-8 h-12 cursor-pointer">
+                  Explore Dashboard
+                </Button>
+              </SignInButton>
+              <SignInButton mode="modal" fallbackRedirectUrl="/regulations">
+                <Button size="lg" variant="secondary" className="rounded-full font-semibold px-8 h-12 cursor-pointer">
+                  Launch Compiler
+                </Button>
+              </SignInButton>
+            </Show>
           </div>
         </section>
 
