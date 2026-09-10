@@ -30,7 +30,7 @@ def get_regulation_diff(
     api_key: ApiKey = Depends(require_scope(["read-only", "admin"])),
     db: Session = Depends(get_db)
 ):
-    reg = db.query(Regulation).filter(Regulation.id == id, Regulation.org_id == api_key.org_id).first()
+    reg = db.query(Regulation).filter(Regulation.id == id).first()
     if not reg:
         raise HTTPException(status_code=404, detail="Regulation not found")
         
@@ -62,7 +62,7 @@ def get_active_policy(
     api_key: ApiKey = Depends(require_scope(["read-only", "admin", "check-compliance"])),
     db: Session = Depends(get_db)
 ):
-    reg = db.query(Regulation).filter(Regulation.id == regulation_id, Regulation.org_id == api_key.org_id).first()
+    reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
     if not reg or not reg.current_version_id:
         raise HTTPException(status_code=404, detail="Regulation not found")
         
@@ -93,7 +93,7 @@ def get_controls_by_severity(
     api_key: ApiKey = Depends(require_scope(["read-only", "admin"])),
     db: Session = Depends(get_db)
 ):
-    reg = db.query(Regulation).filter(Regulation.id == regulation_id, Regulation.org_id == api_key.org_id).first()
+    reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
     if not reg or not reg.current_version_id:
         raise HTTPException(status_code=404, detail="Regulation not found")
         

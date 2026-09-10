@@ -29,6 +29,7 @@ def get_team_members(
     }
 
 @router.patch("/{user_id}/role")
+@router.put("/{user_id}/role")
 def update_team_member_role(
     user_id: uuid.UUID,
     role: str,
@@ -139,7 +140,11 @@ def accept_invite(
         
     existing_user = db.query(User).filter(User.clerk_user_id == req.clerk_user_id).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="User already registered.")
+        existing_user.org_id = invite.org_id
+        existing_user.role = invite.role
+        invite.status = 'accepted'
+        db.commit()
+        return {"message": "Invite accepted successfully", "user_id": str(existing_user.id)}
         
     new_user = User(
         org_id=invite.org_id,

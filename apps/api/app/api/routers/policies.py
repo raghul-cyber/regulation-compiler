@@ -17,14 +17,14 @@ router = APIRouter(tags=["Policies"])
 @router.get("/policies")
 def list_policies(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.developer]))
+    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.developer, RoleEnum.legal_counsel, RoleEnum.auditor]))
 ):
     policies = db.query(Policy).filter(Policy.org_id == current_user.org_id).all()
     
     result = []
     for p in policies:
         # Fetch metrics
-        reqs = db.query(Requirement).filter(Requirement.id.in_(p.requirement_ids)).all()
+        reqs = db.query(Requirement).filter(Requirement.id.in_(p.requirement_ids)).all() if p.requirement_ids else []
         severity_counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
         for r in reqs:
             severity_counts[r.severity.value] += 1

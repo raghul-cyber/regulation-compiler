@@ -110,7 +110,13 @@ def create_report(
     org_id = current_user.org_id if current_user else None
     if not org_id:
         org = db.query(Organization).first()
-        org_id = org.id if org else uuid.UUID('c2edd90d-0521-415c-b333-70769fba8df5')
+        if not org:
+            from app.models.organizations import PlanEnum
+            org = Organization(name="Default Workspace", plan=PlanEnum.trial)
+            db.add(org)
+            db.commit()
+            db.refresh(org)
+        org_id = org.id
 
     report = Report(
         org_id=org_id,
