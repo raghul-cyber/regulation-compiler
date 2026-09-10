@@ -20,6 +20,8 @@ const REPORT_STAGES = [
   { num: 5, name: 'Secure Storage Upload' }
 ];
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://regulation-compiler.onrender.com/api/v1';
+
 export function ReportGenerator({ regulationId, getToken }: { regulationId: string, getToken: () => Promise<string | null> }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([REPORT_TYPES[0].id]);
