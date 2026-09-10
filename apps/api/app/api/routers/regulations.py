@@ -125,6 +125,7 @@ def list_regulations(
     try:
         regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
     except Exception as query_err:
+        db.rollback()
         import logging
         logging.getLogger(__name__).warning(f"Could not order by created_at, falling back: {query_err}")
         regs = db.query(Regulation).all()

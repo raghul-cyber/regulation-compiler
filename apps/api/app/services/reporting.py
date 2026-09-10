@@ -4,9 +4,12 @@ import time
 import io
 import re
 import json
+import logging
 from datetime import datetime, timezone
 from jinja2 import Template
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from app.core.celery_app import celery_app
 from app.models.audit import Report, ReportStatusEnum
@@ -193,36 +196,6 @@ BASE_CSS = """
     @page {
         size: A4 portrait;
         margin: 18mm 15mm 20mm 15mm;
-        @top-left {
-            content: "STATUTORY COMPLIANCE COMPILER \\2022  OFFICIAL AUDIT RECORD";
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 7pt;
-            font-weight: 700;
-            color: #64748b;
-            letter-spacing: 0.08em;
-        }
-        @top-right {
-            content: "STRICT ENFORCEMENT DIRECTIVE";
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 7pt;
-            font-weight: 700;
-            color: #7c3aed;
-            letter-spacing: 0.08em;
-        }
-        @bottom-left {
-            content: "CONFIDENTIAL \\2022  CERTIFIED CODIFIED STATUTORY AUDIT";
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 7pt;
-            color: #94a3b8;
-            letter-spacing: 0.04em;
-        }
-        @bottom-right {
-            content: "Page " counter(page) " of " counter(pages);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 7.5pt;
-            font-weight: 600;
-            color: #64748b;
-        }
     }
     * { box-sizing: border-box; }
     body {
@@ -1590,7 +1563,6 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         
     try:
         if dispatcher: dispatcher.emit(1, "Initialize Report", "started")
-        from playwright.sync_api import sync_playwright
         
         # 1. Fetch Report
         report = db.query(Report).filter(Report.id == report_id).first()
@@ -1757,37 +1729,82 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
             "sections": selected_sections
         })
         
-        # 4. Generate PDF using Playwright with precision page margins
+        # 4. Generate PDF using high-performance native PyMuPDF engine
         if dispatcher: dispatcher.emit(4, "Render PDF", "started")
         pdf_bytes = b""
         try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch(
-                    headless=True,
-                    args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"]
-                )
-                page = browser.new_page()
-                page.set_content(html_content, wait_until="load")
-                pdf_bytes = page.pdf(
-                    format="A4",
-                    print_background=True,
-                    margin={"top": "18mm", "bottom": "20mm", "left": "15mm", "right": "15mm"}
-                )
-                browser.close()
-        except Exception as pw_err:
-            logger.warning(f"Playwright PDF generation failed ({pw_err}), falling back to PyMuPDF...")
-            import fitz
-            doc = fitz.open()
-            page = doc.new_page()
-            rect = fitz.Rect(50, 50, 545, 792)
-            try:
-                page.insert_htmlbox(rect, html_content)
-            except Exception:
-                page.insert_text((50, 80), f"Regulation Compliance Report - {report.regulation_id}\n\nGenerated automatically.")
+            import pymupdf
+            clean_css = re.sub(r'@(top|bottom)-(left|right)\s*\{[^}]*\}', '', BASE_CSS)
+            
+            clean_html = template.render(
+                base_css=clean_css,
+                regulation=reg,
+                requirements=formatted_reqs,
+                critical_count=crit_count,
+                high_count=high_count,
+                date=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                org_id=str(report.org_id),
+                org_name=org_name,
+                report_id=str(report.id),
+                report_title=report_title,
+                selected_sections=selected_sections,
+                section_names=section_titles
+            )
+            
+            story = pymupdf.Story(html=clean_html)
+            buffer = io.BytesIO()
+            writer = pymupdf.DocumentWriter(buffer)
+            
+            def rectfn(rect_num, filled):
+                mediabox = pymupdf.Rect(0, 0, 595, 842) # A4
+                rect = pymupdf.Rect(35, 45, 560, 795)   # Printable Margins
+                return mediabox, rect, None
+
+            story.write(writer, rectfn=rectfn)
+            writer.close()
+            
+            doc = pymupdf.open(stream=buffer.getvalue(), filetype='pdf')
+            total_pages = len(doc)
+            
+            for idx, page in enumerate(doc):
+                # Running Top Header & Rules
+                page.draw_line(pymupdf.Point(35, 38), pymupdf.Point(560, 38), color=(0.75, 0.78, 0.85), width=0.5)
+                page.insert_text(pymupdf.Point(35, 32), 'STATUTORY COMPLIANCE COMPILER • OFFICIAL AUDIT RECORD', fontsize=7, color=(0.35, 0.4, 0.5))
+                page.insert_text(pymupdf.Point(430, 32), 'STRICT ENFORCEMENT DIRECTIVE', fontsize=7, color=(0.45, 0.2, 0.8))
+                
+                # Running Bottom Footer & Rules
+                page.draw_line(pymupdf.Point(35, 805), pymupdf.Point(560, 805), color=(0.85, 0.88, 0.92), width=0.5)
+                page.insert_text(pymupdf.Point(35, 818), 'CONFIDENTIAL • CERTIFIED CODIFIED STATUTORY AUDIT', fontsize=7, color=(0.5, 0.55, 0.6))
+                page.insert_text(pymupdf.Point(490, 818), f'Page {idx+1} of {total_pages}', fontsize=7.5, color=(0.35, 0.4, 0.5))
+                
+            pdf_bytes = doc.tobytes()
+            doc.close()
+            logger.info(f"PyMuPDF rendered {total_pages} pages ({len(pdf_bytes)} bytes) for report {report.id}")
+            
+        except Exception as render_err:
+            logger.warning(f"Native Story rendering failed ({render_err}), falling back to direct document builder...")
+            import pymupdf
+            doc = pymupdf.open()
+            page = doc.new_page(width=595, height=842)
+            page.insert_text(pymupdf.Point(40, 60), "STATUTORY COMPLIANCE AUDIT REPORT", fontsize=16, fontname="helv", color=(0.2, 0.2, 0.6))
+            page.insert_text(pymupdf.Point(40, 85), f"Regulation: {reg.name if hasattr(reg, 'name') else 'Statutory Directive'}", fontsize=11, fontname="helv")
+            page.insert_text(pymupdf.Point(40, 105), f"Jurisdiction: {reg.jurisdiction if hasattr(reg, 'jurisdiction') else 'Official Jurisdiction'}", fontsize=9, fontname="helv", color=(0.4, 0.4, 0.4))
+            page.insert_text(pymupdf.Point(40, 125), f"Audit ID: {report.id} | Generated: {datetime.now(timezone.utc).isoformat()}", fontsize=8, fontname="helv", color=(0.5, 0.5, 0.5))
+            page.draw_line(pymupdf.Point(40, 135), pymupdf.Point(555, 135), color=(0.7, 0.7, 0.7), width=1)
+            
+            y = 160
+            for r_item in formatted_reqs[:35]:
+                if y > 780:
+                    page = doc.new_page(width=595, height=842)
+                    y = 50
+                page.insert_text(pymupdf.Point(40, y), f"[{r_item.get('citation', 'Directive')}] {r_item.get('title', '')[:70]}", fontsize=9, fontname="helv", color=(0.1, 0.1, 0.1))
+                y += 14
+                page.insert_text(pymupdf.Point(40, y), f"Severity: {r_item.get('severity_str', 'HIGH')} | Type: {r_item.get('type_str', 'TECHNICAL')}", fontsize=7.5, fontname="helv", color=(0.4, 0.4, 0.4))
+                y += 20
+                
             pdf_bytes = doc.tobytes()
             doc.close()
 
-        time.sleep(0.5)
         if dispatcher: dispatcher.emit(4, "Render PDF", "completed", {"size_bytes": len(pdf_bytes)})
             
         # 5. Upload to Local Storage / S3
@@ -1798,16 +1815,32 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         
         storage = StorageService()
         storage_path = storage.upload_file(file_obj, filename, "application/pdf")
-        download_url = f"http://127.0.0.1:8080/api/v1/reports/{report.id}/download"
+        
+        # Build production-ready dynamic download URL
+        backend_url = os.getenv("API_PUBLIC_URL") or os.getenv("RENDER_EXTERNAL_URL") or "https://regulation-compiler.onrender.com"
+        if os.getenv("ENVIRONMENT") == "development" or os.getenv("ENVIRONMENT") == "local":
+            download_url = f"http://127.0.0.1:8080/api/v1/reports/{report.id}/download"
+        else:
+            download_url = f"{backend_url.rstrip('/')}/api/v1/reports/{report.id}/download"
+            
+        relative_url = f"/api/v1/reports/{report.id}/download"
             
         report.storage_path = storage_path
         report.status = ReportStatusEnum.completed
         db.commit()
         
-        if dispatcher: dispatcher.emit(5, "Secure Storage Upload", "completed", {"path": download_url, "storage_path": storage_path})
+        if dispatcher: dispatcher.emit(5, "Secure Storage Upload", "completed", {
+            "path": download_url, 
+            "relative_path": relative_url, 
+            "storage_path": storage_path
+        })
         
         if job_id:
-            update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {"report_id": str(report.id), "url": download_url})
+            update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {
+                "report_id": str(report.id), 
+                "url": download_url,
+                "relative_url": relative_url
+            })
         
     except Exception as e:
         import traceback

@@ -75,22 +75,37 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
     }
   };
 
+  const resolveDownloadUrl = (pathOrUrl: string) => {
+    if (!pathOrUrl) return null;
+    const isLocalUrl = pathOrUrl.includes('127.0.0.1') || pathOrUrl.includes('localhost');
+    const isCurrentEnvLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (pathOrUrl.startsWith('http')) {
+      if (isLocalUrl && !isCurrentEnvLocal) {
+        return `${API_BASE.replace('/api/v1', '')}/api/v1/reports/${reportId}/download`;
+      }
+      return pathOrUrl;
+    }
+    return `${API_BASE.replace('/api/v1', '')}${pathOrUrl}`;
+  };
+
   useEffect(() => {
     if (!jobId) return;
 
-    let eventSource: EventSource | null = null;
     let isMounted = true;
+    let eventSource: EventSource | null = null;
 
     const connectSSE = async () => {
-      let token: string | null = null;
+      let token = "";
       try {
-        token = await getToken();
+        if (getToken) {
+          token = await getToken() || "";
+        }
       } catch (e) {
-        console.warn("getToken error in ReportGenerator:", e);
+        // Fallback for local testing or unauthenticated mode
       }
 
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-      const sseUrl = token ? `${API_BASE}/jobs/${jobId}/events?token=${encodeURIComponent(token)}` : `${API_BASE}/jobs/${jobId}/events`;
+      const sseUrl = `${API_BASE}/jobs/${jobId}/events${token ? `?token=${token}` : ''}`;
       eventSource = new EventSource(sseUrl);
 
       eventSource.onmessage = (event) => {
@@ -108,11 +123,8 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
             if (data.stage_number === 5) {
               eventSource?.close();
               if (data.details?.path) {
-                const rawPath = data.details.path;
-                const fullUrl = rawPath.startsWith('http') 
-                  ? rawPath 
-                  : `${API_BASE.replace('/api/v1', '')}${rawPath}`;
-                setDownloadUrl(fullUrl);
+                const fullUrl = resolveDownloadUrl(data.details.path);
+                if (fullUrl) setDownloadUrl(fullUrl);
               }
               fetchDownloadUrl();
             }
@@ -140,7 +152,6 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
 
   const fetchDownloadUrl = async () => {
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
       let attempts = 0;
       const poll = setInterval(async () => {
         attempts++;
@@ -152,10 +163,8 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
         if (res.success && res.data) {
            const report = res.data.find((r: any) => r.id === reportId);
            if (report && report.status === 'completed' && report.download_url) {
-              const fullUrl = report.download_url.startsWith('http')
-                ? report.download_url
-                : `${API_BASE.replace('/api/v1', '')}${report.download_url}`;
-              setDownloadUrl(fullUrl);
+              const fullUrl = resolveDownloadUrl(report.download_url);
+              if (fullUrl) setDownloadUrl(fullUrl);
               clearInterval(poll);
            }
         }

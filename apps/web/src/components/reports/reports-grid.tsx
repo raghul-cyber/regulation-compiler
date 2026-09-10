@@ -44,6 +44,21 @@ export function ReportsGrid({ regulationId, initialReports }: { regulationId: st
     }
   };
 
+  const getDownloadUrl = (rawUrl: string) => {
+    if (!rawUrl) return '#';
+    const isLocalUrl = rawUrl.includes('127.0.0.1') || rawUrl.includes('localhost');
+    const isCurrentEnvLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://regulation-compiler.onrender.com/api/v1';
+
+    if (rawUrl.startsWith('http')) {
+      if (isLocalUrl && !isCurrentEnvLocal) {
+        return rawUrl.replace(/http:\/\/127\.0\.0\.1:8080/, apiBase.replace('/api/v1', ''));
+      }
+      return rawUrl;
+    }
+    return `${apiBase.replace('/api/v1', '')}${rawUrl}`;
+  };
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
@@ -81,7 +96,7 @@ export function ReportsGrid({ regulationId, initialReports }: { regulationId: st
               
               {report.status === 'completed' && report.download_url ? (
                 <a 
-                  href={report.download_url} 
+                  href={getDownloadUrl(report.download_url)} 
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-sm font-medium py-2 rounded border border-zinc-800 transition-colors flex justify-center items-center gap-2"

@@ -173,7 +173,11 @@ def list_reports(
     for r in reports:
         download_url = None
         if r.status == ReportStatusEnum.completed and r.storage_path:
-            download_url = f"http://127.0.0.1:8080/api/v1/reports/{r.id}/download"
+            backend_url = os.getenv("API_PUBLIC_URL") or os.getenv("RENDER_EXTERNAL_URL") or "https://regulation-compiler.onrender.com"
+            if os.getenv("ENVIRONMENT") == "development" or os.getenv("ENVIRONMENT") == "local":
+                download_url = f"http://127.0.0.1:8080/api/v1/reports/{r.id}/download"
+            else:
+                download_url = f"{backend_url.rstrip('/')}/api/v1/reports/{r.id}/download"
                 
         data.append({
             "id": str(r.id),
