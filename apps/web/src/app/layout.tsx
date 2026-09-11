@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Libre_Baskerville, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-import { TopNav } from "@/components/layout/top-nav";
-import { Footer } from "@/components/layout/footer";
-import { PageContainer } from "@/components/layout/page-container";
 import { ConsoleGuard } from "@/components/common/console-guard";
 
 const geistSans = Geist({
@@ -17,9 +14,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const libreBaskerville = Libre_Baskerville({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-libre-baskerville",
+  display: "swap",
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-sans",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Regulation Compiler",
-  description: "Regulation as Code Compiler",
+  title: "Regulation-as-Code Compiler | Turn regulation into working policy",
+  description:
+    "Compliance software that turns GDPR, HIPAA and EU AI Act text into reviewed, versioned obligations your teams can actually act on, with evidence ready for audit.",
 };
 
 export default function RootLayout({
@@ -31,18 +50,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
-        style={{ colorScheme: 'dark' }}
+        className={`${geistSans.variable} ${geistMono.variable} ${libreBaskerville.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
+        suppressHydrationWarning
       >
         <body className="min-h-full flex flex-col bg-[#0a0a0c] text-gray-100">
           <ConsoleGuard />
-          <TopNav />
-          <main className="flex-1 w-full py-8">
-            <PageContainer>
-              {children}
-            </PageContainer>
-          </main>
-          <Footer />
+          {children}
         </body>
       </html>
     </ClerkProvider>
