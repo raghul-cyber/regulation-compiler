@@ -15,7 +15,7 @@ class LLMWrapper:
         
         if openai_key:
             try:
-                self.openai_client = OpenAI(api_key=openai_key)
+                self.openai_client = OpenAI(api_key=openai_key, max_retries=0, timeout=4.0)
             except Exception as e:
                 logger.error(f"Failed to init OpenAI: {e}")
                 

@@ -1,4 +1,4 @@
-﻿import enum
+import enum
 import uuid
 from datetime import date, datetime
 from sqlalchemy import String, ForeignKey, Date, DateTime, JSON, Boolean, Integer
@@ -71,4 +71,24 @@ class FrameworkCatalog(BaseModel):
     source_url: Mapped[str] = mapped_column(String, nullable=False)
     is_fetchable: Mapped[bool] = mapped_column(Boolean, default=False)
     description: Mapped[str] = mapped_column(String, nullable=True)
+
+
+class LiveRegulatorySignal(BaseModel):
+    __tablename__ = "live_regulatory_signals"
+
+    signal_id: Mapped[str] = mapped_column(String, nullable=False, unique=True, index=True)
+    jurisdiction: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    category: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    summary: Mapped[str] = mapped_column(String, nullable=False)
+    severity: Mapped[str] = mapped_column(String, nullable=False, default="info")
+    authority: Mapped[str] = mapped_column(String, nullable=False)
+    citation: Mapped[str | None] = mapped_column(String, nullable=True)
+    source_url: Mapped[str] = mapped_column(String, nullable=False)
+    raw_content: Mapped[str | None] = mapped_column(String, nullable=True)
+    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    regulation_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("regulations.id", ondelete="SET NULL"), nullable=True)
+    is_extracted: Mapped[bool] = mapped_column(Boolean, default=False)
+    extracted_requirements_count: Mapped[int] = mapped_column(Integer, default=0)
+
 

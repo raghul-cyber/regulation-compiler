@@ -15,9 +15,9 @@ if [ -f "create_tables.py" ]; then
     python create_tables.py || echo "Table verification notice: continuing."
 fi
 
-# 3. Start Celery worker in background (using solo pool for minimal memory on free tier)
-echo "[3/3] Starting Celery background worker..."
-celery -A app.workers.tasks worker --loglevel=info -P solo -Q ingestion,reports,notifications &
+# 3. Start Celery worker with Celery Beat in background (using solo pool for minimal memory on free tier)
+echo "[3/3] Starting Celery background worker with 24/7 Beat scheduler..."
+celery -A app.workers.tasks worker --loglevel=info -B -P solo -Q ingestion,reports,notifications &
 
 # 4. Launch FastAPI web server
 PORT="${PORT:-8000}"

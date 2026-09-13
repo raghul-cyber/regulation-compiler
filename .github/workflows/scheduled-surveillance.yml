@@ -1,0 +1,51 @@
+name: 24/7 Regulatory Surveillance Daemon
+
+on:
+  schedule:
+    # Run every 15 minutes, 24 hours a day, 7 days a week
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      jurisdiction:
+        description: 'Jurisdiction to probe on-demand'
+        required: false
+        default: 'GLOBAL'
+
+jobs:
+  statutory-surveillance-sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger 24/7 Live Regulatory Ingestion & AST Extraction
+        env:
+          PROD_API_URL: ${{ secrets.PROD_API_URL || 'https://regulation-compiler.onrender.com' }}
+          PROD_WEB_URL: ${{ secrets.PROD_WEB_URL || 'https://rac-compiler.vercel.app' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          echo "=== [24/7 STATUTORY SURVEILLANCE RUNNER] ==="
+          echo "Timestamp: $(date -u +'%Y-%m-%d %H:%M:%SZ')"
+          
+          API_URL="${PROD_API_URL%/}/api/v1/compliance/monitoring/sync"
+          echo "Pinging Live Scraper & AST Compiler at: $API_URL"
+          
+          HTTP_STATUS=$(curl -s -o sync_response.json -w "%{http_code}" -X POST "$API_URL" \
+            -H "Content-Type: application/json" \
+            --max-time 90 || echo "000")
+            
+          echo "API Response HTTP Status: $HTTP_STATUS"
+          if [ -f sync_response.json ]; then
+            cat sync_response.json || true
+            echo ""
+          fi
+          
+          # Also ping Next.js Vercel Edge Cron route if configured
+          if [ -n "$PROD_WEB_URL" ]; then
+            CRON_URL="${PROD_WEB_URL%/}/api/cron/surveillance"
+            echo "Pinging Vercel Edge Cron at: $CRON_URL"
+            AUTH_HEADER=""
+            if [ -n "$CRON_SECRET" ]; then
+              AUTH_HEADER="-H \"Authorization: Bearer $CRON_SECRET\""
+            fi
+            curl -s -X POST "$CRON_URL" -H "Content-Type: application/json" $AUTH_HEADER --max-time 45 || true
+          fi
+          
+          echo "24/7 surveillance sweep completed successfully."

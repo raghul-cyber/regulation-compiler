@@ -43,7 +43,14 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
         name = "Ingest"
         dispatcher.emit(stage, name, "started")
         
-        file_bytes = storage.get_file_bytes(source_doc.storage_path)
+        try:
+            file_bytes = storage.get_file_bytes(source_doc.storage_path)
+        except Exception as storage_err:
+            if source_doc.raw_text:
+                logger.info("Using source_doc.raw_text for pipeline execution.")
+                file_bytes = source_doc.raw_text.encode("utf-8")
+            else:
+                raise storage_err
         
         dispatcher.emit(stage, name, "completed", {"message": "Document ingested from secure storage"})
 
@@ -237,10 +244,11 @@ Respond ONLY with a JSON array of objects. Each object must have:
             compiled = SemanticEngine.compile_rules(extracted_requirements).get("compiled_rules", [])
             
         for refined in compiled:
-            for req in extracted_requirements:
-                if req.get("title") == refined.get("title") and refined.get("is_valid_ast"):
-                    req["conditions"] = refined.get("refined_ast", req.get("conditions"))
-                    rules_generated += 1
+            if isinstance(refined, dict):
+                for req in extracted_requirements:
+                    if isinstance(req, dict) and req.get("title") == refined.get("title") and refined.get("is_valid_ast"):
+                        req["conditions"] = refined.get("refined_ast", req.get("conditions"))
+                        rules_generated += 1
                     
         dispatcher.emit(stage, name, "completed", {"rules_generated": rules_generated or total_extracted})
 
@@ -252,7 +260,7 @@ Respond ONLY with a JSON array of objects. Each object must have:
         validated_count = total_extracted
         needs_review = 0
         val_prompt = "Validate the compiled rules against common logical fallacies. Return JSON: {'validated': int, 'needs_review': int}"
-        val_user = json.dumps([r.get("title") for r in extracted_requirements[:15]])
+        val_user = json.dumps([r.get("title") if isinstance(r, dict) else str(r) for r in extracted_requirements[:15]])
         
         if llm_client and extracted_requirements:
             try:

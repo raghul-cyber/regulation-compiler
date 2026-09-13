@@ -38,6 +38,10 @@ celery_app.conf.update(
         "poll-regulations-every-12-hours": {
             "task": "app.workers.tasks.poll_regulations_task",
             "schedule": 43200.0, # 12 hours in seconds
+        },
+        "scrape-live-regulations-24-7": {
+            "task": "app.workers.tasks.scrape_and_extract_24_7_regulations",
+            "schedule": 30.0, # 30 seconds continuous statutory surveillance
         }
     }
 )

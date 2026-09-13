@@ -222,3 +222,23 @@ def poll_regulations_task(self):
         raise
     finally:
         db.close()
+
+
+@celery_app.task(name="app.workers.tasks.scrape_and_extract_24_7_regulations")
+def scrape_and_extract_24_7_regulations():
+    """
+    Continuous 24/7 background scraper task executed by Celery worker in deployed environments.
+    """
+    logger.info("Executing 24/7 regulatory scraper task via Celery worker...")
+    from app.services.live_feed_scraper import scraper_service
+    db = SessionLocal()
+    try:
+        res = scraper_service.sync_and_extract_live_signals(db, max_extractions_per_run=1)
+        logger.info(f"24/7 Scraper task completed: {res}")
+        return res
+    except Exception as e:
+        logger.error(f"24/7 Scraper Celery task error: {e}")
+        raise
+    finally:
+        db.close()
+

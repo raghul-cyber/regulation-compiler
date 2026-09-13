@@ -21,6 +21,40 @@ services:
     volumes:
       - redis_data:/data
 
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: ../../infra/Dockerfile.api
+    container_name: regulater-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/regulation_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
+      - CORS_ORIGINS=*
+      - PORT=8000
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  worker:
+    build:
+      context: ../apps/api
+      dockerfile: ../../infra/Dockerfile.worker
+    container_name: regulater-worker
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/regulation_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
+    depends_on:
+      - db
+      - redis
+    restart: always
+
 volumes:
   postgres_data:
   redis_data:

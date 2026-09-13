@@ -122,6 +122,18 @@ async def health_check(request: Request):
         response["status"] = "degraded"
         response["checks"]["redis"] = f"error: {str(e)}"
 
+    # 3. Check 24/7 Statutory Surveillance Daemon
+    try:
+        from app.services.live_feed_scraper import scraper_service
+        response["checks"]["surveillance_24_7"] = {
+            "status": "active" if scraper_service.is_running else "standby",
+            "signals_scraped": scraper_service.stats.get("total_scraped", 0),
+            "regulations_extracted": scraper_service.stats.get("total_extracted", 0),
+            "last_scan_at": scraper_service.stats.get("last_scan_at"),
+        }
+    except Exception as se:
+        response["checks"]["surveillance_24_7"] = {"status": "error", "detail": str(se)}
+
     return response
 
 @app.get("/sentry-debug")
@@ -129,6 +141,17 @@ async def trigger_error():
     if os.getenv("ENVIRONMENT", "").lower() not in ["development", "dev", "local"]:
         return JSONResponse(status_code=404, content={"detail": "Not found"})
     raise Exception("Test Sentry error")
+
+
+from app.services.live_feed_scraper import start_24_7_surveillance_worker
+
+@app.on_event("startup")
+def startup_event():
+    # Launch continuous 24/7 statutory surveillance daemon in background thread
+    start_24_7_surveillance_worker(interval_seconds=25)
+    logging.getLogger("app.main").info("24/7 Live Regulatory Surveillance Worker spawned in background thread (25s interval).")
+
+
 
 
 
