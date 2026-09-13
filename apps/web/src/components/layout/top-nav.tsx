@@ -3,11 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { NavAuth } from './nav-auth';
-import { UploadCloud, Menu, X } from 'lucide-react';
-import { Show, SignInButton } from '@clerk/nextjs';
+import { UploadCloud, Menu, X, ShieldAlert } from 'lucide-react';
+import { Show, SignInButton, useUser } from '@clerk/nextjs';
 
 export function TopNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useUser();
+
+  const userEmails = user?.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+  const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+  const isSuperAdmin = primaryEmail === 'rcraghul12@gmail.com' || userEmails.includes('rcraghul12@gmail.com');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-[#0a0a0c]/80 backdrop-blur-md">
@@ -31,7 +36,17 @@ export function TopNav() {
               <Link href="/compliance-check" className="text-zinc-400 hover:text-white transition-colors">
                 Compliance
               </Link>
-              <Link href="/regulations/new" className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4">
+              {isSuperAdmin && (
+                <Link 
+                  href="/admin" 
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 hover:text-amber-300 hover:bg-amber-500/25 text-xs font-semibold tracking-wide transition-all shadow-sm shadow-amber-500/20"
+                  title="Super-Admin Control Panel"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>Admin</span>
+                </Link>
+              )}
+              <Link href="/regulations/new" className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-2">
                 <UploadCloud className="w-4 h-4" />
                 Upload
               </Link>
@@ -100,6 +115,16 @@ export function TopNav() {
             >
               Compliance
             </Link>
+            {isSuperAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 py-2 text-amber-400 hover:text-amber-300 text-sm font-semibold"
+              >
+                <ShieldAlert className="w-4 h-4" />
+                <span>Super-Admin Panel</span>
+              </Link>
+            )}
             <Link
               href="/regulations/new"
               onClick={() => setMobileMenuOpen(false)}
