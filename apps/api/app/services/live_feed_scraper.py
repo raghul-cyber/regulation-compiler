@@ -125,6 +125,7 @@ class LiveRegulatoryScraperService:
         self.http_client = httpx.Client(timeout=25.0, follow_redirects=True, headers={
             "User-Agent": "RegCompiler-Surveillance-Bot/2.0 (+https://regulationcompiler.internal; contact@regcompiler.org)"
         })
+        self.is_running = False
         self.stats = {
             "total_scans": 0,
             "last_scan_at": None,
@@ -615,6 +616,7 @@ def run_24_7_surveillance_loop(interval_seconds: int = 25):
     Runs completely decoupled from the async event loop so API requests are never blocked.
     """
     logger.info("Starting 24/7 Live Regulatory Surveillance Worker thread...")
+    scraper_service.is_running = True
     # Initial pause of 3 seconds to let uvicorn finish binding ports first
     time.sleep(3)
     while True:

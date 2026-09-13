@@ -126,8 +126,9 @@ async def health_check(request: Request):
     # 3. Check 24/7 Statutory Surveillance Daemon
     try:
         from app.services.live_feed_scraper import scraper_service
+        is_active = getattr(scraper_service, "is_running", False)
         response["checks"]["surveillance_24_7"] = {
-            "status": "active" if scraper_service.is_running else "standby",
+            "status": "active" if is_active else "standby",
             "signals_scraped": scraper_service.stats.get("total_scraped", 0),
             "regulations_extracted": scraper_service.stats.get("total_extracted", 0),
             "last_scan_at": scraper_service.stats.get("last_scan_at"),
