@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: regulation-compiler-api
+    runtime: docker
+    dockerfilePath: infra/Dockerfile.api
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: S3_BUCKET_NAME
+        value: regulations-files
+      - key: API_PUBLIC_URL
+        value: https://regulation-compiler.onrender.com
+      - key: CLERK_SECRET_KEY
+        sync: false
+
+  - type: worker
+    name: regulation-compiler-worker
+    runtime: docker
+    dockerfilePath: infra/Dockerfile.worker
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: S3_BUCKET_NAME
+        value: regulations-files
