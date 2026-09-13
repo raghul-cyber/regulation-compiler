@@ -36,14 +36,6 @@ export default function LandingPage() {
         {/* 1. HERO SECTION */}
         {/* ============================================================ */}
         <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center pt-8">
-          {/* Status Badge */}
-          <div className="pointer-events-auto mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 backdrop-blur-md shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white">Autonomous Statutory Compiler</span>
-            <span className="text-zinc-500">•</span>
-            <span className="text-emerald-400 font-mono">24/7 Live Surveillance Active</span>
-          </div>
-
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter max-w-5xl leading-[1.08] bg-clip-text text-transparent bg-gradient-to-b from-white via-zinc-200 to-zinc-500 pointer-events-auto">
             The Future of <br /> Regulation as Code.
           </h1>
@@ -83,29 +75,29 @@ export default function LandingPage() {
           </div>
 
           {/* Real-Time Platform Metrics Bar */}
-          <div className="mt-14 w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-4 pointer-events-auto">
+          <div className="mt-14 w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-4 pointer-events-auto font-sans">
             <div className="p-4 rounded-xl bg-[#090a0f]/80 border border-zinc-800/80 backdrop-blur-md text-left">
-              <div className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">39+</div>
-              <div className="text-xs text-zinc-400 mt-1 font-medium">Live Regulatory Signals</div>
-              <div className="text-[10px] text-emerald-400 font-mono mt-0.5">● Federal Register &amp; FCA</div>
+              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight font-sans">39+</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium font-sans">Live Regulatory Signals</div>
+              <div className="text-[11px] text-emerald-400 font-sans font-medium mt-1">● Federal Register &amp; FCA</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#090a0f]/80 border border-zinc-800/80 backdrop-blur-md text-left">
-              <div className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">32+</div>
-              <div className="text-xs text-zinc-400 mt-1 font-medium">Compiled Frameworks</div>
-              <div className="text-[10px] text-blue-400 font-mono mt-0.5">● EU AI Act, DORA, GDPR</div>
+              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight font-sans">32+</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium font-sans">Compiled Frameworks</div>
+              <div className="text-[11px] text-blue-400 font-sans font-medium mt-1">● EU AI Act, DORA, GDPR</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#090a0f]/80 border border-zinc-800/80 backdrop-blur-md text-left">
-              <div className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">95+</div>
-              <div className="text-xs text-zinc-400 mt-1 font-medium">Formal AST Rules</div>
-              <div className="text-[10px] text-purple-400 font-mono mt-0.5">● Deterministic Condition Trees</div>
+              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight font-sans">95+</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium font-sans">Formal AST Rules</div>
+              <div className="text-[11px] text-purple-400 font-sans font-medium mt-1">● Deterministic Condition Trees</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#090a0f]/80 border border-zinc-800/80 backdrop-blur-md text-left">
-              <div className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">&lt;50ms</div>
-              <div className="text-xs text-zinc-400 mt-1 font-medium">Evaluation Latency</div>
-              <div className="text-[10px] text-amber-400 font-mono mt-0.5">● In-Memory Zero-Lag Engine</div>
+              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight font-sans">&lt;50ms</div>
+              <div className="text-xs text-zinc-400 mt-1 font-medium font-sans">Evaluation Latency</div>
+              <div className="text-[11px] text-amber-400 font-sans font-medium mt-1">● In-Memory Zero-Lag Engine</div>
             </div>
           </div>
         </section>
