@@ -43,6 +43,20 @@ interface LiveSurveillanceFeedProps {
   regulations?: any[];
 }
 
+function deduplicateEvents(list: FeedEvent[]): FeedEvent[] {
+  if (!list || !Array.isArray(list)) return [];
+  const seen = new Set<string>();
+  const result: FeedEvent[] = [];
+  for (const item of list) {
+    if (!item?.id) continue;
+    if (!seen.has(item.id)) {
+      seen.add(item.id);
+      result.push(item);
+    }
+  }
+  return result;
+}
+
 export function LiveSurveillanceFeed({
   initialEvents = [],
   onSelectJurisdiction,
@@ -54,7 +68,7 @@ export function LiveSurveillanceFeed({
 }: LiveSurveillanceFeedProps) {
   const router = useRouter();
 
-  const [events, setEvents] = useState<FeedEvent[]>(initialEvents);
+  const [events, setEvents] = useState<FeedEvent[]>(() => deduplicateEvents(initialEvents));
   const [isLive, setIsLive] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isProbing, setIsProbing] = useState(false);
@@ -70,10 +84,10 @@ export function LiveSurveillanceFeed({
     eventsRef.current = events;
   }, [events]);
 
-  // Sync initial events
+  // Sync initial events with deduplication
   useEffect(() => {
-    if (initialEvents.length > 0) {
-      setEvents(initialEvents);
+    if (initialEvents && initialEvents.length > 0) {
+      setEvents(deduplicateEvents(initialEvents));
     }
   }, [initialEvents]);
 
@@ -100,11 +114,12 @@ export function LiveSurveillanceFeed({
       try {
         const fresh = await fetchFeedAction();
         if (fresh && fresh.length > 0) {
+          const dedupedFresh = deduplicateEvents(fresh);
           const currentEvents = eventsRef.current;
           const prevIds = new Set(currentEvents.map(e => e.id));
-          const newSignals = fresh.filter(e => !prevIds.has(e.id));
+          const newSignals = dedupedFresh.filter(e => !prevIds.has(e.id));
           
-          setEvents(fresh);
+          setEvents(dedupedFresh);
           setLastUpdated(new Date());
           setSecondsAgo(0);
 
@@ -130,7 +145,7 @@ export function LiveSurveillanceFeed({
     try {
       const fresh = await fetchFeedAction();
       if (fresh) {
-        setEvents(fresh);
+        setEvents(deduplicateEvents(fresh));
         setLastUpdated(new Date());
         setSecondsAgo(0);
       }
@@ -146,7 +161,7 @@ export function LiveSurveillanceFeed({
       const targetJur = filterJurisdiction !== 'ALL' ? filterJurisdiction : 'GLOBAL';
       const result = await onTriggerProbe(targetJur);
       if (result?.event) {
-        setEvents(prev => [result.event, ...prev]);
+        setEvents(prev => deduplicateEvents([result.event, ...prev]));
         setLatestNewSignal(result.event);
         setNewEventFlash(true);
         setTimeout(() => setNewEventFlash(false), 3000);
@@ -162,7 +177,12 @@ export function LiveSurveillanceFeed({
   };
 
   const filteredEvents = useMemo(() => {
+    const seen = new Set<string>();
     return events.filter(e => {
+      if (!e?.id || seen.has(e.id)) {
+        return false;
+      }
+      seen.add(e.id);
       if (filterJurisdiction !== 'ALL' && e.jurisdiction.toUpperCase() !== filterJurisdiction.toUpperCase()) {
         return false;
       }
@@ -378,11 +398,11 @@ export function LiveSurveillanceFeed({
             <p className="text-xs text-zinc-600 mt-1">Switch filter back to "ALL" to inspect the global stream.</p>
           </div>
         ) : (
-          filteredEvents.map((evt) => {
+          filteredEvents.map((evt, idx) => {
             const isSelected = selectedJurisdiction && selectedJurisdiction.toUpperCase() === evt.jurisdiction.toUpperCase();
             return (
               <div
-                key={evt.id}
+                key={`${evt.id}-${idx}`}
                 className={`pt-2.5 first:pt-0 p-3 rounded-lg border transition-all duration-200 group ${
                   isSelected 
                     ? 'bg-blue-950/20 border-blue-500/40 shadow-lg shadow-blue-950/50' 

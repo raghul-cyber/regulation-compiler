@@ -504,9 +504,18 @@ def get_monitoring_feed(
         import logging
         logging.getLogger(__name__).error(f"Live regulatory signals query error: {live_err}")
 
+    # Deduplicate events strictly by ID
+    seen_ids = set()
+    deduped_events = []
+    for evt in events:
+        eid = evt.get("id")
+        if eid and eid not in seen_ids:
+            seen_ids.add(eid)
+            deduped_events.append(evt)
+
     # Sort strictly descending by timestamp
-    events.sort(key=lambda x: x["timestamp"], reverse=True)
-    final_events = events[:limit]
+    deduped_events.sort(key=lambda x: x["timestamp"], reverse=True)
+    final_events = deduped_events[:limit]
 
     return {
         "data": final_events,

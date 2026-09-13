@@ -571,7 +571,8 @@ class LiveRegulatoryScraperService:
 
         if target_signal:
             return {
-                "id": target_signal.signal_id,
+                "id": f"probe-{target_signal.signal_id}-{int(now.timestamp())}",
+                "signal_id": target_signal.signal_id,
                 "jurisdiction": target_signal.jurisdiction,
                 "category": target_signal.category,
                 "title": target_signal.title,

@@ -244,12 +244,12 @@ export function CoverageView() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jurisdictionsList.map((jur: any) => {
+          {jurisdictionsList.map((jur: any, jurIdx: number) => {
             const isSelected = selectedJurisdiction?.toUpperCase() === jur.code.toUpperCase();
             const isLiveSignal = activeSignalJurisdiction?.toUpperCase() === jur.code.toUpperCase();
             return (
               <div
-                key={jur.code}
+                key={`${jur.code || 'jur'}-${jurIdx}`}
                 onClick={() => setSelectedJurisdiction(jur.code)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer group relative ${
                   isSelected
@@ -312,7 +312,7 @@ export function CoverageView() {
                   <div className="pt-2 border-t border-zinc-800/60 flex flex-wrap gap-1">
                     {jur.regulations.map((r: string, idx: number) => (
                       <span
-                        key={idx}
+                        key={`${jur.code || 'jur'}-${r}-${idx}`}
                         className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700/60"
                       >
                         {r}
