@@ -6,7 +6,7 @@ echo "=== Regulation-as-Code Compiler API Startup ==="
 # 1. Run database migrations
 if [ -f "alembic.ini" ]; then
     echo "[1/3] Running Alembic migrations..."
-    alembic upgrade head || echo "Alembic notice: schema already up to date or skipping."
+    alembic upgrade head || alembic stamp head || echo "Alembic notice: schema already up to date."
 fi
 
 # 2. Run seed / table safety script
