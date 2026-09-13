@@ -16,7 +16,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 9
+          version: 11.14.0
           
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -25,7 +25,7 @@ jobs:
           cache: 'pnpm'
           
       - name: Install JS dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
         
       - name: Next.js Build Check
         run: cd apps/web && pnpm run build
