@@ -51,7 +51,7 @@ function GlobeWireframe() {
   useFrame((state, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += delta * 0.04;
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.15) * 0.03;
+      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.15) * 0.02;
     }
   });
 
@@ -83,10 +83,10 @@ function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; c
   useFrame((state) => {
     if (ringRef.current) {
       const t = (state.clock.elapsedTime * 1.5) % 2;
-      const scale = 1 + t * 1.6;
+      const scale = 1 + t * 1.5;
       ringRef.current.scale.set(scale, scale, scale);
       const material = ringRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = Math.max(0, 0.6 - t * 0.3);
+      material.opacity = Math.max(0, 0.5 - t * 0.25);
     }
   });
 
@@ -94,7 +94,7 @@ function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; c
     <group position={position}>
       <mesh ref={ringRef} lookAt={() => position.clone().multiplyScalar(2)}>
         <ringGeometry args={[0.05, 0.07, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.5} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={color} transparent opacity={0.45} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -126,21 +126,26 @@ function JurisdictionMarker({
   onInspectRegulations: (jurisdiction?: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [isFrontFacing, setIsFrontFacing] = useState(true);
   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame((state) => {
+  useFrame(({ camera, clock }) => {
     if (meshRef.current) {
-      const pulse = isActiveSignal ? Math.sin(state.clock.elapsedTime * 6) * 0.4 : 0;
-      const targetScale = isSelected ? 1.8 : (hovered ? 1.5 : (isActiveSignal ? 1.4 + pulse : 1));
+      const pulse = isActiveSignal ? Math.sin(clock.elapsedTime * 6) * 0.4 : 0;
+      const targetScale = isSelected ? 1.6 : (hovered ? 1.4 : (isActiveSignal ? 1.3 + pulse : 1));
       meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.2);
     }
+    // Only show 3D HTML tags when marker is facing towards camera (eliminates backface clumping)
+    const normal = data.position.clone().normalize();
+    const camDir = camera.position.clone().sub(data.position).normalize();
+    setIsFrontFacing(normal.dot(camDir) > 0.12);
   });
 
   const markerColor = isSelected 
     ? '#f59e0b' 
     : (isActiveSignal 
         ? '#38bdf8' 
-        : (data.count > 0 ? '#10b981' : '#38bdf8'));
+        : (data.count > 0 ? '#10b981' : '#60a5fa'));
 
   return (
     <group position={data.position}>
@@ -169,26 +174,36 @@ function JurisdictionMarker({
         <meshBasicMaterial color={markerColor} transparent opacity={isSelected ? 0.45 : 0.25} />
       </mesh>
 
-      {/* Persistent Badge */}
-      <Html distanceFactor={10} zIndexRange={[100, 0]} center>
-        <div 
-          onClick={onClick}
-          className={`cursor-pointer select-none px-2 py-0.5 rounded text-[10px] font-bold tracking-tight uppercase backdrop-blur-md border transition-all transform -translate-y-6 ${
-            isSelected
-              ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/50 scale-110'
-              : (data.count > 0
-                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/90'
-                  : 'bg-blue-950/70 text-blue-300 border-blue-500/30 hover:bg-blue-900/80')
-          }`}
-        >
-          {data.jurisdiction} {data.count > 0 ? `(${data.count})` : ''}
-        </div>
-      </Html>
+      {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
+      {isFrontFacing && (
+        <Html distanceFactor={14} zIndexRange={[18, 0]} center>
+          <div 
+            onClick={onClick}
+            className={`font-sans select-none whitespace-nowrap cursor-pointer px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-5 flex items-center gap-1 shadow-lg ${
+              isSelected
+                ? 'bg-amber-500/25 text-amber-300 border-amber-400/80 ring-2 ring-amber-400/40 scale-110 shadow-amber-500/20'
+                : (isActiveSignal
+                    ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/80 ring-2 ring-cyan-400/40 animate-pulse'
+                    : (data.count > 0
+                        ? 'bg-zinc-950/90 text-emerald-300 border-emerald-500/40 hover:border-emerald-400 hover:bg-zinc-900'
+                        : 'bg-zinc-950/90 text-zinc-400 border-zinc-700/60 hover:border-zinc-500 hover:text-zinc-200'))
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-400' : (data.count > 0 ? 'bg-emerald-400' : 'bg-blue-400')}`} />
+            <span>{data.jurisdiction}</span>
+            {data.count > 0 && (
+              <span className="ml-0.5 px-1 rounded-sm bg-emerald-500/20 text-emerald-400 text-[9px] font-bold">
+                {data.count}
+              </span>
+            )}
+          </div>
+        </Html>
+      )}
 
       {/* Detailed Card when Hovered or Selected */}
-      {(hovered || isSelected) && (
-        <Html distanceFactor={9} zIndexRange={[120, 0]} center>
-          <div className="bg-zinc-950/95 border border-zinc-700/80 p-3.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-24 pointer-events-auto">
+      {(hovered || isSelected) && isFrontFacing && (
+        <Html distanceFactor={11} zIndexRange={[25, 0]} center>
+          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-24 pointer-events-auto select-none">
             <div className="flex items-center justify-between mb-1.5 border-b border-zinc-800 pb-1.5">
               <div className="flex items-center gap-2">
                 <span className="text-base">{data.flag || '🌐'}</span>
@@ -197,15 +212,15 @@ function JurisdictionMarker({
                   <span className="text-[10px] text-zinc-400 font-mono">[{data.jurisdiction}]</span>
                 </div>
               </div>
-              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${data.count > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
-                {data.count > 0 ? 'ACTIVE RULES' : 'SURVEILLANCE'}
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${data.count > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                {data.count > 0 ? `${data.count} RULES` : 'SURVEILLANCE'}
               </span>
             </div>
 
             <div className="space-y-1.5 text-[11px] text-zinc-300 mt-2">
               <div className="flex justify-between">
                 <span className="text-zinc-500">Authority:</span>
-                <span className="text-zinc-300 font-medium truncate max-w-[140px] text-right" title={data.authority}>
+                <span className="text-zinc-300 font-medium truncate max-w-[130px] text-right" title={data.authority}>
                   {data.authority}
                 </span>
               </div>
@@ -224,7 +239,7 @@ function JurisdictionMarker({
                 <div className="text-[10px] text-zinc-500 uppercase font-semibold mb-1">Monitored In System:</div>
                 <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto custom-scrollbar">
                   {data.regulations.slice(0, 3).map((r, i) => (
-                    <span key={i} className="text-[9px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-zinc-300 truncate max-w-[200px]">
+                    <span key={i} className="text-[9px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-zinc-300 truncate max-w-[190px]">
                       {r}
                     </span>
                   ))}
@@ -241,7 +256,7 @@ function JurisdictionMarker({
                   e.stopPropagation();
                   onInspectRegulations(data.jurisdiction);
                 }}
-                className="w-full text-center text-[10px] font-semibold py-1 px-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1"
+                className="w-full text-center text-[10px] font-semibold py-1.5 px-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1.5 shadow-md"
               >
                 Inspect {data.jurisdiction} Regulations
                 <ExternalLink className="w-3 h-3" />
@@ -327,9 +342,16 @@ function GlobeScene({
   onInspectRegulations: (jurisdiction?: string) => void;
 }) {
   const homePosition = useMemo(() => latLongToVector3(HOME_COORD[0], HOME_COORD[1], 2), []);
+  const [isHqFrontFacing, setIsHqFrontFacing] = useState(true);
+
+  useFrame(({ camera }) => {
+    const normal = homePosition.clone().normalize();
+    const camDir = camera.position.clone().sub(homePosition).normalize();
+    setIsHqFrontFacing(normal.dot(camDir) > 0.12);
+  });
 
   return (
-    <group>
+    <group position={[0, -0.25, 0]}>
       <GlobeWireframe />
       
       {/* All Monitored Jurisdiction Markers */}
@@ -358,18 +380,21 @@ function GlobeScene({
       {/* Central HQ Base (San Francisco) */}
       <group position={homePosition}>
         <mesh>
-          <sphereGeometry args={[0.04, 16, 16]} />
+          <sphereGeometry args={[0.045, 16, 16]} />
           <meshBasicMaterial color="#10b981" />
         </mesh>
         <mesh>
-          <sphereGeometry args={[0.07, 16, 16]} />
-          <meshBasicMaterial color="#10b981" transparent opacity={0.3} />
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshBasicMaterial color="#10b981" transparent opacity={0.25} />
         </mesh>
-        <Html distanceFactor={9} zIndexRange={[100, 0]} center>
-          <div className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded text-[10px] font-extrabold tracking-widest backdrop-blur-md pointer-events-none transform -translate-y-5">
-            HQ BASE
-          </div>
-        </Html>
+        {isHqFrontFacing && (
+          <Html distanceFactor={14} zIndexRange={[15, 0]} center>
+            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-emerald-950/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>SF · HQ</span>
+            </div>
+          </Html>
+        )}
       </group>
     </group>
   );
@@ -474,37 +499,37 @@ export function CoverageGlobe({
   return (
     <div className="w-full h-full min-h-[580px] relative rounded-xl border border-zinc-800 bg-[#070709] overflow-hidden shadow-2xl">
       {/* Dynamic Background Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/25 via-zinc-950/80 to-[#070709] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950/80 to-[#070709] pointer-events-none" />
       
       {/* Top Left: Title & Live Surveillance Status */}
-      <div className="absolute top-5 left-6 z-10 pointer-events-none">
+      <div className="absolute top-5 left-6 z-30 pointer-events-none">
         <div className="flex items-center gap-2 mb-1.5">
-          <h3 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
             Global Jurisdiction Monitoring
           </h3>
-          <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+          <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
             LIVE SURVEILLANCE
           </span>
         </div>
-        <p className="text-zinc-400 text-xs max-w-md leading-relaxed">
-          Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking, and active control reach.
+        <p className="text-zinc-400 text-xs max-w-sm leading-relaxed">
+          Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking.
         </p>
-        <div className="flex items-center gap-3 mt-3">
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-900/90 border border-zinc-800 text-blue-400">
+        <div className="flex items-center gap-2 mt-2.5">
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-blue-400 shadow-sm">
             {markers.length} Global Nodes Active
           </span>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-900/90 border border-zinc-800 text-emerald-400">
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-emerald-400 shadow-sm">
             {activeRegionsCount} Active Jurisdictions ({totalActiveRulesets} Rulesets)
           </span>
         </div>
       </div>
 
       {/* Top Right: Telemetry & Controls HUD */}
-      <div className="absolute top-5 right-6 z-10 flex items-center gap-2">
+      <div className="absolute top-5 right-6 z-30 flex items-center gap-2">
         <button
           onClick={() => setAutoRotate(!autoRotate)}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 ${
+          className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm ${
             autoRotate
               ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 hover:bg-blue-600/30'
               : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white'
@@ -517,7 +542,7 @@ export function CoverageGlobe({
 
         <button
           onClick={() => router.push('/regulations')}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white backdrop-blur-md transition-all flex items-center gap-1.5"
+          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
         >
           <Layers className="w-3.5 h-3.5 text-zinc-400" />
           <span>All Regulations</span>
@@ -525,33 +550,33 @@ export function CoverageGlobe({
       </div>
 
       {/* Bottom Left: Node Legend HUD */}
-      <div className="absolute bottom-5 left-6 z-10 p-2.5 rounded-lg bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-md text-[11px] text-zinc-400 flex flex-wrap items-center gap-4 pointer-events-none">
+      <div className="absolute bottom-5 left-6 z-30 p-2 rounded-lg bg-zinc-950/85 border border-zinc-800/80 backdrop-blur-md text-[11px] text-zinc-400 flex flex-wrap items-center gap-3.5 pointer-events-none shadow-md">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
           <span>HQ Base (SF)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-          <span>Active Compliance Rules</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span>Active Rules</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
+          <span className="w-2 h-2 rounded-full bg-blue-400" />
           <span>Surveillance Node</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-          <span>Selected / Focused</span>
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
+          <span>Selected</span>
         </div>
       </div>
 
       {/* Bottom Right: Arcs Note */}
-      <div className="absolute bottom-5 right-6 z-10 text-[11px] text-zinc-500 pointer-events-none">
+      <div className="absolute bottom-5 right-6 z-30 text-[11px] text-zinc-500 pointer-events-none">
         *Streaming arcs indicate encrypted continuous telemetry reach from HQ
       </div>
 
       {/* 3D Canvas */}
       <Canvas 
-        camera={{ position: [0, 0, 5.8], fov: 45 }} 
+        camera={{ position: [0, -0.2, 5.9], fov: 45 }} 
         dpr={[1, 2]}
         gl={{
           antialias: true,
@@ -588,7 +613,8 @@ export function CoverageGlobe({
           minDistance={3.2}
           maxDistance={9.5}
           autoRotate={autoRotate}
-          autoRotateSpeed={0.6}
+          autoRotateSpeed={0.5}
+          target={[0, -0.2, 0]}
         />
       </Canvas>
     </div>
