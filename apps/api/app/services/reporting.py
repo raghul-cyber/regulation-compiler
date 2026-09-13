@@ -1551,7 +1551,7 @@ SECTION_NAMES = {
 
 # --- Celery Task for PDF Generation ---
 
-@celery_app.task(bind=False, max_retries=2, autoretry_for=(Exception,), retry_backoff=True)
+@celery_app.task(bind=False)
 def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list = None):
     from app.db.session import SessionLocal
     from app.models.jobs import BackgroundJob
@@ -1559,9 +1559,22 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
     dispatcher = None
     if job_id:
         dispatcher = EventDispatcher(db, uuid.UUID(job_id))
-        update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
         
     try:
+        # Check if report already completed
+        existing_rep = db.query(Report).filter(Report.id == report_id).first()
+        if existing_rep and existing_rep.status == ReportStatusEnum.completed and existing_rep.storage_path:
+            logger.info(f"Report {report_id} already completed, skipping redundant processing.")
+            if job_id:
+                update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {
+                    "report_id": str(existing_rep.id),
+                    "storage_path": existing_rep.storage_path
+                })
+            return
+
+        if job_id:
+            update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
+
         if dispatcher: dispatcher.emit(1, "Initialize Report", "started")
         
         # 1. Fetch Report
@@ -1638,7 +1651,6 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
                     reqs = v_reqs
                     break
 
-        time.sleep(0.5)
         if dispatcher: dispatcher.emit(2, "Fetch Requirements", "completed", {"count": len(reqs)})
         
         # Format requirement dictionaries for executive template rendering
@@ -1723,7 +1735,6 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
             selected_sections=selected_sections,
             section_names=section_titles
         )
-        time.sleep(0.5)
         if dispatcher: dispatcher.emit(3, "Compile Document Layout", "completed", {
             "template_used": "composite" if is_composite else selected_sections[0],
             "sections": selected_sections

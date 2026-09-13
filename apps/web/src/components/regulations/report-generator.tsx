@@ -91,11 +91,20 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
     return `${API_BASE.replace('/api/v1', '')}${pathOrUrl}`;
   };
 
+  const getEffectiveApiBase = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return 'http://127.0.0.1:8080/api/v1';
+    }
+    return API_BASE;
+  };
+
   useEffect(() => {
     if (!jobId) return;
 
     let isMounted = true;
     let eventSource: EventSource | null = null;
+    let pollTimer: NodeJS.Timeout | null = null;
 
     const connectSSE = async () => {
       let token = "";
@@ -107,7 +116,8 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
         // Fallback for local testing or unauthenticated mode
       }
 
-      const sseUrl = `${API_BASE}/jobs/${jobId}/events${token ? `?token=${token}` : ''}`;
+      const activeBase = getEffectiveApiBase();
+      const sseUrl = `${activeBase}/jobs/${jobId}/events${token ? `?token=${token}` : ''}`;
       eventSource = new EventSource(sseUrl);
 
       eventSource.onmessage = (event) => {
@@ -123,6 +133,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
             setCompletedStages(prev => [...new Set([...prev, data.stage_number])]);
             
             if (data.stage_number === 5) {
+              if (pollTimer) clearInterval(pollTimer);
               eventSource?.close();
               if (data.details?.path) {
                 const fullUrl = resolveDownloadUrl(data.details.path);
@@ -131,6 +142,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
               fetchDownloadUrl();
             }
           } else if (data.status === 'failed') {
+            if (pollTimer) clearInterval(pollTimer);
             setError(data.details?.error || "Report generation failed");
             eventSource?.close();
           }
@@ -140,17 +152,47 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
       };
 
       eventSource.onerror = () => {
-        eventSource?.close();
+        // Do not fail on SSE error; parallel poller below guarantees completion
       };
     };
 
     connectSSE();
 
+    // Parallel active poller guarantees the UI NEVER hangs on dropped SSE connections
+    pollTimer = setInterval(async () => {
+      if (!isMounted) return;
+      try {
+        const res = await pollReports(regulationId);
+        if (res.success && res.data) {
+          const report = res.data.find((r: any) => r.id === reportId);
+          if (report) {
+            if (report.status === 'completed') {
+              setActiveStage(5);
+              setCompletedStages([1, 2, 3, 4, 5]);
+              if (report.download_url) {
+                const fullUrl = resolveDownloadUrl(report.download_url);
+                if (fullUrl) setDownloadUrl(fullUrl);
+              }
+              if (pollTimer) clearInterval(pollTimer);
+              eventSource?.close();
+            } else if (report.status === 'failed') {
+              setError("Report generation failed");
+              if (pollTimer) clearInterval(pollTimer);
+              eventSource?.close();
+            }
+          }
+        }
+      } catch (pollErr) {
+        console.warn("Parallel report polling check:", pollErr);
+      }
+    }, 1200);
+
     return () => {
       isMounted = false;
+      if (pollTimer) clearInterval(pollTimer);
       eventSource?.close();
     };
-  }, [jobId]);
+  }, [jobId, reportId, regulationId]);
 
   const fetchDownloadUrl = async () => {
     try {
@@ -170,7 +212,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
               clearInterval(poll);
            }
         }
-      }, 1500);
+      }, 1000);
     } catch (e) {
       console.error("Error polling reports:", e);
     }

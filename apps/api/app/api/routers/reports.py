@@ -71,6 +71,17 @@ class ReportCreate(BaseModel):
     report_type: Optional[ReportTypeEnum] = None
     report_types: Optional[list[str]] = None
 
+def run_report_in_background(report_id: str, job_id: str, sections: list):
+    import threading
+    t = threading.Thread(
+        target=generate_pdf_report_task, 
+        args=(report_id, job_id, sections), 
+        daemon=True,
+        name=f"report-{report_id[:8]}"
+    )
+    t.start()
+    return t
+
 @router.post("/reports")
 def create_report(
     payload: ReportCreate,
@@ -138,19 +149,16 @@ def create_report(
     db.commit()
     db.refresh(job)
 
-    # Attempt Celery task dispatch with reliable BackgroundTasks fallback
-    dispatched = False
+    # Launch immediately in an in-process thread for instant execution (no 15-minute cold worker delays)
+    run_report_in_background(str(report.id), str(job.id), requested_sections)
+
+    # Optional Celery dispatch for distributed queue topologies
     try:
         task = generate_pdf_report_task.delay(str(report.id), str(job.id), sections=requested_sections)
         job.task_id = task.id
         db.commit()
-        dispatched = True
-        logger.info(f"Dispatched Celery task {task.id} for report {report.id} with sections {requested_sections}")
     except Exception as exc:
-        logger.warning(f"Celery dispatch failed ({exc}). Falling back to asynchronous BackgroundTasks.")
-        
-    if not dispatched:
-        background_tasks.add_task(generate_pdf_report_task, str(report.id), str(job.id), sections=requested_sections)
+        logger.warning(f"Celery dispatch skipped or failed ({exc}). Handled by in-process thread.")
 
     return {
         "message": "Report generation started",
