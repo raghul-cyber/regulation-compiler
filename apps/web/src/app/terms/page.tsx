@@ -8,8 +8,6 @@ export const metadata = {
 };
 
 export default function TermsPage() {
-  const lastUpdated = 'September 13, 2026';
-
   return (
     <div className="w-full max-w-4xl mx-auto py-10 px-4 md:px-6">
       {/* Top Breadcrumb / Back Link */}
@@ -21,9 +19,6 @@ export default function TermsPage() {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           <span>Back to Home</span>
         </Link>
-        <span className="text-xs text-zinc-500 font-mono">
-          Last Updated: {lastUpdated}
-        </span>
       </div>
 
       {/* Header Banner */}
