@@ -41,9 +41,14 @@ def process_ingestion_pipeline(self, job_id: str, source_doc_id: str):
     logger.info(f"Starting ingestion pipeline for job {job_id}")
     db = SessionLocal()
     try:
+        existing = db.query(BackgroundJob).filter(BackgroundJob.id == uuid.UUID(job_id)).first()
+        if existing and existing.status in [JobStatusEnum.completed, JobStatusEnum.failed]:
+            logger.info(f"Job {job_id} already in terminal state {existing.status}, skipping duplicate run.")
+            return
+            
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.processing)
         
-        # Stages 1-3 handled during initialization and here
+        # Stages 1-9 handled during pipeline run
         run_extraction_pipeline(db, uuid.UUID(source_doc_id), job_id)
         update_job_status(db, uuid.UUID(job_id), JobStatusEnum.completed, {"message": "Pipeline completed successfully"})
     except Exception as e:

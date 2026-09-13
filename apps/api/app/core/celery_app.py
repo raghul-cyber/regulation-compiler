@@ -1,5 +1,15 @@
 import os
 import ssl
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Ensure .env is loaded regardless of execution context
+env_path = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
+else:
+    load_dotenv()
+
 from celery import Celery
 
 redis_url = os.getenv("CELERY_BROKER_URL") or os.getenv("REDIS_URL") or "redis://localhost:6379/0"

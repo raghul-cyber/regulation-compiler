@@ -8,26 +8,43 @@ from app.pipelines.semantic_engine import SemanticEngine
 
 logger = logging.getLogger(__name__)
 
+# Global flags so we don't repeatedly wait on failed cloud APIs
+_openai_disabled_reason: str | None = None
+_gemini_disabled_reason: str | None = None
+
 class LLMWrapper:
     def __init__(self, openai_key=None, gemini_key=None):
+        global _openai_disabled_reason, _gemini_disabled_reason
         self.openai_client = None
         self.gemini_client = None
         
-        if openai_key:
+        if openai_key and not _openai_disabled_reason:
             try:
-                self.openai_client = OpenAI(api_key=openai_key, max_retries=0, timeout=4.0)
+                self.openai_client = OpenAI(api_key=openai_key, max_retries=0, timeout=1.5)
             except Exception as e:
                 logger.error(f"Failed to init OpenAI: {e}")
+                _openai_disabled_reason = str(e)
                 
-        if gemini_key:
-            try:
-                self.gemini_client = genai.Client(api_key=gemini_key)
-            except Exception as e:
-                logger.error(f"Failed to init Gemini: {e}")
+        if gemini_key and not _gemini_disabled_reason:
+            if not gemini_key.startswith("AIzaSy"):
+                logger.warning("GEMINI_API_KEY does not start with 'AIzaSy' (invalid format). Disabling cloud Gemini.")
+                _gemini_disabled_reason = "Invalid Gemini API key prefix"
+            else:
+                try:
+                    self.gemini_client = genai.Client(api_key=gemini_key)
+                except Exception as e:
+                    logger.error(f"Failed to init Gemini: {e}")
+                    _gemini_disabled_reason = str(e)
 
     def generate_json(self, system_prompt: str, user_prompt: str):
+        global _openai_disabled_reason, _gemini_disabled_reason
         last_error = None
-        if self.openai_client:
+        
+        # 1. Fast-path: if both cloud APIs have already failed or are unconfigured, use SemanticEngine instantly
+        if not self.openai_client and not self.gemini_client:
+            return self._fallback_semantic_engine(system_prompt, user_prompt)
+            
+        if self.openai_client and not _openai_disabled_reason:
             try:
                 res = self.openai_client.chat.completions.create(
                     model="gpt-4o-mini",
@@ -35,19 +52,22 @@ class LLMWrapper:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt}
                     ],
-                    response_format={ "type": "json_object" }
+                    response_format={ "type": "json_object" },
+                    timeout=2.0
                 )
                 return json.loads(res.choices[0].message.content)
             except Exception as e:
                 last_error = e
                 logger.warning(f"OpenAI failed: {e}. Falling back to Gemini if available.")
-                if "429" in str(e) or "quota" in str(e) or "credit_balance" in str(e):
+                if any(x in str(e).lower() for x in ["429", "quota", "credit_balance", "billing", "unauthorized"]):
+                    _openai_disabled_reason = str(e)
                     self.openai_client = None
                 
-        if self.gemini_client:
+        if self.gemini_client and not _gemini_disabled_reason:
             try:
+                # Try gemini-1.5-flash which is broadly available
                 res = self.gemini_client.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-1.5-flash',
                     contents=[system_prompt + "\n\n" + user_prompt],
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
@@ -57,10 +77,10 @@ class LLMWrapper:
             except Exception as e:
                 last_error = e
                 logger.warning(f"Gemini failed: {e}. Falling back to local SemanticEngine statutory compiler.")
-                if "404" in str(e) or "quota" in str(e) or "429" in str(e):
-                    self.gemini_client = None
+                _gemini_disabled_reason = str(e)
+                self.gemini_client = None
                 
-        logger.info(f"Using local statutory SemanticEngine (cloud LLM error: {last_error})")
+        logger.info(f"Using local statutory SemanticEngine (fast-path fallback, cloud LLM: {last_error})")
         return self._fallback_semantic_engine(system_prompt, user_prompt)
 
     def _fallback_semantic_engine(self, system_prompt: str, user_prompt: str):
@@ -84,17 +104,7 @@ class LLMWrapper:
                 titles = [line.strip() for line in user_prompt.split("\n") if line.strip()]
             return SemanticEngine.build_knowledge_graph(titles)
 
-        # 4. Rule Compilation
-        if "compile" in sys_lower or "refined_ast" in sys_lower or "policy rules" in sys_lower:
-            try:
-                req_objs = json.loads(user_prompt)
-                if not isinstance(req_objs, list):
-                    req_objs = [req_objs]
-            except Exception:
-                req_objs = [{"title": "Statutory Control", "conditions": {}}]
-            return SemanticEngine.compile_rules(req_objs)
-
-        # 5. Validation
+        # 4. Validation (Check BEFORE compile because validation prompt contains 'compiled rules')
         if "validate" in sys_lower or "fallacies" in sys_lower or "needs_review" in sys_lower:
             try:
                 items = json.loads(user_prompt)
@@ -102,6 +112,20 @@ class LLMWrapper:
             except Exception:
                 count = 3
             return {"validated": count, "needs_review": 0}
+
+        # 5. Rule Compilation
+        if "compile" in sys_lower or "refined_ast" in sys_lower or "policy rules" in sys_lower:
+            try:
+                req_objs = json.loads(user_prompt)
+                if not isinstance(req_objs, list):
+                    req_objs = [req_objs]
+                req_objs = [
+                    r if isinstance(r, dict) else {"title": str(r), "conditions": {}}
+                    for r in req_objs
+                ]
+            except Exception:
+                req_objs = [{"title": "Statutory Control", "conditions": {}}]
+            return SemanticEngine.compile_rules(req_objs)
 
         return {}
 

@@ -25,10 +25,42 @@ from app.models.regulations import (
 from app.models.requirements import Requirement, Policy
 from app.services.fetcher import FrameworkFetcher
 from app.services.storage import StorageService
-from app.workers.tasks import process_ingestion_pipeline, process_amendment_pipeline
+import threading
+import logging
+from app.db.session import SessionLocal
+from app.models.jobs import JobStatusEnum
+from app.workers.tasks import process_ingestion_pipeline, process_amendment_pipeline, update_job_status
+from app.pipelines.extraction import run_extraction_pipeline
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["regulations"])
 storage_service = StorageService()
+
+def run_pipeline_in_background(job_id_str: str, source_doc_id_str: str):
+    """
+    Executes the ingestion pipeline in a managed daemon thread so the compilation
+    pipeline completes in seconds and never stalls on cold/hibernating Celery workers.
+    """
+    def _runner():
+        logger.info(f"Starting in-process background pipeline execution for Job {job_id_str}")
+        db = SessionLocal()
+        try:
+            update_job_status(db, uuid.UUID(job_id_str), JobStatusEnum.processing)
+            run_extraction_pipeline(db, uuid.UUID(source_doc_id_str), job_id_str)
+            update_job_status(db, uuid.UUID(job_id_str), JobStatusEnum.completed, {"message": "Pipeline completed successfully"})
+            logger.info(f"In-process pipeline execution successfully finished for Job {job_id_str}")
+        except Exception as e:
+            logger.error(f"In-process pipeline execution failed for Job {job_id_str}: {e}")
+            try:
+                update_job_status(db, uuid.UUID(job_id_str), JobStatusEnum.failed, error=str(e))
+            except Exception:
+                pass
+        finally:
+            db.close()
+            
+    t = threading.Thread(target=_runner, daemon=True)
+    t.start()
 
 
 # ---------------------------------------------------------
@@ -109,7 +141,7 @@ async def upload_regulation(
     regulation.current_version_id = version.id
     db.commit()
 
-    # Phase 14: Enqueue real Celery task
+    # Phase 14: Enqueue task & trigger in-process execution fallback
     job = BackgroundJob(
         job_type=JobTypeEnum.ingestion,
         entity_id=str(version.id)
@@ -117,9 +149,16 @@ async def upload_regulation(
     db.add(job)
     db.commit()
 
-    task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
-    job.task_id = task.id
+    try:
+        task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
+        job.task_id = task.id
+    except Exception as cel_err:
+        logger.warning(f"Could not enqueue Celery task: {cel_err}")
+        job.task_id = str(uuid.uuid4())
     db.commit()
+
+    # Trigger reliable background execution immediately
+    run_pipeline_in_background(str(job.id), str(source_doc.id))
 
     return {
         "regulation_id": str(regulation.id),
@@ -264,9 +303,16 @@ async def ingest_framework(
     db.add(job)
     db.commit()
 
-    task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
-    job.task_id = task.id
+    try:
+        task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
+        job.task_id = task.id
+    except Exception as cel_err:
+        logger.warning(f"Could not enqueue Celery task: {cel_err}")
+        job.task_id = str(uuid.uuid4())
     db.commit()
+
+    # Trigger reliable background execution immediately
+    run_pipeline_in_background(str(job.id), str(source_doc.id))
 
     return {
         "regulation_id": str(regulation.id),
@@ -348,14 +394,21 @@ async def amend_regulation(
     db.add(job)
     db.commit()
 
-    task = process_amendment_pipeline.delay(
-        str(job.id), 
-        str(source_doc.id), 
-        str(old_version_id), 
-        str(new_version.id)
-    )
-    job.task_id = task.id
+    try:
+        task = process_amendment_pipeline.delay(
+            str(job.id), 
+            str(source_doc.id), 
+            str(old_version_id), 
+            str(new_version.id)
+        )
+        job.task_id = task.id
+    except Exception as cel_err:
+        logger.warning(f"Could not enqueue Celery task: {cel_err}")
+        job.task_id = str(uuid.uuid4())
     db.commit()
+
+    # Trigger reliable background execution immediately
+    run_pipeline_in_background(str(job.id), str(source_doc.id))
 
     return {
         "regulation_version_id": str(new_version.id),

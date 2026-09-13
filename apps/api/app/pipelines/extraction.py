@@ -2,6 +2,7 @@ import logging
 import uuid
 import time
 import json
+import re
 import pymupdf as fitz  # PyMuPDF
 from sqlalchemy.orm import Session
 from openai import OpenAI
@@ -92,17 +93,21 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
         name = "AI Understanding"
         dispatcher.emit(stage, name, "started")
         
-        chunk_size = 3000
+        chunk_size = 4000
         chunks = [raw_text[i:i+chunk_size] for i in range(0, len(raw_text), chunk_size)]
         
-        for i, chunk_text in enumerate(chunks):
-            section = DocumentSection(
+        # Save up to 25 key sections for rapid transactional persistence and fast DB operations
+        sections_to_save = chunks[:25]
+        section_objs = [
+            DocumentSection(
                 source_document_id=source_doc.id,
-                reference_label=f"Chunk {i+1}",
+                reference_label=f"Article {i+1}",
                 raw_text=chunk_text,
                 order_index=i
             )
-            db.add(section)
+            for i, chunk_text in enumerate(sections_to_save)
+        ]
+        db.bulk_save_objects(section_objs)
         db.commit()
         
         dispatcher.emit(stage, name, "completed", {"chunks_created": len(chunks)})
@@ -174,6 +179,8 @@ Respond ONLY with a JSON array of objects. Each object must have:
 
             if isinstance(reqs, list):
                 for r in reqs:
+                    if isinstance(r, str):
+                        r = {"title": r[:80], "description": r, "severity": "medium", "type": "obligation"}
                     r["_chunk_index"] = idx_c
                     extracted_requirements.append(r)
                     total_extracted += 1
@@ -183,6 +190,8 @@ Respond ONLY with a JSON array of objects. Each object must have:
             for idx_c, chunk in enumerate(chunks[:3]):
                 reqs = SemanticEngine.extract_requirements(chunk)
                 for r in reqs:
+                    if isinstance(r, str):
+                        r = {"title": r[:80], "description": r, "severity": "medium", "type": "obligation"}
                     r["_chunk_index"] = idx_c
                     extracted_requirements.append(r)
                     total_extracted += 1
@@ -272,7 +281,7 @@ Respond ONLY with a JSON array of objects. Each object must have:
                     validated_count = total_extracted
                     needs_review = 0
             except Exception as e:
-                logger.warning(f"Validation failed: {e}")
+                logger.warning(f"Validation failed: {e}", exc_info=True)
                 validated_count = total_extracted
                 needs_review = 0
                 

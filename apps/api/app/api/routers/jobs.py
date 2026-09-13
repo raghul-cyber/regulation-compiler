@@ -41,14 +41,21 @@ async def get_job_events(
     current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
+    from app.db.session import SessionLocal
+    from app.models.jobs import JobStatusEnum
+
     job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
     target_max_stage = 5 if (job and job.job_type and "report" in str(job.job_type).lower()) else 9
     
     historical_events = db.query(JobEvent).filter(JobEvent.job_id == job_id).order_by(JobEvent.created_at.asc()).all()
     
     async def event_generator():
+        seen_event_ids = set()
         terminal_reached = False
+        
+        # 1. Emit all historical events recorded in DB
         for event in historical_events:
+            seen_event_ids.add(str(event.id))
             payload = {
                 "id": str(event.id),
                 "job_id": str(event.job_id),
@@ -64,40 +71,113 @@ async def get_job_events(
                 
         if terminal_reached:
             return
-            
-        redis_url = celery_app.conf.broker_url
-        redis_client = aioredis.from_url(redis_url)
-        pubsub = redis_client.pubsub()
+
+        # 2. Setup Redis PubSub (best-effort real-time stream)
+        pubsub = None
+        redis_client = None
         channel = f"job_events:{job_id}"
-        await pubsub.subscribe(channel)
+        try:
+            redis_url = celery_app.conf.broker_url
+            redis_client = aioredis.from_url(redis_url, socket_timeout=2.0, socket_connect_timeout=2.0)
+            pubsub = redis_client.pubsub()
+            await pubsub.subscribe(channel)
+        except Exception as r_err:
+            pubsub = None
+            redis_client = None
         
         try:
             last_heartbeat = time.time()
+            last_db_poll = time.time()
+            
             while True:
-                message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
-                if message and message["type"] == "message":
-                    data = message["data"]
-                    if isinstance(data, bytes):
-                        data = data.decode("utf-8")
-                    yield f"data: {data}\n\n"
+                # A. Try reading from Redis PubSub if connected
+                if pubsub:
+                    try:
+                        message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=0.3)
+                        if message and message.get("type") == "message":
+                            data = message["data"]
+                            if isinstance(data, bytes):
+                                data = data.decode("utf-8")
+                            
+                            try:
+                                parsed = json.loads(data)
+                                event_id = str(parsed.get("id", ""))
+                                if event_id and event_id not in seen_event_ids:
+                                    seen_event_ids.add(event_id)
+                                    yield f"data: {data}\n\n"
+                                    
+                                    if parsed.get("stage_number", 0) >= target_max_stage and parsed.get("status") in ["completed", "failed"]:
+                                        await asyncio.sleep(0.5)
+                                        break
+                                    if parsed.get("status") == "failed":
+                                        await asyncio.sleep(0.5)
+                                        break
+                            except Exception:
+                                yield f"data: {data}\n\n"
+                    except Exception:
+                        pass
+
+                # B. Dual-source safety: Poll PostgreSQL every 0.8s to guarantee zero missed events
+                now = time.time()
+                if now - last_db_poll >= 0.8:
+                    last_db_poll = now
+                    try:
+                        poll_db = SessionLocal()
+                        try:
+                            fresh_events = poll_db.query(JobEvent).filter(
+                                JobEvent.job_id == job_id
+                            ).order_by(JobEvent.created_at.asc()).all()
+                            
+                            for ev in fresh_events:
+                                ev_id_str = str(ev.id)
+                                if ev_id_str not in seen_event_ids:
+                                    seen_event_ids.add(ev_id_str)
+                                    payload = {
+                                        "id": ev_id_str,
+                                        "job_id": str(ev.job_id),
+                                        "stage_number": ev.stage_number,
+                                        "stage_name": ev.stage_name,
+                                        "status": ev.status,
+                                        "details": ev.details,
+                                        "created_at": ev.created_at.isoformat()
+                                    }
+                                    yield f"data: {json.dumps(payload)}\n\n"
+                                    
+                                    if ev.status == 'failed' or (ev.stage_number >= target_max_stage and ev.status in ['completed', 'failed']):
+                                        terminal_reached = True
+                                        break
+                            
+                            # Check terminal job status
+                            bg_job = poll_db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
+                            if bg_job and bg_job.status in [JobStatusEnum.completed, JobStatusEnum.failed]:
+                                terminal_reached = True
+                        finally:
+                            poll_db.close()
+                            
+                        if terminal_reached:
+                            await asyncio.sleep(0.5)
+                            break
+                    except Exception as poll_err:
+                        pass
+
+                # C. Heartbeat to keep HTTP connection alive through proxies
+                if now - last_heartbeat > 12:
+                    yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
+                    last_heartbeat = now
                     
-                    parsed = json.loads(data)
-                    if parsed.get("stage_number", 0) >= target_max_stage and parsed.get("status") in ["completed", "failed"]:
-                        await asyncio.sleep(0.5)
-                        break
-                    if parsed.get("status") == "failed":
-                        await asyncio.sleep(0.5)
-                        break
-                else:
-                    if time.time() - last_heartbeat > 15:
-                        yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
-                        last_heartbeat = time.time()
-                        
                 await asyncio.sleep(0.1)
         finally:
-            await pubsub.unsubscribe(channel)
-            await pubsub.close()
-            await redis_client.aclose()
+            if pubsub:
+                try:
+                    await pubsub.unsubscribe(channel)
+                    await pubsub.close()
+                except Exception:
+                    pass
+            if redis_client:
+                try:
+                    await redis_client.aclose()
+                except Exception:
+                    pass
             
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -119,8 +199,19 @@ def retry_job(
         raise HTTPException(status_code=400, detail="Cannot retry: missing source document linkage")
         
     db.query(JobEvent).filter(JobEvent.job_id == job_id).delete()
-        
-    task = process_ingestion_pipeline.delay(str(job.id), str(version.source_document_id))
-    job.task_id = task.id
+    job.status = JobStatusEnum.processing
+    job.error_details = None
+    job.result_data = None
     db.commit()
+        
+    try:
+        task = process_ingestion_pipeline.delay(str(job.id), str(version.source_document_id))
+        job.task_id = task.id
+    except Exception:
+        job.task_id = str(uuid.uuid4())
+    db.commit()
+
+    from app.api.routers.regulations import run_pipeline_in_background
+    run_pipeline_in_background(str(job.id), str(version.source_document_id))
+
     return {"message": "Job re-queued successfully", "job_id": str(job.id)}
