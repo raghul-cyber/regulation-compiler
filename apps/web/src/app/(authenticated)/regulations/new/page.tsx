@@ -17,6 +17,14 @@ interface Framework {
   description: string;
 }
 
+const getApiUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://regulation-compiler.onrender.com/api/v1';
+  }
+  return 'http://127.0.0.1:8080/api/v1';
+};
+
 export default function NewRegulationPage() {
   const { getToken } = useAuth();
   const router = useRouter();
@@ -50,7 +58,7 @@ export default function NewRegulationPage() {
   const fetchFrameworks = async () => {
     try {
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -104,7 +112,7 @@ export default function NewRegulationPage() {
       formData.append('jurisdiction', jurisdiction);
 
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -161,7 +169,7 @@ export default function NewRegulationPage() {
     try {
       setIngesting(acronym);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;

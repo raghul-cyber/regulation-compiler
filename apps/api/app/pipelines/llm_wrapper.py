@@ -58,21 +58,24 @@ class LLMWrapper:
                 return json.loads(res.choices[0].message.content)
             except Exception as e:
                 last_error = e
-                logger.warning(f"OpenAI failed: {e}. Falling back to Gemini if available.")
-                if any(x in str(e).lower() for x in ["429", "quota", "credit_balance", "billing", "unauthorized"]):
-                    _openai_disabled_reason = str(e)
-                    self.openai_client = None
+                logger.warning(f"OpenAI failed: {e}. Disabling OpenAI and falling back.")
+                _openai_disabled_reason = str(e)
+                self.openai_client = None
                 
         if self.gemini_client and not _gemini_disabled_reason:
             try:
-                # Try gemini-1.5-flash which is broadly available
-                res = self.gemini_client.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=[system_prompt + "\n\n" + user_prompt],
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
+                import concurrent.futures
+                def _call_gemini():
+                    return self.gemini_client.models.generate_content(
+                        model='gemini-1.5-flash',
+                        contents=[system_prompt + "\n\n" + user_prompt],
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                        )
                     )
-                )
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    fut = executor.submit(_call_gemini)
+                    res = fut.result(timeout=2.5)
                 return json.loads(res.text)
             except Exception as e:
                 last_error = e

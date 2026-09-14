@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   Loader2, CheckCircle2, XCircle, Target, CheckSquare, 
   ChevronRight, ChevronDown, RotateCcw, Download, Cpu, 
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { ReportGenerator } from './report-generator';
+import { getJobEventsAction } from '@/app/actions';
 
 interface JobEvent {
   id: string;
@@ -31,6 +32,14 @@ const STAGES = [
   { num: 9, name: "Persist to Policy DB", hasDetails: true }
 ];
 
+const getApiBase = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://regulation-compiler.onrender.com/api/v1';
+  }
+  return 'http://127.0.0.1:8080/api/v1';
+};
+
 export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: string, getToken: () => Promise<string | null>, regulationId?: string }) {
   const [events, setEvents] = useState<JobEvent[]>([]);
   const [currentStage, setCurrentStage] = useState(0);
@@ -43,11 +52,41 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
 
   useEffect(() => {
     let abortController = new AbortController();
+    let isTerminated = false;
 
+    // Helper to merge newly arrived events
+    const mergeEvents = (newEvents: JobEvent[], status?: string, errorMsg?: string) => {
+      setEvents(prev => {
+        const map = new Map<string, JobEvent>();
+        for (const e of prev) {
+          map.set(e.id || `${e.stage_number}-${e.status}`, e);
+        }
+        for (const e of newEvents) {
+          map.set(e.id || `${e.stage_number}-${e.status}`, e);
+        }
+        const merged = Array.from(map.values()).sort(
+          (a, b) => (a.stage_number - b.stage_number) || (a.status === 'started' ? -1 : 1)
+        );
+        const maxStage = Math.max(0, ...merged.map(e => e.stage_number));
+        if (maxStage > 0) setCurrentStage(maxStage);
+        return merged;
+      });
+
+      if (status === 'completed') {
+        isTerminated = true;
+        setJobStatus('completed');
+      } else if (status === 'failed') {
+        isTerminated = true;
+        setJobStatus('failed');
+        if (errorMsg) setErrorDetails(errorMsg);
+      }
+    };
+
+    // Track 1: Real-time SSE Stream
     const connectSSE = async () => {
       try {
         const token = await getToken();
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+        const API_BASE = getApiBase();
         
         const headers: Record<string, string> = {};
         if (token) {
@@ -69,7 +108,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
         const decoder = new TextDecoder();
         let buffer = '';
 
-        while (true) {
+        while (!isTerminated) {
           const { value, done } = await reader.read();
           if (done) break;
           
@@ -84,23 +123,18 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
                 const parsed = JSON.parse(data);
                 if (parsed.type === 'heartbeat') continue;
                 
-                setEvents(prev => {
-                  if (prev.some(e => e.id === parsed.id)) return prev;
-                  return [...prev, parsed];
-                });
+                mergeEvents([parsed]);
 
-                setCurrentStage(parsed.stage_number);
-                
                 if (parsed.status === 'failed') {
+                  isTerminated = true;
                   setJobStatus('failed');
                   setErrorDetails(parsed.details?.error || "Pipeline failed");
                   return;
                 }
                 if (parsed.stage_number === 9 && parsed.status === 'completed') {
+                  isTerminated = true;
                   setJobStatus('completed');
                   return;
-                } else {
-                  setJobStatus('processing');
                 }
               } catch(e) {
                 console.error("SSE parse error", e, data);
@@ -110,14 +144,54 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
         }
       } catch (err: any) {
         if (err.name === 'AbortError') return;
-        console.error(err);
-        setError(err.message);
+        console.warn("SSE stream interrupted or buffered, falling back to high-frequency polling:", err.message);
       }
     };
+
+    // Track 2: High-Frequency Parallel Polling (Every 1.2s) - guarantees instant progress even if SSE buffers
+    const pollInterval = setInterval(async () => {
+      if (isTerminated) return;
+      try {
+        const token = await getToken();
+        const API_BASE = getApiBase();
+        const headers: Record<string, string> = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        let jobData: any = null;
+        try {
+          const res = await fetch(`${API_BASE}/jobs/${jobId}`, {
+            headers,
+            signal: AbortSignal.timeout(3500),
+            cache: 'no-store'
+          });
+          if (res.ok) {
+            jobData = await res.json();
+          }
+        } catch {
+          // Direct browser fetch failed (e.g. cross-origin/Vercel), try Next.js server action
+          const actRes = await getJobEventsAction(jobId);
+          if (actRes.success) {
+            jobData = actRes.data;
+          }
+        }
+
+        if (jobData) {
+          if (jobData.events && Array.isArray(jobData.events) && jobData.events.length > 0) {
+            mergeEvents(jobData.events, jobData.status, jobData.error_details);
+          } else if (jobData.status === 'completed' || jobData.status === 'failed') {
+            mergeEvents([], jobData.status, jobData.error_details);
+          }
+        }
+      } catch (pollErr) {
+        console.warn("Poll job status error:", pollErr);
+      }
+    }, 1200);
     
     connectSSE();
 
     return () => {
+      isTerminated = true;
+      clearInterval(pollInterval);
       abortController.abort();
     };
   }, [jobId, getToken]);
@@ -135,7 +209,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     try {
       setIsRetrying(true);
       const token = await getToken();
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const API_BASE = getApiBase();
       const res = await fetch(`${API_BASE}/jobs/${jobId}/retry`, {
         method: 'POST',
         headers: {
@@ -161,7 +235,7 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     try {
       setIsDownloading(true);
       const token = await getToken();
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const API_BASE = getApiBase();
       
       const stage9Event = events.find(e => e.stage_number === 9 && e.status === 'completed');
       const policyId = stage9Event?.details?.policy_id;
@@ -247,6 +321,10 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
     if (stageEvents.some(e => e.status === 'failed')) return 'failed';
     if (stageEvents.some(e => e.status === 'completed')) return 'completed';
     if (stageEvents.some(e => e.status === 'started')) return 'active';
+    // Optimistic active stage: if job is processing and stage 1 has not yet recorded an event, show active
+    if (stageNum === 1 && jobStatus === 'processing' && events.length === 0) return 'active';
+    // If a later stage is active or completed, earlier stages should be shown as completed
+    if (currentStage > stageNum && jobStatus !== 'failed') return 'completed';
     return 'pending';
   };
 

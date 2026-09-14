@@ -18,12 +18,26 @@ router = APIRouter(tags=["jobs"])
 @router.get("/jobs/{job_id}")
 def get_job_status(
     job_id: uuid.UUID,
-    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.developer, RoleEnum.compliance_officer, RoleEnum.legal_counsel, RoleEnum.auditor])),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     job = db.query(BackgroundJob).filter(BackgroundJob.id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+        
+    events = db.query(JobEvent).filter(JobEvent.job_id == job_id).order_by(JobEvent.created_at.asc()).all()
+    events_list = [
+        {
+            "id": str(e.id),
+            "job_id": str(e.job_id),
+            "stage_number": e.stage_number,
+            "stage_name": e.stage_name,
+            "status": e.status,
+            "details": e.details,
+            "created_at": e.created_at.isoformat() if e.created_at else None
+        }
+        for e in events
+    ]
         
     return {
         "id": str(job.id),
@@ -32,8 +46,29 @@ def get_job_status(
         "error_details": job.error_details,
         "result_data": job.result_data,
         "started_at": job.started_at.isoformat() if job.started_at else None,
-        "completed_at": job.completed_at.isoformat() if job.completed_at else None
+        "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+        "events": events_list
     }
+
+@router.get("/jobs/{job_id}/events-list")
+def get_job_events_list(
+    job_id: uuid.UUID,
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    events = db.query(JobEvent).filter(JobEvent.job_id == job_id).order_by(JobEvent.created_at.asc()).all()
+    return [
+        {
+            "id": str(e.id),
+            "job_id": str(e.job_id),
+            "stage_number": e.stage_number,
+            "stage_name": e.stage_name,
+            "status": e.status,
+            "details": e.details,
+            "created_at": e.created_at.isoformat() if e.created_at else None
+        }
+        for e in events
+    ]
 
 @router.get("/jobs/{job_id}/events")
 async def get_job_events(
@@ -178,8 +213,13 @@ async def get_job_events(
                     await redis_client.aclose()
                 except Exception:
                     pass
-            
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    headers = {
+        "Cache-Control": "no-cache, no-transform",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",
+        "Content-Type": "text/event-stream"
+    }
+    return StreamingResponse(event_generator(), media_type="text/event-stream", headers=headers)
 
 @router.post("/jobs/{job_id}/retry")
 def retry_job(

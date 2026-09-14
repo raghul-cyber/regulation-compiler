@@ -26,3 +26,5 @@ Thumbs.db
 *.pdf
 *.log
 scratch/
+.local_storage/
+apps/api/.local_storage/

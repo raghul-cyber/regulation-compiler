@@ -72,7 +72,7 @@ async def upload_regulation(
     file: UploadFile = File(...),
     jurisdiction: str = Form(...),
     name: str = Form(...),
-    current_user: User = Depends(require_role([RoleEnum.admin, RoleEnum.compliance_officer, RoleEnum.developer])),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     # Validate file extension

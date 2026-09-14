@@ -40,17 +40,20 @@ class EventDispatcher:
         status should be one of: "started", "completed", "failed"
         """
         # 1. Persist to DB (primary ground truth)
+        event_id = uuid.uuid4()
+        now = datetime.now()
         try:
             event = JobEvent(
+                id=event_id,
                 job_id=self.job_id,
                 stage_number=stage_number,
                 stage_name=stage_name,
                 status=status,
-                details=details
+                details=details,
+                created_at=now
             )
             self.db.add(event)
             self.db.commit()
-            self.db.refresh(event)
         except Exception as db_err:
             logger.error(f"Failed to persist event to DB for Job {self.job_id}: {db_err}")
             self.db.rollback()
@@ -61,13 +64,13 @@ class EventDispatcher:
             r = get_sync_redis()
             if r:
                 payload = {
-                    "id": str(event.id),
-                    "job_id": str(event.job_id),
-                    "stage_number": event.stage_number,
-                    "stage_name": event.stage_name,
-                    "status": event.status,
-                    "details": event.details,
-                    "created_at": event.created_at.isoformat()
+                    "id": str(event_id),
+                    "job_id": str(self.job_id),
+                    "stage_number": stage_number,
+                    "stage_name": stage_name,
+                    "status": status,
+                    "details": details,
+                    "created_at": now.isoformat()
                 }
                 r.publish(self.channel, json.dumps(payload))
             logger.info(f"Dispatched event for Job {self.job_id}: Stage {stage_number} ({stage_name}) [{status}]")

@@ -2,6 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 
+function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    return 'https://regulation-compiler.onrender.com/api/v1';
+  }
+  return 'http://127.0.0.1:8080/api/v1';
+}
+
 export async function setRequirementStatus(reqId: string, status: string, note?: string) {
   try {
     const { auth } = await import('@clerk/nextjs/server');
@@ -9,7 +17,7 @@ export async function setRequirementStatus(reqId: string, status: string, note?:
     const token = await session.getToken();
     if (!token) throw new Error("Unauthorized");
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+    const API_BASE = getApiBaseUrl();
     const response = await fetch(`${API_BASE}/requirements/${reqId}/status`, {
       method: 'PATCH',
       headers: {
@@ -40,7 +48,7 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
   
   if (!token) throw new Error("Unauthorized");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
 
   // 1. Generate a temporary API key using the user's Clerk Token
   const keyRes = await fetch(`${API_BASE}/api-keys`, {
@@ -112,7 +120,7 @@ export async function generateReport(regulationId: string, typeOrTypes: string |
     console.warn("generateReport session auth fallback:", e);
   }
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -156,7 +164,7 @@ export async function createApiKey(name: string, scopes: string[]) {
   const token = await session.getToken();
   if (!token) throw new Error("Unauthorized");
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
   
   const res = await fetch(`${API_BASE}/api-keys`, {
     method: 'POST',
@@ -181,7 +189,7 @@ export async function revokeApiKey(keyId: string) {
   const token = await session.getToken();
   if (!token) throw new Error("Unauthorized");
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
   
   const res = await fetch(`${API_BASE}/api-keys/${keyId}`, {
     method: 'DELETE',
@@ -208,7 +216,7 @@ export async function uploadRegulationServerAction(formData: FormData) {
     console.warn("uploadRegulationServerAction auth fallback:", e);
   }
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
 
   const headers: Record<string, string> = {};
   if (token) {
@@ -246,7 +254,7 @@ export async function pollReports(regulationId: string) {
     console.warn("pollReports auth fallback:", e);
   }
   
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+  const API_BASE = getApiBaseUrl();
   const headers: Record<string, string> = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -257,5 +265,33 @@ export async function pollReports(regulationId: string) {
   
   const data = await res.json();
   return { success: true, data: data.data };
+}
+
+export async function getJobEventsAction(jobId: string) {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/jobs/${jobId}`, {
+      headers,
+      signal: AbortSignal.timeout(4000),
+      cache: 'no-store'
+    });
+    if (!res.ok) return { success: false, error: `Job status ${res.status}` };
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
 }
 

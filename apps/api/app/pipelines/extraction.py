@@ -145,7 +145,7 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
         name = "Extract Requirements"
         dispatcher.emit(stage, name, "started")
         
-        chunks_to_process = chunks[:5]
+        chunks_to_process = chunks[:2]
         total_extracted = 0
         latest_title = ""
         extracted_requirements = []
@@ -374,8 +374,6 @@ Respond ONLY with a JSON array of objects. Each object must have:
                 saved_db_reqs.append(db_req)
             
             db.commit()
-            for r in saved_db_reqs:
-                db.refresh(r)
 
             # Generate & Persist Policy automatically
             reg_version = db.query(RegulationVersion).filter(RegulationVersion.id == reg_ver_id).first()

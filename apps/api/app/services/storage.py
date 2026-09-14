@@ -56,6 +56,17 @@ class StorageService:
         if isinstance(data, str):
             data = data.encode('utf-8')
 
+        # 1. Save locally first to guarantee zero-latency in-process pipeline retrieval
+        local_file_path = os.path.join(self.local_storage_path, storage_path)
+        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+        try:
+            with open(local_file_path, "wb") as f:
+                f.write(data)
+            logger.info(f"Cached file locally: {local_file_path} ({len(data)} bytes)")
+        except Exception as e:
+            logger.warning(f"Could not cache locally: {e}")
+
+        # 2. Upload to S3 if configured
         if not self.use_local and self.s3_client:
             try:
                 self.s3_client.put_object(
@@ -65,16 +76,9 @@ class StorageService:
                     ContentType=content_type
                 )
                 logger.info(f"S3 put_object successful: {storage_path} ({len(data)} bytes)")
-                return storage_path
             except Exception as e:
-                logger.warning(f"S3 put_object encountered error ({e}). Falling back instantly to local storage.")
+                logger.warning(f"S3 put_object encountered error ({e}). Using local cache.")
 
-        # Local storage fallback (ensures upload stage NEVER stalls or fails)
-        local_file_path = os.path.join(self.local_storage_path, storage_path)
-        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-        with open(local_file_path, "wb") as f:
-            f.write(data)
-        logger.info(f"Local storage fallback successful: {local_file_path} ({len(data)} bytes)")
         return storage_path
 
     def get_file_bytes(self, storage_path: str) -> bytes:
