@@ -297,3 +297,67 @@ export async function getJobEventsAction(jobId: string) {
   }
 }
 
+export async function ingestFrameworkAction(acronym: string) {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/regulations/frameworks/${acronym}/ingest`, {
+      method: 'POST',
+      headers,
+      signal: AbortSignal.timeout(10000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => 'Failed to ingest framework');
+      return { success: false, error: errText };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function getFrameworksAction() {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/regulations/frameworks`, {
+      headers,
+      signal: AbortSignal.timeout(6000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      return { success: false, error: `Status ${res.status}` };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+

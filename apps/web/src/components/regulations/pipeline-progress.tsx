@@ -39,15 +39,10 @@ const getApiBase = () => {
     if (isLocal) {
       return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
     }
-    // Remote domain (e.g. Vercel)
-    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1') && !process.env.NEXT_PUBLIC_API_URL.includes('localhost')) {
-      return process.env.NEXT_PUBLIC_API_URL;
-    }
-    return 'https://regulation-compiler.onrender.com/api/v1';
+    // Remote domain (e.g. Vercel): Use same-origin /api proxy to eliminate all CORS & preflight errors
+    return '/api';
   }
-  return (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1'))
-    ? process.env.NEXT_PUBLIC_API_URL
-    : 'https://regulation-compiler.onrender.com/api/v1';
+  return '/api';
 };
 
 export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: string, getToken: () => Promise<string | null>, regulationId?: string }) {

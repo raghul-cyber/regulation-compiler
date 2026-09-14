@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, BrainCircuit, FileSearch, ShieldCheck, Globe, Library } from 'lucide-react';
-import { uploadRegulationServerAction } from '@/app/actions';
+import { uploadRegulationServerAction, ingestFrameworkAction, getFrameworksAction } from '@/app/actions';
 import { PipelineProgress } from '@/components/regulations/pipeline-progress';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -67,6 +67,14 @@ export default function NewRegulationPage() {
 
   const fetchFrameworks = async () => {
     try {
+      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      if (isRemote) {
+        const res = await getFrameworksAction();
+        if (res.success && Array.isArray(res.data)) {
+          setFrameworks(res.data);
+          return;
+        }
+      }
       const token = await getToken();
       const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
@@ -129,31 +137,42 @@ export default function NewRegulationPage() {
       }
 
       let responseData: any = null;
-      try {
-        const directRes = await fetch(`${apiUrl}/regulations/upload`, {
-          method: 'POST',
-          headers,
-          body: formData
-        });
-        if (directRes.ok) {
-          responseData = await directRes.json();
-        } else {
-          let errText = "Upload failed";
-          try {
-            const errJson = await directRes.json();
-            errText = errJson.detail || errText;
-          } catch {
-            errText = await directRes.text() || errText;
-          }
-          throw new Error(errText);
-        }
-      } catch (directErr: any) {
-        console.warn("Direct upload failed or blocked, trying server action fallback:", directErr);
+      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      
+      if (isRemote) {
+        // On remote domains (e.g. Vercel), use Server Action directly to eliminate cross-origin preflight/CORS errors
         const res = await uploadRegulationServerAction(formData);
         if (!res.success) {
-          throw new Error(res.error || directErr.message || "Upload failed");
+          throw new Error(res.error || "Upload failed");
         }
         responseData = res.data;
+      } else {
+        try {
+          const directRes = await fetch(`${apiUrl}/regulations/upload`, {
+            method: 'POST',
+            headers,
+            body: formData
+          });
+          if (directRes.ok) {
+            responseData = await directRes.json();
+          } else {
+            let errText = "Upload failed";
+            try {
+              const errJson = await directRes.json();
+              errText = errJson.detail || errText;
+            } catch {
+              errText = await directRes.text() || errText;
+            }
+            throw new Error(errText);
+          }
+        } catch (directErr: any) {
+          console.warn("Direct upload fallback to server action:", directErr);
+          const res = await uploadRegulationServerAction(formData);
+          if (!res.success) {
+            throw new Error(res.error || directErr.message || "Upload failed");
+          }
+          responseData = res.data;
+        }
       }
 
       const returnedJobId = responseData?.job_id;
@@ -178,18 +197,27 @@ export default function NewRegulationPage() {
     setError(null);
     try {
       setIngesting(acronym);
-      const token = await getToken();
-      const apiUrl = getApiUrl();
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      let data: any = null;
+
+      if (isRemote) {
+        const res = await ingestFrameworkAction(acronym);
+        if (!res.success) throw new Error(res.error || "Failed to ingest framework");
+        data = res.data;
+      } else {
+        const token = await getToken();
+        const apiUrl = getApiUrl();
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetch(`${apiUrl}/regulations/frameworks/${acronym}/ingest`, {
+          method: 'POST',
+          headers
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Failed to ingest framework");
       }
-      const res = await fetch(`${apiUrl}/regulations/frameworks/${acronym}/ingest`, {
-        method: 'POST',
-        headers
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Failed to ingest framework");
       
       setJobId(data.job_id);
       setRegulationId(data.regulation_id || data.regulation_version_id);

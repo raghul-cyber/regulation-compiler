@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/r3f-test(.*)',
   '/api/webhooks(.*)',
   '/api/cron(.*)',
+  '/api/jobs(.*)',
   '/terms(.*)',
   '/privacy(.*)',
 ]);

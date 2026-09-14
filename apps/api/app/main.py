@@ -47,34 +47,45 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Configure allowed CORS origins
-raw_origins = os.getenv("CORS_ORIGINS", "")
-allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
-if not allowed_origins:
-    allowed_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
-
 # Add Middlewares
 app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
-    allow_origin_regex=r"https://.*\.vercel\.app" if "*" not in allowed_origins else None,
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
+    expose_headers=['*'],
+    max_age=86400,
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+@app.exception_handler(RateLimitExceeded)
+async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    origin = request.headers.get("origin", "*")
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Please retry shortly."},
+        headers={
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+        }
+    )
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception(f"Unhandled exception on {request.method} {request.url.path}: {exc}")
     is_dev = os.getenv("ENVIRONMENT", "").lower() in ["development", "dev", "local"]
     detail = str(exc) if is_dev else "An unexpected server error occurred."
+    origin = request.headers.get("origin", "*")
     return JSONResponse(
         status_code=500,
-        content={"error": "Internal Server Error", "detail": detail, "path": request.url.path}
+        content={"error": "Internal Server Error", "detail": detail, "path": request.url.path},
+        headers={
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+        }
     )
 
 app.include_router(webhooks.router, prefix="/api")
