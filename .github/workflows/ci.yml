@@ -28,7 +28,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
         
       - name: Next.js Build Check
-        run: cd apps/web && pnpm run build
+        run: pnpm --filter web-next build
         
       - name: Set up Python
         uses: actions/setup-python@v5
