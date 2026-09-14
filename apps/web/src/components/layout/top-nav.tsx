@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { NavAuth } from './nav-auth';
 import { UploadCloud, Menu, X, ShieldAlert } from 'lucide-react';
 import { Show, SignInButton, useUser } from '@clerk/nextjs';
@@ -20,8 +21,25 @@ export function TopNav() {
         
         {/* Left: Logo/Wordmark */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold tracking-tight text-white">RegCompiler</span>
+          <Link href="/" className="flex items-center space-x-2.5 group">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center p-0.5 bg-zinc-900/90 border border-zinc-800 group-hover:border-blue-500/50 transition-colors shadow-sm shadow-blue-500/10 shrink-0">
+              <Image 
+                src="/logo-icon.png" 
+                alt="Regulation Compiler Logo" 
+                width={32} 
+                height={32}
+                className="w-full h-full object-contain"
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors leading-tight">
+                RegCompiler
+              </span>
+              <span className="text-[10px] text-zinc-500 font-medium tracking-wide uppercase leading-none hidden sm:inline-block">
+                Regulation as Code
+              </span>
+            </div>
           </Link>
           
           {/* Desktop Nav Links */}

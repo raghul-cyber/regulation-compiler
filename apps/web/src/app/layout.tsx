@@ -20,6 +20,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Regulation Compiler",
   description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo-icon.png", type: "image/png" }
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png" }
+    ],
+  },
 };
 
 export default function RootLayout({

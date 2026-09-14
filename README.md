@@ -1,4 +1,6 @@
 <div align="center">
+  <img src="apps/web/public/logo.png" width="240" alt="Regulation Compiler Logo" style="border-radius: 12px; margin-bottom: 12px;" />
+  <br />
   <img src="https://readme-typing-svg.demolab.com?font=Inter&size=24&pause=1000&color=3B82F6&center=true&vCenter=true&width=600&lines=Regulation-as-Code+Compiler;Turning+Regulatory+Text+Into+Enforceable+Policy;GDPR+%E2%86%92+Structured+JSON+%E2%86%92+Enforceable+API;Compliance+in+Minutes%2C+Not+Months" alt="Typing SVG" />
 </div>
 

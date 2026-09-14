@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Show, SignInButton } from '@clerk/nextjs';
 import { HeroScene } from '@/components/3d/hero-scene-lazy';
@@ -36,6 +37,23 @@ export default function LandingPage() {
         {/* 1. HERO SECTION */}
         {/* ============================================================ */}
         <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center pt-8">
+          {/* Official Brand Badge with Logo */}
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs font-semibold text-zinc-300 mb-8 backdrop-blur-md shadow-xl shadow-blue-500/10 pointer-events-auto hover:border-zinc-700 transition-colors">
+            <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+              <Image 
+                src="/logo-icon.png" 
+                alt="Regulation Compiler Logo" 
+                width={20} 
+                height={20}
+                className="w-full h-full object-contain"
+                priority
+              />
+            </div>
+            <span className="text-white font-medium">Regulation Compiler</span>
+            <span className="text-zinc-600">•</span>
+            <span className="text-blue-400 font-mono tracking-wide text-[11px]">FROM REGULATIONS TO ACTION</span>
+          </div>
+
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter max-w-5xl leading-[1.08] bg-clip-text text-transparent bg-gradient-to-b from-white via-zinc-200 to-zinc-500 pointer-events-auto">
             The Future of <br /> Regulation as Code.
           </h1>

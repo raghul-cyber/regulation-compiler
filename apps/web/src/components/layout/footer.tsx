@@ -1,14 +1,26 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Footer() {
   return (
     <footer className="w-full border-t border-zinc-800/80 bg-[#070709] py-8 md:py-0 transition-colors">
       <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between md:h-16 gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <p className="text-sm text-zinc-500">
-            &copy; {new Date().getFullYear()} Regulation Compiler. Deterministic Statutory Enforcement.
-          </p>
+          <div className="w-6 h-6 rounded-md bg-zinc-900 border border-zinc-800 p-0.5 flex items-center justify-center shrink-0">
+            <Image 
+              src="/logo-icon.png" 
+              alt="Regulation Compiler Logo" 
+              width={20} 
+              height={20}
+              className="w-full h-full object-contain" 
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <p className="text-sm text-zinc-500">
+              &copy; {new Date().getFullYear()} Regulation Compiler. Deterministic Statutory Enforcement.
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400">
           <Link href="/dashboard" className="hover:text-blue-400 transition-colors">
