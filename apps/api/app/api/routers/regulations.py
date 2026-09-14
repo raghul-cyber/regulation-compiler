@@ -194,15 +194,21 @@ def list_regulations(
         "Payment Card Industry Data Security Standard (PCI DSS 4.0)": "Global cardholder data security architecture enforcing network segmentation, multi-factor authentication, end-to-end cryptographic safeguards, and strict vulnerability testing."
     }
 
+    req_counts = {}
+    try:
+        counts = db.query(
+            Requirement.regulation_version_id,
+            func.count(Requirement.id)
+        ).group_by(Requirement.regulation_version_id).all()
+        req_counts = {str(vid): cnt for vid, cnt in counts if vid}
+    except Exception:
+        req_counts = {}
+
     result = []
     for r in regs:
         desc = framework_map.get(r.name) or default_descriptions.get(r.name) or "Official canonical compliance regulation framework."
-        req_count = 0
-        if r.current_version_id:
-            try:
-                req_count = db.query(func.count(Requirement.id)).filter(Requirement.regulation_version_id == r.current_version_id).scalar() or 0
-            except Exception:
-                req_count = 0
+        vid_str = str(r.current_version_id) if r.current_version_id else None
+        req_count = req_counts.get(vid_str, 0) if vid_str else 0
         
         created_str = (
             r.created_at.isoformat() 
@@ -216,11 +222,12 @@ def list_regulations(
             "jurisdiction": r.jurisdiction,
             "description": desc,
             "requirements_count": req_count,
-            "current_version_id": str(r.current_version_id) if r.current_version_id else None,
+            "current_version_id": vid_str,
             "source_url": r.source_url,
             "created_at": created_str
         })
     return result
+
 
 
 @router.get("/frameworks")

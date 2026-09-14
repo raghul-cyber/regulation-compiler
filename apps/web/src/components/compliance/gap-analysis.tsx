@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { getGapAnalysis } from '@/app/(authenticated)/dashboard/actions';
 import { RemediationModal } from './remediation-modal';
@@ -10,19 +10,31 @@ export function GapAnalysis() {
   const [activeRemediation, setActiveRemediation] = useState<any>(null);
 
   useEffect(() => {
-    loadGaps();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    loadGaps().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
+
+    return () => clearTimeout(timer);
   }, []);
 
   async function loadGaps() {
     try {
       const data = await getGapAnalysis();
-      setGaps(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setGaps(data);
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Error loading gap analysis:", e);
     } finally {
       setLoading(false);
     }
   }
+
 
   if (loading) {
     return (

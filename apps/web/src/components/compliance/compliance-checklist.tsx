@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { getComplianceChecklist } from '@/app/(authenticated)/dashboard/actions';
 import { CheckCircle2, XCircle, AlertCircle, Loader2, ListChecks } from 'lucide-react';
@@ -10,19 +10,31 @@ export function ComplianceChecklist() {
   const [activeRemediation, setActiveRemediation] = useState<any>(null);
 
   useEffect(() => {
-    loadChecklist();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    loadChecklist().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
+
+    return () => clearTimeout(timer);
   }, []);
 
   async function loadChecklist() {
     try {
       const data = await getComplianceChecklist();
-      setItems(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setItems(data);
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Error loading checklist:", e);
     } finally {
       setLoading(false);
     }
   }
+
 
   if (loading) {
     return (

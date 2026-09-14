@@ -18,19 +18,31 @@ export function PoliciesView() {
   const [evalError, setEvalError] = useState('');
 
   useEffect(() => {
-    loadPolicies();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    loadPolicies().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
+
+    return () => clearTimeout(timer);
   }, []);
 
   async function loadPolicies() {
     try {
       const data = await getPolicies();
-      setPolicies(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setPolicies(data);
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Error loading policies:", e);
     } finally {
       setLoading(false);
     }
   }
+
 
   function openEvalModal(policyId: string) {
     setEvalPolicyId(policyId);

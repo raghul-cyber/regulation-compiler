@@ -63,13 +63,24 @@ export function CoverageView() {
   }, []);
 
   useEffect(() => {
-    loadAll();
+    // Strict safety timeout: Guarantee UI never hangs on loading spinner
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    loadAll().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
+
+    return () => clearTimeout(timer);
   }, [loadAll]);
 
   const handleManualSync = async () => {
     setIsSyncing(true);
     await loadAll();
   };
+
 
   // Provide stable callback to feed component for real-time live polling
   const handleFetchFeed = useCallback(async (): Promise<FeedEvent[]> => {

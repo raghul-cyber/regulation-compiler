@@ -135,10 +135,11 @@ export function LiveSurveillanceFeed({
       } catch (err) {
         console.warn("Live 24/7 feed sync check:", err);
       }
-    }, 3000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [isLive, fetchFeedAction, onNewSignal]);
+
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);

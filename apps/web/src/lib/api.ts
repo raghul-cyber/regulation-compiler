@@ -32,6 +32,7 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
       cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
       ...options,
       headers: {
         ...headers,
@@ -49,9 +50,10 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     if (err?.digest === 'DYNAMIC_SERVER_USAGE') {
       throw err;
     }
-    console.warn(`Fetch error for [${endpoint}]:`, err);
+    console.warn(`Fetch error for [${endpoint}]:`, err?.message || err);
     return null;
   }
+
 }
 
 

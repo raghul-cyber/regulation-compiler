@@ -10,23 +10,35 @@ export function ComplianceDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadDashboard();
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    loadDashboard().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
+
+    return () => clearTimeout(timer);
   }, []);
 
   async function loadDashboard() {
     try {
       const [res, actRes] = await Promise.all([
-        getComplianceDashboard(),
-        getComplianceActivity()
+        getComplianceDashboard().catch(() => null),
+        getComplianceActivity().catch(() => [])
       ]);
-      setData(res);
+      if (res) {
+        setData(res);
+      }
       setActivity(actRes || []);
     } catch (e) {
-      console.error(e);
+      console.error("Error loading dashboard metrics:", e);
     } finally {
       setLoading(false);
     }
   }
+
 
   if (loading) {
     return (
