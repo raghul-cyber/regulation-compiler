@@ -25,7 +25,7 @@ jobs:
           cache: 'pnpm'
           
       - name: Install JS dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile --config.dangerouslyAllowAllBuilds=true
         
       - name: Next.js Build Check
         run: pnpm --filter web-next build

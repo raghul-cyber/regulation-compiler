@@ -7,3 +7,5 @@ allowBuilds:
   sharp: true
   esbuild: true
   '@sentry/cli': true
+
+dangerouslyAllowAllBuilds: true
