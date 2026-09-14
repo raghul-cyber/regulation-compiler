@@ -3,11 +3,13 @@
 import { revalidatePath } from 'next/cache';
 
 function getApiBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
   if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1') && !process.env.NEXT_PUBLIC_API_URL.includes('localhost')) {
+      return process.env.NEXT_PUBLIC_API_URL;
+    }
     return 'https://regulation-compiler.onrender.com/api/v1';
   }
-  return 'http://127.0.0.1:8080/api/v1';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 }
 
 export async function setRequirementStatus(reqId: string, status: string, note?: string) {

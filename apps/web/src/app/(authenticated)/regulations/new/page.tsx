@@ -18,11 +18,21 @@ interface Framework {
 }
 
 const getApiUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local');
+    if (isLocal) {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+    }
+    // Remote domain (e.g. Vercel)
+    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1') && !process.env.NEXT_PUBLIC_API_URL.includes('localhost')) {
+      return process.env.NEXT_PUBLIC_API_URL;
+    }
     return 'https://regulation-compiler.onrender.com/api/v1';
   }
-  return 'http://127.0.0.1:8080/api/v1';
+  return (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1'))
+    ? process.env.NEXT_PUBLIC_API_URL
+    : 'https://regulation-compiler.onrender.com/api/v1';
 };
 
 export default function NewRegulationPage() {

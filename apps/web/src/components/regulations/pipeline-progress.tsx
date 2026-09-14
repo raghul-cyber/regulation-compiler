@@ -33,11 +33,21 @@ const STAGES = [
 ];
 
 const getApiBase = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local');
+    if (isLocal) {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+    }
+    // Remote domain (e.g. Vercel)
+    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1') && !process.env.NEXT_PUBLIC_API_URL.includes('localhost')) {
+      return process.env.NEXT_PUBLIC_API_URL;
+    }
     return 'https://regulation-compiler.onrender.com/api/v1';
   }
-  return 'http://127.0.0.1:8080/api/v1';
+  return (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1'))
+    ? process.env.NEXT_PUBLIC_API_URL
+    : 'https://regulation-compiler.onrender.com/api/v1';
 };
 
 export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: string, getToken: () => Promise<string | null>, regulationId?: string }) {
@@ -166,9 +176,15 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
           });
           if (res.ok) {
             jobData = await res.json();
+          } else {
+            // Direct fetch returned non-200 (e.g. 401 or proxy issue), fallback to Next.js server action
+            const actRes = await getJobEventsAction(jobId);
+            if (actRes.success) {
+              jobData = actRes.data;
+            }
           }
         } catch {
-          // Direct browser fetch failed (e.g. cross-origin/Vercel), try Next.js server action
+          // Direct browser fetch threw error (network error or timeout), fallback to Next.js server action
           const actRes = await getJobEventsAction(jobId);
           if (actRes.success) {
             jobData = actRes.data;
