@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Regulation Compiler",
-  description: "Regulation as Code Compiler",
+  description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
 };
 
 export default function RootLayout({
