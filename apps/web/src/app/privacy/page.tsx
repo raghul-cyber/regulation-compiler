@@ -194,9 +194,16 @@ export default function PrivacyPage() {
           </p>
           <div className="p-4 rounded-lg bg-zinc-900/80 border border-zinc-800 text-sm font-mono text-zinc-300">
             Office of the Data Protection Officer<br />
-            Regulation-as-Code Compiler Inc.<br />
-            Email: dpo@regulation-compiler.internal<br />
-            Privacy Inquiries: privacy@regulation-compiler.internal
+            AhixLight Inc.<br />
+            Email:{' '}
+            <a href="mailto:contact@ahixlight.com" className="text-emerald-400 hover:underline">
+              contact@ahixlight.com
+            </a>
+            <br />
+            Privacy Inquiries:{' '}
+            <a href="mailto:contact@ahixlight.com" className="text-emerald-400 hover:underline">
+              contact@ahixlight.com
+            </a>
           </div>
         </section>
       </div>

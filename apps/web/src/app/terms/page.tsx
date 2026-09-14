@@ -154,9 +154,16 @@ export default function TermsPage() {
             For inquiries regarding these Terms of Service or regulatory enterprise licensing, please reach out to:
           </p>
           <div className="p-4 rounded-lg bg-zinc-900/80 border border-zinc-800 text-sm font-mono text-zinc-300">
-            Regulation Compiler Legal &amp; Compliance Team<br />
-            Email: legal@regulation-compiler.internal<br />
-            Security Desk: security@regulation-compiler.internal
+            AhixLight Legal &amp; Compliance Team<br />
+            Email:{' '}
+            <a href="mailto:contact@ahixlight.com" className="text-blue-400 hover:underline">
+              contact@ahixlight.com
+            </a>
+            <br />
+            Security Desk:{' '}
+            <a href="mailto:contact@ahixlight.com" className="text-blue-400 hover:underline">
+              contact@ahixlight.com
+            </a>
           </div>
         </section>
       </div>
