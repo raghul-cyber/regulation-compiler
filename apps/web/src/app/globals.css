@@ -131,3 +131,26 @@
     @apply font-sans;
   }
 }
+
+/* ==========================================================================
+   Clerk Development Mode Badge & Warning Suppression
+   Hides orange "Development mode" footer notices in all Clerk components
+   ========================================================================== */
+.cl-development-badge,
+.cl-footerAction__developmentMode,
+.cl-badge--development,
+[data-localization-key="developmentMode"],
+.cl-internal-b3fm6y,
+a[href*="clerk.com/docs/deployments/overview"],
+a[href*="clerk.com"][href*="development"],
+div[class*="development-badge"],
+span[class*="development-badge"],
+p[class*="development-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
