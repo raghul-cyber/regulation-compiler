@@ -26,10 +26,8 @@ SUPER_ADMIN_CLERK_ID = "user_3HpP6350OcHxY6bu77tdXEtihSE"
 def get_clerk_secret_key() -> str:
     key = settings.CLERK_SECRET_KEY or os.environ.get("CLERK_SECRET_KEY")
     if not key:
-        raise HTTPException(
-            status_code=500,
-            detail="CLERK_SECRET_KEY is not configured on the server."
-        )
+        logger.warning("CLERK_SECRET_KEY is not configured on the server. Falling back to local PostgreSQL database registry.")
+        return ""
     return key
 
 
@@ -48,7 +46,8 @@ def verify_super_admin(
 
     # Sync / verify super-admin identity
     is_super_admin = False
-    if current_user.email.strip().lower() == SUPER_ADMIN_EMAIL.lower():
+    user_email = (current_user.email or "").strip().lower()
+    if user_email == SUPER_ADMIN_EMAIL.lower():
         is_super_admin = True
     elif current_user.clerk_user_id == SUPER_ADMIN_CLERK_ID:
         is_super_admin = True
@@ -72,6 +71,8 @@ def fetch_live_clerk_users() -> List[Dict[str, Any]]:
     Queries official Clerk REST API for all real registered users (Zero mocks).
     """
     secret_key = get_clerk_secret_key()
+    if not secret_key:
+        return []
     try:
         with httpx.Client(timeout=15.0) as client:
             resp = client.get(
@@ -226,6 +227,27 @@ def get_admin_overview(
             "audit_actions_count": audit_count,
             "is_super_admin": primary_email.lower() == SUPER_ADMIN_EMAIL.lower()
         })
+
+    if not users_list:
+        # Fallback to local PostgreSQL database users
+        db_users = db.query(User).all()
+        for du in db_users:
+            em = du.email or ""
+            audit_count = db.query(AuditLog).filter(AuditLog.actor_id == du.id).count()
+            users_list.append({
+                "id": du.clerk_user_id or str(du.id),
+                "name": em.split("@")[0].title() if em else "System User",
+                "email": em or "unassigned@local",
+                "avatar_url": None,
+                "role": du.role.value if hasattr(du.role, "value") else str(du.role),
+                "is_verified": True,
+                "auth_strategy": "database",
+                "created_at": du.created_at.isoformat() if hasattr(du, "created_at") and du.created_at else datetime.now(timezone.utc).isoformat(),
+                "last_sign_in_at": None,
+                "last_active_at": None,
+                "audit_actions_count": audit_count,
+                "is_super_admin": bool(em and em.lower() == SUPER_ADMIN_EMAIL.lower())
+            })
 
     # Sort users: Super-admin first, then by last sign-in descending
     users_list.sort(key=lambda x: (not x["is_super_admin"], x["last_sign_in_at"] or ""), reverse=False)

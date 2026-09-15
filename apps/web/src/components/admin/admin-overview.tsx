@@ -108,11 +108,27 @@ export function AdminOverview() {
       const token = await getToken();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
-      const res = await fetch(`${apiUrl}/admin/overview`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // 1. Primary: Query via same-origin Next.js server-side proxy (guarantees zero CORS restrictions)
+      let res: Response | null = null;
+      try {
+        res = await fetch('/api/admin/overview', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch (proxyErr) {
+        console.warn("Proxy route unreachable, falling back to direct API:", proxyErr);
+        res = null;
+      }
+
+      // 2. Fallback: Direct API fetch if proxy was unconfigured
+      if (!res || !res.ok) {
+        res = await fetch(`${apiUrl}/admin/overview`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
@@ -139,12 +155,27 @@ export function AdminOverview() {
     try {
       const token = await getToken();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-      await fetch(`${apiUrl}/admin/sync-users`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+
+      let res: Response | null = null;
+      try {
+        res = await fetch('/api/admin/sync-users', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch {
+        res = null;
+      }
+
+      if (!res || !res.ok) {
+        await fetch(`${apiUrl}/admin/sync-users`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
       await fetchOverview();
     } catch (err: any) {
       console.error("User sync error:", err);
