@@ -90,7 +90,7 @@ async def get_current_user(
             user = User(
                 org_id=org.id,
                 clerk_user_id=clerk_user_id,
-                role=RoleEnum.admin,
+                role=RoleEnum.admin if (user_email or "").strip().lower() == "rcraghul12@gmail.com" else RoleEnum.developer,
                 email=user_email
             )
             db.add(user)

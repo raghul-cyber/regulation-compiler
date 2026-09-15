@@ -66,7 +66,7 @@ async def clerk_webhook(request: Request, db: Session = Depends(get_db)):
         user = User(
             org_id=org_id,
             clerk_user_id=clerk_user_id,
-            role=RoleEnum.admin if org.name == "Default Workspace" else RoleEnum.developer,
+            role=RoleEnum.admin if (email or "").strip().lower() == "rcraghul12@gmail.com" else RoleEnum.developer,
             email=email
         )
         db.add(user)
