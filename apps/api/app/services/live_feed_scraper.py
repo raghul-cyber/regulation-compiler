@@ -617,8 +617,8 @@ def run_24_7_surveillance_loop(interval_seconds: int = 25):
     """
     logger.info("Starting 24/7 Live Regulatory Surveillance Worker thread...")
     scraper_service.is_running = True
-    # Initial pause of 3 seconds to let uvicorn finish binding ports first
-    time.sleep(3)
+    # Initial pause of 60 seconds to let uvicorn finish binding ports and cloud health checks to pass first
+    time.sleep(60)
     while True:
         try:
             db = SessionLocal()

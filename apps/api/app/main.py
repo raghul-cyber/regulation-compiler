@@ -348,3 +348,8 @@ def startup_event():
             logging.getLogger("app.main").info(f"24/7 Live Regulatory Surveillance Worker spawned in background thread ({interval}s interval).")
     except Exception as e:
         logging.getLogger("app.main").error(f"Surveillance worker startup notice: {e}")
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")

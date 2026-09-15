@@ -3,6 +3,18 @@ set -e
 
 echo "=== Regulation-as-Code Compiler API Startup ==="
 
+export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
+
+# Ensure Render virtual environment is activated if present
+if [ -f "/opt/render/project/src/.venv/bin/activate" ]; then
+    echo "Activating Render virtual environment (/opt/render/project/src/.venv)..."
+    source /opt/render/project/src/.venv/bin/activate
+elif [ -f ".venv/bin/activate" ]; then
+    echo "Activating local virtual environment (.venv)..."
+    source .venv/bin/activate
+fi
+
 # Handle working directory if running from repo root
 if [ -d "apps/api" ] && [ ! -d "app" ]; then
     echo "Switching to apps/api directory..."
@@ -12,7 +24,7 @@ fi
 # 1. Run database migrations
 if [ -f "alembic.ini" ]; then
     echo "[1/2] Running Alembic migrations..."
-    alembic upgrade head || alembic stamp head || echo "Alembic notice: schema already up to date."
+    python -m alembic upgrade head || python -m alembic stamp head || echo "Alembic notice: schema already up to date."
 fi
 
 # 2. Run seed / table safety script
@@ -29,5 +41,5 @@ fi
 
 # 4. Launch FastAPI web server
 PORT="${PORT:-10000}"
-echo "FastAPI launching on port ${PORT}..."
-exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"
+echo "FastAPI launching on 0.0.0.0:${PORT} with $(python --version)..."
+exec python -u -m uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --proxy-headers --forwarded-allow-ips='*'
