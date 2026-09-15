@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { apiClient } from '@/lib/api-client';
 
 function getApiBaseUrl(): string {
   if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
@@ -20,20 +21,16 @@ export async function setRequirementStatus(reqId: string, status: string, note?:
     if (!token) throw new Error("Unauthorized");
 
     const API_BASE = getApiBaseUrl();
-    const response = await fetch(`${API_BASE}/requirements/${reqId}/status`, {
+    const data = await apiClient(`${API_BASE}/requirements/${reqId}/status`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ status, reviewer_note: note }),
+      timeoutMs: 15000,
+      retries: 2
     });
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
     
     // Force Next.js to re-fetch the requirements so the status update is immediately visible
     revalidatePath('/(authenticated)/regulations/[id]/requirements', 'page');
@@ -81,20 +78,17 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
     };
 
     // 3. Hit the Developer API using the temporary API Key
-    const checkRes = await fetch(`${API_BASE}/check-compliance`, {
+    const result = await apiClient(`${API_BASE}/check-compliance`, {
       method: 'POST',
       headers: {
         'X-API-Key': rawKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(backendPayload)
+      body: JSON.stringify(backendPayload),
+      timeoutMs: 25000,
+      retries: 2
     });
 
-    if (!checkRes.ok) {
-      throw new Error(`API Error: ${checkRes.status} ${checkRes.statusText}`);
-    }
-
-    const result = await checkRes.json();
     return { success: true, data: result };
 
   } catch (error: any) {

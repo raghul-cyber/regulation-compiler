@@ -11,10 +11,13 @@ from app.models.requirements import Policy, ComplianceCheck, Requirement
 from app.models.regulations import RegulationVersion, Regulation, FrameworkCatalog
 from app.models.audit import AuditLog
 from app.services.compliance import evaluate_policy_compliance, remediate_violation
+from app.core.limiter import limiter
+from app.core.cache import ResponseCache
 
 router = APIRouter(tags=["Compliance"])
 
 @router.post("/compliance/evaluate")
+@limiter.limit("30/minute")
 def evaluate_compliance(
     request: Request,
     payload: Dict[str, Any], # expecting {"policy_id": "uuid", "system_payload": {...}}
@@ -32,7 +35,13 @@ def evaluate_compliance(
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid policy_id UUID")
 
+    # Tenant Isolation: verify policy belongs to current user's org or is global
+    policy = db.query(Policy).filter(Policy.id == policy_id).first()
+    if policy and policy.org_id and policy.org_id != current_user.org_id:
+        raise HTTPException(status_code=403, detail="Access denied: Cannot evaluate against policy from another organization")
+
     check = evaluate_policy_compliance(db, policy_id, system_payload, current_user.org_id)
+    ResponseCache.invalidate("compliance")
     return {"data": {"id": check.id, "result": check.result.value}}
 
 @router.get("/compliance/dashboard")
@@ -40,6 +49,12 @@ def get_dashboard(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user)
 ):
+    org_key = str(current_user.org_id) if (current_user and current_user.org_id) else "public"
+    cache_key = f"compliance:dashboard:{org_key}"
+    cached = ResponseCache.get(cache_key)
+    if cached is not None:
+        return cached
+
     query = db.query(Policy)
     if current_user and current_user.org_id:
         query = query.filter(Policy.org_id == current_user.org_id)
@@ -151,7 +166,7 @@ def get_dashboard(
                 "policy_id": str(policies[0].id) if policies else "default"
             })
 
-    return {
+    res = {
         "data": {
             "compliant": compliant_reqs,
             "non_compliant": non_compliant_reqs,
@@ -159,6 +174,8 @@ def get_dashboard(
             "failing_items": failing_items
         }
     }
+    ResponseCache.set(cache_key, res, ttl_seconds=30)
+    return res
 
 @router.get("/compliance/gap-analysis")
 def get_gap_analysis(

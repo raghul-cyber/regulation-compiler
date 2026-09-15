@@ -3,7 +3,7 @@ import os
 import re
 import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Response
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Response, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from pydantic import BaseModel
@@ -17,6 +17,7 @@ from app.models.jobs import BackgroundJob, JobTypeEnum, JobStatusEnum
 from app.core.auth import get_optional_current_user
 from app.services.reporting import generate_pdf_report_task
 from app.services.storage import StorageService
+from app.core.limiter import limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -83,7 +84,9 @@ def run_report_in_background(report_id: str, job_id: str, sections: list):
     return t
 
 @router.post("/reports")
+@limiter.limit("10/minute")
 def create_report(
+    request: Request,
     payload: ReportCreate,
     background_tasks: BackgroundTasks,
     current_user: Optional[User] = Depends(get_optional_current_user),

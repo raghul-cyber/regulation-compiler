@@ -33,7 +33,7 @@ def seed_canonical():
         print(f"Found {len(dummy_regs)} mock/test regulations to remove.")
 
         def delete_regulation_cleanly(reg):
-            db.execute(text(f"UPDATE regulations SET current_version_id = NULL WHERE id = '{reg.id}'"))
+            db.execute(text("UPDATE regulations SET current_version_id = NULL WHERE id = :reg_id"), {"reg_id": str(reg.id)})
             db.flush()
             
             versions = db.query(RegulationVersion).filter(RegulationVersion.regulation_id == reg.id).all()

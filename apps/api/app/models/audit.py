@@ -1,7 +1,7 @@
 import enum
 import uuid
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, DateTime, ARRAY
+from sqlalchemy import String, ForeignKey, DateTime, ARRAY, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 
@@ -46,13 +46,18 @@ class AuditLog(BaseModel):
     entity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False)
 
+    __table_args__ = (
+        Index("idx_audit_log_org_created", "org_id", "created_at"),
+        Index("idx_audit_log_actor_created", "actor_id", "created_at"),
+    )
+
 
 class ApiKey(BaseModel):
     __tablename__ = "api_keys"
 
     org_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False, default="Default Key")
-    key_hash: Mapped[str] = mapped_column(String, nullable=False)
+    key_hash: Mapped[str] = mapped_column(String, nullable=False, index=True)
     scopes: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
@@ -88,4 +93,4 @@ class LLMLog(BaseModel):
     total_tokens: Mapped[int] = mapped_column(nullable=False)
     latency_ms: Mapped[int] = mapped_column(nullable=False)
     estimated_cost: Mapped[float] = mapped_column(nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False, index=True)

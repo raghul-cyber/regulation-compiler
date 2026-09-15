@@ -5,7 +5,7 @@ from typing import Optional
 
 import json
 import re
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status, Response
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status, Response, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -31,6 +31,10 @@ from app.db.session import SessionLocal
 from app.models.jobs import JobStatusEnum
 from app.workers.tasks import process_ingestion_pipeline, process_amendment_pipeline, update_job_status
 from app.pipelines.extraction import run_extraction_pipeline
+from app.core.limiter import limiter
+from app.core.security_guard import sanitize_filename, validate_file_magic_bytes, MAX_UPLOAD_SIZE
+from app.services.spending_caps import check_spending_cap, SpendingCapExceededException
+from app.core.cache import ResponseCache
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +72,27 @@ def run_pipeline_in_background(job_id_str: str, source_doc_id_str: str):
 # ---------------------------------------------------------
 
 @router.post("/upload")
+@limiter.limit("5/minute")
 async def upload_regulation(
+    request: Request,
     file: UploadFile = File(...),
     jurisdiction: str = Form(...),
     name: str = Form(...),
     current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
+    # Check spending cap
+    org_id = current_user.org_id if current_user else None
+    try:
+        check_spending_cap(db, org_id, expected_invocation_cost=0.02)
+    except SpendingCapExceededException as sce:
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
+
+    # Sanitize filename to prevent directory traversal
+    clean_filename = sanitize_filename(file.filename)
+
     # Validate file extension
-    ext = file.filename.split('.')[-1].lower() if '.' in file.filename else ''
+    ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
     if ext == 'pdf':
         file_type = FileTypeEnum.pdf
     elif ext in ['htm', 'html']:
@@ -87,19 +103,25 @@ async def upload_regulation(
             detail="Only PDF and HTML files are supported."
         )
 
-    # Validate file size (max 50MB)
-    MAX_FILE_SIZE = 50 * 1024 * 1024
+    # Validate file size (strict 25MB enterprise limit)
     content = await file.read()
-    if len(content) > MAX_FILE_SIZE:
+    if len(content) > MAX_UPLOAD_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="File size exceeds the 50MB maximum limit."
+            detail="File size exceeds the 25MB maximum limit."
+        )
+
+    # Validate magic bytes against malicious disguised payloads
+    if not validate_file_magic_bytes(content, ext):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Security verification failed: File contents do not match valid {ext.upper()} magic byte format."
         )
     await file.seek(0)
 
     # 1. Upload file to S3
     try:
-        storage_path = storage_service.upload_file(file.file, file.filename, file.content_type)
+        storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to upload file")
 
@@ -160,6 +182,9 @@ async def upload_regulation(
     # Trigger reliable background execution immediately
     run_pipeline_in_background(str(job.id), str(source_doc.id))
 
+    # Invalidate cached regulation lists
+    ResponseCache.invalidate("regulations")
+
     return {
         "regulation_id": str(regulation.id),
         "regulation_version_id": str(version.id),
@@ -169,15 +194,32 @@ async def upload_regulation(
 
 @router.get("")
 def list_regulations(
+    page: Optional[int] = None,
+    page_size: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
+    # Check cache if not paginated
+    cache_key = "regulations:list" if (page is None and page_size is None) else None
+    if cache_key:
+        cached = ResponseCache.get(cache_key)
+        if cached is not None:
+            return cached
+
     try:
-        regs = db.query(Regulation).order_by(Regulation.created_at.desc()).all()
+        base_query = db.query(Regulation).order_by(Regulation.created_at.desc())
+        total_items = base_query.count()
+        if page is not None and page_size is not None:
+            p = max(1, page)
+            ps = min(100, max(1, page_size))
+            regs = base_query.offset((p - 1) * ps).limit(ps).all()
+        else:
+            regs = base_query.all()
     except Exception as query_err:
         db.rollback()
         import logging
         logging.getLogger(__name__).warning(f"Could not order by created_at, falling back: {query_err}")
         regs = db.query(Regulation).all()
+        total_items = len(regs)
 
     try:
         framework_map = {f.name: f.description for f in db.query(FrameworkCatalog).all()}
@@ -226,6 +268,26 @@ def list_regulations(
             "source_url": r.source_url,
             "created_at": created_str
         })
+
+    if page is not None and page_size is not None:
+        p = max(1, page)
+        ps = min(100, max(1, page_size))
+        total_pages = (total_items + ps - 1) // ps if ps > 0 else 1
+        return {
+            "items": result,
+            "pagination": {
+                "page": p,
+                "page_size": ps,
+                "total_items": total_items,
+                "total_pages": total_pages,
+                "has_next": p < total_pages,
+                "has_prev": p > 1
+            }
+        }
+
+    # Cache full list for 60s
+    if cache_key:
+        ResponseCache.set(cache_key, result, ttl_seconds=60)
     return result
 
 
@@ -334,7 +396,9 @@ async def ingest_framework(
 # ---------------------------------------------------------
 
 @router.post("/{regulation_id}/amend")
+@limiter.limit("5/minute")
 async def amend_regulation(
+    request: Request,
     regulation_id: uuid.UUID,
     file: UploadFile = File(...),
     version_label: str = Form(...),
@@ -345,7 +409,16 @@ async def amend_regulation(
     if not reg:
         raise HTTPException(status_code=404, detail="Regulation not found")
 
-    ext = file.filename.split('.')[-1].lower() if '.' in file.filename else ''
+    # Check spending cap
+    try:
+        check_spending_cap(db, current_user.org_id, expected_invocation_cost=0.02)
+    except SpendingCapExceededException as sce:
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
+
+    # Sanitize filename
+    clean_filename = sanitize_filename(file.filename)
+
+    ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
     if ext == 'pdf':
         file_type = FileTypeEnum.pdf
     elif ext in ['htm', 'html']:
@@ -353,18 +426,24 @@ async def amend_regulation(
     else:
         raise HTTPException(status_code=400, detail="Only PDF and HTML supported.")
 
-    # Validate file size (max 50MB)
-    MAX_FILE_SIZE = 50 * 1024 * 1024
+    # Validate file size (25MB enterprise limit)
     content = await file.read()
-    if len(content) > MAX_FILE_SIZE:
+    if len(content) > MAX_UPLOAD_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="File size exceeds the 50MB maximum limit."
+            detail="File size exceeds the 25MB maximum limit."
+        )
+
+    # Validate magic bytes
+    if not validate_file_magic_bytes(content, ext):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Security verification failed: File contents do not match valid {ext.upper()} magic byte format."
         )
     await file.seek(0)
 
     try:
-        storage_path = storage_service.upload_file(file.file, file.filename, file.content_type)
+        storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to upload file")
 
@@ -416,6 +495,9 @@ async def amend_regulation(
 
     # Trigger reliable background execution immediately
     run_pipeline_in_background(str(job.id), str(source_doc.id))
+
+    # Invalidate cached regulation lists
+    ResponseCache.invalidate("regulations")
 
     return {
         "regulation_version_id": str(new_version.id),

@@ -1,4 +1,4 @@
-﻿import enum
+import enum
 import uuid
 from datetime import datetime
 from sqlalchemy import String, ForeignKey, Numeric, DateTime, Index
@@ -57,6 +57,7 @@ class Requirement(BaseModel):
 
     __table_args__ = (
         Index("ix_requirements_version_severity_status", "regulation_version_id", "severity", "validation_status"),
+        Index("idx_requirements_ver_type", "regulation_version_id", "type"),
         Index("ix_requirements_description_tsvector", "description", postgresql_using="gin", postgresql_ops={"description": "gin_trgm_ops"}),
     )
 
@@ -80,6 +81,11 @@ class ComplianceCheck(BaseModel):
     result: Mapped[ComplianceResultEnum] = mapped_column(nullable=False)
     violations: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
+    __table_args__ = (
+        Index("idx_compliance_checks_org_created", "org_id", "created_at"),
+        Index("idx_compliance_checks_policy_res", "policy_id", "result"),
+    )
+
 
 class SystemMapping(BaseModel):
     __tablename__ = "system_mappings"
@@ -97,6 +103,7 @@ class RequirementEmbedding(BaseModel):
     embedding = mapped_column(Vector(768), nullable=False)
     model_used: Mapped[str] = mapped_column(String, nullable=False)
 
+
 class ImpactRecord(BaseModel):
     __tablename__ = "impact_records"
 
@@ -106,4 +113,3 @@ class ImpactRecord(BaseModel):
     change_type: Mapped[str] = mapped_column(String, nullable=False) # 'modified' or 'removed'
     severity: Mapped[SeverityEnum] = mapped_column(nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-
