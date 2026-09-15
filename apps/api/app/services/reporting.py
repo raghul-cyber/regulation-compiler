@@ -134,6 +134,9 @@ def clean_regulatory_text(val: str) -> str:
     text = py_html.unescape(text)
     # Clean leftover prefixes like 'Obligation Control 1: /div>'
     text = re.sub(r'^Obligation Control \d+:\s*(?:/?(?:div|col|tbody|tr|td|p|span)\b\s*>|="[^"]*"\s*/?>|\s*>\s*)*', '', text, flags=re.IGNORECASE).strip()
+    # Normalize unicode ligatures (e.g. \ufb01 -> fi, \ufb02 -> fl, \ufb03 -> ffi)
+    import unicodedata
+    text = unicodedata.normalize('NFKD', text)
     # Normalize whitespace & non-breaking spaces
     text = text.replace('\xa0', ' ')
     text = re.sub(r'\s+', ' ', text).strip()
@@ -191,7 +194,6 @@ def extract_conditions_readable(conditions) -> list[str]:
     return [str(conditions)]
 
 
-# --- Executive Letterhead & Precision Border CSS ---
 BASE_CSS = """
     @page {
         size: A4 portrait;
@@ -202,62 +204,69 @@ BASE_CSS = """
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         color: #0f172a;
         background: #ffffff;
-        line-height: 1.5;
-        font-size: 9.5pt;
+        line-height: 1.45;
+        font-size: 9pt;
         padding: 0;
         margin: 0;
-        -webkit-font-smoothing: antialiased;
     }
     
-    /* Top Letterhead Banner */
-    .letterhead {
+    /* Top Letterhead Table */
+    table.letterhead-table {
+        width: 100%;
+        border-collapse: collapse;
         border-bottom: 2px solid #7c3aed;
-        padding-bottom: 16px;
-        margin-bottom: 18px;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
     }
     .letterhead-accent {
         height: 4px;
-        background: linear-gradient(90deg, #7c3aed, #4f46e5, #06b6d4);
-        margin-bottom: 14px;
+        background: #7c3aed;
+        margin-bottom: 10px;
         border-radius: 2px;
     }
-    .letterhead-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+    .letterhead-left {
+        vertical-align: top;
+        text-align: left;
+        padding-bottom: 10px;
+    }
+    .letterhead-right {
+        vertical-align: top;
+        text-align: right;
+        width: 230px;
+        padding-bottom: 10px;
     }
     .doc-classification {
         display: inline-block;
-        font-size: 7.5pt;
+        font-size: 7pt;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #6d28d9;
         background: #f5f3ff;
         border: 1px solid #ddd6fe;
-        padding: 3px 8px;
+        padding: 2px 7px;
         border-radius: 4px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .doc-title {
-        font-size: 19pt;
+        font-size: 17pt;
         font-weight: 800;
         color: #0f172a;
-        margin: 0 0 6px 0;
+        margin: 0 0 4px 0;
         letter-spacing: -0.02em;
         line-height: 1.2;
     }
     .doc-subtitle {
-        font-size: 11pt;
+        font-size: 10pt;
         color: #475569;
         margin: 0;
         font-weight: 600;
     }
     .jurisdiction-badge {
         display: inline-block;
-        font-size: 7.5pt;
+        font-size: 7pt;
         font-weight: 700;
-        padding: 2px 7px;
+        padding: 2px 6px;
         border-radius: 4px;
         background: #0ea5e9;
         color: #ffffff;
@@ -267,125 +276,141 @@ BASE_CSS = """
     
     .doc-meta-box {
         text-align: right;
-        font-size: 8pt;
+        font-size: 7.5pt;
         color: #64748b;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 6px;
-        padding: 10px 14px;
-        min-width: 220px;
+        padding: 8px 12px;
     }
-    .meta-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 4px;
+    table.meta-inner-table {
+        width: 100%;
+        border-collapse: collapse;
     }
-    .meta-row:last-child { margin-bottom: 0; }
-    .meta-lbl { font-weight: 600; color: #475569; margin-right: 12px; }
-    .meta-val { font-weight: 700; color: #0f172a; }
+    table.meta-inner-table td {
+        padding: 2px 0;
+    }
+    .meta-lbl { font-weight: 600; color: #475569; text-align: left; }
+    .meta-val { font-weight: 700; color: #0f172a; text-align: right; }
 
-    /* Metadata Ribbon */
-    .metadata-ribbon {
-        display: table;
+    /* Metadata Ribbon Table */
+    table.metadata-ribbon-table {
         width: 100%;
         table-layout: fixed;
+        border-collapse: collapse;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 6px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
     .ribbon-cell {
-        display: table-cell;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-right: 1px solid #e2e8f0;
-        font-size: 8pt;
+        font-size: 7.5pt;
         vertical-align: middle;
     }
     .ribbon-cell:last-child { border-right: none; }
-    .ribbon-lbl { font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
-    .ribbon-val { font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .ribbon-lbl { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
+    .ribbon-val { font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; display: block; }
 
-    /* KPI Metrics Cards */
-    .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 22px;
+    /* KPI Metrics Table */
+    table.metrics-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 8px 0;
+        margin-bottom: 18px;
+    }
+    .metric-td {
+        width: 25%;
+        padding: 0;
+        vertical-align: top;
     }
     .metric-box {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px 14px;
+        border-radius: 6px;
+        padding: 10px 10px;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
     .metric-box.purple { border-top: 3px solid #7c3aed; }
     .metric-box.red { border-top: 3px solid #ef4444; }
     .metric-box.amber { border-top: 3px solid #f59e0b; }
     .metric-box.green { border-top: 3px solid #10b981; }
     
-    .metric-num { font-size: 20pt; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .metric-num { font-size: 18pt; font-weight: 800; line-height: 1; margin-bottom: 3px; }
     .metric-box.purple .metric-num { color: #7c3aed; }
     .metric-box.red .metric-num { color: #dc2626; }
     .metric-box.amber .metric-num { color: #d97706; }
     .metric-box.green .metric-num { color: #059669; }
-    .metric-tag { font-size: 7pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+    .metric-tag { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
 
-    /* Module Index Ribbon */
-    .module-index {
+    /* Module Index Table */
+    table.module-index-table {
+        width: 100%;
+        border-collapse: collapse;
         background: #faf5ff;
         border: 1px solid #e9d5ff;
         border-radius: 6px;
-        padding: 8px 14px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        margin-bottom: 16px;
     }
-    .module-index-title {
-        font-size: 7.5pt;
+    .module-index-title-cell {
+        font-size: 7pt;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.06em;
         color: #6b21a8;
-        margin-right: 12px;
         white-space: nowrap;
+        width: 150px;
+        vertical-align: middle;
+        padding: 6px 6px 6px 12px;
     }
-    .module-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
+    .module-index-pills-cell {
+        vertical-align: middle;
+        text-align: right;
+        padding: 6px 12px 6px 6px;
     }
     .pill-item {
+        display: inline-block;
         background: #ffffff;
         border: 1px solid #d8b4fe;
         color: #6b21a8;
-        font-size: 7.5pt;
+        font-size: 7pt;
         font-weight: 700;
-        padding: 2px 8px;
+        padding: 2px 6px;
         border-radius: 4px;
+        margin: 1px 2px;
     }
 
-    /* Section Headings */
-    .section-header {
+    /* Section Header Table */
+    table.section-header-table {
+        width: 100%;
+        border-collapse: collapse;
         border-bottom: 2px solid #0f172a;
-        padding-bottom: 6px;
-        margin-top: 24px;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
+        margin-top: 18px;
+        margin-bottom: 10px;
+    }
+    .section-title-cell {
+        vertical-align: bottom;
+        text-align: left;
+        padding-bottom: 4px;
     }
     .section-title {
-        font-size: 12.5pt;
+        font-size: 11.5pt;
         font-weight: 800;
         color: #0f172a;
         margin: 0;
         letter-spacing: -0.01em;
     }
+    .section-badge-cell {
+        vertical-align: bottom;
+        text-align: right;
+        width: 140px;
+        padding-bottom: 4px;
+    }
     .section-badge {
-        font-size: 7pt;
+        display: inline-block;
+        font-size: 6.5pt;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -400,9 +425,9 @@ BASE_CSS = """
 
     .section-narrative {
         color: #334155;
-        font-size: 9pt;
-        line-height: 1.5;
-        margin-bottom: 16px;
+        font-size: 8.5pt;
+        line-height: 1.45;
+        margin-bottom: 12px;
     }
 
     /* Requirement Cards */
@@ -411,47 +436,54 @@ BASE_CSS = """
         border: 1px solid #cbd5e1;
         border-left: 4px solid #7c3aed;
         border-radius: 6px;
-        margin-bottom: 12px;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        margin-bottom: 10px;
     }
     .audit-card.critical { border-left-color: #dc2626; }
     .audit-card.high { border-left-color: #ea580c; }
     .audit-card.medium { border-left-color: #ca8a04; }
 
-    .card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    table.card-top-table {
+        width: 100%;
+        border-collapse: collapse;
         background: #f8fafc;
         border-bottom: 1px solid #e2e8f0;
-        padding: 7px 12px;
-        border-top-right-radius: 5px;
+    }
+    .card-top-left {
+        vertical-align: middle;
+        text-align: left;
+        padding: 6px 10px;
+    }
+    .card-top-right {
+        vertical-align: middle;
+        text-align: right;
+        width: 80px;
+        padding: 6px 10px;
     }
     .citation-tag {
-        font-size: 7.5pt;
+        display: inline-block;
+        font-size: 7pt;
         font-weight: 800;
         color: #4338ca;
         background: #e0e7ff;
-        padding: 2px 7px;
+        padding: 2px 6px;
         border-radius: 4px;
         letter-spacing: 0.04em;
-        margin-right: 8px;
-        white-space: nowrap;
+        margin-right: 6px;
+        vertical-align: middle;
     }
     .card-req-title {
-        font-size: 9pt;
+        font-size: 8.5pt;
         font-weight: 700;
         color: #0f172a;
-        flex: 1;
+        vertical-align: middle;
     }
     .severity-pill {
-        font-size: 7pt;
+        display: inline-block;
+        font-size: 6.5pt;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        padding: 2px 8px;
+        padding: 2px 7px;
         border-radius: 4px;
         white-space: nowrap;
     }
@@ -461,146 +493,156 @@ BASE_CSS = """
     .pill-low { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     .card-content {
-        padding: 10px 12px;
+        padding: 8px 10px;
     }
     .card-desc {
-        font-size: 8.5pt;
+        font-size: 8pt;
         color: #334155;
-        line-height: 1.45;
-        margin: 0 0 8px 0;
+        line-height: 1.4;
+        margin: 0 0 6px 0;
     }
 
-    /* Specifications 2-column grid */
-    .specs-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+    /* Specifications 2-column Table */
+    table.specs-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 6px;
-        padding: 8px 10px;
+    }
+    td.spec-pane-col {
+        width: 50%;
+        vertical-align: top;
+        padding: 6px 8px;
+    }
+    td.spec-pane-left {
+        border-right: 1px solid #e2e8f0;
     }
     .spec-pane-title {
-        font-size: 7pt;
+        font-size: 6.5pt;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.06em;
         color: #475569;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
         border-bottom: 1px solid #cbd5e1;
-        padding-bottom: 3px;
+        padding-bottom: 2px;
     }
     .spec-item-list {
         list-style: none;
         padding: 0;
         margin: 0;
-        font-size: 8pt;
+        font-size: 7.5pt;
         color: #1e293b;
     }
     .spec-item-list li {
-        margin-bottom: 3px;
-        display: flex;
-        align-items: flex-start;
+        margin-bottom: 2px;
         line-height: 1.35;
     }
-    .spec-item-list li:last-child { margin-bottom: 0; }
     .bullet-action {
         color: #7c3aed;
         font-weight: bold;
-        margin-right: 6px;
+        margin-right: 4px;
     }
     .bullet-evidence {
         color: #059669;
         font-weight: bold;
-        margin-right: 6px;
+        margin-right: 4px;
     }
     .stipulations-strip {
-        margin-top: 8px;
+        margin-top: 6px;
         background: #faf5ff;
         border: 1px solid #f3e8ff;
         border-radius: 4px;
-        padding: 5px 8px;
-        font-size: 7.5pt;
+        padding: 4px 6px;
+        font-size: 7pt;
         color: #581c87;
     }
 
-    /* Page Breaks */
-    .page-break {
-        page-break-before: always;
-        break-before: page;
-        margin-top: 20px;
+    /* Checklist Item Table */
+    table.checklist-item-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        margin-bottom: 6px;
+    }
+    td.check-box-td {
+        width: 28px;
+        vertical-align: top;
+        text-align: center;
+        padding: 8px 2px 8px 8px;
+    }
+    .custom-check-box {
+        font-size: 14pt;
+        line-height: 1;
+        color: #7c3aed;
+    }
+    td.checklist-content-td {
+        vertical-align: top;
+        padding: 6px 8px 6px 4px;
+    }
+    table.checklist-header-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    td.checklist-header-left {
+        vertical-align: middle;
+        text-align: left;
+    }
+    td.checklist-header-right {
+        vertical-align: middle;
+        text-align: right;
+        width: 70px;
+    }
+    .checklist-action-strip {
+        font-size: 7pt;
+        color: #6d28d9;
+        background: #f5f3ff;
+        border: 1px solid #ede9fe;
+        border-radius: 4px;
+        padding: 3px 6px;
+        margin-top: 4px;
     }
 
     /* Table Styles */
     table.audit-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        font-size: 8pt;
-        page-break-inside: auto;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        font-size: 7.5pt;
     }
     table.audit-table th {
         background: #1e293b;
         color: #f8fafc;
         text-align: left;
-        padding: 8px 10px;
+        padding: 6px 8px;
         font-weight: 700;
-        font-size: 7.5pt;
+        font-size: 7pt;
         letter-spacing: 0.04em;
         text-transform: uppercase;
         border: 1px solid #1e293b;
     }
     table.audit-table td {
-        padding: 8px 10px;
+        padding: 6px 8px;
         border: 1px solid #e2e8f0;
         vertical-align: top;
-        line-height: 1.4;
+        line-height: 1.35;
     }
     table.audit-table tr:nth-child(even) td {
         background: #f8fafc;
     }
 
-    /* Checklist Item Styles */
-    .checklist-row {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .check-box-indicator {
-        width: 15px;
-        height: 15px;
-        border: 2px solid #7c3aed;
-        border-radius: 3px;
-        margin-top: 2px;
-        flex-shrink: 0;
-    }
-    .checklist-body {
-        flex: 1;
-    }
-    .checklist-hdr {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-    }
-
     .footer-stamp {
-        margin-top: 30px;
-        padding-top: 12px;
+        margin-top: 20px;
+        padding-top: 8px;
         border-top: 1px solid #e2e8f0;
-        font-size: 7.5pt;
+        font-size: 7pt;
         color: #64748b;
-        display: flex;
-        justify-content: space-between;
-        page-break-inside: avoid;
     }
 """
 
@@ -612,65 +654,87 @@ EXECUTIVE_SUMMARY_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification">Official Statutory Audit Record</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">COMPLIANCE:</span><span class="meta-val" style="color: #059669;">100% CODIFIED</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">COMPLIANCE:</td><td class="meta-val" style="color: #059669;">100% CODIFIED</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Jurisdiction & Scope</span>
-            <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Canonical Rulebook</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Supervisory Status</span>
-            <span class="ribbon-val" style="color: #7c3aed;">Certified Active Enforcement</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Jurisdiction & Scope</span>
+                <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Canonical Rulebook</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Supervisory Status</span>
+                <span class="ribbon-val" style="color: #7c3aed;">Certified Active Enforcement</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metrics-grid">
-        <div class="metric-box purple">
-            <div class="metric-num">{{ requirements|length }}</div>
-            <div class="metric-tag">Enforceable Controls</div>
-        </div>
-        <div class="metric-box red">
-            <div class="metric-num">{{ critical_count }}</div>
-            <div class="metric-tag">Critical Obligations</div>
-        </div>
-        <div class="metric-box amber">
-            <div class="metric-num">{{ high_count }}</div>
-            <div class="metric-tag">High-Risk Safeguards</div>
-        </div>
-        <div class="metric-box green">
-            <div class="metric-num">100%</div>
-            <div class="metric-tag">Verification Coverage</div>
-        </div>
-    </div>
+    <table class="metrics-table">
+        <tr>
+            <td class="metric-td">
+                <div class="metric-box purple">
+                    <div class="metric-num">{{ requirements|length }}</div>
+                    <div class="metric-tag">Enforceable Controls</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box red">
+                    <div class="metric-num">{{ critical_count }}</div>
+                    <div class="metric-tag">Critical Obligations</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box amber">
+                    <div class="metric-num">{{ high_count }}</div>
+                    <div class="metric-tag">High-Risk Safeguards</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box green">
+                    <div class="metric-num">100%</div>
+                    <div class="metric-tag">Verification Coverage</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-header">
-        <h2 class="section-title">1.0 Executive Summary & Statutory Mandate</h2>
-        <span class="section-badge badge-exec">Executive Directive</span>
-    </div>
+    <table class="section-header-table">
+        <tr>
+            <td class="section-title-cell">
+                <h2 class="section-title">1.0 Executive Summary & Statutory Mandate</h2>
+            </td>
+            <td class="section-badge-cell">
+                <span class="section-badge badge-exec">Executive Directive</span>
+            </td>
+        </tr>
+    </table>
     <div class="section-narrative">
         This executive compliance summary compiles the enforceable requirements derived from the formal codified statutory text of <strong>{{ regulation.name }}</strong> ({{ regulation.jurisdiction }}). 
         The provisions cataloged herein constitute mandatory technical and governance obligations, requiring verifiable system actions, continuous log retention, and verifiable proof of compliance for statutory supervisory authorities.
@@ -678,42 +742,48 @@ EXECUTIVE_SUMMARY_TMPL = """
 
     {% for req in requirements %}
     <div class="audit-card {{ req.severity_str }}">
-        <div class="card-top">
-            <div style="display: flex; align-items: center;">
-                <span class="citation-tag">{{ req.citation }}</span>
-                <span class="card-req-title">{{ req.title }}</span>
-            </div>
-            <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-        </div>
+        <table class="card-top-table">
+            <tr>
+                <td class="card-top-left">
+                    <span class="citation-tag">{{ req.citation }}</span>
+                    <strong class="card-req-title">{{ req.title }}</strong>
+                </td>
+                <td class="card-top-right">
+                    <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                </td>
+            </tr>
+        </table>
         <div class="card-content">
             <div class="card-desc">{{ req.description }}</div>
             
-            <div class="specs-grid">
-                <div>
-                    <div class="spec-pane-title">Mandatory Technical Actions</div>
-                    {% if req.actions %}
-                        <ul class="spec-item-list">
-                        {% for act in req.actions %}
-                            <li><span class="bullet-action">&bull;</span>{{ act }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #64748b; font-size: 8pt;">Enforce baseline technical security protocols.</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <div class="spec-pane-title">Supervisory Audit Deliverables</div>
-                    {% if req.evidence_required %}
-                        <ul class="spec-item-list">
-                        {% for ev in req.evidence_required %}
-                            <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #64748b; font-size: 8pt;">Cryptographic log preservation and configuration snapshot.</span>
-                    {% endif %}
-                </div>
-            </div>
+            <table class="specs-table">
+                <tr>
+                    <td class="spec-pane-col spec-pane-left">
+                        <div class="spec-pane-title">Mandatory Technical Actions</div>
+                        {% if req.actions %}
+                            <ul class="spec-item-list">
+                            {% for act in req.actions %}
+                                <li><span class="bullet-action">&bull;</span>{{ act }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 7.5pt;">Enforce baseline technical security protocols.</span>
+                        {% endif %}
+                    </td>
+                    <td class="spec-pane-col spec-pane-right">
+                        <div class="spec-pane-title">Supervisory Audit Deliverables</div>
+                        {% if req.evidence_required %}
+                            <ul class="spec-item-list">
+                            {% for ev in req.evidence_required %}
+                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 7.5pt;">Cryptographic log preservation and configuration snapshot.</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
 
             {% if req.conditions %}
             <div class="stipulations-strip">
@@ -725,8 +795,12 @@ EXECUTIVE_SUMMARY_TMPL = """
     {% endfor %}
 
     <div class="footer-stamp">
-        <div>Official Statutory Compliance Report | Generated by Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Official Statutory Compliance Report | Generated by Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -740,46 +814,58 @@ TECHNICAL_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification">Technical Specification</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">FORMAT:</span><span class="meta-val" style="color: #7c3aed;">EXECUTABLE AST</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">FORMAT:</td><td class="meta-val" style="color: #7c3aed;">EXECUTABLE AST</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Jurisdiction & Scope</span>
-            <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Technical Specifications</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Total Mappings</span>
-            <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Jurisdiction & Scope</span>
+                <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Technical Specifications</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Total Mappings</span>
+                <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-header">
-        <h2 class="section-title">Requirements to Technical System Enforcement Matrix</h2>
-        <span class="section-badge badge-tech">AST Enforcement</span>
-    </div>
+    <table class="section-header-table">
+        <tr>
+            <td class="section-title-cell">
+                <h2 class="section-title">Requirements to Technical System Enforcement Matrix</h2>
+            </td>
+            <td class="section-badge-cell">
+                <span class="section-badge badge-tech">AST Enforcement</span>
+            </td>
+        </tr>
+    </table>
     <div class="section-narrative">
         Codified mapping of statutory mandates to technical enforcement mechanisms, automated policy verification, and telemetry constraints.
     </div>
@@ -826,7 +912,7 @@ TECHNICAL_TMPL = """
                         <span style="color: #64748b;">System log preservation</span>
                     {% endif %}
                     {% if req.conditions %}
-                        <div class="stipulations-strip" style="margin-top: 6px;">
+                        <div class="stipulations-strip" style="margin-top: 4px;">
                             {{ req.conditions|join(', ') }}
                         </div>
                     {% endif %}
@@ -837,8 +923,12 @@ TECHNICAL_TMPL = """
     </table>
 
     <div class="footer-stamp">
-        <div>Technical Enforcement Matrix | Generated by Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Technical Enforcement Matrix | Generated by Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -852,95 +942,117 @@ AUDIT_EVIDENCE_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification">Supervisory Audit Manifest</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">AUDIT READINESS:</span><span class="meta-val" style="color: #059669;">CERTIFIED</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">AUDIT READINESS:</td><td class="meta-val" style="color: #059669;">CERTIFIED</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Scope</span>
-            <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Evidentiary Manifest</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Total Deliverables</span>
-            <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Scope</span>
+                <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Evidentiary Manifest</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Total Deliverables</span>
+                <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-header">
-        <h2 class="section-title">Mandatory Audit Artifacts & Telemetry Requirements</h2>
-        <span class="section-badge badge-audit">Audit Manifest</span>
-    </div>
+    <table class="section-header-table">
+        <tr>
+            <td class="section-title-cell">
+                <h2 class="section-title">Mandatory Audit Artifacts & Telemetry Requirements</h2>
+            </td>
+            <td class="section-badge-cell">
+                <span class="section-badge badge-audit">Audit Manifest</span>
+            </td>
+        </tr>
+    </table>
     <div class="section-narrative">
         Exhaustive evidentiary deliverables and cryptographic verification requirements mandated for statutory compliance inspections.
     </div>
 
     {% for req in requirements %}
     <div class="audit-card {{ req.severity_str }}">
-        <div class="card-top">
-            <div style="display: flex; align-items: center;">
-                <span class="citation-tag">{{ req.citation }}</span>
-                <span class="card-req-title">{{ req.title }}</span>
-            </div>
-            <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-        </div>
+        <table class="card-top-table">
+            <tr>
+                <td class="card-top-left">
+                    <span class="citation-tag">{{ req.citation }}</span>
+                    <strong class="card-req-title">{{ req.title }}</strong>
+                </td>
+                <td class="card-top-right">
+                    <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                </td>
+            </tr>
+        </table>
         <div class="card-content">
             <div class="card-desc">{{ req.description }}</div>
             
-            <div class="specs-grid">
-                <div>
-                    <div class="spec-pane-title">Mandatory Audit Evidence Deliverables</div>
-                    {% if req.evidence_required %}
-                        <ul class="spec-item-list">
-                        {% for ev in req.evidence_required %}
-                            <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #64748b; font-size: 8pt;">Formal configuration audit trail, cryptographic hash verification, and system log preservation.</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <div class="spec-pane-title">Mandatory Technical Safeguards</div>
-                    {% if req.actions %}
-                        <ul class="spec-item-list">
-                        {% for act in req.actions %}
-                            <li><span class="bullet-action">&bull;</span>{{ act }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #64748b; font-size: 8pt;">Verify continuous operational control status.</span>
-                    {% endif %}
-                </div>
-            </div>
+            <table class="specs-table">
+                <tr>
+                    <td class="spec-pane-col spec-pane-left">
+                        <div class="spec-pane-title">Mandatory Audit Evidence Deliverables</div>
+                        {% if req.evidence_required %}
+                            <ul class="spec-item-list">
+                            {% for ev in req.evidence_required %}
+                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 7.5pt;">Formal configuration audit trail, cryptographic hash verification, and system log preservation.</span>
+                        {% endif %}
+                    </td>
+                    <td class="spec-pane-col spec-pane-right">
+                        <div class="spec-pane-title">Mandatory Technical Safeguards</div>
+                        {% if req.actions %}
+                            <ul class="spec-item-list">
+                            {% for act in req.actions %}
+                                <li><span class="bullet-action">&bull;</span>{{ act }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 7.5pt;">Verify continuous operational control status.</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
     {% endfor %}
 
     <div class="footer-stamp">
-        <div>Supervisory Audit Manifest | Generated by Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Supervisory Audit Manifest | Generated by Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -954,65 +1066,87 @@ GAP_ANALYSIS_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification" style="color: #991b1b; background: #fef2f2; border-color: #fecaca;">Risk Exposure Assessment</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge" style="background: #dc2626;">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">FOCUS:</span><span class="meta-val" style="color: #dc2626;">HIGH & CRITICAL EXPOSURE</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">FOCUS:</td><td class="meta-val" style="color: #dc2626;">HIGH & CRITICAL EXPOSURE</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Critical / High Directives</span>
-            <span class="ribbon-val" style="color: #dc2626;">{{ critical_count + high_count }} Elevated Obligations</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Remediation Priority</span>
-            <span class="ribbon-val" style="color: #dc2626;">Immediate Operational Action</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Critical / High Directives</span>
+                <span class="ribbon-val" style="color: #dc2626;">{{ critical_count + high_count }} Elevated Obligations</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Remediation Priority</span>
+                <span class="ribbon-val" style="color: #dc2626;">Immediate Operational Action</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metrics-grid">
-        <div class="metric-box red">
-            <div class="metric-num">{{ critical_count }}</div>
-            <div class="metric-tag">Critical Exposure</div>
-        </div>
-        <div class="metric-box amber">
-            <div class="metric-num">{{ high_count }}</div>
-            <div class="metric-tag">High-Risk Safeguards</div>
-        </div>
-        <div class="metric-box purple">
-            <div class="metric-num">{{ requirements|length }}</div>
-            <div class="metric-tag">Total Baseline</div>
-        </div>
-        <div class="metric-box green">
-            <div class="metric-num">100%</div>
-            <div class="metric-tag">Codified Rigor</div>
-        </div>
-    </div>
+    <table class="metrics-table">
+        <tr>
+            <td class="metric-td">
+                <div class="metric-box red">
+                    <div class="metric-num">{{ critical_count }}</div>
+                    <div class="metric-tag">Critical Exposure</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box amber">
+                    <div class="metric-num">{{ high_count }}</div>
+                    <div class="metric-tag">High-Risk Safeguards</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box purple">
+                    <div class="metric-num">{{ requirements|length }}</div>
+                    <div class="metric-tag">Total Baseline</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box green">
+                    <div class="metric-num">100%</div>
+                    <div class="metric-tag">Codified Rigor</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-header">
-        <h2 class="section-title">Critical Risk & High-Exposure Gap Analysis</h2>
-        <span class="section-badge badge-gap">Risk Assessment</span>
-    </div>
+    <table class="section-header-table">
+        <tr>
+            <td class="section-title-cell">
+                <h2 class="section-title">Critical Risk & High-Exposure Gap Analysis</h2>
+            </td>
+            <td class="section-badge-cell">
+                <span class="section-badge badge-gap">Risk Assessment</span>
+            </td>
+        </tr>
+    </table>
     <div class="section-narrative">
         This gap analysis assesses statutory provisions carrying maximum enforcement risk under <strong>{{ regulation.name }}</strong>. 
         Items flagged as Critical or High severity represent legal obligations where missing controls or deferred remediation expose the organization to direct statutory sanctions or operational disruption.
@@ -1023,42 +1157,48 @@ GAP_ANALYSIS_TMPL = """
 
     {% for req in target_reqs %}
     <div class="audit-card {{ req.severity_str }}">
-        <div class="card-top">
-            <div style="display: flex; align-items: center;">
-                <span class="citation-tag" style="background: #fee2e2; color: #991b1b;">{{ req.citation }}</span>
-                <span class="card-req-title" style="color: #991b1b;">URGENT REMEDIATION: {{ req.title }}</span>
-            </div>
-            <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-        </div>
+        <table class="card-top-table">
+            <tr>
+                <td class="card-top-left">
+                    <span class="citation-tag" style="background: #fee2e2; color: #991b1b;">{{ req.citation }}</span>
+                    <strong class="card-req-title" style="color: #991b1b;">URGENT REMEDIATION: {{ req.title }}</strong>
+                </td>
+                <td class="card-top-right">
+                    <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                </td>
+            </tr>
+        </table>
         <div class="card-content">
             <div class="card-desc">{{ req.description }}</div>
             
-            <div class="specs-grid">
-                <div>
-                    <div class="spec-pane-title" style="color: #991b1b;">Immediate Remediation Actions</div>
-                    {% if req.actions %}
-                        <ul class="spec-item-list">
-                        {% for act in req.actions %}
-                            <li><span class="bullet-action" style="color: #dc2626;">&bull;</span><strong>{{ act }}</strong></li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #dc2626; font-size: 8pt;">Deploy immediate technical safeguards and verify configuration baseline.</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <div class="spec-pane-title">Required Audit Deliverables</div>
-                    {% if req.evidence_required %}
-                        <ul class="spec-item-list">
-                        {% for ev in req.evidence_required %}
-                            <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span style="color: #64748b; font-size: 8pt;">Signed architectural remediation sign-off & system telemetry logs.</span>
-                    {% endif %}
-                </div>
-            </div>
+            <table class="specs-table">
+                <tr>
+                    <td class="spec-pane-col spec-pane-left">
+                        <div class="spec-pane-title" style="color: #991b1b;">Immediate Remediation Actions</div>
+                        {% if req.actions %}
+                            <ul class="spec-item-list">
+                            {% for act in req.actions %}
+                                <li><span class="bullet-action" style="color: #dc2626;">&bull;</span><strong>{{ act }}</strong></li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #dc2626; font-size: 7.5pt;">Deploy immediate technical safeguards and verify configuration baseline.</span>
+                        {% endif %}
+                    </td>
+                    <td class="spec-pane-col spec-pane-right">
+                        <div class="spec-pane-title">Required Audit Deliverables</div>
+                        {% if req.evidence_required %}
+                            <ul class="spec-item-list">
+                            {% for ev in req.evidence_required %}
+                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 7.5pt;">Signed architectural remediation sign-off & system telemetry logs.</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
 
             {% if req.conditions %}
             <div class="stipulations-strip" style="background: #fff1f2; border-color: #ffe4e6; color: #9f1239;">
@@ -1070,8 +1210,12 @@ GAP_ANALYSIS_TMPL = """
     {% endfor %}
 
     <div class="footer-stamp">
-        <div>Regulatory Gap Analysis & Risk Exposure Manifest | Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Regulatory Gap Analysis & Risk Exposure Manifest | Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -1085,76 +1229,100 @@ CHECKLIST_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification">Operational Playbook</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">FIELD READY:</span><span class="meta-val" style="color: #059669;">YES</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">FIELD READY:</td><td class="meta-val" style="color: #059669;">YES</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Scope</span>
-            <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Engineering & GRC Rollout</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Total Action Items</span>
-            <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Scope</span>
+                <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Engineering & GRC Rollout</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Total Action Items</span>
+                <span class="ribbon-val" style="color: #7c3aed;">{{ requirements|length }} Controls</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-header">
-        <h2 class="section-title">Operational Engineering & Compliance Checklist</h2>
-        <span class="section-badge badge-check">Field Playbook</span>
-    </div>
+    <table class="section-header-table">
+        <tr>
+            <td class="section-title-cell">
+                <h2 class="section-title">Operational Engineering & Compliance Checklist</h2>
+            </td>
+            <td class="section-badge-cell">
+                <span class="section-badge badge-check">Field Playbook</span>
+            </td>
+        </tr>
+    </table>
     <div class="section-narrative">
         Field-ready actionable checklist for cross-functional engineering, legal, and compliance deployment squads.
     </div>
 
     {% for req in requirements %}
-    <div class="checklist-row">
-        <div class="check-box-indicator"></div>
-        <div class="checklist-body">
-            <div class="checklist-hdr">
-                <div>
-                    <span class="citation-tag">{{ req.citation }}</span>
-                    <strong style="font-size: 9pt; color: #0f172a;">{{ req.title }}</strong>
+    <table class="checklist-item-table">
+        <tr>
+            <td class="check-box-td">
+                <div class="custom-check-box">&#9633;</div>
+            </td>
+            <td class="checklist-content-td">
+                <table class="checklist-header-table">
+                    <tr>
+                        <td class="checklist-header-left">
+                            <span class="citation-tag">{{ req.citation }}</span>
+                            <strong style="font-size: 8.5pt; color: #0f172a; vertical-align: middle;">{{ req.title }}</strong>
+                        </td>
+                        <td class="checklist-header-right">
+                            <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                        </td>
+                    </tr>
+                </table>
+                <div style="font-size: 8pt; color: #475569; margin-top: 3px; margin-bottom: 4px; line-height: 1.35;">
+                    {{ req.description }}
                 </div>
-                <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-            </div>
-            <div style="font-size: 8.5pt; color: #475569; margin-bottom: 6px; line-height: 1.4;">
-                {{ req.description }}
-            </div>
-            {% if req.actions %}
-            <div style="font-size: 8pt; color: #6d28d9; background: #f5f3ff; border: 1px solid #ede9fe; border-radius: 4px; padding: 4px 8px;">
-                <strong>Required System Action:</strong> {{ req.actions|join(' • ') }}
-            </div>
-            {% endif %}
-        </div>
-    </div>
+                {% if req.actions %}
+                <div class="checklist-action-strip">
+                    <strong>Required System Action:</strong> {{ req.actions|join(' • ') }}
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
     {% endfor %}
 
     <div class="footer-stamp">
-        <div>Operational Engineering Checklist | Generated by Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Operational Engineering Checklist | Generated by Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -1168,81 +1336,105 @@ COMPOSITE_REPORT_TMPL = """
 <style>{{ base_css }}</style>
 </head>
 <body>
-    <!-- Formal Letterhead -->
-    <div class="letterhead">
-        <div class="letterhead-accent"></div>
-        <div class="letterhead-content">
-            <div>
+    <!-- Top Letterhead -->
+    <div class="letterhead-accent"></div>
+    <table class="letterhead-table">
+        <tr>
+            <td class="letterhead-left">
                 <span class="doc-classification">Official Statutory Audit Record</span>
                 <h1 class="doc-title">{{ report_title }}</h1>
                 <p class="doc-subtitle">{{ regulation.name }} <span class="jurisdiction-badge">{{ regulation.jurisdiction }}</span></p>
-            </div>
-            <div class="doc-meta-box">
-                <div class="meta-row"><span class="meta-lbl">DOC REF:</span><span class="meta-val">RAC-{{ report_id[:8]|upper }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">ISSUER:</span><span class="meta-val">{{ org_name }}</span></div>
-                <div class="meta-row"><span class="meta-lbl">TIMESTAMP:</span><span class="meta-val">{{ date }} UTC</span></div>
-                <div class="meta-row"><span class="meta-lbl">COMPLIANCE:</span><span class="meta-val" style="color: #059669;">100% CODIFIED</span></div>
-            </div>
-        </div>
-    </div>
+            </td>
+            <td class="letterhead-right">
+                <div class="doc-meta-box">
+                    <table class="meta-inner-table">
+                        <tr><td class="meta-lbl">DOC REF:</td><td class="meta-val">RAC-{{ report_id[:8]|upper }}</td></tr>
+                        <tr><td class="meta-lbl">ISSUER:</td><td class="meta-val">{{ org_name }}</td></tr>
+                        <tr><td class="meta-lbl">TIMESTAMP:</td><td class="meta-val">{{ date }} UTC</td></tr>
+                        <tr><td class="meta-lbl">COMPLIANCE:</td><td class="meta-val" style="color: #059669;">100% CODIFIED</td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <!-- Metadata Ribbon -->
-    <div class="metadata-ribbon">
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Issuing Entity</span>
-            <span class="ribbon-val">{{ org_name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Legal Framework</span>
-            <span class="ribbon-val">{{ regulation.name }}</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Jurisdiction & Scope</span>
-            <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Canonical Rulebook</span>
-        </div>
-        <div class="ribbon-cell">
-            <span class="ribbon-lbl">Supervisory Status</span>
-            <span class="ribbon-val" style="color: #7c3aed;">Certified Active Enforcement</span>
-        </div>
-    </div>
+    <table class="metadata-ribbon-table">
+        <tr>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Issuing Entity</span>
+                <span class="ribbon-val">{{ org_name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Legal Framework</span>
+                <span class="ribbon-val">{{ regulation.name }}</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Jurisdiction & Scope</span>
+                <span class="ribbon-val">{{ regulation.jurisdiction }} &bull; Canonical Rulebook</span>
+            </td>
+            <td class="ribbon-cell">
+                <span class="ribbon-lbl">Supervisory Status</span>
+                <span class="ribbon-val" style="color: #7c3aed;">Certified Active Enforcement</span>
+            </td>
+        </tr>
+    </table>
 
     <!-- KPI Scorecard -->
-    <div class="metrics-grid">
-        <div class="metric-box purple">
-            <div class="metric-num">{{ requirements|length }}</div>
-            <div class="metric-tag">Enforceable Controls</div>
-        </div>
-        <div class="metric-box red">
-            <div class="metric-num">{{ critical_count }}</div>
-            <div class="metric-tag">Critical Obligations</div>
-        </div>
-        <div class="metric-box amber">
-            <div class="metric-num">{{ high_count }}</div>
-            <div class="metric-tag">High-Risk Safeguards</div>
-        </div>
-        <div class="metric-box green">
-            <div class="metric-num">100%</div>
-            <div class="metric-tag">Verification Coverage</div>
-        </div>
-    </div>
+    <table class="metrics-table">
+        <tr>
+            <td class="metric-td">
+                <div class="metric-box purple">
+                    <div class="metric-num">{{ requirements|length }}</div>
+                    <div class="metric-tag">Enforceable Controls</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box red">
+                    <div class="metric-num">{{ critical_count }}</div>
+                    <div class="metric-tag">Critical Obligations</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box amber">
+                    <div class="metric-num">{{ high_count }}</div>
+                    <div class="metric-tag">High-Risk Safeguards</div>
+                </div>
+            </td>
+            <td class="metric-td">
+                <div class="metric-box green">
+                    <div class="metric-num">100%</div>
+                    <div class="metric-tag">Verification Coverage</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <!-- Included Modules Index -->
-    <div class="module-index">
-        <div class="module-index-title">Included Audit Modules</div>
-        <div class="module-pills">
-            {% for s_name in section_names %}
-            <span class="pill-item">&#10003; {{ s_name }}</span>
-            {% endfor %}
-        </div>
-    </div>
+    <table class="module-index-table">
+        <tr>
+            <td class="module-index-title-cell">Included Audit Modules</td>
+            <td class="module-index-pills-cell">
+                {% for s_name in section_names %}
+                <span class="pill-item">&#10003; {{ s_name }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
 
     <!-- 1. Executive Summary -->
     {% if 'executive_summary' in selected_sections %}
     <div id="module-executive-summary">
-        <div class="section-header">
-            <h2 class="section-title">1.0 Executive Summary & Statutory Mandate</h2>
-            <span class="section-badge badge-exec">Executive Directive</span>
-        </div>
+        <table class="section-header-table">
+            <tr>
+                <td class="section-title-cell">
+                    <h2 class="section-title">1.0 Executive Summary & Statutory Mandate</h2>
+                </td>
+                <td class="section-badge-cell">
+                    <span class="section-badge badge-exec">Executive Directive</span>
+                </td>
+            </tr>
+        </table>
         <div class="section-narrative">
             This executive compliance summary compiles the enforceable requirements derived from the formal codified statutory text of <strong>{{ regulation.name }}</strong> ({{ regulation.jurisdiction }}). 
             The directives outlined below represent mandatory technical baseline obligations requiring continuous log preservation, verifiable system actions, and formal proof for statutory oversight inspections.
@@ -1250,42 +1442,48 @@ COMPOSITE_REPORT_TMPL = """
 
         {% for req in requirements %}
         <div class="audit-card {{ req.severity_str }}">
-            <div class="card-top">
-                <div style="display: flex; align-items: center;">
-                    <span class="citation-tag">{{ req.citation }}</span>
-                    <span class="card-req-title">{{ req.title }}</span>
-                </div>
-                <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-            </div>
+            <table class="card-top-table">
+                <tr>
+                    <td class="card-top-left">
+                        <span class="citation-tag">{{ req.citation }}</span>
+                        <strong class="card-req-title">{{ req.title }}</strong>
+                    </td>
+                    <td class="card-top-right">
+                        <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                    </td>
+                </tr>
+            </table>
             <div class="card-content">
                 <div class="card-desc">{{ req.description }}</div>
                 
-                <div class="specs-grid">
-                    <div>
-                        <div class="spec-pane-title">Mandatory Technical Actions</div>
-                        {% if req.actions %}
-                            <ul class="spec-item-list">
-                            {% for act in req.actions %}
-                                <li><span class="bullet-action">&bull;</span>{{ act }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #64748b; font-size: 8pt;">Enforce baseline technical security protocols.</span>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <div class="spec-pane-title">Supervisory Audit Deliverables</div>
-                        {% if req.evidence_required %}
-                            <ul class="spec-item-list">
-                            {% for ev in req.evidence_required %}
-                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #64748b; font-size: 8pt;">Cryptographic log preservation and configuration snapshot.</span>
-                        {% endif %}
-                    </div>
-                </div>
+                <table class="specs-table">
+                    <tr>
+                        <td class="spec-pane-col spec-pane-left">
+                            <div class="spec-pane-title">Mandatory Technical Actions</div>
+                            {% if req.actions %}
+                                <ul class="spec-item-list">
+                                {% for act in req.actions %}
+                                    <li><span class="bullet-action">&bull;</span>{{ act }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #64748b; font-size: 7.5pt;">Enforce baseline technical security protocols.</span>
+                            {% endif %}
+                        </td>
+                        <td class="spec-pane-col spec-pane-right">
+                            <div class="spec-pane-title">Supervisory Audit Deliverables</div>
+                            {% if req.evidence_required %}
+                                <ul class="spec-item-list">
+                                {% for ev in req.evidence_required %}
+                                    <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #64748b; font-size: 7.5pt;">Cryptographic log preservation and configuration snapshot.</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
 
                 {% if req.conditions %}
                 <div class="stipulations-strip">
@@ -1296,16 +1494,24 @@ COMPOSITE_REPORT_TMPL = """
         </div>
         {% endfor %}
     </div>
+    {% if 'gap_analysis' in selected_sections or 'technical' in selected_sections or 'audit_evidence' in selected_sections or 'checklist' in selected_sections %}
+    <div style="page-break-after: always;"></div>
+    {% endif %}
     {% endif %}
 
     <!-- 2. Gap Analysis -->
     {% if 'gap_analysis' in selected_sections %}
-    {% if 'executive_summary' in selected_sections %}<div class="page-break"></div>{% endif %}
     <div id="module-gap-analysis">
-        <div class="section-header">
-            <h2 class="section-title">2.0 Regulatory Gap Analysis & High-Risk Exposure Assessment</h2>
-            <span class="section-badge badge-gap">Risk Assessment</span>
-        </div>
+        <table class="section-header-table">
+            <tr>
+                <td class="section-title-cell">
+                    <h2 class="section-title">2.0 Regulatory Gap Analysis & High-Risk Exposure Assessment</h2>
+                </td>
+                <td class="section-badge-cell">
+                    <span class="section-badge badge-gap">Risk Assessment</span>
+                </td>
+            </tr>
+        </table>
         <div class="section-narrative">
             The provisions detailed below represent statutory mandates carrying maximum compliance risk under <strong>{{ regulation.name }}</strong>. 
             Provisions classified as Critical or High severity require immediate technical safeguard mobilization; missing or incomplete controls expose the institution to supervisory fines and operational mandates.
@@ -1316,42 +1522,48 @@ COMPOSITE_REPORT_TMPL = """
 
         {% for req in target_reqs %}
         <div class="audit-card {{ req.severity_str }}">
-            <div class="card-top">
-                <div style="display: flex; align-items: center;">
-                    <span class="citation-tag" style="background: #fee2e2; color: #991b1b;">{{ req.citation }}</span>
-                    <span class="card-req-title" style="color: #991b1b;">URGENT REMEDIATION: {{ req.title }}</span>
-                </div>
-                <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-            </div>
+            <table class="card-top-table">
+                <tr>
+                    <td class="card-top-left">
+                        <span class="citation-tag" style="background: #fee2e2; color: #991b1b;">{{ req.citation }}</span>
+                        <strong class="card-req-title" style="color: #991b1b;">URGENT REMEDIATION: {{ req.title }}</strong>
+                    </td>
+                    <td class="card-top-right">
+                        <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                    </td>
+                </tr>
+            </table>
             <div class="card-content">
                 <div class="card-desc">{{ req.description }}</div>
                 
-                <div class="specs-grid">
-                    <div>
-                        <div class="spec-pane-title" style="color: #991b1b;">Immediate Remediation Actions</div>
-                        {% if req.actions %}
-                            <ul class="spec-item-list">
-                            {% for act in req.actions %}
-                                <li><span class="bullet-action" style="color: #dc2626;">&bull;</span><strong>{{ act }}</strong></li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #dc2626; font-size: 8pt;">Deploy immediate technical safeguards and verify configuration baseline.</span>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <div class="spec-pane-title">Required Audit Deliverables</div>
-                        {% if req.evidence_required %}
-                            <ul class="spec-item-list">
-                            {% for ev in req.evidence_required %}
-                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #64748b; font-size: 8pt;">Signed architectural remediation sign-off & system telemetry logs.</span>
-                        {% endif %}
-                    </div>
-                </div>
+                <table class="specs-table">
+                    <tr>
+                        <td class="spec-pane-col spec-pane-left">
+                            <div class="spec-pane-title" style="color: #991b1b;">Immediate Remediation Actions</div>
+                            {% if req.actions %}
+                                <ul class="spec-item-list">
+                                {% for act in req.actions %}
+                                    <li><span class="bullet-action" style="color: #dc2626;">&bull;</span><strong>{{ act }}</strong></li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #dc2626; font-size: 7.5pt;">Deploy immediate technical safeguards and verify configuration baseline.</span>
+                            {% endif %}
+                        </td>
+                        <td class="spec-pane-col spec-pane-right">
+                            <div class="spec-pane-title">Required Audit Deliverables</div>
+                            {% if req.evidence_required %}
+                                <ul class="spec-item-list">
+                                {% for ev in req.evidence_required %}
+                                    <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #64748b; font-size: 7.5pt;">Signed architectural remediation sign-off & system telemetry logs.</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
 
                 {% if req.conditions %}
                 <div class="stipulations-strip" style="background: #fff1f2; border-color: #ffe4e6; color: #9f1239;">
@@ -1362,16 +1574,24 @@ COMPOSITE_REPORT_TMPL = """
         </div>
         {% endfor %}
     </div>
+    {% if 'technical' in selected_sections or 'audit_evidence' in selected_sections or 'checklist' in selected_sections %}
+    <div style="page-break-after: always;"></div>
+    {% endif %}
     {% endif %}
 
     <!-- 3. Technical System Mapping -->
     {% if 'technical' in selected_sections %}
-    {% if 'executive_summary' in selected_sections or 'gap_analysis' in selected_sections %}<div class="page-break"></div>{% endif %}
     <div id="module-technical">
-        <div class="section-header">
-            <h2 class="section-title">3.0 Technical System Mapping & AST Enforcement Matrix</h2>
-            <span class="section-badge badge-tech">AST Enforcement</span>
-        </div>
+        <table class="section-header-table">
+            <tr>
+                <td class="section-title-cell">
+                    <h2 class="section-title">3.0 Technical System Mapping & AST Enforcement Matrix</h2>
+                </td>
+                <td class="section-badge-cell">
+                    <span class="section-badge badge-tech">AST Enforcement</span>
+                </td>
+            </tr>
+        </table>
         <div class="section-narrative">
             Codified mapping of statutory mandates to technical enforcement mechanisms, automated policy verification, and telemetry constraints.
         </div>
@@ -1418,7 +1638,7 @@ COMPOSITE_REPORT_TMPL = """
                             <span style="color: #64748b;">System log preservation</span>
                         {% endif %}
                         {% if req.conditions %}
-                            <div class="stipulations-strip" style="margin-top: 6px;">
+                            <div class="stipulations-strip" style="margin-top: 4px;">
                                 {{ req.conditions|join(', ') }}
                             </div>
                         {% endif %}
@@ -1428,104 +1648,138 @@ COMPOSITE_REPORT_TMPL = """
             </tbody>
         </table>
     </div>
+    {% if 'audit_evidence' in selected_sections or 'checklist' in selected_sections %}
+    <div style="page-break-after: always;"></div>
+    {% endif %}
     {% endif %}
 
     <!-- 4. Audit Evidence -->
     {% if 'audit_evidence' in selected_sections %}
-    {% if 'executive_summary' in selected_sections or 'gap_analysis' in selected_sections or 'technical' in selected_sections %}<div class="page-break"></div>{% endif %}
     <div id="module-audit-evidence">
-        <div class="section-header">
-            <h2 class="section-title">4.0 Supervisory Audit Evidence & Telemetry Requirements</h2>
-            <span class="section-badge badge-audit">Audit Manifest</span>
-        </div>
+        <table class="section-header-table">
+            <tr>
+                <td class="section-title-cell">
+                    <h2 class="section-title">4.0 Supervisory Audit Evidence & Telemetry Requirements</h2>
+                </td>
+                <td class="section-badge-cell">
+                    <span class="section-badge badge-audit">Audit Manifest</span>
+                </td>
+            </tr>
+        </table>
         <div class="section-narrative">
             Exhaustive evidentiary deliverables and cryptographic verification requirements mandated for statutory compliance inspections.
         </div>
 
         {% for req in requirements %}
         <div class="audit-card {{ req.severity_str }}">
-            <div class="card-top">
-                <div style="display: flex; align-items: center;">
-                    <span class="citation-tag">{{ req.citation }}</span>
-                    <span class="card-req-title">{{ req.title }}</span>
-                </div>
-                <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-            </div>
+            <table class="card-top-table">
+                <tr>
+                    <td class="card-top-left">
+                        <span class="citation-tag">{{ req.citation }}</span>
+                        <strong class="card-req-title">{{ req.title }}</strong>
+                    </td>
+                    <td class="card-top-right">
+                        <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                    </td>
+                </tr>
+            </table>
             <div class="card-content">
                 <div class="card-desc">{{ req.description }}</div>
                 
-                <div class="specs-grid">
-                    <div>
-                        <div class="spec-pane-title">Mandatory Audit Evidence Deliverables</div>
-                        {% if req.evidence_required %}
-                            <ul class="spec-item-list">
-                            {% for ev in req.evidence_required %}
-                                <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #64748b; font-size: 8pt;">Formal configuration audit trail, cryptographic hash verification, and system log preservation.</span>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <div class="spec-pane-title">Mandatory Technical Safeguards</div>
-                        {% if req.actions %}
-                            <ul class="spec-item-list">
-                            {% for act in req.actions %}
-                                <li><span class="bullet-action">&bull;</span>{{ act }}</li>
-                            {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span style="color: #64748b; font-size: 8pt;">Verify continuous operational control status.</span>
-                        {% endif %}
-                    </div>
-                </div>
+                <table class="specs-table">
+                    <tr>
+                        <td class="spec-pane-col spec-pane-left">
+                            <div class="spec-pane-title">Mandatory Audit Evidence Deliverables</div>
+                            {% if req.evidence_required %}
+                                <ul class="spec-item-list">
+                                {% for ev in req.evidence_required %}
+                                    <li><span class="bullet-evidence">&#10003;</span>{{ ev }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #64748b; font-size: 7.5pt;">Formal configuration audit trail, cryptographic hash verification, and system log preservation.</span>
+                            {% endif %}
+                        </td>
+                        <td class="spec-pane-col spec-pane-right">
+                            <div class="spec-pane-title">Mandatory Technical Safeguards</div>
+                            {% if req.actions %}
+                                <ul class="spec-item-list">
+                                {% for act in req.actions %}
+                                    <li><span class="bullet-action">&bull;</span>{{ act }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span style="color: #64748b; font-size: 7.5pt;">Verify continuous operational control status.</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% if 'checklist' in selected_sections %}
+    <div style="page-break-after: always;"></div>
+    {% endif %}
     {% endif %}
 
     <!-- 5. Implementation Checklist -->
     {% if 'checklist' in selected_sections %}
-    {% if 'executive_summary' in selected_sections or 'gap_analysis' in selected_sections or 'technical' in selected_sections or 'audit_evidence' in selected_sections %}<div class="page-break"></div>{% endif %}
     <div id="module-checklist">
-        <div class="section-header">
-            <h2 class="section-title">5.0 Operational Engineering & Compliance Checklist</h2>
-            <span class="section-badge badge-check">Field Playbook</span>
-        </div>
+        <table class="section-header-table">
+            <tr>
+                <td class="section-title-cell">
+                    <h2 class="section-title">5.0 Operational Engineering & Compliance Checklist</h2>
+                </td>
+                <td class="section-badge-cell">
+                    <span class="section-badge badge-check">Field Playbook</span>
+                </td>
+            </tr>
+        </table>
         <div class="section-narrative">
             Field-ready actionable checklist for cross-functional engineering, legal, and compliance deployment squads.
         </div>
 
         {% for req in requirements %}
-        <div class="checklist-row">
-            <div class="check-box-indicator"></div>
-            <div class="checklist-body">
-                <div class="checklist-hdr">
-                    <div>
-                        <span class="citation-tag">{{ req.citation }}</span>
-                        <strong style="font-size: 9pt; color: #0f172a;">{{ req.title }}</strong>
+        <table class="checklist-item-table">
+            <tr>
+                <td class="check-box-td">
+                    <div class="custom-check-box">&#9633;</div>
+                </td>
+                <td class="checklist-content-td">
+                    <table class="checklist-header-table">
+                        <tr>
+                            <td class="checklist-header-left">
+                                <span class="citation-tag">{{ req.citation }}</span>
+                                <strong style="font-size: 8.5pt; color: #0f172a; vertical-align: middle;">{{ req.title }}</strong>
+                            </td>
+                            <td class="checklist-header-right">
+                                <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="font-size: 8pt; color: #475569; margin-top: 3px; margin-bottom: 4px; line-height: 1.35;">
+                        {{ req.description }}
                     </div>
-                    <span class="severity-pill pill-{{ req.severity_str }}">{{ req.severity_str }}</span>
-                </div>
-                <div style="font-size: 8.5pt; color: #475569; margin-bottom: 6px; line-height: 1.4;">
-                    {{ req.description }}
-                </div>
-                {% if req.actions %}
-                <div style="font-size: 8pt; color: #6d28d9; background: #f5f3ff; border: 1px solid #ede9fe; border-radius: 4px; padding: 4px 8px;">
-                    <strong>Required System Action:</strong> {{ req.actions|join(' • ') }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
+                    {% if req.actions %}
+                    <div class="checklist-action-strip">
+                        <strong>Required System Action:</strong> {{ req.actions|join(' • ') }}
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
         {% endfor %}
     </div>
     {% endif %}
 
     <div class="footer-stamp">
-        <div>Official Statutory Compliance Report | Generated by Regulation-as-Code Compiler</div>
-        <div>Report ID: {{ report_id }}</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; font-size: 7pt; color: #64748b;">Official Statutory Compliance Report | Generated by Regulation-as-Code Compiler</td>
+                <td style="text-align: right; font-size: 7pt; color: #64748b;">Report ID: {{ report_id }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
@@ -1539,6 +1793,7 @@ TEMPLATES = {
     "checklist": CHECKLIST_TMPL,
     "composite": COMPOSITE_REPORT_TMPL
 }
+
 
 SECTION_NAMES = {
     "executive_summary": "Executive Summary",
@@ -1720,7 +1975,7 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         else:
             tmpl_str = TEMPLATES.get(selected_sections[0], EXECUTIVE_SUMMARY_TMPL)
 
-        template = Template(tmpl_str, autoescape=True)
+        template = Template(tmpl_str, autoescape=False)
         html_content = template.render(
             base_css=BASE_CSS,
             regulation=reg,
