@@ -219,6 +219,11 @@ app.include_router(admin.router, prefix="/api/v1")
 # -------------------------------------------------------------
 # High-Reliability Observability & Health Probes (Uptime Monitoring)
 # -------------------------------------------------------------
+@app.get("/", response_class=JSONResponse)
+async def root_ping():
+    """Root Ping for Cloud Platform Health & Port Verification (HTTP 200)."""
+    return {"status": "ok", "service": "Regulation-as-Code Compiler API", "version": "1.1.0"}
+
 @app.get("/health", response_class=JSONResponse)
 async def health_check(request: Request):
     """Fast Liveness Probe (HTTP 200)."""

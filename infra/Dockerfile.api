@@ -16,4 +16,8 @@ RUN playwright install --with-deps chromium
 COPY . .
 RUN chmod +x start.sh || true
 
+ENV PORT=10000
+EXPOSE 10000
+EXPOSE 8000
+
 CMD ["./start.sh"]
