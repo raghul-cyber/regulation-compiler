@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createApiKey, revokeApiKey } from '@/app/actions';
 import { Key, Plus, Copy, AlertCircle, Loader2, X, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/intra-app-toast';
 
 const AVAILABLE_SCOPES = [
   { id: 'read-only', label: 'Read Only', desc: 'Can read regulations, requirements, and compliance statuses.' },
@@ -27,18 +28,21 @@ export function ApiKeysList({ initialKeys }: { initialKeys: any[] }) {
     );
   };
 
+  const toast = useToast();
+
   const handleCreate = async () => {
     setIsCreating(true);
     try {
       const res = await createApiKey(keyName, selectedScopes);
       if (!res.success) {
-        alert(res.error);
+        toast.error("API Key Error", res.error || "Unable to create API key");
         return;
       }
       setGeneratedRawKey(res.data.raw_key);
+      toast.success("API Key Generated", "Your key is ready. Copy it now, it won't be shown again.");
       router.refresh(); // Refresh list behind modal
-    } catch (e) {
-      alert("Failed to create API key");
+    } catch (e: any) {
+      toast.error("Failed to create API key", e?.message);
     } finally {
       setIsCreating(false);
     }
@@ -50,19 +54,20 @@ export function ApiKeysList({ initialKeys }: { initialKeys: any[] }) {
     try {
       const res = await revokeApiKey(id);
       if (!res.success) {
-        alert(res.error);
+        toast.error("Revocation Failed", res.error);
         return;
       }
+      toast.success("Key Revoked", "The API key has been revoked permanently.");
       router.refresh();
-    } catch(e) {
-      alert("Failed to revoke API key");
+    } catch(e: any) {
+      toast.error("Failed to revoke API key", e?.message);
     }
   };
 
   const copyToClipboard = () => {
     if (generatedRawKey) {
       navigator.clipboard.writeText(generatedRawKey);
-      alert('Copied to clipboard!');
+      toast.success("Copied to clipboard!", "Secret API token copied to your clipboard.");
     }
   };
 

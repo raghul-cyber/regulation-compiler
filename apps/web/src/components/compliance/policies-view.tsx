@@ -5,14 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Plus, ShieldCheck, Info, FileJson } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/intra-app-toast';
+import { EvaluationResultModal } from './evaluation-result-modal';
 
-export function PoliciesView() {
+interface PoliciesViewProps {
+  onNavigateTab?: (tabId: string) => void;
+}
+
+export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
   const [policies, setPolicies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState<boolean>(false);
   const router = useRouter();
+  const toast = useToast();
   
   const [evalModalOpen, setEvalModalOpen] = useState(false);
+  const [resultModalOpen, setResultModalOpen] = useState(false);
   const [evalPolicyId, setEvalPolicyId] = useState<string | null>(null);
   const [evalPayload, setEvalPayload] = useState('{\n  "encryption": true,\n  "access_control": true\n}');
   const [evalError, setEvalError] = useState('');
@@ -43,11 +51,18 @@ export function PoliciesView() {
     }
   }
 
-
   function openEvalModal(policyId: string) {
     setEvalPolicyId(policyId);
     setEvalModalOpen(true);
     setEvalError('');
+  }
+
+  function handleNavigate(tabId: string) {
+    if (onNavigateTab) {
+      onNavigateTab(tabId);
+    } else {
+      router.push(`/dashboard?tab=${tabId}`);
+    }
   }
 
   async function submitEvaluation() {
@@ -65,11 +80,36 @@ export function PoliciesView() {
     setEvaluating(true);
     try {
       await evaluateCompliance(evalPolicyId, parsedPayload);
-      alert("Evaluation complete! Check Dashboard and Gap Analysis tabs.");
+      
+      // Close input payload modal
       setEvalModalOpen(false);
-    } catch (e) {
-      console.error(e);
-      alert("Evaluation failed. See console.");
+      
+      // Open rich Intra-App Popup Modal
+      setResultModalOpen(true);
+
+      // Dispatch high-visibility intra-app notification toast
+      toast.success(
+        "Evaluation Complete!", 
+        "System state compiled against policy rules. Check Dashboard and Gap Analysis tabs.",
+        {
+          action: {
+            label: "Open Dashboard",
+            onClick: () => handleNavigate('dashboard'),
+          },
+          secondaryAction: {
+            label: "Gap Analysis",
+            onClick: () => handleNavigate('gaps'),
+          },
+          duration: 6000,
+        }
+      );
+    } catch (e: any) {
+      console.error("Compliance evaluation error:", e);
+      setEvalError('Evaluation failed. Please verify your system payload.');
+      toast.error(
+        "Evaluation Failed", 
+        e?.message || "Unable to evaluate policy against system context. Check console logs."
+      );
     } finally {
       setEvaluating(false);
     }
@@ -215,6 +255,14 @@ export function PoliciesView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <EvaluationResultModal
+        isOpen={resultModalOpen}
+        onClose={() => setResultModalOpen(false)}
+        onNavigateToDashboard={() => handleNavigate('dashboard')}
+        onNavigateToGaps={() => handleNavigate('gaps')}
+        policyTitle={policies.find(p => p.id === evalPolicyId)?.regulation_name}
+      />
     </div>
   );
 }

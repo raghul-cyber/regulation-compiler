@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { IntraAppToastProvider } from "@/components/ui/intra-app-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,14 +52,16 @@ export default function RootLayout({
         style={{ colorScheme: 'dark' }}
       >
         <body className="min-h-full flex flex-col bg-[#0a0a0c] text-gray-100">
-          <ConsoleGuard />
-          <TopNav />
-          <main className="flex-1 w-full py-8">
-            <PageContainer>
-              {children}
-            </PageContainer>
-          </main>
-          <Footer />
+          <IntraAppToastProvider>
+            <ConsoleGuard />
+            <TopNav />
+            <main className="flex-1 w-full py-8">
+              <PageContainer>
+                {children}
+              </PageContainer>
+            </main>
+            <Footer />
+          </IntraAppToastProvider>
         </body>
       </html>
     </ClerkProvider>

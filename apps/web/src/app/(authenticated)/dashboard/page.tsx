@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PoliciesView } from '@/components/compliance/policies-view';
 import { ComplianceDashboard } from '@/components/compliance/compliance-dashboard';
 import { GapAnalysis } from '@/components/compliance/gap-analysis';
@@ -16,6 +16,16 @@ export default function DashboardPage() {
     { id: 'gaps', label: 'Gap Analysis' },
     { id: 'checklist', label: 'Compliance Checklist' },
   ];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam && tabs.some(t => t.id === tabParam)) {
+        setActiveTab(tabParam);
+      }
+    }
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto py-8 px-4 sm:px-6">
@@ -44,7 +54,7 @@ export default function DashboardPage() {
 
       <div className="pt-4">
         {activeTab === 'coverage' && <CoverageView />}
-        {activeTab === 'policies' && <PoliciesView />}
+        {activeTab === 'policies' && <PoliciesView onNavigateTab={(tab) => setActiveTab(tab)} />}
         {activeTab === 'dashboard' && <ComplianceDashboard />}
         {activeTab === 'gaps' && <GapAnalysis />}
         {activeTab === 'checklist' && <ComplianceChecklist />}

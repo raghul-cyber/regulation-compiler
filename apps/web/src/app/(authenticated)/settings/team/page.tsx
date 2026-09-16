@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { Users, Shield, Loader2, UserCheck, AlertCircle, MailPlus, Trash2, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/components/ui/intra-app-toast';
 
 interface TeamMember {
   id: string;
@@ -29,6 +30,7 @@ const ROLES = [
 
 export default function TeamSettingsPage() {
   const { getToken } = useAuth();
+  const toast = useToast();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [invites, setInvites] = useState<PendingInvite[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,8 +87,9 @@ export default function TeamSettingsPage() {
       if (!res.ok) throw new Error("Failed to update role");
       
       setMembers(members.map(m => m.id === userId ? { ...m, role: newRole } : m));
+      toast.success("Role Updated", "Member permissions have been updated.");
     } catch (err: any) {
-      alert(err.message);
+      toast.error("Role Update Failed", err?.message || "Could not update user role.");
     } finally {
       setUpdating(null);
     }
@@ -111,9 +114,10 @@ export default function TeamSettingsPage() {
       
       setInviteSuccessLink("sent");
       setInviteEmail("");
+      toast.success("Invite Sent", `An invitation has been dispatched to ${inviteEmail}.`);
       fetchTeamAndInvites();
     } catch (err: any) {
-      alert(err.message);
+      toast.error("Invite Failed", err?.message || "Could not send team invitation.");
     } finally {
       setUpdating(null);
     }
@@ -131,8 +135,9 @@ export default function TeamSettingsPage() {
       if (!res.ok) throw new Error("Failed to revoke invite");
       
       setInvites(invites.filter(i => i.id !== inviteId));
+      toast.success("Invite Revoked", "The invitation has been cancelled.");
     } catch (err: any) {
-      alert(err.message);
+      toast.error("Revoke Failed", err?.message || "Could not revoke invitation.");
     } finally {
       setUpdating(null);
     }

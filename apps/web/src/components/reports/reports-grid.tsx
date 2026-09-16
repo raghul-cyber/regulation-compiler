@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { generateReport } from '@/app/actions';
 import { FileText, Plus, Download, AlertTriangle, Loader2, X, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/intra-app-toast';
 
 const REPORT_TYPES = [
   { id: 'executive_summary', title: 'Executive Summary', desc: 'High-level overview of total requirements and key obligations.' },
@@ -15,6 +16,7 @@ const REPORT_TYPES = [
 
 export function ReportsGrid({ regulationId, initialReports }: { regulationId: string, initialReports: any[] }) {
   const router = useRouter();
+  const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState(REPORT_TYPES[0].id);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -24,13 +26,14 @@ export function ReportsGrid({ regulationId, initialReports }: { regulationId: st
     try {
       const res = await generateReport(regulationId, selectedReportType);
       if (!res.success) {
-        alert(res.error);
+        toast.error("Generation Failed", res.error || "Failed to trigger report generation");
         return;
       }
+      toast.success("Report Queued", "Your report generation task is processing.");
       setIsModalOpen(false);
       router.refresh();
-    } catch (e) {
-      alert("Failed to trigger report generation");
+    } catch (e: any) {
+      toast.error("Failed to trigger report generation", e?.message);
     } finally {
       setIsGenerating(false);
     }

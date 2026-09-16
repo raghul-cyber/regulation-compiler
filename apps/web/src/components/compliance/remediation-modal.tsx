@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { remediateCompliance } from '@/app/(authenticated)/dashboard/actions';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/intra-app-toast';
 
 export function RemediationModal({ isOpen, onClose, onSuccess, checkId, reqId, title }: any) {
   const [payload, setPayload] = useState('{\n  "fix_applied": true\n}');
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   if (!isOpen) return null;
 
@@ -14,10 +16,11 @@ export function RemediationModal({ isOpen, onClose, onSuccess, checkId, reqId, t
     setLoading(true);
     try {
       await remediateCompliance(checkId, reqId, JSON.parse(payload));
+      toast.success("Remediation Applied", "Updated system payload submitted successfully.");
       onSuccess();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to apply remediation.");
+      toast.error("Remediation Failed", err?.message || "Failed to apply remediation.");
     } finally {
       setLoading(false);
     }
