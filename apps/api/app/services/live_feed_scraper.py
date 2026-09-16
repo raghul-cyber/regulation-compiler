@@ -1,3 +1,4 @@
+import os
 import asyncio
 import hashlib
 import logging
@@ -615,41 +616,58 @@ scraper_service = LiveRegulatoryScraperService()
 import threading
 import time
 
-def run_24_7_surveillance_loop(interval_seconds: int = 25):
+def run_24_7_surveillance_loop(interval_seconds: int = 25, max_iterations: Optional[int] = None):
     """
     Dedicated background worker thread for 24/7 continuous statutory surveillance.
     Runs completely decoupled from the async event loop so API requests are never blocked.
     """
-    logger.info("Starting 24/7 Live Regulatory Surveillance Worker thread...")
+    logger.info(f"Starting 24/7 Live Regulatory Surveillance Worker (interval={interval_seconds}s)...")
     scraper_service.is_running = True
-    # Initial pause of 60 seconds to let uvicorn finish binding ports and cloud health checks to pass first
-    time.sleep(60)
+    initial_delay = int(os.getenv("SURVEILLANCE_INITIAL_DELAY", "5"))
+    if initial_delay > 0:
+        logger.info(f"[24/7 Surveillance Daemon] Initial delay: waiting {initial_delay}s before first surveillance sweep...")
+        time.sleep(initial_delay)
+
+    iteration = 0
     while True:
+        iteration += 1
         try:
             db = SessionLocal()
             try:
                 result = scraper_service.sync_and_extract_live_signals(db, max_extractions_per_run=1)
                 scraper_service.stats["next_scan_at"] = (datetime.now(timezone.utc) + timedelta(seconds=interval_seconds)).isoformat()
-                logger.info(f"[24/7 Surveillance Daemon] Sync result: {result}")
+                logger.info(f"[24/7 Surveillance Daemon] Cycle #{iteration} result: {result}")
             finally:
                 db.close()
                 import gc
                 gc.collect()
         except Exception as e:
-            logger.error(f"[24/7 Surveillance Daemon] Unexpected error: {e}")
+            logger.error(f"[24/7 Surveillance Daemon] Unexpected error in cycle #{iteration}: {e}")
+
+        if max_iterations is not None and iteration >= max_iterations:
+            logger.info(f"[24/7 Surveillance Daemon] Completed requested {max_iterations} cycles. Stopping.")
+            break
 
         time.sleep(interval_seconds)
 
 
-def start_24_7_surveillance_worker(interval_seconds: int = 25):
+def start_24_7_surveillance_worker(interval_seconds: int = 25, max_iterations: Optional[int] = None):
     """
     Spawns the continuous 24/7 regulatory surveillance worker in a background daemon thread.
     """
     worker_thread = threading.Thread(
         target=run_24_7_surveillance_loop,
-        args=(interval_seconds,),
+        args=(interval_seconds, max_iterations),
         daemon=True,
         name="24_7_Surveillance_Worker"
     )
     worker_thread.start()
     return worker_thread
+
+
+if __name__ == "__main__":
+    import sys
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    interval = int(sys.argv[1]) if len(sys.argv) > 1 else 15
+    print(f"=== Starting 24/7 Live Regulatory Surveillance Daemon ({interval}s interval) ===")
+    run_24_7_surveillance_loop(interval_seconds=interval)
