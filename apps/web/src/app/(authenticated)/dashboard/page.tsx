@@ -20,31 +20,46 @@ export default function DashboardPage() {
 
   // Verify administrative privileges across Clerk identity and PostgreSQL tenant role
   useEffect(() => {
-    if (user) {
-      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
-      const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-      const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
-      const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
+    let active = true;
 
-      const isSuper = (
-        primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
-        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
-        user.id === SUPER_ADMIN_CLERK_ID
-      );
-      const adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
-      
+    async function checkClearance() {
+      if (!isLoaded) return;
+
+      let adminClearance = false;
+      if (user) {
+        const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+        const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+        const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
+        const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
+
+        const isSuper = (
+          primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+          userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+          user.id === SUPER_ADMIN_CLERK_ID
+        );
+        adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
+      }
+
       if (adminClearance) {
-        setIsAdmin(true);
+        if (active) setIsAdmin(true);
+        return;
+      }
+
+      try {
+        const profile = await getCurrentUserProfile();
+        if (active && (profile?.is_admin || profile?.is_super_admin)) {
+          setIsAdmin(true);
+        }
+      } catch {
+        // Keep non-admin
       }
     }
 
-    // Also verify backend organization role asynchronously
-    getCurrentUserProfile().then(profile => {
-      if (profile?.is_admin || profile?.is_super_admin) {
-        setIsAdmin(true);
-      }
-    }).catch(() => {});
-  }, [user]);
+    checkClearance();
+    return () => {
+      active = false;
+    };
+  }, [user, isLoaded]);
 
   // Tab list dynamically includes MiroFish Swarm Traffic ONLY for administrative logins
   const tabs = [

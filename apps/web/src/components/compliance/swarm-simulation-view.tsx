@@ -38,6 +38,7 @@ const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
 export function SwarmSimulationView() {
   const { user, isLoaded } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const [agents, setAgents] = useState<any[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [simulating, setSimulating] = useState(false);
@@ -49,30 +50,55 @@ export function SwarmSimulationView() {
   const toast = useToast();
 
   useEffect(() => {
-    if (user) {
-      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
-      const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-      const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
-      const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
+    let active = true;
 
-      const isSuper = (
-        primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
-        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
-        user.id === SUPER_ADMIN_CLERK_ID
-      );
-      const adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
-      
+    async function checkClearance() {
+      if (!isLoaded) return;
+
+      let adminClearance = false;
+      if (user) {
+        const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+        const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+        const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
+        const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
+
+        const isSuper = (
+          primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+          userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+          user.id === SUPER_ADMIN_CLERK_ID
+        );
+        adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
+      }
+
       if (adminClearance) {
-        setIsAdmin(true);
+        if (active) {
+          setIsAdmin(true);
+          setAuthChecking(false);
+        }
+        return;
+      }
+
+      try {
+        const profile = await getCurrentUserProfile();
+        if (active) {
+          if (profile?.is_admin || profile?.is_super_admin) {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+        }
+      } catch {
+        if (active) setIsAdmin(false);
+      } finally {
+        if (active) setAuthChecking(false);
       }
     }
 
-    getCurrentUserProfile().then(profile => {
-      if (profile?.is_admin || profile?.is_super_admin) {
-        setIsAdmin(true);
-      }
-    }).catch(() => {});
-  }, [user]);
+    checkClearance();
+    return () => {
+      active = false;
+    };
+  }, [user, isLoaded]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -159,7 +185,7 @@ export function SwarmSimulationView() {
     }
   }
 
-  if (!isLoaded) {
+  if (!isLoaded || authChecking) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] text-zinc-400">
         <RefreshCw className="w-8 h-8 animate-spin text-amber-400 mb-3" />
