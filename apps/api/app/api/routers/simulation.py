@@ -28,21 +28,20 @@ def verify_simulation_admin(
     current_user: Optional[User] = Depends(get_optional_current_user)
 ) -> Optional[User]:
     """
-    Ensures that only administrators can access MiroFish Swarm simulation endpoints.
-    If authenticated, non-admin users receive HTTP 403 Forbidden.
+    Ensures that only system administrators can access MiroFish Swarm simulation endpoints.
+    If authenticated, non-admin accounts receive HTTP 403 Forbidden.
     """
     if current_user:
         email = (current_user.email or "").strip().lower()
-        is_admin = (
+        is_super = (
             email == SUPER_ADMIN_EMAIL.lower()
             or current_user.clerk_user_id == SUPER_ADMIN_CLERK_ID
-            or current_user.role == RoleEnum.admin
-            or str(getattr(current_user, 'role', '')).lower() == 'admin'
         )
-        if not is_admin:
+        if not is_super:
+            logger.warning(f"MiroFish Swarm simulation access denied for non-admin user {current_user.id} ({email})")
             raise HTTPException(
                 status_code=403,
-                detail="Administrative clearance required. MiroFish Swarm simulation is restricted to organization administrators."
+                detail=f"Administrative clearance required. MiroFish Swarm simulation is restricted exclusively to system administrator ({SUPER_ADMIN_EMAIL})."
             )
     return current_user
 

@@ -6,8 +6,7 @@ import {
   getSwarmAgents,
   runSwarmSimulation,
   getSwarmRuns,
-  getSwarmReport,
-  getCurrentUserProfile
+  getSwarmReport
 } from '@/app/(authenticated)/dashboard/actions';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/intra-app-toast';
@@ -49,55 +48,24 @@ export function SwarmSimulationView() {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const toast = useToast();
 
+  // Strict administrator clearance check: Only rcraghul12@gmail.com can view or operate MiroFish swarm
   useEffect(() => {
-    let active = true;
+    if (!isLoaded) return;
 
-    async function checkClearance() {
-      if (!isLoaded) return;
+    if (user) {
+      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+      const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
 
-      let adminClearance = false;
-      if (user) {
-        const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
-        const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-        const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
-        const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
-
-        const isSuper = (
-          primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
-          userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
-          user.id === SUPER_ADMIN_CLERK_ID
-        );
-        adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
-      }
-
-      if (adminClearance) {
-        if (active) {
-          setIsAdmin(true);
-          setAuthChecking(false);
-        }
-        return;
-      }
-
-      try {
-        const profile = await getCurrentUserProfile();
-        if (active) {
-          if (profile?.is_admin || profile?.is_super_admin) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        }
-      } catch {
-        if (active) setIsAdmin(false);
-      } finally {
-        if (active) setAuthChecking(false);
-      }
+      const isSuper = (
+        primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+        user.id === SUPER_ADMIN_CLERK_ID
+      );
+      setIsAdmin(isSuper);
+    } else {
+      setIsAdmin(false);
     }
-
-    checkClearance();
-    return () => {
-      active = false;
-    };
+    setAuthChecking(false);
   }, [user, isLoaded]);
 
   useEffect(() => {

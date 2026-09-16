@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { getCurrentUserProfile } from './actions';
 import { PoliciesView } from '@/components/compliance/policies-view';
 import { ComplianceDashboard } from '@/components/compliance/compliance-dashboard';
 import { GapAnalysis } from '@/components/compliance/gap-analysis';
@@ -18,47 +17,24 @@ export default function DashboardPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('coverage');
 
-  // Verify administrative privileges across Clerk identity and PostgreSQL tenant role
+  // Strict security gate: MiroFish Swarm Traffic is restricted exclusively to administrator logins (rcraghul12@gmail.com).
+  // Non-admin accounts (and standard tenant organizations) must NEVER see or access swarm simulation.
   useEffect(() => {
-    let active = true;
+    if (!isLoaded) return;
 
-    async function checkClearance() {
-      if (!isLoaded) return;
+    if (user) {
+      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+      const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
 
-      let adminClearance = false;
-      if (user) {
-        const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
-        const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-        const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
-        const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
-
-        const isSuper = (
-          primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
-          userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
-          user.id === SUPER_ADMIN_CLERK_ID
-        );
-        adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
-      }
-
-      if (adminClearance) {
-        if (active) setIsAdmin(true);
-        return;
-      }
-
-      try {
-        const profile = await getCurrentUserProfile();
-        if (active && (profile?.is_admin || profile?.is_super_admin)) {
-          setIsAdmin(true);
-        }
-      } catch {
-        // Keep non-admin
-      }
+      const isSuperAdmin = (
+        primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+        user.id === SUPER_ADMIN_CLERK_ID
+      );
+      setIsAdmin(isSuperAdmin);
+    } else {
+      setIsAdmin(false);
     }
-
-    checkClearance();
-    return () => {
-      active = false;
-    };
   }, [user, isLoaded]);
 
   // Tab list dynamically includes MiroFish Swarm Traffic ONLY for administrative logins

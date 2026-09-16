@@ -45,7 +45,7 @@ def test_api():
     assert fetched_report["run_id"] == run_id
     print("Success: Report successfully retrieved by run_id.")
 
-    print("\nTesting RBAC clearance: Simulated non-admin user...")
+    print("\nTesting RBAC clearance: Simulated non-admin user (developer@example.com)...")
     from app.models.organizations import User, RoleEnum
     from app.core.auth import get_optional_current_user
     import uuid
@@ -62,15 +62,51 @@ def test_api():
     try:
         res_forbidden = client.post("/api/v1/simulation/swarm/run", json={"rounds": 1})
         assert res_forbidden.status_code == 403, f"Expected 403 Forbidden for non-admin, got {res_forbidden.status_code}: {res_forbidden.text}"
-        print(f"Success: Non-admin correctly rejected with HTTP 403 Forbidden: {res_forbidden.json()['detail']}")
+        print(f"Success: Non-admin developer correctly rejected with HTTP 403 Forbidden: {res_forbidden.json()['detail']}")
 
         res_agents_forbidden = client.get("/api/v1/simulation/swarm/agents")
         assert res_agents_forbidden.status_code == 403, f"Expected 403 Forbidden for non-admin, got {res_agents_forbidden.status_code}"
-        print("Success: Non-admin correctly blocked from retrieving swarm agents.")
+        print("Success: Non-admin developer correctly blocked from retrieving swarm agents.")
     finally:
         app.dependency_overrides.pop(get_optional_current_user, None)
 
-    print("\nALL FASTAPI SIMULATION AND RBAC CLEARANCE ENDPOINTS VERIFIED!")
+    print("\nTesting RBAC clearance: Simulated tenant admin user (org_admin@company.com, role=admin)...")
+    tenant_admin = User(
+        id=uuid.uuid4(),
+        org_id=uuid.uuid4(),
+        clerk_user_id="user_tenant_admin_test",
+        role=RoleEnum.admin,
+        email="org_admin@company.com"
+    )
+    app.dependency_overrides[get_optional_current_user] = lambda: tenant_admin
+    try:
+        res_tenant_forbidden = client.post("/api/v1/simulation/swarm/run", json={"rounds": 1})
+        assert res_tenant_forbidden.status_code == 403, f"Expected 403 Forbidden for tenant admin, got {res_tenant_forbidden.status_code}"
+        print(f"Success: Tenant admin correctly rejected with HTTP 403 Forbidden: {res_tenant_forbidden.json()['detail']}")
+
+        res_tenant_agents = client.get("/api/v1/simulation/swarm/agents")
+        assert res_tenant_agents.status_code == 403
+        print("Success: Tenant admin correctly blocked from retrieving swarm agents.")
+    finally:
+        app.dependency_overrides.pop(get_optional_current_user, None)
+
+    print("\nTesting RBAC clearance: Super-admin user (rcraghul12@gmail.com)...")
+    super_admin = User(
+        id=uuid.uuid4(),
+        org_id=uuid.uuid4(),
+        clerk_user_id="user_3HpP6350OcHxY6bu77tdXEtihSE",
+        role=RoleEnum.admin,
+        email="rcraghul12@gmail.com"
+    )
+    app.dependency_overrides[get_optional_current_user] = lambda: super_admin
+    try:
+        res_super_agents = client.get("/api/v1/simulation/swarm/agents")
+        assert res_super_agents.status_code == 200, f"Expected 200 for super admin, got {res_super_agents.status_code}"
+        print(f"Success: Super-admin rcraghul12@gmail.com granted HTTP 200 with {res_super_agents.json()['total_agents']} agents.")
+    finally:
+        app.dependency_overrides.pop(get_optional_current_user, None)
+
+    print("\nALL FASTAPI SIMULATION AND STRICT RBAC CLEARANCE ENDPOINTS VERIFIED!")
 
 if __name__ == "__main__":
     test_api()

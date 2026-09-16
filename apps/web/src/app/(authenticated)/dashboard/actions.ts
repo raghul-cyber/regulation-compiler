@@ -521,13 +521,48 @@ export async function triggerSurveillanceProbe(jurisdiction: string = 'GLOBAL') 
 
 // -------------------------------------------------------------
 // MiroFish Multi-Agent Swarm Intelligence & Simulation Actions
+// Restricted strictly to system administrator (rcraghul12@gmail.com)
 // -------------------------------------------------------------
+const SUPER_ADMIN_EMAIL = 'rcraghul12@gmail.com';
+const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
+
+async function isCallerSuperAdmin(): Promise<boolean> {
+  try {
+    const session = await auth();
+    if (!session || !session.userId) return false;
+    if (session.userId === SUPER_ADMIN_CLERK_ID) return true;
+
+    const { currentUser } = await import('@clerk/nextjs/server');
+    const user = await currentUser();
+    if (!user) return false;
+
+    const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+    const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+    return (
+      primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+      userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+      user.id === SUPER_ADMIN_CLERK_ID
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function getSwarmAgents() {
+  const isAdmin = await isCallerSuperAdmin();
+  if (!isAdmin) return [];
   const data = await fetchWithAuth('/simulation/swarm/agents');
   return data?.agents || data?.data || [];
 }
 
 export async function runSwarmSimulation(rounds: number = 3, targetPolicyId?: string) {
+  const isAdmin = await isCallerSuperAdmin();
+  if (!isAdmin) {
+    return {
+      status: "error",
+      message: "Forbidden: MiroFish swarm simulation is strictly restricted to administrator accounts."
+    };
+  }
   const data = await fetchWithAuth('/simulation/swarm/run', {
     method: 'POST',
     body: JSON.stringify({ rounds, target_policy_id: targetPolicyId || null }),
@@ -537,11 +572,15 @@ export async function runSwarmSimulation(rounds: number = 3, targetPolicyId?: st
 }
 
 export async function getSwarmRuns() {
+  const isAdmin = await isCallerSuperAdmin();
+  if (!isAdmin) return [];
   const data = await fetchWithAuth('/simulation/swarm/runs');
   return data?.runs || data?.data || [];
 }
 
 export async function getSwarmReport(runId: string) {
+  const isAdmin = await isCallerSuperAdmin();
+  if (!isAdmin) return null;
   const data = await fetchWithAuth(`/simulation/swarm/report/${runId}`, {
     timeoutMs: 15000
   });
