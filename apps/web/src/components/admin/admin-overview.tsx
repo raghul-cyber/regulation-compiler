@@ -95,8 +95,8 @@ interface AdminOverviewData {
 }
 
 export function AdminOverview() {
-  const { getToken } = useAuth();
-  const { user } = useUser();
+  const { getToken, isLoaded: isAuthLoaded, isSignedIn } = useAuth();
+  const { user, isLoaded: isUserLoaded } = useUser();
 
   // Instant 0ms Render via sessionStorage Cache (Stale-While-Revalidate)
   const [data, setData] = useState<AdminOverviewData | null>(() => {
@@ -140,31 +140,68 @@ export function AdminOverview() {
     setError(null);
 
     try {
-      const token = await getToken();
+      // 1. Retrieve valid token with retry to avoid transient null during hydration
+      let token: string | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          token = await getToken({ skipCache: attempt > 0 });
+          if (token) break;
+        } catch {
+          token = null;
+        }
+        await new Promise(r => setTimeout(r, 300));
+      }
+
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      if (user?.id) {
+        headers['X-Clerk-User-Id'] = user.id;
+      }
+      const primaryEmail = user?.primaryEmailAddress?.emailAddress;
+      if (primaryEmail) {
+        headers['X-User-Email'] = primaryEmail;
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
-      // 1. Primary: Fast proxy fetch with strict 10-second timeout to prevent any long hangs
+      // 2. Primary: Fast proxy fetch with 18-second timeout
       let res: Response | null = null;
       try {
         res = await fetch('/api/admin/overview', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          signal: AbortSignal.timeout(10000)
+          headers,
+          signal: AbortSignal.timeout(18000)
         });
       } catch (proxyErr) {
         console.warn("Proxy route unreachable or timed out, falling back to direct API:", proxyErr);
         res = null;
       }
 
-      // 2. Fallback: Direct API fetch with strict 10-second timeout
+      // 3. Fallback: Direct API fetch with 25-second tolerance for cold-starts
       if (!res || !res.ok) {
         res = await fetch(`${apiUrl}/admin/overview`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          signal: AbortSignal.timeout(10000)
+          headers,
+          signal: AbortSignal.timeout(25000)
         });
+      }
+
+      // 4. If 401: Refresh token and retry once
+      if (res && res.status === 401) {
+        try {
+          const freshToken = await getToken({ skipCache: true });
+          if (freshToken) {
+            headers['Authorization'] = `Bearer ${freshToken}`;
+            res = await fetch(`${apiUrl}/admin/overview`, {
+              headers,
+              signal: AbortSignal.timeout(20000)
+            });
+          }
+        } catch (refreshErr) {
+          console.warn("Token refresh retry notice:", refreshErr);
+        }
       }
 
       if (!res.ok) {
@@ -193,27 +230,39 @@ export function AdminOverview() {
       setIsRevalidating(false);
       isFetchingRef.current = false;
     }
-  }, [getToken]);
+  }, [getToken, user]);
 
   useEffect(() => {
+    if (!isAuthLoaded || !isSignedIn) return;
     const hasCachedData = Boolean(data);
     fetchOverview(hasCachedData);
-  }, [fetchOverview]);
+  }, [isAuthLoaded, isSignedIn, fetchOverview]);
 
   const handleSyncUsers = async () => {
     setSyncing(true);
     try {
-      const token = await getToken();
+      const token = await getToken({ skipCache: true }).catch(() => null);
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      if (user?.id) {
+        headers['X-Clerk-User-Id'] = user.id;
+      }
+      const primaryEmail = user?.primaryEmailAddress?.emailAddress;
+      if (primaryEmail) {
+        headers['X-User-Email'] = primaryEmail;
+      }
 
       let res: Response | null = null;
       try {
         res = await fetch('/api/admin/sync-users', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          signal: AbortSignal.timeout(15000)
+          headers,
+          signal: AbortSignal.timeout(20000)
         });
       } catch {
         res = null;
@@ -222,10 +271,8 @@ export function AdminOverview() {
       if (!res || !res.ok) {
         await fetch(`${apiUrl}/admin/sync-users`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          signal: AbortSignal.timeout(15000)
+          headers,
+          signal: AbortSignal.timeout(25000)
         });
       }
       try {
