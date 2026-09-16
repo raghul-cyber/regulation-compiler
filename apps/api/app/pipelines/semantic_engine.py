@@ -37,21 +37,49 @@ class SemanticEngine:
         r'\bexempt from\b', r'\bwithout prejudice to\b'
     ]
 
+    # Pre-compiled high-performance unified regular expressions (zero-allocation per call)
+    PROHIBITION_REGEX = re.compile(
+        r'\b(?:shall\s+not|must\s+not|may\s+not|is\s+prohibited|are\s+prohibited|shall\s+be\s+prohibited|restricted\s+from)\b',
+        re.IGNORECASE
+    )
+    OBLIGATION_REGEX = re.compile(
+        r'\b(?:shall\s+ensure|shall\s+implement|shall\s+establish|shall\s+maintain|shall\s+adopt|shall\s+conduct|is\s+required\s+to|are\s+required\s+to|shall|must)\b',
+        re.IGNORECASE
+    )
+    PERMISSION_REGEX = re.compile(
+        r'\b(?:is\s+permitted|are\s+permitted|where\s+appropriate|provided\s+that|may\s+decide|where\s+feasible|may)\b',
+        re.IGNORECASE
+    )
+    DEFINITION_REGEX = re.compile(
+        r'\b(?:is\s+defined\s+as|within\s+the\s+meaning\s+of|for\s+the\s+purposes\s+of\s+this|means)\b',
+        re.IGNORECASE
+    )
+    EXCEPTION_REGEX = re.compile(
+        r'\b(?:by\s+way\s+of\s+derogation|does\s+not\s+apply\s+to|with\s+the\s+exception\s+of|exempt\s+from|without\s+prejudice\s+to)\b',
+        re.IGNORECASE
+    )
+    ARTICLE_REGEX = re.compile(
+        r'(?:Article|Section|Requirement|Clause)\s+(\d+[\w\.\-]*)[:\s\-\–]+([^\n\.\;]+)',
+        re.IGNORECASE
+    )
+    SENTENCE_SPLIT_REGEX = re.compile(r'(?<=[.?!])\s+')
+
     @classmethod
     def classify_text(cls, text: str) -> Dict[str, int]:
         """
         Classifies sentences in statutory text into obligations, prohibitions, and permissions.
+        Uses precompiled unified regex expressions for high speed and minimal memory footprint.
         """
         lower = text.lower()
-        sentences = re.split(r'(?<=[.?!])\s+', lower)
+        sentences = cls.SENTENCE_SPLIT_REGEX.split(lower)
         
         obs, pros, perms = 0, 0, 0
         for s in sentences:
-            if any(re.search(p, s) for p in cls.PROHIBITION_PATTERNS):
+            if cls.PROHIBITION_REGEX.search(s):
                 pros += 1
-            elif any(re.search(p, s) for p in cls.OBLIGATION_PATTERNS):
+            elif cls.OBLIGATION_REGEX.search(s):
                 obs += 1
-            elif any(re.search(p, s) for p in cls.PERMISSION_PATTERNS):
+            elif cls.PERMISSION_REGEX.search(s):
                 perms += 1
 
         # Ensure realistic baseline numbers if text contains statutory content
@@ -72,11 +100,7 @@ class SemanticEngine:
         reqs = []
         
         # 1. Look for explicit Article / Section patterns
-        article_matches = re.finditer(
-            r'(?:Article|Section|Requirement|Clause)\s+(\d+[\w\.\-]*)[:\s\-\–]+([^\n\.\;]+)',
-            chunk,
-            re.IGNORECASE
-        )
+        article_matches = cls.ARTICLE_REGEX.finditer(chunk)
         
         found_spans = []
         for m in article_matches:
@@ -90,9 +114,9 @@ class SemanticEngine:
                 # Determine obligation type
                 c_lower = clause_text.lower()
                 req_type = "obligation"
-                if any(re.search(p, c_lower) for p in cls.PROHIBITION_PATTERNS):
+                if cls.PROHIBITION_REGEX.search(c_lower):
                     req_type = "prohibition"
-                elif any(re.search(p, c_lower) for p in cls.PERMISSION_PATTERNS):
+                elif cls.PERMISSION_REGEX.search(c_lower):
                     req_type = "permission"
 
                 # Determine severity
@@ -139,9 +163,9 @@ class SemanticEngine:
             for i, p in enumerate(paragraphs[:4]):
                 p_lower = p.lower()
                 req_type = "obligation"
-                if any(re.search(pat, p_lower) for pat in cls.PROHIBITION_PATTERNS):
+                if cls.PROHIBITION_REGEX.search(p_lower):
                     req_type = "prohibition"
-                elif any(re.search(pat, p_lower) for pat in cls.PERMISSION_PATTERNS):
+                elif cls.PERMISSION_REGEX.search(p_lower):
                     req_type = "permission"
 
                 severity = "high" if "security" in p_lower or "risk" in p_lower else "medium"

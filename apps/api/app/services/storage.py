@@ -9,6 +9,32 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+import threading
+
+_CACHED_S3_CLIENT = None
+_S3_INIT_LOCK = threading.Lock()
+
+def get_s3_client():
+    global _CACHED_S3_CLIENT
+    if _CACHED_S3_CLIENT is None:
+        with _S3_INIT_LOCK:
+            if _CACHED_S3_CLIENT is None:
+                import botocore.config
+                _CACHED_S3_CLIENT = boto3.client(
+                    's3',
+                    endpoint_url=settings.S3_ENDPOINT_URL,
+                    aws_access_key_id=settings.S3_ACCESS_KEY,
+                    aws_secret_access_key=settings.S3_SECRET_KEY,
+                    region_name="eu-central-1",
+                    config=botocore.config.Config(
+                        signature_version='s3v4',
+                        connect_timeout=3,
+                        read_timeout=6,
+                        retries={'max_attempts': 1}
+                    )
+                )
+    return _CACHED_S3_CLIENT
+
 class StorageService:
     def __init__(self):
         self.bucket_name = settings.S3_BUCKET_NAME
@@ -23,20 +49,7 @@ class StorageService:
         ])
         
         if not self.use_local:
-            import botocore.config
-            self.s3_client = boto3.client(
-                's3',
-                endpoint_url=settings.S3_ENDPOINT_URL,
-                aws_access_key_id=settings.S3_ACCESS_KEY,
-                aws_secret_access_key=settings.S3_SECRET_KEY,
-                region_name="eu-central-1",
-                config=botocore.config.Config(
-                    signature_version='s3v4',
-                    connect_timeout=3,
-                    read_timeout=6,
-                    retries={'max_attempts': 1}
-                )
-            )
+            self.s3_client = get_s3_client()
         else:
             logger.warning(f"StorageService running in LOCAL mode. Files will be saved to {self.local_storage_path}")
             self.s3_client = None

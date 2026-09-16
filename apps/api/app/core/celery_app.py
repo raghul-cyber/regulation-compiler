@@ -35,6 +35,12 @@ celery_app.conf.update(
     broker_connection_retry_on_startup=True,
     broker_use_ssl=ssl_options,
     redis_backend_use_ssl=ssl_options,
+    # Memory optimization & leak prevention
+    worker_max_tasks_per_child=int(os.getenv("CELERY_MAX_TASKS_PER_CHILD", "50")),
+    worker_max_memory_per_child=int(os.getenv("CELERY_MAX_MEMORY_PER_CHILD", "200000")),  # 200MB resident memory ceiling per worker
+    worker_prefetch_multiplier=1,  # Prevent worker from hoarding multiple heavy documents in RAM
+    result_expires=1800,           # Expire completed task records after 30 minutes
+    task_acks_late=True,
     # Route tasks so active worker processes them reliably
     task_routes={
         "app.workers.tasks.dispatch_webhook_task": {"queue": "notifications"},

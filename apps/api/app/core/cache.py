@@ -6,8 +6,65 @@ from typing import Any, Callable, Dict, Optional, Tuple
 
 logger = logging.getLogger("core.cache")
 
-# Fast In-Memory Cache Store: { "key": (data, expiry_timestamp) }
-_cache_store: Dict[str, Tuple[Any, float]] = {}
+import threading
+from collections import OrderedDict
+
+MAX_CACHE_ENTRIES = 500
+
+class BoundedTTLCache:
+    """
+    Thread-safe bounded in-memory cache with TTL expiration and LRU eviction.
+    Enforces a strict upper ceiling on stored entries to prevent memory leaks.
+    """
+    def __init__(self, maxsize: int = MAX_CACHE_ENTRIES):
+        self.maxsize = maxsize
+        self._store: OrderedDict[str, Tuple[Any, float]] = OrderedDict()
+        self._lock = threading.Lock()
+
+    def get(self, key: str) -> Optional[Any]:
+        now = time.time()
+        with self._lock:
+            if key not in self._store:
+                return None
+            val, expiry = self._store[key]
+            if now > expiry:
+                del self._store[key]
+                return None
+            self._store.move_to_end(key)
+            return val
+
+    def set(self, key: str, value: Any, ttl_seconds: int = 300):
+        now = time.time()
+        expiry = now + ttl_seconds
+        with self._lock:
+            # 1. Proactively purge expired entries if approaching capacity
+            if len(self._store) >= self.maxsize:
+                expired = [k for k, (_, exp) in self._store.items() if now > exp]
+                for k in expired:
+                    del self._store[k]
+            # 2. Enforce strict LRU ceiling
+            while len(self._store) >= self.maxsize:
+                self._store.popitem(last=False)
+            self._store[key] = (value, expiry)
+            self._store.move_to_end(key)
+
+    def invalidate(self, prefix: str):
+        with self._lock:
+            matching = [k for k in self._store.keys() if k.startswith(prefix)]
+            for k in matching:
+                self._store.pop(k, None)
+            if matching:
+                logger.info(f"Invalidated {len(matching)} cache entries with prefix: {prefix}")
+
+    def clear(self):
+        with self._lock:
+            self._store.clear()
+
+    def __len__(self):
+        with self._lock:
+            return len(self._store)
+
+_cache_instance = BoundedTTLCache(maxsize=MAX_CACHE_ENTRIES)
 
 
 class ResponseCache:
@@ -18,27 +75,15 @@ class ResponseCache:
 
     @classmethod
     def get(cls, key: str) -> Optional[Any]:
-        record = _cache_store.get(key)
-        if not record:
-            return None
-        data, expiry = record
-        if time.time() > expiry:
-            del _cache_store[key]
-            return None
-        return data
+        return _cache_instance.get(key)
 
     @classmethod
     def set(cls, key: str, value: Any, ttl_seconds: int = 300):
-        _cache_store[key] = (value, time.time() + ttl_seconds)
+        _cache_instance.set(key, value, ttl_seconds)
 
     @classmethod
     def invalidate(cls, prefix: str):
-        """Invalidates all cache keys matching the given prefix."""
-        matching = [k for k in _cache_store.keys() if k.startswith(prefix)]
-        for k in matching:
-            _cache_store.pop(k, None)
-        if matching:
-            logger.info(f"Invalidated {len(matching)} cache entries with prefix: {prefix}")
+        _cache_instance.invalidate(prefix)
 
 
 def cached_endpoint(ttl_seconds: int = 300, key_prefix: str = ""):

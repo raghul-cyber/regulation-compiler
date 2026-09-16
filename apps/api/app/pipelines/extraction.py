@@ -3,6 +3,7 @@ import uuid
 import time
 import json
 import re
+import gc
 import pymupdf as fitz  # PyMuPDF
 from sqlalchemy.orm import Session
 from openai import OpenAI
@@ -64,10 +65,11 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
         page_count = 1
         
         if source_doc.file_type.value == "pdf" or source_doc.storage_path.endswith(".pdf"):
-            doc = fitz.open(stream=file_bytes, filetype="pdf")
-            page_count = len(doc)
-            for page in doc:
-                raw_text += page.get_text() + "\n"
+            with fitz.open(stream=file_bytes, filetype="pdf") as doc:
+                page_count = len(doc)
+                text_pages = [page.get_text() for page in doc]
+                raw_text = "\n".join(text_pages)
+                del text_pages
         else:
             raw_content = file_bytes.decode('utf-8', errors='ignore')
             if "<html" in raw_content.lower() or "<div" in raw_content.lower() or "<body" in raw_content.lower() or "<table" in raw_content.lower():
@@ -77,11 +79,17 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
                     for s in soup(["script", "style", "nav", "header", "footer"]):
                         s.extract()
                     raw_text = soup.get_text(separator="\n", strip=True)
+                    del soup
                 except Exception:
                     raw_text = re.sub(r'<[^>]+>', ' ', raw_content)
             else:
                 raw_text = raw_content
+            del raw_content
             
+        # Free heavy input file bytes buffer immediately to release 5-25MB of RAM before NLP chunking
+        del file_bytes
+        gc.collect()
+
         source_doc.raw_text = raw_text
         source_doc.page_count = page_count
         db.commit()
@@ -417,4 +425,7 @@ Respond ONLY with a JSON array of objects. Each object must have:
         logger.error(f"Pipeline failed at stage {stage} ({name}): {e}")
         dispatcher.emit(stage, name, "failed", {"error": str(e)})
         raise e
+    finally:
+        gc.collect()
+
 

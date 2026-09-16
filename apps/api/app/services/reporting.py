@@ -5,11 +5,21 @@ import io
 import re
 import json
 import logging
+import gc
 from datetime import datetime, timezone
 from jinja2 import Template
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
+
+# Template Cache to avoid repeated parsing and AST allocations for massive report layouts
+_COMPILED_TEMPLATES = {}
+def get_compiled_template(tmpl_str: str) -> Template:
+    tmpl_hash = hash(tmpl_str)
+    if tmpl_hash not in _COMPILED_TEMPLATES:
+        _COMPILED_TEMPLATES[tmpl_hash] = Template(tmpl_str, autoescape=False)
+    return _COMPILED_TEMPLATES[tmpl_hash]
+
 
 from app.core.celery_app import celery_app
 from app.models.audit import Report, ReportStatusEnum
@@ -1975,9 +1985,10 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         else:
             tmpl_str = TEMPLATES.get(selected_sections[0], EXECUTIVE_SUMMARY_TMPL)
 
-        template = Template(tmpl_str, autoescape=False)
-        html_content = template.render(
-            base_css=BASE_CSS,
+        template = get_compiled_template(tmpl_str)
+        clean_css = re.sub(r'@(top|bottom)-(left|right)\s*\{[^}]*\}', '', BASE_CSS)
+        clean_html = template.render(
+            base_css=clean_css,
             regulation=reg,
             requirements=formatted_reqs,
             critical_count=crit_count,
@@ -2000,23 +2011,6 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         pdf_bytes = b""
         try:
             import pymupdf
-            clean_css = re.sub(r'@(top|bottom)-(left|right)\s*\{[^}]*\}', '', BASE_CSS)
-            
-            clean_html = template.render(
-                base_css=clean_css,
-                regulation=reg,
-                requirements=formatted_reqs,
-                critical_count=crit_count,
-                high_count=high_count,
-                date=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
-                org_id=str(report.org_id),
-                org_name=org_name,
-                report_id=str(report.id),
-                report_title=report_title,
-                selected_sections=selected_sections,
-                section_names=section_titles
-            )
-            
             story = pymupdf.Story(html=clean_html)
             buffer = io.BytesIO()
             writer = pymupdf.DocumentWriter(buffer)
@@ -2030,6 +2024,7 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
             writer.close()
             
             doc = pymupdf.open(stream=buffer.getvalue(), filetype='pdf')
+            buffer.close()
             total_pages = len(doc)
             
             for idx, page in enumerate(doc):
@@ -2071,6 +2066,9 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
             pdf_bytes = doc.tobytes()
             doc.close()
 
+        # Free rendered HTML string from memory
+        del clean_html
+
         if dispatcher: dispatcher.emit(4, "Render PDF", "completed", {"size_bytes": len(pdf_bytes)})
             
         # 5. Upload to Local Storage / S3
@@ -2081,6 +2079,8 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
         
         storage = StorageService()
         storage_path = storage.upload_file(file_obj, filename, "application/pdf")
+        file_obj.close()
+        del pdf_bytes
         
         # Build production-ready dynamic download URL
         backend_url = os.getenv("API_PUBLIC_URL") or os.getenv("RENDER_EXTERNAL_URL") or "https://regulation-compiler.onrender.com"
@@ -2122,3 +2122,4 @@ def generate_pdf_report_task(report_id: str, job_id: str = None, sections: list 
             update_job_status(db, uuid.UUID(job_id), JobStatusEnum.failed, error=str(e))
     finally:
         db.close()
+        gc.collect()
