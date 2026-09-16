@@ -4,7 +4,11 @@ import { auth } from '@clerk/nextjs/server';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
-async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+interface FetchAuthOptions extends RequestInit {
+  timeoutMs?: number;
+}
+
+async function fetchWithAuth(endpoint: string, options: FetchAuthOptions = {}) {
   let token: string | null = null;
   try {
     const session = await auth();
@@ -28,9 +32,10 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     const cleanBaseUrl = API_BASE_URL.replace(/\/+$/, '');
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     
-    // Strict 4.5s timeout: Prevents indefinite hangs when Render is cold-starting
+    // Configurable timeout (defaults to 4.5s to prevent Render cold-start hangs, allows longer for swarm simulations)
+    const timeoutMs = options.timeoutMs || 4500;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       const response = await fetch(`${cleanBaseUrl}${cleanEndpoint}`, {
@@ -513,5 +518,35 @@ export async function triggerSurveillanceProbe(jurisdiction: string = 'GLOBAL') 
   });
   return data || { status: "success", jurisdiction, message: "Synthetic probe completed" };
 }
+
+// -------------------------------------------------------------
+// MiroFish Multi-Agent Swarm Intelligence & Simulation Actions
+// -------------------------------------------------------------
+export async function getSwarmAgents() {
+  const data = await fetchWithAuth('/simulation/swarm/agents');
+  return data?.agents || data?.data || [];
+}
+
+export async function runSwarmSimulation(rounds: number = 3, targetPolicyId?: string) {
+  const data = await fetchWithAuth('/simulation/swarm/run', {
+    method: 'POST',
+    body: JSON.stringify({ rounds, target_policy_id: targetPolicyId || null }),
+    timeoutMs: 60000 // Extended timeout for multi-round 10-agent real evaluation loops
+  });
+  return data?.data || data?.report || data;
+}
+
+export async function getSwarmRuns() {
+  const data = await fetchWithAuth('/simulation/swarm/runs');
+  return data?.runs || data?.data || [];
+}
+
+export async function getSwarmReport(runId: string) {
+  const data = await fetchWithAuth(`/simulation/swarm/report/${runId}`, {
+    timeoutMs: 15000
+  });
+  return data?.data || data?.report || null;
+}
+
 
 

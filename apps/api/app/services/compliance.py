@@ -1,4 +1,4 @@
-﻿import uuid
+import uuid
 import logging
 from sqlalchemy.orm import Session
 from app.models.requirements import ComplianceCheck, ComplianceResultEnum, Policy, Requirement
@@ -7,7 +7,10 @@ import json
 logger = logging.getLogger(__name__)
 
 def evaluate_policy_compliance(db: Session, policy_id: uuid.UUID, payload: dict, org_id: uuid.UUID) -> ComplianceCheck:
-    policy = db.query(Policy).filter(Policy.id == policy_id, Policy.org_id == org_id).first()
+    policy = db.query(Policy).filter(
+        Policy.id == policy_id,
+        (Policy.org_id == org_id) | (Policy.org_id.is_(None))
+    ).first()
     if not policy:
         raise ValueError("Policy not found")
 

@@ -19,7 +19,7 @@ from sqlalchemy import text
 from app.api.routers import (
     team, webhooks, test_rbac, regulations, requirements,
     reports, developer, api_keys, system_mappings, jobs,
-    policies, compliance, customer, admin
+    policies, compliance, customer, admin, simulation
 )
 from app.core.celery_app import celery_app
 from app.core.limiter import limiter
@@ -215,6 +215,7 @@ app.include_router(jobs.router, prefix="/api/v1")
 app.include_router(policies.router, prefix="/api/v1")
 app.include_router(compliance.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(simulation.router, prefix="/api/v1")
 
 # -------------------------------------------------------------
 # High-Reliability Observability & Health Probes (Uptime Monitoring)
