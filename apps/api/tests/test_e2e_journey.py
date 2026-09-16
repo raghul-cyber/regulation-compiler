@@ -1,9 +1,10 @@
-﻿import pytest
+import pytest
 import uuid
 import os
 from fastapi.testclient import TestClient
 
 os.environ["ENVIRONMENT"] = "test"
+os.environ["ENABLE_SURVEILLANCE_DAEMON"] = "false"
 
 from app.main import app
 from app.core.auth import get_current_user
@@ -16,13 +17,14 @@ app.dependency_overrides[get_current_user] = mock_get_current_user
 client = TestClient(app)
 
 def test_phase1_upload():
-    with open("requirements.txt", "rb") as f:
-        response = client.post(
-            "/api/v1/regulations/upload",
-            data={"name": "Test Reg E2E", "jurisdiction": "EU"},
-            files={"file": ("test.pdf", f, "application/pdf")}
-        )
-    assert response.status_code == 200 # Actual behavior is 200 OK
+    # Valid PDF magic header bytes
+    dummy_pdf_content = b"%PDF-1.4\n1 0 obj\n<<\n>>\nendobj\ntrailer\n<<\n>>\n%%EOF\n"
+    response = client.post(
+        "/api/v1/regulations/upload",
+        data={"name": "Test Reg E2E", "jurisdiction": "EU"},
+        files={"file": ("test.pdf", dummy_pdf_content, "application/pdf")}
+    )
+    assert response.status_code == 200
 
 @pytest.mark.asyncio
 async def test_phase2_3_events():
