@@ -42,10 +42,20 @@ export function ConsoleGuard() {
       originalError.apply(console, args);
     };
 
+    // Global native alert override: completely silences raw browser alerts and routes to intra-app system
+    const originalAlert = window.alert;
+    window.alert = (message?: any) => {
+      const msg = String(message ?? '');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('intra-app-alert', { detail: { message: msg } }));
+      }
+    };
+
     return () => {
       console.warn = originalWarn;
       console.log = originalLog;
       console.error = originalError;
+      window.alert = originalAlert;
     };
   }, []);
 

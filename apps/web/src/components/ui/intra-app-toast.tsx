@@ -87,6 +87,36 @@ export function IntraAppToastProvider({ children }: { children: React.ReactNode 
     [showToast]
   );
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleWindowAlertEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ message: string }>;
+      const msg = customEvent.detail?.message || '';
+      if (!msg) return;
+
+      if (
+        msg.toLowerCase().includes('complete') || 
+        msg.toLowerCase().includes('success') || 
+        msg.toLowerCase().includes('copied')
+      ) {
+        success('Notice', msg);
+      } else if (
+        msg.toLowerCase().includes('fail') || 
+        msg.toLowerCase().includes('error')
+      ) {
+        error('Notice', msg);
+      } else {
+        info('Notice', msg);
+      }
+    };
+
+    window.addEventListener('intra-app-alert', handleWindowAlertEvent);
+    return () => {
+      window.removeEventListener('intra-app-alert', handleWindowAlertEvent);
+    };
+  }, [success, error, info]);
+
   return (
     <IntraAppToastContext.Provider value={{ showToast, dismissToast, success, error, warning, info }}>
       {children}
