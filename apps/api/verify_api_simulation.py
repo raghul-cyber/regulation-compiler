@@ -9,7 +9,13 @@ from app.main import app
 client = TestClient(app)
 
 def test_api():
-    print("Testing GET /api/v1/simulation/swarm/agents...")
+    print("Testing GET /api/v1/team/me...")
+    res = client.get("/api/v1/team/me")
+    assert res.status_code == 200, f"Expected 200, got {res.status_code}: {res.text}"
+    me_data = res.json()
+    print(f"Success: /team/me response: {me_data}")
+
+    print("\nTesting GET /api/v1/simulation/swarm/agents...")
     res = client.get("/api/v1/simulation/swarm/agents")
     assert res.status_code == 200, f"Expected 200, got {res.status_code}: {res.text}"
     data = res.json()
@@ -39,7 +45,32 @@ def test_api():
     assert fetched_report["run_id"] == run_id
     print("Success: Report successfully retrieved by run_id.")
 
-    print("\nALL FASTAPI SIMULATION ENDPOINTS VERIFIED!")
+    print("\nTesting RBAC clearance: Simulated non-admin user...")
+    from app.models.organizations import User, RoleEnum
+    from app.core.auth import get_optional_current_user
+    import uuid
+
+    non_admin = User(
+        id=uuid.uuid4(),
+        org_id=uuid.uuid4(),
+        clerk_user_id="user_non_admin_test",
+        role=RoleEnum.developer,
+        email="developer@example.com"
+    )
+    # Override get_optional_current_user to simulate non-admin
+    app.dependency_overrides[get_optional_current_user] = lambda: non_admin
+    try:
+        res_forbidden = client.post("/api/v1/simulation/swarm/run", json={"rounds": 1})
+        assert res_forbidden.status_code == 403, f"Expected 403 Forbidden for non-admin, got {res_forbidden.status_code}: {res_forbidden.text}"
+        print(f"Success: Non-admin correctly rejected with HTTP 403 Forbidden: {res_forbidden.json()['detail']}")
+
+        res_agents_forbidden = client.get("/api/v1/simulation/swarm/agents")
+        assert res_agents_forbidden.status_code == 403, f"Expected 403 Forbidden for non-admin, got {res_agents_forbidden.status_code}"
+        print("Success: Non-admin correctly blocked from retrieving swarm agents.")
+    finally:
+        app.dependency_overrides.pop(get_optional_current_user, None)
+
+    print("\nALL FASTAPI SIMULATION AND RBAC CLEARANCE ENDPOINTS VERIFIED!")
 
 if __name__ == "__main__":
     test_api()

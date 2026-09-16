@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import {
   getSwarmAgents,
   runSwarmSimulation,
   getSwarmRuns,
-  getSwarmReport
+  getSwarmReport,
+  getCurrentUserProfile
 } from '@/app/(authenticated)/dashboard/actions';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/intra-app-toast';
@@ -30,7 +32,12 @@ import {
   Database
 } from 'lucide-react';
 
+const SUPER_ADMIN_EMAIL = 'rcraghul12@gmail.com';
+const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
+
 export function SwarmSimulationView() {
+  const { user, isLoaded } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [agents, setAgents] = useState<any[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [simulating, setSimulating] = useState(false);
@@ -42,8 +49,36 @@ export function SwarmSimulationView() {
   const toast = useToast();
 
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    if (user) {
+      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+      const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
+      const metadataRole = ((user.publicMetadata as { role?: string })?.role || '').toLowerCase();
+      const orgRole = (user.organizationMemberships?.[0]?.role || '').toLowerCase();
+
+      const isSuper = (
+        primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
+        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+        user.id === SUPER_ADMIN_CLERK_ID
+      );
+      const adminClearance = isSuper || metadataRole === 'admin' || metadataRole === 'super_admin' || orgRole === 'admin' || orgRole === 'org:admin';
+      
+      if (adminClearance) {
+        setIsAdmin(true);
+      }
+    }
+
+    getCurrentUserProfile().then(profile => {
+      if (profile?.is_admin || profile?.is_super_admin) {
+        setIsAdmin(true);
+      }
+    }).catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadInitialData();
+    }
+  }, [isAdmin]);
 
   async function loadInitialData() {
     setLoadingAgents(true);
@@ -122,6 +157,35 @@ export function SwarmSimulationView() {
     } finally {
       setSimulating(false);
     }
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] text-zinc-400">
+        <RefreshCw className="w-8 h-8 animate-spin text-amber-400 mb-3" />
+        <p className="text-sm font-medium text-zinc-300">Verifying Administrative Clearance...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="w-full max-w-xl mx-auto my-12 p-8 rounded-2xl bg-zinc-950 border border-amber-500/30 text-center relative overflow-hidden shadow-2xl">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto mb-5">
+          <Lock className="w-7 h-7" />
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+          <ShieldAlert className="w-3.5 h-3.5" />
+          Admin Clearance Required
+        </div>
+        <h2 className="text-xl font-bold text-white tracking-tight">
+          MiroFish Swarm Simulation Restricted
+        </h2>
+        <p className="mt-2 text-sm text-zinc-400 leading-relaxed max-w-md mx-auto">
+          Autonomous multi-agent swarm traffic generation and live policy stress tests are restricted to organization administrators. Please sign in with an administrative account to access this console.
+        </p>
+      </div>
+    );
   }
 
   return (

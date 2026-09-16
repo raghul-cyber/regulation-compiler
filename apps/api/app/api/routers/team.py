@@ -1,13 +1,51 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import uuid
 
 from app.db.session import get_db
-from app.core.auth import require_role
+from app.core.auth import require_role, get_optional_current_user
 from app.models.organizations import User, RoleEnum
 
 router = APIRouter(tags=["team"])
+
+SUPER_ADMIN_EMAIL = "rcraghul12@gmail.com"
+SUPER_ADMIN_CLERK_ID = "user_3HpP6350OcHxY6bu77tdXEtihSE"
+
+@router.get("/me")
+def get_current_user_profile(
+    current_user: Optional[User] = Depends(get_optional_current_user)
+):
+    """
+    Returns current authenticated user profile and administrative role clearance.
+    """
+    if not current_user:
+        return {
+            "authenticated": False,
+            "role": None,
+            "is_admin": False,
+            "is_super_admin": False
+        }
+    
+    email = (current_user.email or "").strip().lower()
+    is_super = (
+        email == SUPER_ADMIN_EMAIL.lower()
+        or current_user.clerk_user_id == SUPER_ADMIN_CLERK_ID
+    )
+    is_admin = (
+        is_super
+        or current_user.role == RoleEnum.admin
+        or str(getattr(current_user, 'role', '')).lower() == 'admin'
+    )
+    
+    return {
+        "authenticated": True,
+        "id": str(current_user.id),
+        "email": current_user.email,
+        "role": current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role),
+        "is_admin": is_admin,
+        "is_super_admin": is_super
+    }
 
 @router.get("/")
 def get_team_members(

@@ -548,5 +548,14 @@ export async function getSwarmReport(runId: string) {
   return data?.data || data?.report || null;
 }
 
+export async function getCurrentUserProfile() {
+  try {
+    const data = await fetchWithAuth('/team/me');
+    return data || null;
+  } catch (err) {
+    return null;
+  }
+}
+
 
 

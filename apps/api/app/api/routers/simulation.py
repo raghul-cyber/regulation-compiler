@@ -12,13 +12,39 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.core.auth import get_optional_current_user
-from app.models.organizations import User
+from app.models.organizations import User, RoleEnum
 from app.services.mirofish_simulator import mirofish_engine
 from app.core.cache import ResponseCache
 
 logger = logging.getLogger("api.simulation")
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
+
+SUPER_ADMIN_EMAIL = "rcraghul12@gmail.com"
+SUPER_ADMIN_CLERK_ID = "user_3HpP6350OcHxY6bu77tdXEtihSE"
+
+
+def verify_simulation_admin(
+    current_user: Optional[User] = Depends(get_optional_current_user)
+) -> Optional[User]:
+    """
+    Ensures that only administrators can access MiroFish Swarm simulation endpoints.
+    If authenticated, non-admin users receive HTTP 403 Forbidden.
+    """
+    if current_user:
+        email = (current_user.email or "").strip().lower()
+        is_admin = (
+            email == SUPER_ADMIN_EMAIL.lower()
+            or current_user.clerk_user_id == SUPER_ADMIN_CLERK_ID
+            or current_user.role == RoleEnum.admin
+            or str(getattr(current_user, 'role', '')).lower() == 'admin'
+        )
+        if not is_admin:
+            raise HTTPException(
+                status_code=403,
+                detail="Administrative clearance required. MiroFish Swarm simulation is restricted to organization administrators."
+            )
+    return current_user
 
 
 class SwarmRunRequest(BaseModel):
@@ -27,10 +53,12 @@ class SwarmRunRequest(BaseModel):
 
 
 @router.get("/swarm/agents")
-def get_swarm_agents():
+def get_swarm_agents(
+    current_user: Optional[User] = Depends(verify_simulation_admin)
+):
     """
     Returns the active roster of 10 MiroFish autonomous swarm personas
-    and their technical operational baselines.
+    and their technical operational baselines. Restricted to administrators.
     """
     personas = mirofish_engine.get_personas()
     return {
@@ -45,7 +73,7 @@ def get_swarm_agents():
 def run_swarm_simulation_endpoint(
     body: Optional[SwarmRunRequest] = None,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_current_user)
+    current_user: Optional[User] = Depends(verify_simulation_admin)
 ):
     """
     Launches a real MiroFish multi-agent swarm simulation (NO MOCKS).
@@ -80,9 +108,11 @@ def run_swarm_simulation_endpoint(
 
 
 @router.get("/swarm/runs")
-def get_recent_swarm_runs():
+def get_recent_swarm_runs(
+    current_user: Optional[User] = Depends(verify_simulation_admin)
+):
     """
-    Returns the list of recent MiroFish swarm simulation runs.
+    Returns the list of recent MiroFish swarm simulation runs. Restricted to administrators.
     """
     recent_runs = ResponseCache.get("mirofish:recent_runs") or []
     return {
@@ -94,9 +124,12 @@ def get_recent_swarm_runs():
 
 
 @router.get("/swarm/report/{run_id}")
-def get_swarm_run_report(run_id: str):
+def get_swarm_run_report(
+    run_id: str,
+    current_user: Optional[User] = Depends(verify_simulation_admin)
+):
     """
-    Retrieves the full synthesized ReportAgent output for a completed simulation run.
+    Retrieves the full synthesized ReportAgent output for a completed simulation run. Restricted to administrators.
     """
     report = ResponseCache.get(f"mirofish:run:{run_id}")
     if not report:
