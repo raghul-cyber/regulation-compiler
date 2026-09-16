@@ -59,15 +59,19 @@ async function handleProxyRequest(
         headers,
         body: method === 'POST' ? body : undefined,
         cache: 'no-store',
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(12000),
       });
 
       const data = await resp.json().catch(() => ({}));
-      return NextResponse.json(data, { status: resp.status });
+      const responseHeaders: Record<string, string> = {};
+      if (method === 'GET' && resp.ok) {
+        responseHeaders['Cache-Control'] = 'private, max-age=30, stale-while-revalidate=60';
+      }
+      return NextResponse.json(data, { status: resp.status, headers: responseHeaders });
     } catch (err: any) {
       lastError = err;
-      // Sleep 1 second before retry if Render is spinning up
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Sleep 500ms before retry if server was warming up
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
   }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { 
   Users, 
@@ -15,10 +15,11 @@ import {
   Radio, 
   Lock, 
   Shield, 
-  ExternalLink,
-  ChevronRight,
-  TrendingUp,
-  Fingerprint
+  ExternalLink, 
+  ChevronRight, 
+  TrendingUp, 
+  Fingerprint,
+  WifiOff
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -33,6 +34,8 @@ import {
   Cell 
 } from 'recharts';
 import { Button } from '@/components/ui/button';
+
+const ADMIN_CACHE_KEY = 'rc_admin_overview_telemetry_cache';
 
 interface ClerkUserRecord {
   id: string;
@@ -95,38 +98,72 @@ export function AdminOverview() {
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  const [data, setData] = useState<AdminOverviewData | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Instant 0ms Render via sessionStorage Cache (Stale-While-Revalidate)
+  const [data, setData] = useState<AdminOverviewData | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem(ADMIN_CACHE_KEY);
+        if (cached) return JSON.parse(cached);
+      } catch {}
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return !sessionStorage.getItem(ADMIN_CACHE_KEY);
+      } catch {}
+    }
+    return true;
+  });
+
+  const [isRevalidating, setIsRevalidating] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
+  const isFetchingRef = useRef(false);
 
-  const fetchOverview = useCallback(async () => {
+  const fetchOverview = useCallback(async (isSilentRevalidation = false) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
+    if (!isSilentRevalidation) {
+      setData(prev => {
+        if (!prev) setLoading(true);
+        return prev;
+      });
+    } else {
+      setIsRevalidating(true);
+    }
+    setError(null);
+
     try {
-      setError(null);
       const token = await getToken();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
 
-      // 1. Primary: Query via same-origin Next.js server-side proxy (guarantees zero CORS restrictions)
+      // 1. Primary: Fast proxy fetch with strict 10-second timeout to prevent any long hangs
       let res: Response | null = null;
       try {
         res = await fetch('/api/admin/overview', {
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          signal: AbortSignal.timeout(10000)
         });
       } catch (proxyErr) {
-        console.warn("Proxy route unreachable, falling back to direct API:", proxyErr);
+        console.warn("Proxy route unreachable or timed out, falling back to direct API:", proxyErr);
         res = null;
       }
 
-      // 2. Fallback: Direct API fetch if proxy was unconfigured
+      // 2. Fallback: Direct API fetch with strict 10-second timeout
       if (!res || !res.ok) {
         res = await fetch(`${apiUrl}/admin/overview`, {
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          signal: AbortSignal.timeout(10000)
         });
       }
 
@@ -137,17 +174,30 @@ export function AdminOverview() {
 
       const json = await res.json();
       setData(json);
+      try {
+        sessionStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify(json));
+      } catch {}
+      setError(null);
     } catch (err: any) {
       console.error("Admin overview fetch error:", err);
-      setError(err.message || "Failed to load admin telemetry.");
+      // Only display blocking error if we have no existing cached data to display
+      setData(prev => {
+        if (!prev) {
+          setError(err.message || "Failed to load admin telemetry.");
+        }
+        return prev;
+      });
     } finally {
       setLoading(false);
       setSyncing(false);
+      setIsRevalidating(false);
+      isFetchingRef.current = false;
     }
   }, [getToken]);
 
   useEffect(() => {
-    fetchOverview();
+    const hasCachedData = Boolean(data);
+    fetchOverview(hasCachedData);
   }, [fetchOverview]);
 
   const handleSyncUsers = async () => {
@@ -162,7 +212,8 @@ export function AdminOverview() {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          signal: AbortSignal.timeout(15000)
         });
       } catch {
         res = null;
@@ -173,10 +224,14 @@ export function AdminOverview() {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
-          }
+          },
+          signal: AbortSignal.timeout(15000)
         });
       }
-      await fetchOverview();
+      try {
+        sessionStorage.removeItem(ADMIN_CACHE_KEY);
+      } catch {}
+      await fetchOverview(false);
     } catch (err: any) {
       console.error("User sync error:", err);
       setError("Failed to sync users with Clerk.");
@@ -230,24 +285,34 @@ export function AdminOverview() {
     }
   };
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] text-zinc-400">
         <RefreshCw className="w-8 h-8 animate-spin text-amber-400 mb-4" />
         <h3 className="text-lg font-bold text-white tracking-tight">Authenticating Super-Admin Clearance...</h3>
         <p className="text-xs text-zinc-500 mt-1">Retrieving live Clerk directory, user logins, and cryptographic audit records</p>
+        <div className="mt-6">
+          <Button 
+            onClick={() => fetchOverview(false)} 
+            variant="outline" 
+            size="sm" 
+            className="border-zinc-800 text-xs text-zinc-400 hover:text-white"
+          >
+            Refresh Probe
+          </Button>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <div className="max-w-xl mx-auto my-12 p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-center">
         <ShieldAlert className="w-10 h-10 text-rose-400 mx-auto mb-3" />
         <h3 className="text-lg font-bold text-white">Administrative Access Restricted</h3>
         <p className="text-sm text-rose-300/90 mt-2">{error}</p>
         <div className="mt-6 flex justify-center gap-3">
-          <Button onClick={fetchOverview} variant="outline" size="sm" className="border-zinc-700">
+          <Button onClick={() => fetchOverview(false)} variant="outline" size="sm" className="border-zinc-700">
             Retry Connection
           </Button>
         </div>
@@ -271,6 +336,12 @@ export function AdminOverview() {
               <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold tracking-wide">
                 RESTRICTED CLEARANCE
               </span>
+              {isRevalidating && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 text-xs font-mono animate-pulse">
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  Live Syncing...
+                </span>
+              )}
             </div>
             <p className="text-sm text-zinc-400 mt-1">
               Active Session: <span className="font-mono text-amber-300 font-semibold">{data?.authorized_admin}</span> • Full tenant governance and authentic live user directory.

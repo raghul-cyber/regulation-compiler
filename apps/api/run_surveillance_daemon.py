@@ -3,6 +3,13 @@
 Executes continuous worldwide statutory scraping, regulatory signal ingestion,
 automated rule extraction, and AST compilation in PostgreSQL.
 """
+import builtins
+_orig_print = builtins.print
+def _unbuffered_print(*args, **kwargs):
+    kwargs.setdefault('flush', True)
+    return _orig_print(*args, **kwargs)
+builtins.print = _unbuffered_print
+
 import sys
 import os
 import time

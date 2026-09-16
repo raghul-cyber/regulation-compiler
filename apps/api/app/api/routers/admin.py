@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 
+from app.core.cache import ResponseCache
 from app.db.session import get_db
 from app.core.config import settings
 from app.core.auth import get_current_user, get_optional_current_user
@@ -66,15 +67,22 @@ def verify_super_admin(
     return current_user
 
 
-def fetch_live_clerk_users() -> List[Dict[str, Any]]:
+def fetch_live_clerk_users(force_refresh: bool = False) -> List[Dict[str, Any]]:
     """
     Queries official Clerk REST API for all real registered users (Zero mocks).
+    Employs ResponseCache with a 5-minute TTL to prevent high latency on repeat loads.
     """
+    cache_key = "admin:clerk_users"
+    if not force_refresh:
+        cached_users = ResponseCache.get(cache_key)
+        if cached_users is not None:
+            return cached_users
+
     secret_key = get_clerk_secret_key()
     if not secret_key:
         return []
     try:
-        with httpx.Client(timeout=15.0) as client:
+        with httpx.Client(timeout=6.0) as client:
             resp = client.get(
                 "https://api.clerk.com/v1/users?limit=100&order_by=-created_at",
                 headers={
@@ -85,7 +93,10 @@ def fetch_live_clerk_users() -> List[Dict[str, Any]]:
             if resp.status_code != 200:
                 logger.error(f"Failed to fetch Clerk users: {resp.status_code} {resp.text}")
                 return []
-            return resp.json()
+            data = resp.json()
+            if isinstance(data, list):
+                ResponseCache.set(cache_key, data, ttl_seconds=300)
+            return data
     except Exception as e:
         logger.error(f"Error communicating with Clerk API: {e}")
         return []
@@ -93,7 +104,8 @@ def fetch_live_clerk_users() -> List[Dict[str, Any]]:
 
 def sync_clerk_users_to_db(clerk_users: List[Dict[str, Any]], db: Session):
     """
-    Synchronizes Clerk registered accounts into local PostgreSQL users table.
+    Batch synchronizes Clerk registered accounts into local PostgreSQL users table
+    in a single database transaction.
     """
     if not clerk_users:
         return
@@ -105,6 +117,9 @@ def sync_clerk_users_to_db(clerk_users: List[Dict[str, Any]], db: Session):
         db.add(org)
         db.commit()
         db.refresh(org)
+
+    all_existing_users = {u.clerk_user_id: u for u in db.query(User).all() if u.clerk_user_id}
+    has_changes = False
 
     for c_user in clerk_users:
         c_id = c_user.get("id")
@@ -125,11 +140,11 @@ def sync_clerk_users_to_db(clerk_users: List[Dict[str, Any]], db: Session):
         if not email_val:
             email_val = f"{c_id}@user.clerk"
 
-        existing = db.query(User).filter(User.clerk_user_id == c_id).first()
+        existing = all_existing_users.get(c_id)
         if existing:
             if existing.email != email_val and email_val:
                 existing.email = email_val
-                db.commit()
+                has_changes = True
         else:
             role = RoleEnum.admin if email_val.lower() == SUPER_ADMIN_EMAIL.lower() else RoleEnum.developer
             new_user = User(
@@ -139,11 +154,15 @@ def sync_clerk_users_to_db(clerk_users: List[Dict[str, Any]], db: Session):
                 email=email_val
             )
             db.add(new_user)
-            try:
-                db.commit()
-            except Exception as ex:
-                db.rollback()
-                logger.warning(f"Error syncing user {c_id}: {ex}")
+            all_existing_users[c_id] = new_user
+            has_changes = True
+
+    if has_changes:
+        try:
+            db.commit()
+        except Exception as ex:
+            db.rollback()
+            logger.warning(f"Error batch syncing users: {ex}")
 
 
 @router.get("/overview")
@@ -153,15 +172,33 @@ def get_admin_overview(
 ):
     """
     Comprehensive Super-Admin Overview:
-    - Real users directory directly from Clerk API with verified email IDs and login timestamps.
+    - Cached & vectorized for lightning-fast sub-second response times.
+    - Live Clerk directory with verified email IDs and login timestamps.
     - Activity timeline and breakdown for graphics.
-    - PostgreSQL audit trace telemetry.
+    - Single-batch aggregated PostgreSQL audit trace telemetry.
     """
-    # 1. Fetch live Clerk users
-    clerk_users_raw = fetch_live_clerk_users()
-    sync_clerk_users_to_db(clerk_users_raw, db)
+    # 1. Check in-memory / Redis cache for instant sub-millisecond response
+    cache_key = "admin:overview"
+    cached_overview = ResponseCache.get(cache_key)
+    if cached_overview is not None:
+        return cached_overview
 
-    # Build structured user list
+    # 2. Fetch live Clerk users (utilizes 5-minute TTL cache internally)
+    clerk_users_raw = fetch_live_clerk_users()
+
+    # 3. Vectorized Bulk Lookups (Eliminates N+1 query loops)
+    all_db_users = db.query(User).all()
+    users_by_clerk_id = {u.clerk_user_id: u for u in all_db_users if u.clerk_user_id}
+    users_by_id = {u.id: u for u in all_db_users}
+
+    # Bulk fetch audit log counts per actor in 1 query
+    audit_counts = dict(
+        db.query(AuditLog.actor_id, func.count(AuditLog.id))
+        .group_by(AuditLog.actor_id)
+        .all()
+    )
+
+    # Build structured user list with O(1) in-memory lookups
     users_list = []
     total_logins_recorded = 0
     active_in_last_24h = 0
@@ -202,16 +239,13 @@ def get_admin_overview(
         elif last_active and (now_ms - last_active) < one_day_ms:
             active_in_last_24h += 1
 
-        # Check DB role
-        db_user = db.query(User).filter(User.clerk_user_id == c_id).first()
+        # O(1) in-memory DB role and audit count
+        db_user = users_by_clerk_id.get(c_id)
         user_role = db_user.role.value if (db_user and hasattr(db_user.role, 'value')) else (db_user.role if db_user else "developer")
         if primary_email.lower() == SUPER_ADMIN_EMAIL.lower():
             user_role = "super_admin"
 
-        # Count audit actions by this user
-        audit_count = 0
-        if db_user:
-            audit_count = db.query(AuditLog).filter(AuditLog.actor_id == db_user.id).count()
+        audit_count = audit_counts.get(db_user.id, 0) if db_user else 0
 
         users_list.append({
             "id": c_id,
@@ -230,10 +264,9 @@ def get_admin_overview(
 
     if not users_list:
         # Fallback to local PostgreSQL database users
-        db_users = db.query(User).all()
-        for du in db_users:
+        for du in all_db_users:
             em = du.email or ""
-            audit_count = db.query(AuditLog).filter(AuditLog.actor_id == du.id).count()
+            audit_count = audit_counts.get(du.id, 0)
             users_list.append({
                 "id": du.clerk_user_id or str(du.id),
                 "name": em.split("@")[0].title() if em else "System User",
@@ -252,7 +285,7 @@ def get_admin_overview(
     # Sort users: Super-admin first, then by last sign-in descending
     users_list.sort(key=lambda x: (not x["is_super_admin"], x["last_sign_in_at"] or ""), reverse=False)
 
-    # 2. Activity Timeline Graphics Data (Group audit logs by day over past 14 days)
+    # 4. Activity Timeline Graphics Data (Group audit logs by day over past 14 days)
     now_utc = datetime.now(timezone.utc)
     days_map = {}
     for i in range(13, -1, -1):
@@ -301,7 +334,7 @@ def get_admin_overview(
 
     activity_timeline = list(days_map.values())
 
-    # 3. Action Breakdown chart data
+    # 5. Action Breakdown chart data
     action_breakdown = [
         {"name": "Surveillance Probes", "category": "SURVEILLANCE_PROBES", "count": action_categories_count["SURVEILLANCE_PROBES"], "color": "#10b981"},
         {"name": "Policy Evaluations", "category": "COMPLIANCE_EVALUATIONS", "count": action_categories_count["COMPLIANCE_EVALUATIONS"], "color": "#3b82f6"},
@@ -309,20 +342,15 @@ def get_admin_overview(
         {"name": "Security Audits", "category": "SECURITY_AUDITS", "count": action_categories_count["SECURITY_AUDITS"], "color": "#f59e0b"},
     ]
 
-    # 4. Recent Real Audit Log Entries
+    # 6. Recent Real Audit Log Entries with O(1) in-memory actor lookup
     recent_logs = []
     for log in all_logs[:15]:
         created_iso = log.created_at.isoformat() if log.created_at else now_utc.isoformat()
-        # Find actor email
         actor_email = "Automated Engine"
         if log.actor_id:
-            user_match = next((u for u in users_list if str(u.get("id")) == str(log.actor_id)), None)
-            if user_match:
-                actor_email = user_match["email"]
-            else:
-                db_u = db.query(User).filter(User.id == log.actor_id).first()
-                if db_u:
-                    actor_email = db_u.email
+            matched_u = users_by_id.get(log.actor_id)
+            if matched_u:
+                actor_email = matched_u.email
 
         recent_logs.append({
             "id": str(log.id),
@@ -337,7 +365,7 @@ def get_admin_overview(
     total_checks = db.query(ComplianceCheck).count()
     total_policies = db.query(Policy).count()
 
-    return {
+    response_data = {
         "status": "success",
         "authorized_admin": admin.email,
         "metrics": {
@@ -355,6 +383,10 @@ def get_admin_overview(
         "recent_audit_trail": recent_logs
     }
 
+    # Cache overview payload for 60 seconds
+    ResponseCache.set(cache_key, response_data, ttl_seconds=60)
+    return response_data
+
 
 @router.post("/sync-users")
 def trigger_users_sync(
@@ -362,13 +394,16 @@ def trigger_users_sync(
     db: Session = Depends(get_db)
 ):
     """
-    Forces immediate reconciliation between Clerk user accounts and PostgreSQL database.
+    Forces immediate reconciliation between Clerk user accounts and PostgreSQL database,
+    and invalidates the admin caches to deliver fresh telemetry.
     """
-    raw_users = fetch_live_clerk_users()
+    raw_users = fetch_live_clerk_users(force_refresh=True)
     sync_clerk_users_to_db(raw_users, db)
+    ResponseCache.invalidate("admin")
     return {
         "status": "success",
         "message": f"Successfully synchronized {len(raw_users)} Clerk user accounts with PostgreSQL.",
         "synced_count": len(raw_users),
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
