@@ -152,9 +152,10 @@ async def get_job_events(
                     except Exception:
                         pass
 
-                # B. Dual-source safety: Poll PostgreSQL every 0.8s to guarantee zero missed events
+                # B. Dual-source safety: Poll PostgreSQL every 1.2s to guarantee zero missed events without DB thrashing
                 now = time.time()
-                if now - last_db_poll >= 0.8:
+                poll_interval = 2.0 if pubsub else 1.2
+                if now - last_db_poll >= poll_interval:
                     last_db_poll = now
                     try:
                         poll_db = SessionLocal()
@@ -213,6 +214,8 @@ async def get_job_events(
                     await redis_client.aclose()
                 except Exception:
                     pass
+            import gc
+            gc.collect()
     headers = {
         "Cache-Control": "no-cache, no-transform",
         "Connection": "keep-alive",

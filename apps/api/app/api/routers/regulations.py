@@ -106,6 +106,7 @@ async def upload_regulation(
     # Validate file size (strict 25MB enterprise limit)
     content = await file.read()
     if len(content) > MAX_UPLOAD_SIZE:
+        del content
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail="File size exceeds the 25MB maximum limit."
@@ -113,11 +114,15 @@ async def upload_regulation(
 
     # Validate magic bytes against malicious disguised payloads
     if not validate_file_magic_bytes(content, ext):
+        del content
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Security verification failed: File contents do not match valid {ext.upper()} magic byte format."
         )
     await file.seek(0)
+    del content
+    import gc
+    gc.collect()
 
     # 1. Upload file to S3
     try:

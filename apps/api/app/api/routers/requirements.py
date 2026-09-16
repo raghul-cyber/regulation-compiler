@@ -53,15 +53,14 @@ def list_requirements(
         # Hybrid Search path
         import os
         from sqlalchemy import text
-        from google import genai
         from google.genai import types
+        from app.pipelines.embeddings import get_gemini_client
 
         # 1. Get embedding for the query
-        gemini_key = os.environ.get("GEMINI_API_KEY")
-        if not gemini_key:
+        try:
+            client = get_gemini_client()
+        except Exception:
             raise HTTPException(status_code=500, detail="Semantic search is unavailable. Missing GEMINI_API_KEY.")
-            
-        client = genai.Client(api_key=gemini_key)
         try:
             emb_res = client.models.embed_content(
                 model='gemini-embedding-2',

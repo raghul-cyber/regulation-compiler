@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from google import genai
@@ -8,12 +9,30 @@ from app.models.requirements import Requirement, RequirementEmbedding, Validatio
 
 logger = logging.getLogger(__name__)
 
+_CACHED_GEMINI_CLIENT = None
+_GEMINI_LOCK = threading.Lock()
+
+def get_gemini_client() -> genai.Client:
+    global _CACHED_GEMINI_CLIENT
+    if _CACHED_GEMINI_CLIENT is None:
+        key = os.environ.get("GEMINI_API_KEY")
+        if not key:
+            raise ValueError("GEMINI_API_KEY is not set")
+        with _GEMINI_LOCK:
+            if _CACHED_GEMINI_CLIENT is None:
+                _CACHED_GEMINI_CLIENT = genai.Client(api_key=key)
+    return _CACHED_GEMINI_CLIENT
+
 def generate_requirement_embedding(db: Session, requirement_id: str, client: genai.Client = None):
     """
     Generates an embedding for a requirement and checks for duplicates.
     """
     if not client:
-        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        try:
+            client = get_gemini_client()
+        except Exception as e:
+            logger.error(f"Cannot initialize Gemini client: {e}")
+            return False
         
     req = db.query(Requirement).filter(Requirement.id == requirement_id).first()
     if not req:

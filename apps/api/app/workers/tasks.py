@@ -1,6 +1,7 @@
 import logging
 import uuid
 import httpx
+import gc
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
@@ -59,6 +60,7 @@ def process_ingestion_pipeline(self, job_id: str, source_doc_id: str):
         raise
     finally:
         db.close()
+        gc.collect()
 
 
 @celery_app.task(bind=True, max_retries=3, autoretry_for=(Exception,), retry_backoff=True)
@@ -83,6 +85,7 @@ def process_amendment_pipeline(self, job_id: str, source_doc_id: str, old_versio
         raise
     finally:
         db.close()
+        gc.collect()
 
 
 @celery_app.task(bind=True, max_retries=5, autoretry_for=(httpx.RequestError,), retry_backoff=True)
@@ -124,6 +127,7 @@ def generate_report_task(self, job_id: str, report_id: str):
         raise
     finally:
         db.close()
+        gc.collect()
 
 
 import hashlib
@@ -227,6 +231,7 @@ def poll_regulations_task(self):
         raise
     finally:
         db.close()
+        gc.collect()
 
 
 @celery_app.task(name="app.workers.tasks.scrape_and_extract_24_7_regulations")
@@ -246,4 +251,5 @@ def scrape_and_extract_24_7_regulations():
         raise
     finally:
         db.close()
+        gc.collect()
 

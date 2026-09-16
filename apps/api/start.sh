@@ -5,6 +5,7 @@ echo "=== Regulation-as-Code Compiler API Startup ==="
 
 export PYTHONUNBUFFERED=1
 export PYTHONDONTWRITEBYTECODE=1
+export MALLOC_ARENA_MAX=2
 
 # Ensure Render virtual environment is activated if present
 if [ -f "/opt/render/project/src/.venv/bin/activate" ]; then

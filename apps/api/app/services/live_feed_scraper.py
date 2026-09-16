@@ -122,9 +122,14 @@ class LiveRegulatoryScraperService:
     """
 
     def __init__(self):
-        self.http_client = httpx.Client(timeout=25.0, follow_redirects=True, headers={
-            "User-Agent": "RegCompiler-Surveillance-Bot/2.0 (+https://regulationcompiler.internal; contact@regcompiler.org)"
-        })
+        self.http_client = httpx.Client(
+            timeout=25.0,
+            follow_redirects=True,
+            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
+            headers={
+                "User-Agent": "RegCompiler-Surveillance-Bot/2.0 (+https://regulationcompiler.internal; contact@regcompiler.org)"
+            }
+        )
         self.is_running = False
         self.stats = {
             "total_scans": 0,
@@ -628,6 +633,8 @@ def run_24_7_surveillance_loop(interval_seconds: int = 25):
                 logger.info(f"[24/7 Surveillance Daemon] Sync result: {result}")
             finally:
                 db.close()
+                import gc
+                gc.collect()
         except Exception as e:
             logger.error(f"[24/7 Surveillance Daemon] Unexpected error: {e}")
 

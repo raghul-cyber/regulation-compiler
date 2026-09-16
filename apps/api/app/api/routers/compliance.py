@@ -90,11 +90,13 @@ def get_dashboard(
         }
 
     policy_ids = [p.id for p in policies]
-    checks = db.query(ComplianceCheck).filter(ComplianceCheck.policy_id.in_(policy_ids)).order_by(desc(ComplianceCheck.created_at)).all()
     latest_check_map = {}
-    for c in checks:
-        if c.policy_id not in latest_check_map:
-            latest_check_map[c.policy_id] = c
+    for pid in policy_ids:
+        latest = db.query(ComplianceCheck).filter(
+            ComplianceCheck.policy_id == pid
+        ).order_by(desc(ComplianceCheck.created_at)).first()
+        if latest:
+            latest_check_map[pid] = latest
 
     all_req_ids = []
     for p in policies:
@@ -105,7 +107,8 @@ def get_dashboard(
     req_map = {}
     if all_req_ids:
         try:
-            reqs = db.query(Requirement).filter(Requirement.id.in_(all_req_ids[:300])).all()
+            # Select only needed columns (id, title) rather than heavy ASTs and vectors
+            reqs = db.query(Requirement.id, Requirement.title).filter(Requirement.id.in_(all_req_ids[:150])).all()
             req_map = {r.id: r for r in reqs}
         except Exception:
             req_map = {}

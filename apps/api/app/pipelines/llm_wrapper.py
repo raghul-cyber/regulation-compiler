@@ -8,6 +8,11 @@ from app.pipelines.semantic_engine import SemanticEngine
 
 logger = logging.getLogger(__name__)
 
+import concurrent.futures
+
+# Reusable shared thread pool for asynchronous LLM calls to prevent thread stack memory leaks
+_SHARED_LLM_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=2, thread_name_prefix="llm_timeout_worker")
+
 # Global flags so we don't repeatedly wait on failed cloud APIs
 _openai_disabled_reason: str | None = None
 _gemini_disabled_reason: str | None = None
@@ -73,9 +78,8 @@ class LLMWrapper:
                             response_mime_type="application/json",
                         )
                     )
-                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                    fut = executor.submit(_call_gemini)
-                    res = fut.result(timeout=2.5)
+                fut = _SHARED_LLM_EXECUTOR.submit(_call_gemini)
+                res = fut.result(timeout=2.5)
                 return json.loads(res.text)
             except Exception as e:
                 last_error = e
