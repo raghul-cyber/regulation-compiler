@@ -2,11 +2,43 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Show, SignInButton } from '@clerk/nextjs';
 import { ArrowRight } from 'lucide-react';
 import { HeroProductPreview } from './hero-product-preview';
 import { useScrollReveal, useCountUp } from '@/hooks/use-scroll-reveal';
+import { Playfair_Display } from 'next/font/google';
+
+const playfair = Playfair_Display({ subsets: ['latin'] });
+
+const TypingText = ({ text, delay = 0, speed = 80 }: { text: string; delay?: number; speed?: number }) => {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    let intervalId: NodeJS.Timeout;
+    
+    const startTyping = () => {
+      intervalId = setInterval(() => {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+        if (i >= text.length) {
+          clearInterval(intervalId);
+        }
+      }, speed);
+    };
+
+    const timeoutId = setTimeout(startTyping, delay);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, [text, delay, speed]);
+
+  return <>{displayedText}</>;
+};
 
 export function HeroSection() {
   const { ref: heroRef, isRevealed: heroRevealed } = useScrollReveal({ threshold: 0.05 });
@@ -49,12 +81,12 @@ export function HeroSection() {
         </div>
 
         {/* Main Headline with Terminal Cursor */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter max-w-5xl leading-[1.08] text-[#F2F6F8]">
-          Turn Complex Regulations into <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2F6F8] via-[#5CC8FF] to-[#9AA9B5]">
-            Executable Code
+        <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight max-w-5xl leading-[1.1] text-[#F2F6F8] ${playfair.className}`}>
+          Turn Complex Regulations <br />
+          into <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2F6F8] via-[#E2E8F0] to-[#9AA9B5]">
+            <TypingText text="Executable Code." delay={300} speed={65} />
           </span>
-          <span className="text-[#5CC8FF]">.</span>
           <span className="landing-cursor" aria-hidden="true" />
         </h1>
 
