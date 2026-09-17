@@ -12,7 +12,8 @@ import {
   Layers, 
   Activity,
   Maximize2,
-  Minimize2
+  Minimize2,
+  X
 } from 'lucide-react';
 
 // Static Jurisdiction -> Coordinates (Lat, Lng) Mapping
@@ -117,12 +118,14 @@ function JurisdictionMarker({
   isSelected,
   isActiveSignal = false,
   onClick,
+  onClose,
   onInspectRegulations
 }: { 
   data: MarkerData;
   isSelected: boolean;
   isActiveSignal?: boolean;
   onClick: () => void;
+  onClose?: () => void;
   onInspectRegulations: (jurisdiction?: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -179,7 +182,7 @@ function JurisdictionMarker({
 
       {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
       {isFrontFacing && (
-        <Html distanceFactor={7} zIndexRange={[18, 0]} center>
+        <Html distanceFactor={4.8} zIndexRange={[18, 0]} center>
           <div 
             onClick={onClick}
             className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-full text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
@@ -205,64 +208,88 @@ function JurisdictionMarker({
 
       {/* Detailed Card when Hovered or Selected */}
       {(hovered || isSelected) && isFrontFacing && (
-        <Html distanceFactor={8} zIndexRange={[25, 0]} center>
-          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-22 pointer-events-auto select-none">
-            <div className="flex items-center justify-between mb-1.5 border-b border-zinc-800 pb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-base">{data.flag || '🌐'}</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white leading-tight">{data.name}</h4>
-                  <span className="text-[10px] text-zinc-400 font-mono">[{data.jurisdiction}]</span>
+        <Html distanceFactor={4.5} zIndexRange={[45, 0]} center>
+          <div 
+            className={`font-sans bg-[#08090E]/98 border border-zinc-700/90 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-48 pointer-events-auto select-none transition-all duration-200 ${
+              data.position.y > 0.25 
+                ? 'transform translate-y-5' 
+                : (data.position.y < -0.25 ? 'transform -translate-y-16' : 'transform -translate-y-10')
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-zinc-800 pb-1">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-sm shrink-0">{data.flag || '🌐'}</span>
+                <div className="truncate">
+                  <h4 className="text-[11px] font-bold text-white leading-tight truncate">{data.name}</h4>
+                  <span className="text-[9px] text-zinc-400 font-mono">[{data.jurisdiction}]</span>
                 </div>
               </div>
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${data.count > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
-                {data.count > 0 ? `${data.count} RULES` : 'SURVEILLANCE'}
-              </span>
+              <div className="flex items-center gap-1 shrink-0">
+                <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
+                  data.count > 0 
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                }`}>
+                  {data.count > 0 ? `${data.count} RULES` : 'ACTIVE'}
+                </span>
+                {isSelected && onClose && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClose();
+                    }}
+                    className="p-0.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                    title="Close Details"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-1.5 text-[11px] text-zinc-300 mt-2">
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Authority:</span>
-                <span className="text-zinc-300 font-medium truncate max-w-[130px] text-right" title={data.authority}>
+            <div className="space-y-1 text-[10px] text-zinc-300">
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-500 text-[9px]">Authority:</span>
+                <span className="text-zinc-300 font-medium truncate max-w-[100px] text-right" title={data.authority}>
                   {data.authority}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Active Rulesets:</span>
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-500 text-[9px]">Rulesets:</span>
                 <span className="text-white font-bold">{data.count} Framework{data.count !== 1 ? 's' : ''}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-500">Compliance Health:</span>
-                <span className="text-emerald-400 font-bold">{data.complianceScore.toFixed(1)}%</span>
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-500 text-[9px]">Health:</span>
+                <span className="text-emerald-400 font-bold">{data.complianceScore.toFixed(0)}%</span>
               </div>
             </div>
 
             {data.regulations && data.regulations.length > 0 && (
-              <div className="mt-2.5 pt-2 border-t border-zinc-800/80">
-                <div className="text-[10px] text-zinc-500 uppercase font-semibold mb-1">Monitored In System:</div>
-                <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto custom-scrollbar">
-                  {data.regulations.slice(0, 3).map((r, i) => (
-                    <span key={i} className="text-[9px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-zinc-300 truncate max-w-[190px]">
-                      {r}
+              <div className="mt-1.5 pt-1.5 border-t border-zinc-800/80">
+                <div className="text-[9px] text-zinc-500 uppercase font-semibold mb-0.5">Monitored:</div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[8px] px-1.5 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded text-zinc-300 truncate" title={data.regulations[0]}>
+                    {data.regulations[0]}
+                  </span>
+                  {data.regulations.length > 1 && (
+                    <span className="text-[8px] text-zinc-500">
+                      +{data.regulations.length - 1} more regulation{data.regulations.length > 2 ? 's' : ''}
                     </span>
-                  ))}
-                  {data.regulations.length > 3 && (
-                    <span className="text-[9px] text-zinc-500 self-center">+{data.regulations.length - 3} more</span>
                   )}
                 </div>
               </div>
             )}
 
-            <div className="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+            <div className="mt-2 pt-1.5 border-t border-zinc-800/80">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onInspectRegulations(data.jurisdiction);
                 }}
-                className="w-full text-center text-[10px] font-semibold py-1.5 px-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1.5 shadow-md"
+                className="w-full text-center text-[9px] font-semibold py-1 px-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer"
               >
-                Inspect {data.jurisdiction} Regulations
-                <ExternalLink className="w-3 h-3" />
+                <span>Inspect {data.jurisdiction}</span>
+                <ExternalLink className="w-2.5 h-2.5" />
               </button>
             </div>
           </div>
@@ -372,7 +399,8 @@ function GlobeScene({
               data={marker}
               isSelected={isSelected}
               isActiveSignal={isActiveSignal}
-              onClick={() => onSelectJurisdiction(marker.jurisdiction)}
+              onClick={() => onSelectJurisdiction(isSelected ? '' : marker.jurisdiction)}
+              onClose={() => onSelectJurisdiction('')}
               onInspectRegulations={onInspectRegulations}
             />
             {/* Real-time Streaming Arc connecting HQ to this Jurisdiction */}
