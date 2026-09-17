@@ -8,36 +8,67 @@ import { Show, SignInButton } from '@clerk/nextjs';
 import { ArrowRight } from 'lucide-react';
 import { HeroProductPreview } from './hero-product-preview';
 import { useScrollReveal, useCountUp } from '@/hooks/use-scroll-reveal';
-import { Playfair_Display } from 'next/font/google';
+import { Courier_Prime } from 'next/font/google';
 
-const playfair = Playfair_Display({ subsets: ['latin'] });
+const courierPrime = Courier_Prime({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+});
 
-const TypingText = ({ text, delay = 0, speed = 80 }: { text: string; delay?: number; speed?: number }) => {
-  const [displayedText, setDisplayedText] = useState("");
+const LINE1_TARGET = "Turn Complex Regulations";
+const LINE2_TARGET = "into Executable Code.";
+
+const TypingHeadline = ({ delay = 150, speed = 28 }: { delay?: number; speed?: number }) => {
+  const [typedCount, setTypedCount] = useState(0);
 
   useEffect(() => {
-    let i = 0;
-    let intervalId: NodeJS.Timeout;
-    
-    const startTyping = () => {
-      intervalId = setInterval(() => {
-        setDisplayedText(text.slice(0, i + 1));
-        i++;
-        if (i >= text.length) {
-          clearInterval(intervalId);
-        }
-      }, speed);
-    };
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTypedCount(LINE1_TARGET.length + 1 + LINE2_TARGET.length);
+      return;
+    }
 
-    const timeoutId = setTimeout(startTyping, delay);
+    let intervalId: NodeJS.Timeout;
+    const totalChars = LINE1_TARGET.length + 1 + LINE2_TARGET.length;
+
+    const startTimeout = setTimeout(() => {
+      intervalId = setInterval(() => {
+        setTypedCount((prev) => {
+          if (prev >= totalChars) {
+            clearInterval(intervalId);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, speed);
+    }, delay);
 
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(startTimeout);
       clearInterval(intervalId);
     };
-  }, [text, delay, speed]);
+  }, [delay, speed]);
 
-  return <>{displayedText}</>;
+  const line1Len = LINE1_TARGET.length;
+  const line1Text = LINE1_TARGET.slice(0, Math.min(typedCount, line1Len));
+  const isTypingLine1 = typedCount <= line1Len;
+
+  const line2Count = Math.max(0, typedCount - (line1Len + 1));
+  const line2Text = LINE2_TARGET.slice(0, Math.min(line2Count, LINE2_TARGET.length));
+
+  return (
+    <div className="flex flex-col items-center justify-center select-none">
+      <span className="block min-h-[1.25em] tracking-tight text-[#F2F6F8]">
+        {line1Text}
+        {isTypingLine1 && <span className="landing-cursor" aria-hidden="true" />}
+      </span>
+      <span className="block min-h-[1.25em] mt-1 sm:mt-2 tracking-tight">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2F6F8] via-[#E2E8F0] to-[#9AA9B5]">
+          {line2Text}
+        </span>
+        {!isTypingLine1 && <span className="landing-cursor" aria-hidden="true" />}
+      </span>
+    </div>
+  );
 };
 
 export function HeroSection() {
@@ -80,18 +111,15 @@ export function HeroSection() {
           </span>
         </div>
 
-        {/* Main Headline with Terminal Cursor */}
-        <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight max-w-5xl leading-[1.1] text-[#F2F6F8] ${playfair.className}`}>
-          Turn Complex Regulations <br />
-          into <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2F6F8] via-[#E2E8F0] to-[#9AA9B5]">
-            <TypingText text="Executable Code." delay={300} speed={65} />
-          </span>
-          <span className="landing-cursor" aria-hidden="true" />
-        </h1>
+        {/* Main Headline in Rectangular Display Card */}
+        <div className="w-full max-w-4xl mx-auto rounded-2xl bg-[#080D13]/70 border border-[#17222C] shadow-2xl shadow-black/80 backdrop-blur-xl px-6 py-7 sm:px-10 sm:py-9 mb-4 relative hover:border-[#1E2C38] transition-all">
+          <h1 className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#F2F6F8] ${courierPrime.className} leading-[1.25]`}>
+            <TypingHeadline delay={150} speed={28} />
+          </h1>
+        </div>
 
         {/* Supporting Copy */}
-        <p className="mt-6 text-base sm:text-lg md:text-xl text-[#9AA9B5] max-w-3xl font-normal leading-relaxed">
+        <p className="mt-4 text-base sm:text-lg md:text-xl text-[#9AA9B5] max-w-3xl font-normal leading-relaxed">
           Transform dense, ambiguous legal text into deterministic Abstract Syntax Trees and machine-executable verification policies. Automated statutory surveillance running 24/7 across global regulatory gazettes.
         </p>
 
