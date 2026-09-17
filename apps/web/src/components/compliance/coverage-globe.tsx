@@ -609,11 +609,13 @@ export function CoverageGlobe({
 
         <OrbitControls 
           enablePan={false}
-          enableZoom={true}
-          minDistance={3.2}
-          maxDistance={9.5}
+          enableZoom={false}
+          enableDamping={true}
+          dampingFactor={0.05}
+          minDistance={5.9}
+          maxDistance={5.9}
           autoRotate={autoRotate}
-          autoRotateSpeed={0.5}
+          autoRotateSpeed={0.75}
           target={[0, -0.2, 0]}
         />
       </Canvas>
