@@ -111,15 +111,13 @@ export function HeroSection() {
           </span>
         </div>
 
-        {/* Main Headline in Rectangular Display Card */}
-        <div className="w-full max-w-4xl mx-auto rounded-2xl bg-[#080D13]/70 border border-[#17222C] shadow-2xl shadow-black/80 backdrop-blur-xl px-6 py-7 sm:px-10 sm:py-9 mb-4 relative hover:border-[#1E2C38] transition-all">
-          <h1 className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#F2F6F8] ${courierPrime.className} leading-[1.25]`}>
-            <TypingHeadline delay={150} speed={28} />
-          </h1>
-        </div>
+        {/* Main Headline with Terminal Cursor */}
+        <h1 className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#F2F6F8] max-w-4xl mx-auto leading-[1.25] ${courierPrime.className}`}>
+          <TypingHeadline delay={150} speed={28} />
+        </h1>
 
         {/* Supporting Copy */}
-        <p className="mt-4 text-base sm:text-lg md:text-xl text-[#9AA9B5] max-w-3xl font-normal leading-relaxed">
+        <p className="mt-6 text-base sm:text-lg md:text-xl text-[#9AA9B5] max-w-3xl font-normal leading-relaxed">
           Transform dense, ambiguous legal text into deterministic Abstract Syntax Trees and machine-executable verification policies. Automated statutory surveillance running 24/7 across global regulatory gazettes.
         </p>
 
