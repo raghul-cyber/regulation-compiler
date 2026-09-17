@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, ArrowDown, FileText, Split, Layers, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, FileText, Split, Layers, CheckCircle2 } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const FRAGMENTS = [
   {
@@ -32,11 +33,13 @@ const FRAGMENTS = [
 
 export function ProblemSection() {
   const [selectedFragment, setSelectedFragment] = useState<string>('doc_1');
+  const { ref: titleRef, isRevealed: titleRevealed } = useScrollReveal();
+  const { ref: contentRef, isRevealed: contentRevealed } = useScrollReveal({ threshold: 0.1 });
 
   return (
     <section id="problem" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Section Eyebrow & Title */}
-      <div className="text-center max-w-3xl mx-auto mb-16">
+      <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-16`}>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17222C]/70 border border-[#1E2C38] text-[#5CC8FF] text-xs font-mono font-medium uppercase tracking-wider mb-4">
           <AlertCircle className="w-3.5 h-3.5" />
           The Structural Disconnect
@@ -51,7 +54,7 @@ export function ProblemSection() {
       </div>
 
       {/* Interactive Document Fragment Breakdown Visualization */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} grid grid-cols-1 lg:grid-cols-12 gap-6 items-start`}>
         {/* Left Column: Fragment Selector Cards */}
         <div className="lg:col-span-6 space-y-3">
           <div className="text-xs font-mono text-[#62717C] uppercase tracking-wider mb-2">
@@ -65,7 +68,7 @@ export function ProblemSection() {
                 onClick={() => setSelectedFragment(frag.id)}
                 className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer text-left ${
                   isSelected
-                    ? 'bg-[#0C131B] border-[#5CC8FF]/50 shadow-[0_0_20px_rgba(92,200,255,0.1)]'
+                    ? 'bg-[#0C131B] landing-border-glow'
                     : 'bg-[#080D13]/80 border-[#17222C] hover:border-[#1E2C38] hover:bg-[#0C131B]/50'
                 }`}
               >

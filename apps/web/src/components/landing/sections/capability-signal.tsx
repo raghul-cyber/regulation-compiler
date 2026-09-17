@@ -1,6 +1,7 @@
 'use client';
 
 import { FileText, Cpu, Binary, CheckCircle2, ShieldCheck, Code2 } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const CAPABILITIES = [
   { icon: FileText, label: 'REGULATION INGESTION', detail: 'Multi-Gazette Feeds' },
@@ -12,9 +13,14 @@ const CAPABILITIES = [
 ];
 
 export function CapabilitySignal() {
+  const { ref, isRevealed } = useScrollReveal();
+
   return (
     <section className="w-full max-w-6xl mx-auto px-4 pointer-events-auto">
-      <div className="py-4 px-6 rounded-2xl bg-[#080D13]/80 border border-[#17222C] shadow-lg backdrop-blur-md">
+      <div 
+        ref={ref} 
+        className={`landing-stagger ${isRevealed ? 'revealed' : ''} py-4 px-6 rounded-2xl bg-[#080D13]/80 border border-[#17222C] shadow-lg backdrop-blur-md`}
+      >
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 divide-y sm:divide-y-0 lg:divide-x divide-[#17222C]">
           {CAPABILITIES.map((cap, i) => {
             const Icon = cap.icon;

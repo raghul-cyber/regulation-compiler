@@ -1,6 +1,7 @@
 'use client';
 
-import { Layers, Database, Cpu, Binary, ShieldCheck, Code, ArrowRight } from 'lucide-react';
+import { Layers, Database, Cpu, Binary, ShieldCheck, Code } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const ARCH_LAYERS = [
   {
@@ -46,10 +47,13 @@ const ARCH_LAYERS = [
 ];
 
 export function ArchitectureSection() {
+  const { ref: titleRef, isRevealed: titleRevealed } = useScrollReveal();
+  const { ref: layersRef, isRevealed: layersRevealed } = useScrollReveal({ threshold: 0.08 });
+
   return (
     <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Eyebrow & Title */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
+      <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17222C]/70 border border-[#1E2C38] text-[#5CC8FF] text-xs font-mono font-medium uppercase tracking-wider mb-4">
           <Layers className="w-3.5 h-3.5" />
           Technical Stack
@@ -63,7 +67,7 @@ export function ArchitectureSection() {
       </div>
 
       {/* Layer Stack */}
-      <div className="space-y-3">
+      <div ref={layersRef} className={`landing-stagger ${layersRevealed ? 'revealed' : ''} space-y-3`}>
         {ARCH_LAYERS.map((layer) => {
           const Icon = layer.icon;
           return (

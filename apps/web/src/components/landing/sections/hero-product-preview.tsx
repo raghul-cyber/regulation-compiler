@@ -1,19 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Terminal, Cpu, FileCode2, Copy, Check } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 export function HeroProductPreview() {
   const [activeTab, setActiveTab] = useState<'input' | 'analysis' | 'compiled'>('compiled');
   const [copied, setCopied] = useState(false);
+  const [tabKey, setTabKey] = useState(0); // Reset progress bar on tab switch
+  const { ref, isRevealed } = useScrollReveal({ threshold: 0.1 });
 
   const handleCopy = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleTabSwitch = (tab: 'input' | 'analysis' | 'compiled') => {
+    setActiveTab(tab);
+    setTabKey(prev => prev + 1);
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto mt-14 rounded-2xl bg-[#080D13]/90 border border-[#17222C] shadow-2xl shadow-black/80 backdrop-blur-xl overflow-hidden text-left transition-all duration-300 hover:border-[#1E2C38]">
+    <div ref={ref} className={`landing-reveal ${isRevealed ? 'revealed' : ''} w-full max-w-4xl mx-auto mt-14 rounded-2xl bg-[#080D13]/90 border border-[#17222C] shadow-2xl shadow-black/80 backdrop-blur-xl overflow-hidden text-left transition-all duration-300 hover:border-[#1E2C38]`}>
       {/* Top Window Bar */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#0C131B]/80 border-b border-[#17222C]">
         <div className="flex items-center gap-2">
@@ -41,9 +49,9 @@ export function HeroProductPreview() {
       </div>
 
       {/* Compiler Mode Navigation Tabs */}
-      <div className="flex items-center gap-1 px-4 pt-2 border-b border-[#17222C] bg-[#080D13] font-mono text-xs">
+      <div className="relative flex items-center gap-1 px-4 pt-2 border-b border-[#17222C] bg-[#080D13] font-mono text-xs">
         <button
-          onClick={() => setActiveTab('input')}
+          onClick={() => handleTabSwitch('input')}
           className={`px-3 py-2 border-b-2 font-medium transition-all flex items-center gap-2 ${
             activeTab === 'input'
               ? 'border-[#5CC8FF] text-[#5CC8FF] bg-[#0C131B]'
@@ -54,7 +62,7 @@ export function HeroProductPreview() {
           <span>01. Statutory Input</span>
         </button>
         <button
-          onClick={() => setActiveTab('analysis')}
+          onClick={() => handleTabSwitch('analysis')}
           className={`px-3 py-2 border-b-2 font-medium transition-all flex items-center gap-2 ${
             activeTab === 'analysis'
               ? 'border-[#5CC8FF] text-[#5CC8FF] bg-[#0C131B]'
@@ -65,7 +73,7 @@ export function HeroProductPreview() {
           <span>02. Semantic Extraction</span>
         </button>
         <button
-          onClick={() => setActiveTab('compiled')}
+          onClick={() => handleTabSwitch('compiled')}
           className={`px-3 py-2 border-b-2 font-medium transition-all flex items-center gap-2 ${
             activeTab === 'compiled'
               ? 'border-[#5CC8FF] text-[#5CC8FF] bg-[#0C131B]'
@@ -75,9 +83,13 @@ export function HeroProductPreview() {
           <Terminal className="w-3.5 h-3.5" />
           <span>03. Executable AST Logic</span>
         </button>
+        {/* Progress bar on tab switch */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <div key={tabKey} className="landing-tab-progress-bar" />
+        </div>
       </div>
 
-      {/* Code / Content Area */}
+      {/* Code / Content Area with Line Numbers */}
       <div className="p-5 font-mono text-xs leading-relaxed min-h-[200px]">
         {activeTab === 'input' && (
           <div className="text-[#9AA9B5] space-y-2">
@@ -126,8 +138,8 @@ export function HeroProductPreview() {
         )}
 
         {activeTab === 'compiled' && (
-          <div className="text-[#F2F6F8] space-y-1 overflow-x-auto">
-            <div className="text-[#62717C]">// Deterministic AST Rule Tree (Target: OPA Rego / Python Policy Engine)</div>
+          <div className="text-[#F2F6F8] space-y-1 overflow-x-auto landing-line-numbers">
+            <div><span className="text-[#62717C]">// Deterministic AST Rule Tree (Target: OPA Rego / Python Policy Engine)</span></div>
             <div>
               <span className="text-[#5CC8FF]">rule</span> <span className="text-[#F2F6F8] font-bold">EU_AI_ACT_ART9_RISK_SYSTEM</span> <span className="text-[#62717C]">&#123;</span>
             </div>
@@ -141,10 +153,10 @@ export function HeroProductPreview() {
               <span className="text-[#5CC8FF]">assert:</span>
             </div>
             <div className="pl-8 text-[#9AA9B5]">
-              system.risk_framework.documented == <span className="text-[#67D6A0]">true</span> &amp;&amp;
+              system.risk_framework.documented == <span className="text-[#67D6A0]">true</span> <span className="text-[#5CC8FF]">&amp;&amp;</span>
             </div>
             <div className="pl-8 text-[#9AA9B5]">
-              system.risk_framework.lifecycle_iterative == <span className="text-[#67D6A0]">true</span> &amp;&amp;
+              system.risk_framework.lifecycle_iterative == <span className="text-[#67D6A0]">true</span> <span className="text-[#5CC8FF]">&amp;&amp;</span>
             </div>
             <div className="pl-8 text-[#9AA9B5]">
               system.post_market_monitoring.active == <span className="text-[#67D6A0]">true</span>
@@ -156,7 +168,7 @@ export function HeroProductPreview() {
               <span className="text-[#5CC8FF]">on_fail:</span> dispatch_remediation_playbook(<span className="text-[#5CC8FF]">&quot;PLAYBOOK_AI_ACT_9&quot;</span>)
             </div>
             <div>
-              <span className="text-[#62717C]">&#125;</span>
+              <span className="text-[#62717C]">&#125;</span><span className="landing-cursor" aria-hidden="true" />
             </div>
           </div>
         )}

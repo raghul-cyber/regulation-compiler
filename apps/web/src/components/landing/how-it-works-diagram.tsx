@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Globe2, 
   Cpu, 
@@ -8,15 +8,9 @@ import {
   ShieldCheck, 
   ArrowRight, 
   CheckCircle2, 
-  FileText, 
-  Zap, 
-  Terminal, 
-  Code2, 
-  Layers,
-  Database,
-  Radio,
-  FileCheck
+  Zap,
 } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 interface Stage {
   id: string;
@@ -158,12 +152,78 @@ const STAGES: Stage[] = [
   }
 ];
 
+const AUTO_ROTATE_MS = 10000;
+
+/** Simple JSON syntax highlighter for the code snippets */
+function HighlightedJSON({ code }: { code: string }) {
+  const lines = code.split('\n');
+  return (
+    <>
+      {lines.map((line, i) => {
+        // Highlight JSON keys, string values, numbers, booleans, and comments
+        const highlighted = line
+          // Comments
+          .replace(/(\/\/.*)$/g, '<span style="color:#62717C">$1</span>')
+          // JSON keys  
+          .replace(/"([^"]+)"(?=\s*:)/g, '<span style="color:#5CC8FF">"$1"</span>')
+          // String values (after colon)
+          .replace(/:\s*"([^"]+)"/g, ': <span style="color:#67D6A0">"$1"</span>')
+          // Array string values
+          .replace(/\[\s*"([^"]+)"/g, '[<span style="color:#67D6A0">"$1"</span>')
+          .replace(/,\s*"([^"]+)"/g, ', <span style="color:#67D6A0">"$1"</span>')
+          // Numbers
+          .replace(/:\s*(\d+\.?\d*)/g, ': <span style="color:#FFB86C">$1</span>')
+          // Booleans
+          .replace(/:\s*(true|false)/g, ': <span style="color:#67D6A0">$1</span>');
+        
+        return (
+          <div key={i} dangerouslySetInnerHTML={{ __html: highlighted || '&nbsp;' }} />
+        );
+      })}
+    </>
+  );
+}
+
 export function HowItWorksDiagram() {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progressKey, setProgressKey] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const activeStage = STAGES[activeStageIndex];
+  const { ref, isRevealed } = useScrollReveal({ threshold: 0.08 });
+
+  const advanceStage = useCallback(() => {
+    setActiveStageIndex(prev => (prev + 1) % STAGES.length);
+    setProgressKey(prev => prev + 1);
+  }, []);
+
+  // Auto-rotate timer
+  useEffect(() => {
+    if (isPaused) return;
+    timerRef.current = setInterval(advanceStage, AUTO_ROTATE_MS);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isPaused, advanceStage, activeStageIndex]);
+
+  const handleManualSwitch = (idx: number) => {
+    setActiveStageIndex(idx);
+    setProgressKey(prev => prev + 1);
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (!isPaused) {
+      timerRef.current = setInterval(advanceStage, AUTO_ROTATE_MS);
+    }
+  };
 
   return (
-    <div className="w-full">
+    <div 
+      ref={ref} 
+      className={`landing-reveal ${isRevealed ? 'revealed' : ''} w-full`}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
+    >
       {/* Interactive Stage Step Indicator */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
         {STAGES.map((stage, idx) => {
@@ -173,8 +233,8 @@ export function HowItWorksDiagram() {
           return (
             <button
               key={stage.id}
-              onClick={() => setActiveStageIndex(idx)}
-              className={`text-left p-4 rounded-xl border transition-all duration-300 relative group cursor-pointer ${
+              onClick={() => handleManualSwitch(idx)}
+              className={`text-left p-4 rounded-xl border transition-all duration-300 relative group cursor-pointer overflow-hidden ${
                 isActive
                   ? `bg-zinc-900/90 ${stage.borderColor} shadow-lg shadow-black/40 ring-1 ${stage.color.replace('text-', 'ring-')}`
                   : 'bg-[#0b0c10]/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/40'
@@ -196,8 +256,12 @@ export function HowItWorksDiagram() {
                 {stage.subtitle}
               </p>
 
+              {/* Auto-rotate progress bar */}
               {isActive && (
-                <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0">
+                  {!isPaused && <div key={progressKey} className="h-[2px] bg-gradient-to-r from-[#5CC8FF] to-[#67D6A0]" style={{ animation: `landing-tab-progress ${AUTO_ROTATE_MS}ms linear forwards` }} />}
+                  <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+                </div>
               )}
             </button>
           );
@@ -230,13 +294,13 @@ export function HowItWorksDiagram() {
           {/* Quick Stage Switchers */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setActiveStageIndex(prev => (prev > 0 ? prev - 1 : STAGES.length - 1))}
+              onClick={() => handleManualSwitch((activeStageIndex > 0 ? activeStageIndex - 1 : STAGES.length - 1))}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all cursor-pointer"
             >
               Previous
             </button>
             <button
-              onClick={() => setActiveStageIndex(prev => (prev < STAGES.length - 1 ? prev + 1 : 0))}
+              onClick={() => handleManualSwitch((activeStageIndex < STAGES.length - 1 ? activeStageIndex + 1 : 0))}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all flex items-center gap-1 cursor-pointer shadow-sm shadow-blue-500/20"
             >
               <span>Next Stage</span>
@@ -245,7 +309,7 @@ export function HowItWorksDiagram() {
           </div>
         </div>
 
-        {/* Two-Column Showcase: Description & Highlights (Left) vs Interactive Code (Right) */}
+        {/* Two-Column Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Stage Explanation & Highlights */}
           <div className="lg:col-span-5 space-y-6">
@@ -278,7 +342,7 @@ export function HowItWorksDiagram() {
             </div>
           </div>
 
-          {/* Right Column: Code & AST Inspector */}
+          {/* Right Column: Code & AST Inspector with Syntax Highlighting */}
           <div className="lg:col-span-7">
             <div className="rounded-xl border border-zinc-800 bg-[#050608] overflow-hidden shadow-xl">
               <div className="px-4 py-2.5 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between">
@@ -298,7 +362,10 @@ export function HowItWorksDiagram() {
               </div>
               <div className="p-4 overflow-x-auto max-h-[340px] custom-scrollbar">
                 <pre className="text-xs font-mono text-zinc-300 leading-relaxed">
-                  <code>{activeStage.codeSnippet}</code>
+                  <code>
+                    <HighlightedJSON code={activeStage.codeSnippet} />
+                    <span className="landing-cursor" aria-hidden="true" />
+                  </code>
                 </pre>
               </div>
             </div>

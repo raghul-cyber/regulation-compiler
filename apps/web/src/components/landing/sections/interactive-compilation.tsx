@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Compass, CheckCircle2, Link2, Shield, Binary } from 'lucide-react';
+import { Compass, CheckCircle2, Link2 } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 interface InteractiveNode {
   id: string;
@@ -12,8 +13,8 @@ interface InteractiveNode {
   rule: string;
   validation: 'PASS' | 'ACTIVE' | 'EVALUATING';
   connections: string[];
-  x: number; // percentage
-  y: number; // percentage
+  x: number;
+  y: number;
 }
 
 const NODES: InteractiveNode[] = [
@@ -94,11 +95,13 @@ const NODES: InteractiveNode[] = [
 export function InteractiveCompilation() {
   const [activeNodeId, setActiveNodeId] = useState<string>('node_ai_act');
   const activeNode = NODES.find((n) => n.id === activeNodeId) || NODES[0];
+  const { ref: titleRef, isRevealed: titleRevealed } = useScrollReveal();
+  const { ref: contentRef, isRevealed: contentRevealed } = useScrollReveal({ threshold: 0.1 });
 
   return (
     <section id="interactive" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
-      <div className="text-center max-w-3xl mx-auto mb-14">
+      <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17222C]/70 border border-[#1E2C38] text-[#5CC8FF] text-xs font-mono font-medium uppercase tracking-wider mb-4">
           <Compass className="w-3.5 h-3.5" />
           Live Interactive Field
@@ -112,19 +115,19 @@ export function InteractiveCompilation() {
       </div>
 
       {/* Main Interactive Field Canvas Container */}
-      <div className="relative w-full rounded-2xl bg-[#080D13]/90 border border-[#17222C] backdrop-blur-xl p-6 md:p-8 overflow-hidden shadow-2xl">
+      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} relative w-full rounded-2xl bg-[#080D13]/90 border border-[#17222C] backdrop-blur-xl p-6 md:p-8 overflow-hidden shadow-2xl`}>
         {/* Subtle grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#17222C08_1px,transparent_1px),linear-gradient(to_bottom,#17222C08_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           {/* Interactive Topology Graph Area (7 Cols) */}
           <div className="lg:col-span-7 relative h-[380px] rounded-xl bg-[#0C131B]/60 border border-[#17222C] p-4 flex items-center justify-center">
-            {/* SVG Connecting Edges */}
+            {/* SVG Connecting Edges with animated dash flow */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               {NODES.map((n1) =>
                 n1.connections.map((targetId) => {
                   const n2 = NODES.find((t) => t.id === targetId);
-                  if (!n2 || n1.id > n2.id) return null; // Draw each line once
+                  if (!n2 || n1.id > n2.id) return null;
 
                   const isEdgeActive = activeNode.id === n1.id || activeNode.id === n2.id;
                   return (
@@ -136,8 +139,8 @@ export function InteractiveCompilation() {
                       y2={`${n2.y}%`}
                       stroke={isEdgeActive ? '#5CC8FF' : '#17222C'}
                       strokeWidth={isEdgeActive ? 1.5 : 1}
-                      strokeDasharray={isEdgeActive ? 'none' : '4 4'}
-                      className="transition-all duration-300"
+                      className={`transition-all duration-300 ${isEdgeActive ? 'landing-edge-active' : ''}`}
+                      strokeDasharray={isEdgeActive ? '6 6' : '4 4'}
                     />
                   );
                 })
@@ -164,7 +167,7 @@ export function InteractiveCompilation() {
                   }`}
                 >
                   <div className="flex items-center gap-1.5 whitespace-nowrap">
-                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#5CC8FF]' : 'bg-[#2D718F]'}`} />
+                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#5CC8FF] shadow-[0_0_8px_rgba(92,200,255,0.6)]' : 'bg-[#2D718F]'} transition-all`} />
                     <span className="font-semibold">{node.label}</span>
                   </div>
                 </button>
@@ -216,6 +219,7 @@ export function InteractiveCompilation() {
                   </div>
                   <pre className="text-[11px] text-[#9AA9B5] bg-[#080D13] p-2.5 rounded-lg border border-[#17222C] mt-1 overflow-x-auto">
                     <code>{activeNode.rule}</code>
+                    <span className="landing-cursor" aria-hidden="true" />
                   </pre>
                 </div>
               </div>
