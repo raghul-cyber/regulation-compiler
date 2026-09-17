@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { NavAuth } from './nav-auth';
 import { UploadCloud, Menu, X, ShieldAlert, ArrowRight } from 'lucide-react';
-import { Show, SignInButton, useUser } from '@clerk/nextjs';
+import { Show, SignInButton, useUser, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 
 export function TopNav() {
@@ -36,39 +36,41 @@ export function TopNav() {
   // =========================================================================
   if (isLanding) {
     return (
-      <header className="sticky top-0 z-50 w-full pt-3 px-4 pointer-events-none transition-all duration-300">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-4 pb-2 pointer-events-none`}
+      >
         <div
-          className={`w-full max-w-6xl mx-auto h-[68px] rounded-2xl flex items-center justify-between px-5 sm:px-6 pointer-events-auto transition-all duration-300 ${
+          className={`max-w-7xl mx-auto flex items-center justify-between px-5 py-2.5 rounded-2xl transition-all duration-300 pointer-events-auto ${
             isScrolled
-              ? 'bg-[#080D13]/85 backdrop-blur-xl border border-[#17222C] shadow-2xl shadow-black/80'
+              ? 'bg-[#080D13]/85 backdrop-blur-xl border border-[#17222C] shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
               : 'bg-transparent border border-transparent'
           }`}
         >
-          {/* Left: Brand Logo & Wordmark */}
-          <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center p-0.5 bg-[#0C131B] border border-[#17222C] group-hover:border-[#5CC8FF50] transition-colors shadow-sm shrink-0">
+          {/* Brand Wordmark & Tactical Monogram */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 rounded-lg bg-[#0E151D] border border-[#22313E] flex items-center justify-center p-1.5 shadow-inner transition-transform group-hover:scale-105">
               <Image
-                src="/logo-icon.png"
-                alt="Regulation Compiler Logo"
-                width={32}
-                height={32}
-                className="w-full h-full object-contain"
+                src="/icon.png"
+                alt="Regulation Compiler Monogram"
+                width={20}
+                height={20}
+                className="w-5 h-5 object-contain"
                 priority
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-bold tracking-tight text-[#F2F6F8] group-hover:text-[#5CC8FF] transition-colors leading-tight font-sans">
+              <span className="font-serif font-bold text-sm tracking-tight text-[#F2F6F8]">
                 RegCompiler
               </span>
-              <span className="text-[10px] text-[#62717C] font-mono tracking-wider uppercase leading-none hidden sm:inline-block">
-                Regulation as Code
+              <span className="font-mono text-[9px] tracking-widest text-[#9AA9B5] uppercase">
+                REGULATION AS CODE
               </span>
             </div>
           </Link>
 
-          {/* Center: Nav Anchors */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-mono font-medium text-[#9AA9B5]">
-            <a href="#hero" className="hover:text-[#F2F6F8] transition-colors">
+          {/* Center: Tactical Editorial Links */}
+          <nav className="hidden lg:flex items-center gap-7 font-mono text-xs text-[#9AA9B5]">
+            <a href="#product" className="hover:text-[#F2F6F8] transition-colors">
               Product
             </a>
             <a href="#problem" className="hover:text-[#F2F6F8] transition-colors">
@@ -100,7 +102,7 @@ export function TopNav() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>
-              <NavAuth />
+              <UserButton />
             </Show>
 
             <Show when="signed-out">
