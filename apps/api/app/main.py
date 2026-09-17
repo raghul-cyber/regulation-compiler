@@ -298,10 +298,11 @@ async def deep_health_check(request: Request):
         from app.services.live_feed_scraper import scraper_service
         is_active = getattr(scraper_service, "is_running", False)
         response["checks"]["surveillance_24_7"] = {
-            "status": "active" if is_active else "standby",
-            "signals_scraped": scraper_service.stats.get("total_scraped", 0),
-            "regulations_extracted": scraper_service.stats.get("total_extracted", 0),
+            "status": "active" if is_active or scraper_service.stats.get("worker_thread_alive") else "standby",
+            "signals_scraped": scraper_service.stats.get("signals_scraped", 0) or scraper_service.stats.get("signals_ingested", 0),
+            "regulations_extracted": scraper_service.stats.get("regulations_extracted", 0) or scraper_service.stats.get("total_extracted", 0),
             "last_scan_at": scraper_service.stats.get("last_scan_at"),
+            "total_scans": scraper_service.stats.get("total_scans", 0)
         }
     except Exception as se:
         response["checks"]["surveillance_24_7"] = {"status": "error", "detail": str(se)}

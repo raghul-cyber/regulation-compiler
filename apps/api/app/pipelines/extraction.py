@@ -45,14 +45,17 @@ def run_extraction_pipeline(db: Session, source_document_id: uuid.UUID, job_id: 
         name = "Ingest"
         dispatcher.emit(stage, name, "started")
         
-        try:
-            file_bytes = storage.get_file_bytes(source_doc.storage_path)
-        except Exception as storage_err:
-            if source_doc.raw_text:
-                logger.info("Using source_doc.raw_text for pipeline execution.")
-                file_bytes = source_doc.raw_text.encode("utf-8")
-            else:
-                raise storage_err
+        if source_doc.storage_path and source_doc.storage_path.startswith("live_feed/") and source_doc.raw_text:
+            file_bytes = source_doc.raw_text.encode("utf-8")
+        else:
+            try:
+                file_bytes = storage.get_file_bytes(source_doc.storage_path)
+            except Exception as storage_err:
+                if source_doc.raw_text:
+                    logger.info("Using source_doc.raw_text for pipeline execution.")
+                    file_bytes = source_doc.raw_text.encode("utf-8")
+                else:
+                    raise storage_err
         
         dispatcher.emit(stage, name, "completed", {"message": "Document ingested from secure storage"})
 

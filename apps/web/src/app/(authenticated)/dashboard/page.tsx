@@ -6,6 +6,7 @@ import { ComplianceDashboard } from '@/components/compliance/compliance-dashboar
 import { GapAnalysis } from '@/components/compliance/gap-analysis';
 import { ComplianceChecklist } from '@/components/compliance/compliance-checklist';
 import { SwarmSimulationView } from '@/components/compliance/swarm-simulation-view';
+import { Actions247View } from '@/components/compliance/actions-247-view';
 import { CoverageView } from './coverage-view';
 import { ShieldAlert } from 'lucide-react';
 
@@ -37,9 +38,10 @@ export default function DashboardPage() {
     }
   }, [user, isLoaded]);
 
-  // Tab list dynamically includes MiroFish Swarm Traffic ONLY for administrative logins
+  // Tab list dynamically includes 24/7 Actions and MiroFish Swarm Traffic for administrative logins
   const tabs = [
     { id: 'coverage', label: 'Global Monitoring' },
+    { id: 'actions_24_7', label: '24/7 Actions' },
     ...(isAdmin ? [{ id: 'swarm', label: 'MiroFish Swarm Traffic', adminOnly: true }] : []),
     { id: 'policies', label: 'Policies & Evaluation' },
     { id: 'dashboard', label: 'Compliance Dashboard' },
@@ -102,6 +104,7 @@ export default function DashboardPage() {
 
       <div className="pt-4">
         {activeTab === 'coverage' && <CoverageView />}
+        {activeTab === 'actions_24_7' && <Actions247View />}
         {activeTab === 'swarm' && isAdmin && <SwarmSimulationView />}
         {activeTab === 'policies' && <PoliciesView onNavigateTab={(tab) => setActiveTab(tab)} />}
         {activeTab === 'dashboard' && <ComplianceDashboard />}
