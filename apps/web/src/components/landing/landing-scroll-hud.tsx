@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowUp, Activity, Compass } from 'lucide-react';
+import { ArrowUp, Compass } from 'lucide-react';
 
 interface SectionInfo {
   id: string;
@@ -10,11 +10,14 @@ interface SectionInfo {
 }
 
 const SECTIONS: SectionInfo[] = [
-  { id: 'hero', label: 'Core Engine', code: '01' },
-  { id: 'about', label: 'Paradigm Shift', code: '02' },
-  { id: 'pipeline', label: 'Architecture', code: '03' },
-  { id: 'capabilities', label: 'Capabilities', code: '04' },
-  { id: 'jurisdictions', label: 'Coverage', code: '05' },
+  { id: 'hero', label: 'Core', code: '01' },
+  { id: 'problem', label: 'Problem', code: '02' },
+  { id: 'transformation', label: 'Transform', code: '03' },
+  { id: 'how-it-works', label: 'Pipeline', code: '04' },
+  { id: 'interactive', label: 'Field', code: '05' },
+  { id: 'architecture', label: 'Arch', code: '06' },
+  { id: 'security', label: 'Security', code: '07' },
+  { id: 'use-cases', label: 'Scope', code: '08' },
 ];
 
 export function LandingScrollHUD() {
@@ -31,7 +34,7 @@ export function LandingScrollHUD() {
       
       setScrollProgress(Math.min(Math.max(scrolled, 0), 100));
       setIsScrolled(winScroll > 250);
-      setZDepth(Math.round(winScroll * 0.15));
+      setZDepth(Math.round(winScroll * 0.12));
 
       // Calculate active section based on element positions
       const sectionElements = SECTIONS.map(s => document.getElementById(s.id));
@@ -47,7 +50,7 @@ export function LandingScrollHUD() {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // initial check
+    onScroll();
 
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -67,33 +70,35 @@ export function LandingScrollHUD() {
     <>
       {/* 1. Ultra-thin Top Glowing Scroll Progress Laser Line */}
       <div 
-        className="fixed top-0 left-0 right-0 h-[2px] z-50 pointer-events-none bg-zinc-900/50"
+        className="fixed top-0 left-0 right-0 h-[2px] z-50 pointer-events-none bg-[#080D13]/60"
       >
         <div 
-          className="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-500 transition-[width] duration-75 ease-out shadow-[0_0_12px_rgba(56,189,248,0.8)]"
+          className="h-full bg-gradient-to-r from-[#2D718F] via-[#5CC8FF] to-[#67D6A0] transition-[width] duration-75 ease-out shadow-[0_0_10px_rgba(92,200,255,0.7)]"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      {/* 2. Floating Cybernetic HUD & Telemetry Capsule (Fixed bottom-right on desktop) */}
+      {/* 2. Floating Cybernetic HUD & Telemetry Capsule (Fixed bottom-6 right-6) */}
       <div className="fixed bottom-6 right-6 z-40 pointer-events-auto hidden md:flex flex-col items-end gap-2 font-mono">
-        <div className="p-3 rounded-2xl bg-[#090b12]/90 border border-blue-500/20 backdrop-blur-xl shadow-2xl shadow-blue-500/10 text-xs flex flex-col gap-2.5 transition-all duration-300 hover:border-blue-500/40">
+        <div className="p-3 rounded-2xl bg-[#080D13]/90 border border-[#17222C] backdrop-blur-xl shadow-2xl shadow-black/90 text-xs flex flex-col gap-2.5 transition-all duration-300 hover:border-[#1E2C38]">
           {/* Status Header */}
-          <div className="flex items-center justify-between gap-4 pb-2 border-b border-zinc-800/80">
-            <div className="flex items-center gap-2 text-zinc-400 text-[11px]">
+          <div className="flex items-center justify-between gap-4 pb-2 border-b border-[#17222C]">
+            <div className="flex items-center gap-2 text-[#9AA9B5] text-[11px]">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#67D6A0] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#67D6A0]" />
               </span>
-              <span className="tracking-wider uppercase text-zinc-300 font-semibold">GRID COMPILER</span>
+              <span className="tracking-wider uppercase text-[#F2F6F8] font-semibold text-[10px]">
+                COMPLIANCE FIELD
+              </span>
             </div>
-            <div className="text-[10px] text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
-              DEPTH -{zDepth}m
+            <div className="text-[10px] text-[#5CC8FF] font-bold bg-[#5CC8FF15] px-2 py-0.5 rounded border border-[#5CC8FF30]">
+              Z-DEPTH -{zDepth}m
             </div>
           </div>
 
           {/* Active Section Tracker */}
-          <div className="flex items-center gap-1.5 pt-0.5">
+          <div className="flex items-center gap-1 pt-0.5">
             {SECTIONS.map((sec) => {
               const isActive = activeSection === sec.id;
               return (
@@ -101,14 +106,14 @@ export function LandingScrollHUD() {
                   key={sec.id}
                   onClick={() => scrollTo(sec.id)}
                   title={`${sec.code} // ${sec.label}`}
-                  className={`group relative px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                  className={`group relative px-2 py-1 rounded-lg text-[10px] font-semibold transition-all duration-200 cursor-pointer ${
                     isActive 
-                      ? 'bg-blue-600/30 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(34,211,238,0.25)]' 
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 border border-transparent'
+                      ? 'bg-[#5CC8FF20] text-[#5CC8FF] border border-[#5CC8FF40] shadow-[0_0_10px_rgba(92,200,255,0.2)]' 
+                      : 'text-[#62717C] hover:text-[#9AA9B5] hover:bg-[#17222C]/50 border border-transparent'
                   }`}
                 >
                   <span>{sec.code}</span>
-                  <span className="hidden group-hover:inline-block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-[10px] text-zinc-200 whitespace-nowrap shadow-lg">
+                  <span className="hidden group-hover:inline-block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#080D13] border border-[#17222C] text-[10px] text-[#F2F6F8] whitespace-nowrap shadow-lg">
                     {sec.label}
                   </span>
                 </button>
@@ -117,12 +122,12 @@ export function LandingScrollHUD() {
           </div>
 
           {/* Metrics Footer */}
-          <div className="flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-zinc-800/60">
+          <div className="flex items-center justify-between text-[10px] text-[#62717C] pt-1 border-t border-[#17222C]">
             <span className="flex items-center gap-1">
-              <Compass className="w-3 h-3 text-blue-400" />
+              <Compass className="w-3 h-3 text-[#5CC8FF]" />
               {SECTIONS.find(s => s.id === activeSection)?.label.toUpperCase()}
             </span>
-            <span className="text-zinc-400 font-semibold">{Math.round(scrollProgress)}% SCROLL</span>
+            <span className="text-[#9AA9B5] font-semibold">{Math.round(scrollProgress)}% SCROLL</span>
           </div>
         </div>
 
@@ -131,7 +136,7 @@ export function LandingScrollHUD() {
           <button
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="p-2 rounded-xl bg-zinc-900/80 hover:bg-blue-600 border border-zinc-800 hover:border-blue-500 text-zinc-400 hover:text-white transition-all duration-200 backdrop-blur-md shadow-lg cursor-pointer"
+            className="p-2 rounded-xl bg-[#080D13]/80 hover:bg-[#5CC8FF] border border-[#17222C] hover:border-[#5CC8FF] text-[#9AA9B5] hover:text-[#05070A] transition-all duration-200 backdrop-blur-md shadow-lg cursor-pointer"
           >
             <ArrowUp className="w-4 h-4" />
           </button>
