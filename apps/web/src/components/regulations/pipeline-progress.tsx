@@ -340,15 +340,26 @@ export function PipelineProgress({ jobId, getToken, regulationId }: { jobId: str
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+    <div className="space-y-6 max-w-3xl mx-auto bg-[#090a0f] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 shadow-xl">
+      <div className="flex items-center justify-between pb-5 border-b border-zinc-800/80">
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">Compilation Pipeline</h2>
-          <p className="text-sm text-zinc-400 mt-1">Job ID: <span className="font-mono text-xs">{jobId}</span></p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Compilation Pipeline</h2>
+            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase ${
+              jobStatus === 'completed' 
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                : jobStatus === 'failed' 
+                  ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                  : 'bg-blue-500/15 text-blue-400 border border-blue-500/30 animate-pulse'
+            }`}>
+              {jobStatus}
+            </span>
+          </div>
+          <p className="text-xs text-zinc-400 mt-1">Job ID: <span className="font-mono text-zinc-300">{jobId}</span></p>
         </div>
         <div className="text-right">
-          <div className="text-sm font-mono text-zinc-300">{getTotalDuration()}</div>
-          <div className="text-xs text-zinc-500 mt-1 capitalize">{jobStatus}</div>
+          <div className="text-sm font-mono font-semibold text-zinc-200">{getTotalDuration()}</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">Stage {currentStage} of 9</div>
         </div>
       </div>
 

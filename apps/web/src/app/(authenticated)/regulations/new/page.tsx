@@ -240,26 +240,32 @@ export default function NewRegulationPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-4">Add Regulation</h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Ingest a new regulatory framework into the Knowledge Graph. Our AI will automatically parse requirements, map policies, and identify compliance gaps.
+    <div className="max-w-5xl mx-auto py-8 md:py-12 px-4">
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <BrainCircuit className="w-3.5 h-3.5" />
+          Statutory Ingestion Engine
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+          Ingest Regulatory Framework
+        </h1>
+        <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          Ingest a statutory document or canonical framework into the Knowledge Graph. The compiler automatically decomposes legal text into deterministic AST rules.
         </p>
       </div>
 
       <div className="flex justify-center mb-8">
-        <div className="bg-black/50 p-1 rounded-lg border border-gray-800 flex gap-1">
+        <div className="bg-zinc-900/90 p-1 rounded-xl border border-zinc-800 flex gap-1 shadow-md">
             <button 
                 onClick={() => { setTab('standard'); setError(null); }}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'standard' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                className={`px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer btn-tactile ${tab === 'standard' ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'}`}
             >
                 <Library className="h-4 w-4" />
-                Standard Framework
+                Standard Catalog
             </button>
             <button 
                 onClick={() => { setTab('custom'); setError(null); }}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'custom' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                className={`px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer btn-tactile ${tab === 'custom' ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'}`}
             >
                 <UploadCloud className="h-4 w-4" />
                 Custom Upload
@@ -268,48 +274,50 @@ export default function NewRegulationPage() {
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-red-900/20 border border-red-500/50 rounded-xl flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-          <div className="text-red-200">{error}</div>
+        <div className="mb-8 p-4 bg-red-950/30 border border-red-500/40 rounded-xl flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+          <div className="text-sm text-red-200">{error}</div>
         </div>
       )}
 
       {tab === 'standard' && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-xl">
             <div className="flex items-center gap-3 mb-6">
-              <Library className="h-6 w-6 text-emerald-500" />
-              <h2 className="text-xl font-semibold text-white">Supported Frameworks</h2>
+              <Library className="h-5 w-5 text-blue-400" />
+              <h2 className="text-lg font-bold text-white tracking-tight">Pre-Configured Statutory Catalogs</h2>
             </div>
             
             {loadingFrameworks ? (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mb-4" />
-                    <p>Loading catalog...</p>
+                <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-3" />
+                    <p className="text-sm font-medium text-zinc-300">Loading statutory catalogs...</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {frameworks.map(f => (
-                        <div key={f.id} className="bg-black border border-gray-800 rounded-xl p-5 hover:border-emerald-500/50 transition-colors group flex flex-col">
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{f.acronym}</h3>
-                                    <p className="text-xs text-gray-500 mt-1">{f.name}</p>
-                                </div>
-                                <span className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded flex items-center gap-1">
-                                    <Globe className="h-3 w-3" />
-                                    {f.jurisdiction}
-                                </span>
+                        <div key={f.id} className="bg-[#090a0f] border border-zinc-800/80 rounded-xl p-5 hover:border-zinc-700 transition-all group flex flex-col justify-between">
+                            <div>
+                              <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                      <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors">{f.acronym}</h3>
+                                      <p className="text-xs text-zinc-400 mt-0.5">{f.name}</p>
+                                  </div>
+                                  <span className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] font-mono px-2 py-0.5 rounded flex items-center gap-1">
+                                      <Globe className="h-3 w-3 text-zinc-500" />
+                                      {f.jurisdiction}
+                                  </span>
+                              </div>
+                              <p className="text-xs text-zinc-400 mb-6 leading-relaxed">{f.description}</p>
                             </div>
-                            <p className="text-sm text-gray-400 mb-6 flex-grow">{f.description}</p>
                             
                             {f.is_fetchable ? (
                                 <button 
                                     onClick={() => handleIngestFramework(f.acronym)}
                                     disabled={isUploading}
-                                    className={`w-full transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 ${
+                                    className={`w-full transition-all rounded-lg py-2.5 text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer btn-tactile ${
                                         ingesting === f.acronym
-                                            ? 'bg-emerald-600 text-white border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                                            : 'bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30'
+                                            ? 'bg-blue-600 text-white border border-blue-400 shadow-md shadow-blue-500/40'
+                                            : 'bg-blue-600/15 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30'
                                     }`}
                                 >
                                     {ingesting === f.acronym ? (
@@ -327,7 +335,7 @@ export default function NewRegulationPage() {
                             ) : (
                                 <button 
                                     onClick={() => setTab('custom')}
-                                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors rounded py-2 text-sm font-medium flex items-center justify-center gap-2"
+                                    className="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition-colors rounded-lg py-2.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer btn-tactile"
                                 >
                                     <UploadCloud className="h-4 w-4" />
                                     Requires Upload
@@ -341,43 +349,47 @@ export default function NewRegulationPage() {
       )}
 
       {tab === 'custom' && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-2xl mx-auto">
+        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-2xl p-6 sm:p-8 max-w-2xl mx-auto backdrop-blur-md shadow-xl">
           <div className="flex items-center gap-3 mb-6">
-            <UploadCloud className="h-6 w-6 text-emerald-500" />
-            <h2 className="text-xl font-semibold text-white">Custom Upload</h2>
+            <UploadCloud className="h-5 w-5 text-blue-400" />
+            <h2 className="text-lg font-bold text-white tracking-tight">Custom Document Upload</h2>
           </div>
 
           <div className="space-y-6">
             {/* Metadata Fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Regulation Name</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  Regulation Name
+                </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. GDPR, HIPAA"
-                  className="w-full bg-black border border-gray-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  placeholder="e.g. DORA, EU AI Act"
+                  className="w-full bg-[#090a0f] border border-zinc-800 rounded-xl p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Jurisdiction</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  Jurisdiction
+                </label>
                 <input
                   type="text"
                   value={jurisdiction}
                   onChange={(e) => setJurisdiction(e.target.value)}
-                  placeholder="e.g. EU, US, Global"
-                  className="w-full bg-black border border-gray-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  placeholder="e.g. EU, US, UK, Global"
+                  className="w-full bg-[#090a0f] border border-zinc-800 rounded-xl p-3 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                 />
               </div>
             </div>
 
             {/* Drop Zone */}
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-                isDragging ? 'border-emerald-500 bg-emerald-500/10' : 
-                file ? 'border-emerald-500/50 bg-emerald-500/5' : 
-                'border-gray-700 hover:border-gray-500 hover:bg-gray-800/50'
+              className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-all ${
+                isDragging ? 'border-blue-500 bg-blue-500/10' : 
+                file ? 'border-blue-500/50 bg-blue-500/5' : 
+                'border-zinc-800 hover:border-zinc-700 bg-[#090a0f]/50'
               }`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
@@ -385,28 +397,28 @@ export default function NewRegulationPage() {
             >
               {file ? (
                 <div className="flex flex-col items-center">
-                  <div className="h-16 w-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-4">
-                    <FileText className="h-8 w-8 text-emerald-500" />
+                  <div className="h-14 w-14 bg-blue-500/15 rounded-2xl flex items-center justify-center mb-3 border border-blue-500/30">
+                    <FileText className="h-7 w-7 text-blue-400" />
                   </div>
-                  <div className="text-white font-medium mb-1">{file.name}</div>
-                  <div className="text-gray-400 text-sm mb-4">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                  <div className="text-white font-medium text-sm mb-1">{file.name}</div>
+                  <div className="text-zinc-500 text-xs mb-4">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
                   <button 
                     onClick={() => setFile(null)}
-                    className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                    className="text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
                   >
-                    Remove file
+                    Remove selected file
                   </button>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <div className="h-16 w-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                    <UploadCloud className="h-8 w-8 text-gray-400" />
+                  <div className="h-14 w-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-4">
+                    <UploadCloud className="h-7 w-7 text-zinc-400" />
                   </div>
-                  <p className="text-white font-medium mb-2">Drag and drop your regulatory document here</p>
-                  <p className="text-gray-400 text-sm mb-6">Supports PDF and HTML files up to 50MB</p>
+                  <p className="text-white font-medium text-sm mb-1">Drag and drop statutory document here</p>
+                  <p className="text-zinc-500 text-xs mb-5">Accepts official PDF and HTML gazettes up to 50MB</p>
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-6 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-5 py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-xs rounded-lg transition-all cursor-pointer btn-tactile shadow-sm"
                   >
                     Browse Files
                   </button>
@@ -427,7 +439,7 @@ export default function NewRegulationPage() {
 
             {error && (
               <div className="p-4 bg-red-950/30 border border-red-900/50 rounded-xl flex items-start gap-3 text-sm text-red-300">
-                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
                 <div>{error}</div>
               </div>
             )}
@@ -436,21 +448,21 @@ export default function NewRegulationPage() {
             <button
               onClick={handleUpload}
               disabled={isUploading || !file || !name || !jurisdiction}
-              className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
+              className={`w-full py-3.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-3 transition-all cursor-pointer btn-tactile ${
                 isUploading || !file || !name || !jurisdiction
-                  ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                  ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25'
               }`}
             >
               {isUploading ? (
                 <>
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  Ingesting Document...
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Ingesting & Parsing Document...</span>
                 </>
               ) : (
                 <>
-                  <BrainCircuit className="h-6 w-6" />
-                  Start Ingestion Pipeline
+                  <BrainCircuit className="h-5 w-5" />
+                  <span>Start Statutory Ingestion Pipeline</span>
                 </>
               )}
             </button>

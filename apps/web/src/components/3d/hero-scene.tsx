@@ -4,7 +4,7 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const NUM_NODES = 150;
+const NUM_NODES = 60;
 
 function SceneLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -20,10 +20,10 @@ function SceneLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean })
 
   const nodes = useMemo(() => {
     return Array.from({ length: NUM_NODES }, () => ({
-      x: (Math.random() - 0.5) * 20,
-      y: (Math.random() - 0.5) * 20,
-      z: (Math.random() - 0.5) * 10 - 5,
-      speed: Math.random() * 0.2 + 0.1,
+      x: (Math.random() - 0.5) * 16,
+      y: (Math.random() - 0.5) * 12,
+      z: (Math.random() - 0.5) * 8 - 3,
+      speed: Math.random() * 0.08 + 0.04,
       offset: Math.random() * Math.PI * 2,
     }));
   }, []);
@@ -33,7 +33,7 @@ function SceneLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean })
     if (prefersReducedMotion && meshRef.current) {
       nodes.forEach((node, i) => {
         dummy.position.set(node.x, node.y, node.z);
-        dummy.scale.set(1, 1, 1);
+        dummy.scale.set(0.6, 0.6, 0.6);
         dummy.updateMatrix();
         meshRef.current!.setMatrixAt(i, dummy.matrix);
       });
@@ -44,20 +44,20 @@ function SceneLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean })
   useFrame((state) => {
     if (prefersReducedMotion) return; // Freeze animation
     
-    const camZ = 5 + (scrollY * 0.005);
-    const camY = -(scrollY * 0.002);
+    const camZ = 5 + (scrollY * 0.002);
+    const camY = -(scrollY * 0.001);
     
-    state.camera.position.lerp(new THREE.Vector3(0, camY, camZ), 0.1);
+    state.camera.position.lerp(new THREE.Vector3(0, camY, camZ), 0.05);
     state.camera.lookAt(0, 0, 0);
 
     if (meshRef.current) {
       const time = state.clock.elapsedTime;
       
       nodes.forEach((node, i) => {
-        const x = node.x + Math.sin(time * node.speed + node.offset) * 2;
-        const y = node.y + Math.cos(time * node.speed + node.offset) * 2;
+        const x = node.x + Math.sin(time * node.speed + node.offset) * 0.4;
+        const y = node.y + Math.cos(time * node.speed + node.offset) * 0.4;
         const z = node.z;
-        const scale = Math.sin(time + node.offset) * 0.5 + 0.8;
+        const scale = (Math.sin(time * 0.8 + node.offset) * 0.15 + 0.5);
         
         dummy.position.set(x, y, z);
         dummy.scale.set(scale, scale, scale);
@@ -71,19 +71,20 @@ function SceneLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean })
 
   return (
     <>
-      <directionalLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
-      <directionalLight position={[-10, -10, -10]} intensity={1} color="#3b82f6" />
+      <directionalLight position={[10, 10, 10]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-10, -10, -10]} intensity={0.6} color="#3b82f6" />
       <ambientLight intensity={0.2} />
       
       <instancedMesh ref={meshRef} args={[undefined, undefined, NUM_NODES]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
+        <sphereGeometry args={[0.035, 16, 16]} />
         <meshPhysicalMaterial 
           color="#3b82f6" 
-          emissive="#1d4ed8"
-          emissiveIntensity={0.5}
-          roughness={0.2} 
-          metalness={0.8} 
-          transmission={0.5}
+          emissive="#1e40af"
+          emissiveIntensity={0.4}
+          roughness={0.3} 
+          metalness={0.7} 
+          transparent={true}
+          opacity={0.65}
         />
       </instancedMesh>
     </>
