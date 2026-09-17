@@ -76,25 +76,25 @@ function GlobeWireframe() {
   );
 }
 
-// Elegant subtle pinpoint node wave (calm, non-distracting)
-function SubtleGlowRing({ position, color = '#38bdf8' }: { position: THREE.Vector3; color?: string }) {
+// Animated Sonar Ping Ring
+function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; color?: string }) {
   const ringRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (ringRef.current) {
-      const t = (state.clock.elapsedTime * 0.8) % 2;
-      const scale = 1 + t * 0.8;
+      const t = (state.clock.elapsedTime * 1.5) % 2;
+      const scale = 1 + t * 1.5;
       ringRef.current.scale.set(scale, scale, scale);
       const material = ringRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = Math.max(0, 0.35 - t * 0.18);
+      material.opacity = Math.max(0, 0.5 - t * 0.25);
     }
   });
 
   return (
     <group position={position}>
       <mesh ref={ringRef} lookAt={() => position.clone().multiplyScalar(2)}>
-        <ringGeometry args={[0.045, 0.058, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
+        <ringGeometry args={[0.05, 0.07, 32]} />
+        <meshBasicMaterial color={color} transparent opacity={0.45} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -131,14 +131,14 @@ function JurisdictionMarker({
 
   useFrame(({ camera, clock }) => {
     if (meshRef.current) {
-      const pulse = isActiveSignal ? Math.sin(clock.elapsedTime * 4) * 0.2 : 0;
-      const targetScale = isSelected ? 1.5 : (hovered ? 1.35 : (isActiveSignal ? 1.2 + pulse : 1));
-      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.15);
+      const pulse = isActiveSignal ? Math.sin(clock.elapsedTime * 6) * 0.4 : 0;
+      const targetScale = isSelected ? 1.6 : (hovered ? 1.4 : (isActiveSignal ? 1.3 + pulse : 1));
+      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.2);
     }
-    // Only show tooltip when node faces towards camera (eliminates backface clumping)
+    // Only show 3D HTML tags when marker is facing towards camera (eliminates backface clumping)
     const normal = data.position.clone().normalize();
     const camDir = camera.position.clone().sub(data.position).normalize();
-    setIsFrontFacing(normal.dot(camDir) > 0.15);
+    setIsFrontFacing(normal.dot(camDir) > 0.12);
   });
 
   const markerColor = isSelected 
@@ -149,74 +149,119 @@ function JurisdictionMarker({
 
   return (
     <group position={data.position}>
-      {/* Subtle pulse wave on active / selected */}
-      {(isSelected || isActiveSignal) && (
-        <SubtleGlowRing 
+      {/* Sonar Ping Wave */}
+      {(isSelected || hovered || data.count > 0 || isActiveSignal) && (
+        <SonarPing 
           position={data.position} 
           color={isActiveSignal ? '#38bdf8' : markerColor} 
         />
       )}
 
-      {/* Main Core Pinpoint Node */}
+      {/* Main Core Node */}
       <mesh 
         ref={meshRef}
         onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = 'pointer'; }}
         onPointerOut={(e) => { e.stopPropagation(); setHovered(false); document.body.style.cursor = 'auto'; }}
         onClick={(e) => { e.stopPropagation(); onClick(); }}
       >
-        <sphereGeometry args={[0.04, 16, 16]} />
+        <sphereGeometry args={[0.045, 16, 16]} />
         <meshBasicMaterial color={markerColor} />
       </mesh>
       
       {/* Outer Halo */}
       <mesh>
-        <sphereGeometry args={[0.07, 16, 16]} />
-        <meshBasicMaterial color={markerColor} transparent opacity={isSelected ? 0.35 : (hovered ? 0.25 : 0.15)} />
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshBasicMaterial color={markerColor} transparent opacity={isSelected ? 0.45 : 0.25} />
       </mesh>
 
-      {/* Minimal, Sleek Tooltip — Only visible on deliberate hover or selection */}
-      {(hovered || isSelected) && isFrontFacing && (
-        <Html distanceFactor={11} zIndexRange={[30, 0]} center>
+      {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
+      {isFrontFacing && (
+        <Html distanceFactor={14} zIndexRange={[18, 0]} center>
           <div 
-            onClick={(e) => e.stopPropagation()}
-            className="font-sans bg-zinc-950/95 border border-zinc-700/80 py-2.5 px-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-52 transform -translate-y-16 pointer-events-auto select-none transition-all duration-200"
+            onClick={onClick}
+            className={`font-sans select-none whitespace-nowrap cursor-pointer px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-5 flex items-center gap-1 shadow-lg ${
+              isSelected
+                ? 'bg-amber-500/25 text-amber-300 border-amber-400/80 ring-2 ring-amber-400/40 scale-110 shadow-amber-500/20'
+                : (isActiveSignal
+                    ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/80 ring-2 ring-cyan-400/40 animate-pulse'
+                    : (data.count > 0
+                        ? 'bg-zinc-950/90 text-emerald-300 border-emerald-500/40 hover:border-emerald-400 hover:bg-zinc-900'
+                        : 'bg-zinc-950/90 text-zinc-400 border-zinc-700/60 hover:border-zinc-500 hover:text-zinc-200'))
+            }`}
           >
-            <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-zinc-800/80">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-sm shrink-0">{data.flag || '🌐'}</span>
-                <div className="min-w-0">
-                  <h4 className="text-xs font-bold text-white tracking-tight truncate leading-tight">{data.name}</h4>
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-400' : (data.count > 0 ? 'bg-emerald-400' : 'bg-blue-400')}`} />
+            <span>{data.jurisdiction}</span>
+            {data.count > 0 && (
+              <span className="ml-0.5 px-1 rounded-sm bg-emerald-500/20 text-emerald-400 text-[9px] font-bold">
+                {data.count}
+              </span>
+            )}
+          </div>
+        </Html>
+      )}
+
+      {/* Detailed Card when Hovered or Selected */}
+      {(hovered || isSelected) && isFrontFacing && (
+        <Html distanceFactor={11} zIndexRange={[25, 0]} center>
+          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-24 pointer-events-auto select-none">
+            <div className="flex items-center justify-between mb-1.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-base">{data.flag || '🌐'}</span>
+                <div>
+                  <h4 className="text-xs font-bold text-white leading-tight">{data.name}</h4>
                   <span className="text-[10px] text-zinc-400 font-mono">[{data.jurisdiction}]</span>
                 </div>
               </div>
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${data.count > 0 ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'}`}>
-                {data.count > 0 ? `${data.count} RULES` : 'ACTIVE'}
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${data.count > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                {data.count > 0 ? `${data.count} RULES` : 'SURVEILLANCE'}
               </span>
             </div>
 
-            <div className="mt-1.5 space-y-1 text-[10px] text-zinc-400">
-              <div className="flex justify-between items-center">
+            <div className="space-y-1.5 text-[11px] text-zinc-300 mt-2">
+              <div className="flex justify-between">
                 <span className="text-zinc-500">Authority:</span>
-                <span className="text-zinc-300 font-medium truncate max-w-[110px]" title={data.authority}>
+                <span className="text-zinc-300 font-medium truncate max-w-[130px] text-right" title={data.authority}>
                   {data.authority}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-500">Compliance:</span>
-                <span className="text-emerald-400 font-bold font-mono">{data.complianceScore.toFixed(1)}%</span>
+              <div className="flex justify-between">
+                <span className="text-zinc-500">Active Rulesets:</span>
+                <span className="text-white font-bold">{data.count} Framework{data.count !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-zinc-500">Compliance Health:</span>
+                <span className="text-emerald-400 font-bold">{data.complianceScore.toFixed(1)}%</span>
               </div>
             </div>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onInspectRegulations(data.jurisdiction);
-              }}
-              className="mt-2 w-full text-center text-[10px] font-medium py-1 px-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition-all flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>Inspect {data.jurisdiction} Rules</span>
-              <ExternalLink className="w-2.5 h-2.5" />
-            </button>
+            {data.regulations && data.regulations.length > 0 && (
+              <div className="mt-2.5 pt-2 border-t border-zinc-800/80">
+                <div className="text-[10px] text-zinc-500 uppercase font-semibold mb-1">Monitored In System:</div>
+                <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto custom-scrollbar">
+                  {data.regulations.slice(0, 3).map((r, i) => (
+                    <span key={i} className="text-[9px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-zinc-300 truncate max-w-[190px]">
+                      {r}
+                    </span>
+                  ))}
+                  {data.regulations.length > 3 && (
+                    <span className="text-[9px] text-zinc-500 self-center">+{data.regulations.length - 3} more</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInspectRegulations(data.jurisdiction);
+                }}
+                className="w-full text-center text-[10px] font-semibold py-1.5 px-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1.5 shadow-md"
+              >
+                Inspect {data.jurisdiction} Regulations
+                <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </Html>
       )}
@@ -224,7 +269,7 @@ function JurisdictionMarker({
   );
 }
 
-// Elegant, anti-aliased quadratic bezier streaming arc with calm traveling photon
+// Arc with traveling pulse animation
 function StreamingArc({ 
   start, 
   end, 
@@ -240,23 +285,23 @@ function StreamingArc({
   const curve = useMemo(() => {
     const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
     const distance = start.distanceTo(end);
-    const elevatedMidPoint = midPoint.clone().normalize().multiplyScalar(2 + distance * 0.28);
+    const elevatedMidPoint = midPoint.clone().normalize().multiplyScalar(2 + distance * 0.32);
     return new THREE.QuadraticBezierCurve3(start, elevatedMidPoint, end);
   }, [start, end]);
 
-  const points = useMemo(() => curve.getPoints(50), [curve]);
+  const points = useMemo(() => curve.getPoints(60), [curve]);
   const geometry = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
   
   useFrame((state) => {
     if (lineRef.current) {
       const material = lineRef.current.material as THREE.LineBasicMaterial;
       material.opacity = isHighlighted 
-        ? 0.35 + Math.sin(state.clock.elapsedTime * 2) * 0.15 
-        : 0.12;
+        ? 0.4 + Math.sin(state.clock.elapsedTime * 3) * 0.3 
+        : 0.15 + Math.sin(state.clock.elapsedTime * 1.5) * 0.1;
     }
 
     if (particleRef.current) {
-      const progress = (state.clock.elapsedTime * 0.25) % 1;
+      const progress = (state.clock.elapsedTime * 0.4) % 1;
       const point = curve.getPoint(progress);
       particleRef.current.position.copy(point);
     }
@@ -267,17 +312,17 @@ function StreamingArc({
       {/* @ts-ignore */}
       <line ref={lineRef} geometry={geometry}>
         <lineBasicMaterial 
-          color={isHighlighted ? "#fbbf24" : "#3b82f6"} 
+          color={isHighlighted ? "#fbbf24" : "#60a5fa"} 
           transparent 
-          opacity={0.15} 
-          linewidth={1} 
+          opacity={0.25} 
+          linewidth={isHighlighted ? 2 : 1} 
         />
       </line>
 
-      {/* Traveling Data Signal Photon */}
+      {/* Traveling Data Signal Particle */}
       <mesh ref={particleRef}>
-        <sphereGeometry args={[0.018, 8, 8]} />
-        <meshBasicMaterial color={isHighlighted ? "#fbbf24" : "#60a5fa"} />
+        <sphereGeometry args={[0.02, 8, 8]} />
+        <meshBasicMaterial color={isHighlighted ? "#f59e0b" : "#93c5fd"} />
       </mesh>
     </group>
   );
@@ -342,11 +387,14 @@ function GlobeScene({
           <sphereGeometry args={[0.08, 16, 16]} />
           <meshBasicMaterial color="#10b981" transparent opacity={0.25} />
         </mesh>
-        {/* Clean HQ pinpoint marker */}
-        <mesh>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshBasicMaterial color="#10b981" />
-        </mesh>
+        {isHqFrontFacing && (
+          <Html distanceFactor={14} zIndexRange={[15, 0]} center>
+            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-emerald-950/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>SF · HQ</span>
+            </div>
+          </Html>
+        )}
       </group>
     </group>
   );

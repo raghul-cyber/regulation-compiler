@@ -160,7 +160,6 @@ const STAGES: Stage[] = [
 
 export function HowItWorksDiagram() {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
-  const [copied, setCopied] = useState(false);
   const activeStage = STAGES[activeStageIndex];
 
   return (
@@ -293,29 +292,9 @@ export function HowItWorksDiagram() {
                     {activeStage.codeTitle}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-zinc-500 uppercase bg-zinc-800 px-2 py-0.5 rounded hidden sm:inline-block">
-                    SYNTACTIC AST
-                  </span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(activeStage.codeSnippet);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="px-2 py-0.5 text-[10px] font-mono text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded transition-all cursor-pointer flex items-center gap-1"
-                    title="Copy snippet"
-                  >
-                    {copied ? (
-                      <>
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        <span className="text-emerald-400">Copied</span>
-                      </>
-                    ) : (
-                      <span>Copy</span>
-                    )}
-                  </button>
-                </div>
+                <span className="text-[10px] font-mono text-zinc-500 uppercase bg-zinc-800 px-2 py-0.5 rounded">
+                  SYNTACTIC AST
+                </span>
               </div>
               <div className="p-4 overflow-x-auto max-h-[340px] custom-scrollbar">
                 <pre className="text-xs font-mono text-zinc-300 leading-relaxed">
