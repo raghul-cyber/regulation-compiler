@@ -588,30 +588,30 @@ export function CoverageGlobe({
         </div>
       </div>
 
-      {/* Bottom Overlay: Node Legend & Arcs Note */}
-      <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-6 sm:right-6 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pointer-events-none">
-        {/* Node Legend HUD */}
-        <div className="p-2 px-3 rounded-lg bg-zinc-950/90 border border-zinc-800/80 backdrop-blur-md text-[11px] text-zinc-400 flex flex-wrap items-center gap-3 shadow-md">
+      {/* Bottom Overlay: Node Legend & Arcs Note (Both in single line separately without overlapping) */}
+      <div className="absolute bottom-3 left-4 right-4 sm:bottom-4 sm:left-5 sm:right-5 z-30 flex items-center justify-between gap-3 pointer-events-none">
+        {/* Node Legend HUD (Single line, strictly no wrapping) */}
+        <div className="px-3 py-1.5 rounded-lg bg-zinc-950/90 border border-zinc-800/80 backdrop-blur-md text-[10px] text-zinc-400 flex items-center flex-nowrap whitespace-nowrap gap-3 shadow-md shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-            <span className="whitespace-nowrap">HQ Base (SF)</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 shrink-0" />
+            <span>HQ Base (SF)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="whitespace-nowrap">Active Rules</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span>Active Rules</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-400" />
-            <span className="whitespace-nowrap">Surveillance Node</span>
+            <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+            <span>Surveillance Node</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="whitespace-nowrap">Selected</span>
+            <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+            <span>Selected</span>
           </div>
         </div>
 
-        {/* Arcs Note */}
-        <div className="text-[10px] sm:text-[11px] text-zinc-500 sm:text-right leading-tight drop-shadow max-w-sm">
+        {/* Arcs Note (Single line, strictly no wrapping) */}
+        <div className="text-[10px] text-zinc-500 whitespace-nowrap text-right shrink-0 drop-shadow">
           *Streaming arcs indicate encrypted continuous telemetry reach from HQ
         </div>
       </div>
