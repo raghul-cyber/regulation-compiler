@@ -509,77 +509,83 @@ export function CoverageGlobe({
       {/* Dynamic Background Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950/80 to-[#070709] pointer-events-none" />
       
-      {/* Top Left: Title & Live Surveillance Status */}
-      <div className="absolute top-5 left-6 z-30 pointer-events-none">
-        <div className="flex items-center gap-2 mb-1.5">
-          <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-            Global Jurisdiction Monitoring
-          </h3>
-          <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-            LIVE SURVEILLANCE
-          </span>
+      {/* Top Header Overlay: Title, Status, and Controls */}
+      <div className="absolute top-4 left-4 right-4 sm:top-5 sm:left-6 sm:right-6 z-30 flex flex-col md:flex-row md:items-start justify-between gap-3 pointer-events-none">
+        {/* Left: Title & Live Surveillance Status */}
+        <div className="pointer-events-none max-w-md">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              Global Jurisdiction Monitoring
+            </h3>
+            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+              LIVE SURVEILLANCE
+            </span>
+          </div>
+          <p className="text-zinc-400 text-xs leading-relaxed hidden sm:block">
+            Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking.
+          </p>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-blue-400 shadow-sm">
+              {markers.length} Global Nodes Active
+            </span>
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-emerald-400 shadow-sm">
+              {activeRegionsCount} Active Jurisdictions ({totalActiveRulesets} Rulesets)
+            </span>
+          </div>
         </div>
-        <p className="text-zinc-400 text-xs max-w-sm leading-relaxed">
-          Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking.
-        </p>
-        <div className="flex items-center gap-2 mt-2.5">
-          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-blue-400 shadow-sm">
-            {markers.length} Global Nodes Active
-          </span>
-          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-emerald-400 shadow-sm">
-            {activeRegionsCount} Active Jurisdictions ({totalActiveRulesets} Rulesets)
-          </span>
+
+        {/* Right: Telemetry & Controls HUD */}
+        <div className="flex items-center gap-2 pointer-events-auto shrink-0 self-start md:self-auto">
+          <button
+            onClick={() => setAutoRotate(!autoRotate)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm ${
+              autoRotate
+                ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 hover:bg-blue-600/30'
+                : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white'
+            }`}
+            title="Toggle Auto Rotation"
+          >
+            <Compass className={`w-3.5 h-3.5 ${autoRotate ? 'animate-spin' : ''}`} />
+            <span>{autoRotate ? 'Orbit On' : 'Orbit Paused'}</span>
+          </button>
+
+          <button
+            onClick={() => router.push('/regulations')}
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <Layers className="w-3.5 h-3.5 text-zinc-400" />
+            <span>All Regulations</span>
+          </button>
         </div>
       </div>
 
-      {/* Top Right: Telemetry & Controls HUD */}
-      <div className="absolute top-5 right-6 z-30 flex items-center gap-2">
-        <button
-          onClick={() => setAutoRotate(!autoRotate)}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm ${
-            autoRotate
-              ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 hover:bg-blue-600/30'
-              : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white'
-          }`}
-          title="Toggle Auto Rotation"
-        >
-          <Compass className={`w-3.5 h-3.5 ${autoRotate ? 'animate-spin' : ''}`} />
-          <span>{autoRotate ? 'Orbit On' : 'Orbit Paused'}</span>
-        </button>
+      {/* Bottom Overlay: Node Legend & Arcs Note */}
+      <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-6 sm:right-6 z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pointer-events-none">
+        {/* Node Legend HUD */}
+        <div className="p-2 px-3 rounded-lg bg-zinc-950/90 border border-zinc-800/80 backdrop-blur-md text-[11px] text-zinc-400 flex flex-wrap items-center gap-3 shadow-md">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+            <span className="whitespace-nowrap">HQ Base (SF)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="whitespace-nowrap">Active Rules</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400" />
+            <span className="whitespace-nowrap">Surveillance Node</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <span className="whitespace-nowrap">Selected</span>
+          </div>
+        </div>
 
-        <button
-          onClick={() => router.push('/regulations')}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
-        >
-          <Layers className="w-3.5 h-3.5 text-zinc-400" />
-          <span>All Regulations</span>
-        </button>
-      </div>
-
-      {/* Bottom Left: Node Legend HUD */}
-      <div className="absolute bottom-5 left-6 z-30 p-2 rounded-lg bg-zinc-950/85 border border-zinc-800/80 backdrop-blur-md text-[11px] text-zinc-400 flex flex-wrap items-center gap-3.5 pointer-events-none shadow-md">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
-          <span>HQ Base (SF)</span>
+        {/* Arcs Note */}
+        <div className="text-[10px] sm:text-[11px] text-zinc-500 sm:text-right leading-tight drop-shadow max-w-sm">
+          *Streaming arcs indicate encrypted continuous telemetry reach from HQ
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Active Rules</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-400" />
-          <span>Surveillance Node</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-400" />
-          <span>Selected</span>
-        </div>
-      </div>
-
-      {/* Bottom Right: Arcs Note */}
-      <div className="absolute bottom-5 right-6 z-30 text-[11px] text-zinc-500 pointer-events-none">
-        *Streaming arcs indicate encrypted continuous telemetry reach from HQ
       </div>
 
       {/* 3D Canvas */}
