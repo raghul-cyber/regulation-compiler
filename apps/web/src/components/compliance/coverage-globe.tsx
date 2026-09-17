@@ -134,11 +134,14 @@ function JurisdictionMarker({
       const pulse = isActiveSignal ? Math.sin(clock.elapsedTime * 6) * 0.4 : 0;
       const targetScale = isSelected ? 1.6 : (hovered ? 1.4 : (isActiveSignal ? 1.3 + pulse : 1));
       meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.2);
+
+      // Only show 3D HTML tags when marker is facing towards camera (eliminates backface clumping)
+      const worldPos = new THREE.Vector3();
+      meshRef.current.getWorldPosition(worldPos);
+      const normal = worldPos.clone().sub(new THREE.Vector3(0, -0.15, 0)).normalize();
+      const camDir = camera.position.clone().sub(worldPos).normalize();
+      setIsFrontFacing(normal.dot(camDir) > 0.12);
     }
-    // Only show 3D HTML tags when marker is facing towards camera (eliminates backface clumping)
-    const normal = data.position.clone().normalize();
-    const camDir = camera.position.clone().sub(data.position).normalize();
-    setIsFrontFacing(normal.dot(camDir) > 0.12);
   });
 
   const markerColor = isSelected 
@@ -176,10 +179,10 @@ function JurisdictionMarker({
 
       {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
       {isFrontFacing && (
-        <Html distanceFactor={14} zIndexRange={[18, 0]} center>
+        <Html distanceFactor={6.2} zIndexRange={[18, 0]} center>
           <div 
             onClick={onClick}
-            className={`font-sans select-none whitespace-nowrap cursor-pointer px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-5 flex items-center gap-1 shadow-lg ${
+            className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-full text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-3.5 flex items-center gap-1 shadow-lg ${
               isSelected
                 ? 'bg-amber-500/25 text-amber-300 border-amber-400/80 ring-2 ring-amber-400/40 scale-110 shadow-amber-500/20'
                 : (isActiveSignal
@@ -192,7 +195,7 @@ function JurisdictionMarker({
             <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-400' : (data.count > 0 ? 'bg-emerald-400' : 'bg-blue-400')}`} />
             <span>{data.jurisdiction}</span>
             {data.count > 0 && (
-              <span className="ml-0.5 px-1 rounded-sm bg-emerald-500/20 text-emerald-400 text-[9px] font-bold">
+              <span className="ml-0.5 px-1 rounded-sm bg-emerald-500/20 text-emerald-400 text-[8px] font-bold">
                 {data.count}
               </span>
             )}
@@ -202,8 +205,8 @@ function JurisdictionMarker({
 
       {/* Detailed Card when Hovered or Selected */}
       {(hovered || isSelected) && isFrontFacing && (
-        <Html distanceFactor={11} zIndexRange={[25, 0]} center>
-          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-24 pointer-events-auto select-none">
+        <Html distanceFactor={7.5} zIndexRange={[25, 0]} center>
+          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-20 pointer-events-auto select-none">
             <div className="flex items-center justify-between mb-1.5 border-b border-zinc-800 pb-1.5">
               <div className="flex items-center gap-2">
                 <span className="text-base">{data.flag || '🌐'}</span>
@@ -285,7 +288,7 @@ function StreamingArc({
   const curve = useMemo(() => {
     const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
     const distance = start.distanceTo(end);
-    const elevatedMidPoint = midPoint.clone().normalize().multiplyScalar(2 + distance * 0.32);
+    const elevatedMidPoint = midPoint.clone().normalize().multiplyScalar(2 + distance * 0.28);
     return new THREE.QuadraticBezierCurve3(start, elevatedMidPoint, end);
   }, [start, end]);
 
@@ -343,15 +346,20 @@ function GlobeScene({
 }) {
   const homePosition = useMemo(() => latLongToVector3(HOME_COORD[0], HOME_COORD[1], 2), []);
   const [isHqFrontFacing, setIsHqFrontFacing] = useState(true);
+  const hqRef = useRef<THREE.Group>(null);
 
   useFrame(({ camera }) => {
-    const normal = homePosition.clone().normalize();
-    const camDir = camera.position.clone().sub(homePosition).normalize();
-    setIsHqFrontFacing(normal.dot(camDir) > 0.12);
+    if (hqRef.current) {
+      const worldPos = new THREE.Vector3();
+      hqRef.current.getWorldPosition(worldPos);
+      const normal = worldPos.clone().sub(new THREE.Vector3(0, -0.15, 0)).normalize();
+      const camDir = camera.position.clone().sub(worldPos).normalize();
+      setIsHqFrontFacing(normal.dot(camDir) > 0.12);
+    }
   });
 
   return (
-    <group position={[0, -0.25, 0]}>
+    <group position={[0, -0.15, 0]} scale={0.5}>
       <GlobeWireframe />
       
       {/* All Monitored Jurisdiction Markers */}
@@ -378,7 +386,7 @@ function GlobeScene({
       })}
 
       {/* Central HQ Base (San Francisco) */}
-      <group position={homePosition}>
+      <group ref={hqRef} position={homePosition}>
         <mesh>
           <sphereGeometry args={[0.045, 16, 16]} />
           <meshBasicMaterial color="#10b981" />
@@ -388,8 +396,8 @@ function GlobeScene({
           <meshBasicMaterial color="#10b981" transparent opacity={0.25} />
         </mesh>
         {isHqFrontFacing && (
-          <Html distanceFactor={14} zIndexRange={[15, 0]} center>
-            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-emerald-950/50">
+          <Html distanceFactor={6.2} zIndexRange={[15, 0]} center>
+            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full text-[8px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-3.5 flex items-center gap-1 shadow-md shadow-emerald-950/50">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>SF · HQ</span>
             </div>
@@ -576,7 +584,7 @@ export function CoverageGlobe({
 
       {/* 3D Canvas */}
       <Canvas 
-        camera={{ position: [0, -0.2, 5.9], fov: 45 }} 
+        camera={{ position: [0, -0.15, 5.9], fov: 45 }} 
         dpr={[1, 2]}
         gl={{
           antialias: true,
@@ -616,7 +624,7 @@ export function CoverageGlobe({
           maxDistance={5.9}
           autoRotate={autoRotate}
           autoRotateSpeed={0.75}
-          target={[0, -0.2, 0]}
+          target={[0, -0.15, 0]}
         />
       </Canvas>
     </div>
