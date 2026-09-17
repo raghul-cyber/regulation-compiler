@@ -179,10 +179,10 @@ function JurisdictionMarker({
 
       {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
       {isFrontFacing && (
-        <Html distanceFactor={6.2} zIndexRange={[18, 0]} center>
+        <Html distanceFactor={7} zIndexRange={[18, 0]} center>
           <div 
             onClick={onClick}
-            className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-full text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-3.5 flex items-center gap-1 shadow-lg ${
+            className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-full text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
               isSelected
                 ? 'bg-amber-500/25 text-amber-300 border-amber-400/80 ring-2 ring-amber-400/40 scale-110 shadow-amber-500/20'
                 : (isActiveSignal
@@ -205,8 +205,8 @@ function JurisdictionMarker({
 
       {/* Detailed Card when Hovered or Selected */}
       {(hovered || isSelected) && isFrontFacing && (
-        <Html distanceFactor={7.5} zIndexRange={[25, 0]} center>
-          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-20 pointer-events-auto select-none">
+        <Html distanceFactor={8} zIndexRange={[25, 0]} center>
+          <div className="font-sans bg-zinc-950/95 border border-zinc-700/80 p-3 rounded-xl shadow-2xl backdrop-blur-xl text-left w-64 transform -translate-y-22 pointer-events-auto select-none">
             <div className="flex items-center justify-between mb-1.5 border-b border-zinc-800 pb-1.5">
               <div className="flex items-center gap-2">
                 <span className="text-base">{data.flag || '🌐'}</span>
@@ -359,7 +359,7 @@ function GlobeScene({
   });
 
   return (
-    <group position={[0, -0.15, 0]} scale={0.5}>
+    <group position={[0, -0.15, 0]} scale={0.65}>
       <GlobeWireframe />
       
       {/* All Monitored Jurisdiction Markers */}
@@ -396,8 +396,8 @@ function GlobeScene({
           <meshBasicMaterial color="#10b981" transparent opacity={0.25} />
         </mesh>
         {isHqFrontFacing && (
-          <Html distanceFactor={6.2} zIndexRange={[15, 0]} center>
-            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full text-[8px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-3.5 flex items-center gap-1 shadow-md shadow-emerald-950/50">
+          <Html distanceFactor={7} zIndexRange={[15, 0]} center>
+            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full text-[8px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-emerald-950/50">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>SF · HQ</span>
             </div>
