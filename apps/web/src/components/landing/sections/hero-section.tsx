@@ -17,8 +17,8 @@ export function HeroSection() {
 
   return (
     <section 
-      id="hero" 
-      className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center pt-10 scroll-mt-24"
+      id="product" 
+      className="w-full flex flex-col items-center text-center pt-24 sm:pt-28 md:pt-32 scroll-mt-28"
     >
       {/* Small Technical Eyebrow Badge */}
       <div className="inline-flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-[#080D13]/90 border border-[#17222C] text-xs font-semibold text-[#9AA9B5] mb-8 backdrop-blur-md shadow-lg shadow-black/40 hover:border-[#1E2C38] transition-colors">

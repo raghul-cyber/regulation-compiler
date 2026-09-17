@@ -21,7 +21,7 @@ export default function LandingPage() {
       <LandingScrollHUD />
 
       {/* 12-Section Continuous Story Narrative Container */}
-      <div className="relative z-10 w-full min-h-[150vh] pointer-events-none -mt-8 space-y-28 pb-24">
+      <div className="relative z-10 w-full min-h-[150vh] pointer-events-none space-y-28 pb-24">
         {/* Section 02 — Hero Entry & Product Preview */}
         <HeroSection />
 

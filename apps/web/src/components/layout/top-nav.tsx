@@ -42,8 +42,8 @@ export function TopNav() {
         <div
           className={`max-w-7xl mx-auto flex items-center justify-between px-5 py-2.5 rounded-2xl transition-all duration-300 pointer-events-auto ${
             isScrolled
-              ? 'bg-[#080D13]/85 backdrop-blur-xl border border-[#17222C] shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
-              : 'bg-transparent border border-transparent'
+              ? 'bg-[#080D13]/95 backdrop-blur-2xl border border-[#17222C] shadow-[0_8px_32px_rgba(0,0,0,0.6)]'
+              : 'bg-[#080D13]/80 backdrop-blur-xl border border-[#17222C]/70 shadow-[0_4px_24px_rgba(0,0,0,0.35)]'
           }`}
         >
           {/* Brand Wordmark & Tactical Monogram */}
@@ -137,7 +137,7 @@ export function TopNav() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-2 max-w-6xl mx-auto rounded-2xl border border-[#17222C] bg-[#080D13]/95 backdrop-blur-xl p-4 space-y-3 pointer-events-auto font-mono text-xs shadow-2xl">
             <a
-              href="#hero"
+              href="#product"
               onClick={() => setMobileMenuOpen(false)}
               className="block py-2 text-[#9AA9B5] hover:text-[#F2F6F8]"
             >
