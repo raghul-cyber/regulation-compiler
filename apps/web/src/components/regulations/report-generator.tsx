@@ -20,7 +20,6 @@ const REPORT_STAGES = [
   { num: 5, name: 'Secure Storage Upload' }
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://regulation-compiler.onrender.com/api/v1';
 
 export function ReportGenerator({ regulationId, getToken }: { regulationId: string, getToken: () => Promise<string | null> }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,24 +78,18 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
 
   const resolveDownloadUrl = (pathOrUrl: string) => {
     if (!pathOrUrl) return null;
+    const renderBase = 'https://regulation-compiler.onrender.com';
     const isLocalUrl = pathOrUrl.includes('127.0.0.1') || pathOrUrl.includes('localhost');
     const isCurrentEnvLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const effectiveBase = isCurrentEnvLocal ? 'http://127.0.0.1:8080' : renderBase;
 
     if (pathOrUrl.startsWith('http')) {
       if (isLocalUrl && !isCurrentEnvLocal) {
-        return `${API_BASE.replace('/api/v1', '')}/api/v1/reports/${reportId}/download`;
+        return `${renderBase}/api/v1/reports/${reportId}/download`;
       }
       return pathOrUrl;
     }
-    return `${API_BASE.replace('/api/v1', '')}${pathOrUrl}`;
-  };
-
-  const getEffectiveApiBase = () => {
-    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-      return 'http://127.0.0.1:8080/api/v1';
-    }
-    return API_BASE;
+    return `${effectiveBase}${pathOrUrl}`;
   };
 
   useEffect(() => {
@@ -107,17 +100,9 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
     let pollTimer: NodeJS.Timeout | null = null;
 
     const connectSSE = async () => {
-      let token = "";
-      try {
-        if (getToken) {
-          token = await getToken() || "";
-        }
-      } catch (e) {
-        // Fallback for local testing or unauthenticated mode
-      }
-
-      const activeBase = getEffectiveApiBase();
-      const sseUrl = `${activeBase}/jobs/${jobId}/events${token ? `?token=${token}` : ''}`;
+      // Always use the Next.js proxy route to avoid direct CORS calls to Render
+      // The proxy (apps/web/src/app/api/jobs/[id]/events/route.ts) forwards to backend server-side
+      const sseUrl = `/api/jobs/${jobId}/events`;
       eventSource = new EventSource(sseUrl);
 
       eventSource.onmessage = (event) => {
