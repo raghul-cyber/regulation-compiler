@@ -4,7 +4,7 @@ import time
 import shutil
 import logging
 from typing import Optional
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -118,6 +118,14 @@ app.add_middleware(IdempotencyGuardMiddleware)
 # 8. CORS Middleware
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+        "https://regulation-compiler-web.vercel.app",
+        "https://regulation-compiler.onrender.com",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ],
     allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=['*'],
@@ -125,6 +133,23 @@ app.add_middleware(
     expose_headers=['*', 'X-Idempotent-Replay', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'],
     max_age=86400,
 )
+
+# Explicit global preflight OPTIONS handler guaranteeing 200 OK with CORS on any endpoint
+@app.options("/{full_path:path}")
+async def preflight_options_handler(full_path: str, request: Request):
+    origin = request.headers.get("origin") or "*"
+    req_headers = request.headers.get("access-control-request-headers") or "*"
+    return Response(
+        content="OK",
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+            "Access-Control-Allow-Headers": req_headers,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "86400",
+        }
+    )
 
 app.state.limiter = limiter
 

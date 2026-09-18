@@ -2,8 +2,18 @@ import { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '');
+function getBackendBaseUrl(): string {
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    const pubUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (pubUrl && !pubUrl.includes('127.0.0.1') && !pubUrl.includes('localhost')) {
+      return pubUrl.replace(/\/+$/, '');
+    }
+    return 'https://regulation-compiler.onrender.com/api/v1';
+  }
+  return (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
+}
+
+const API_BASE_URL = getBackendBaseUrl();
 
 export async function GET(req: NextRequest) {
   // Attempt to proxy upstream SSE stream from FastAPI

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AdminOverview } from '@/components/admin/admin-overview';
 
 const SUPER_ADMIN_EMAIL = 'rcraghul12@gmail.com';
+const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
 
 export default function AdminPage() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -21,11 +22,14 @@ export default function AdminPage() {
     );
   }
 
-  // Extract user email
+  // Extract user email and Clerk user ID
   const userEmails = user?.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || (userEmails[0] || '');
 
-  const isSuperAdmin = primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() || userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase());
+  const isSuperAdmin = 
+    primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() || 
+    userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+    user?.id === SUPER_ADMIN_CLERK_ID;
 
   // If not super-admin, display strict security-grade 403 Access Denied
   if (!isSignedIn || !isSuperAdmin) {

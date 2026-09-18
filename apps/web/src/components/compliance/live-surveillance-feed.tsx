@@ -158,7 +158,8 @@ export function LiveSurveillanceFeed({
     };
   }, [isLive, onNewSignal]);
 
-  // Continuous 24/7 automatic live stream polling every 1 second (guaranteed heartbeat)
+  // Resilient fallback polling every 15 seconds (SSE stream handles real-time 1s updates;
+  // this poll is a safety net for when the SSE connection drops or is unavailable)
   useEffect(() => {
     if (!isLive) return;
 
@@ -185,9 +186,9 @@ export function LiveSurveillanceFeed({
           }
         }
       } catch (err) {
-        console.warn("Live 24/7 feed sync check:", err);
+        // Silent - SSE stream is the primary live channel
       }
-    }, 1000);
+    }, 15000);
 
     return () => clearInterval(interval);
   }, [isLive, fetchFeedAction, onNewSignal]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { getRegulations, getGlobalMonitoringData, getMonitoringFeed, triggerSurveillanceProbe } from './actions';
 import { LiveSurveillanceFeed, FeedEvent } from '@/components/compliance/live-surveillance-feed';
 import dynamic from 'next/dynamic';
@@ -82,10 +82,17 @@ export function CoverageView() {
   };
 
 
-  // Provide ultra-low latency callback to feed component for 1-second live polling
+  // Feed fetch callback for live surveillance component (called every 15s by fallback poller;
+  // real-time updates are pushed via the SSE stream at 1s cadence)
+  const isFetchingFeedRef = useRef(false);
   const handleFetchFeed = useCallback(async (): Promise<FeedEvent[]> => {
+    if (isFetchingFeedRef.current) return [];
+    isFetchingFeedRef.current = true;
     try {
-      const res = await fetch('/api/compliance/feed?limit=25', { cache: 'no-store' });
+      const res = await fetch('/api/compliance/feed?limit=25', {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+      });
       if (res.ok) {
         const json = await res.json();
         if (Array.isArray(json?.data) && json.data.length > 0) {
@@ -94,8 +101,14 @@ export function CoverageView() {
       }
     } catch {
       // Fallback seamlessly to server action
+    } finally {
+      isFetchingFeedRef.current = false;
     }
-    return await getMonitoringFeed(25);
+    try {
+      return await getMonitoringFeed(25);
+    } catch {
+      return [];
+    }
   }, []);
 
   const jurisdictionsList = useMemo(() => {
