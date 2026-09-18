@@ -82,8 +82,19 @@ export function CoverageView() {
   };
 
 
-  // Provide stable callback to feed component for real-time live polling
+  // Provide ultra-low latency callback to feed component for 1-second live polling
   const handleFetchFeed = useCallback(async (): Promise<FeedEvent[]> => {
+    try {
+      const res = await fetch('/api/compliance/feed?limit=25', { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json?.data) && json.data.length > 0) {
+          return json.data;
+        }
+      }
+    } catch {
+      // Fallback seamlessly to server action
+    }
     return await getMonitoringFeed(25);
   }, []);
 

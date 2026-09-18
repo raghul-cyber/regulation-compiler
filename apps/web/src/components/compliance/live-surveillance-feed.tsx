@@ -106,7 +106,59 @@ export function LiveSurveillanceFeed({
     }
   }, [selectedJurisdiction]);
 
-  // Continuous 24/7 automatic live stream polling every 3 seconds
+  // High-Frequency Real-Time Server-Sent Events (SSE) Stream (1s live cadence)
+  useEffect(() => {
+    if (!isLive || typeof window === 'undefined') return;
+
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource('/api/compliance/stream');
+
+      eventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === 'heartbeat' || payload.type === 'signal') {
+            setSecondsAgo(0);
+            setLastUpdated(new Date());
+
+            if (payload.latest_signal) {
+              const sig = payload.latest_signal;
+              const currentEvents = eventsRef.current;
+              const exists = currentEvents.some(e => e.id === sig.id);
+              if (!exists) {
+                const updated = deduplicateEvents([sig, ...currentEvents]);
+                setEvents(updated);
+                setLatestNewSignal(sig);
+                setNewEventFlash(true);
+                setTimeout(() => setNewEventFlash(false), 3000);
+                if (onNewSignal) {
+                  onNewSignal(sig.jurisdiction);
+                }
+              }
+            }
+          }
+        } catch {
+          // Ignore parse errors on keepalive pings
+        }
+      };
+
+      eventSource.onerror = () => {
+        if (eventSource) {
+          eventSource.close();
+        }
+      };
+    } catch {
+      // Fallback cleanly to 1s interval polling
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [isLive, onNewSignal]);
+
+  // Continuous 24/7 automatic live stream polling every 1 second (guaranteed heartbeat)
   useEffect(() => {
     if (!isLive) return;
 
@@ -135,7 +187,7 @@ export function LiveSurveillanceFeed({
       } catch (err) {
         console.warn("Live 24/7 feed sync check:", err);
       }
-    }, 8000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [isLive, fetchFeedAction, onNewSignal]);
@@ -268,16 +320,16 @@ export function LiveSurveillanceFeed({
                 Live Regulatory Surveillance Feed
               </h3>
               <span className={`px-2 py-0.5 text-[10px] font-extrabold rounded-full ${isLive ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-zinc-800 text-zinc-500'}`}>
-                {isLive ? '24/7 AUTO-UPDATE ACTIVE' : 'PAUSED'}
+                {isLive ? '24/7 LIVE STREAM (1s)' : 'PAUSED'}
               </span>
             </div>
             <p className="text-[11px] text-zinc-400 flex items-center gap-1.5 mt-0.5 flex-wrap">
               <span className="text-emerald-400 font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Continuous stream (3s)
+                Continuous stream (1s)
               </span>
               <span>•</span>
-              <span>Auto-sweep in: ~{Math.max(1, 25 - (secondsAgo % 25))}s</span>
+              <span>Auto-sweep in: ~{Math.max(1, 10 - (secondsAgo % 10))}s</span>
               <span>•</span>
               <span className="text-zinc-500">Synced {secondsAgo}s ago</span>
             </p>

@@ -345,7 +345,7 @@ def startup_event():
     # Safely launch continuous 24/7 statutory surveillance daemon in background thread
     try:
         if os.getenv("ENABLE_SURVEILLANCE_DAEMON", "true").lower() != "false":
-            interval = int(os.getenv("SURVEILLANCE_INTERVAL", "180"))
+            interval = int(os.getenv("SURVEILLANCE_INTERVAL", "10"))
             start_24_7_surveillance_worker(interval_seconds=interval)
             logging.getLogger("app.main").info(f"24/7 Live Regulatory Surveillance Worker spawned in background thread ({interval}s interval).")
     except Exception as e:
