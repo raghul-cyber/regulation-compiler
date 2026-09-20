@@ -122,7 +122,8 @@ def fetch_live_clerk_users(force_refresh: bool = False) -> List[Dict[str, Any]]:
                 "https://api.clerk.com/v1/users?limit=100&order_by=-created_at",
                 headers={
                     "Authorization": f"Bearer {secret_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "User-Agent": "RegCompiler-Admin/1.0 (Live Directory Integration)"
                 }
             )
             if resp.status_code != 200:
