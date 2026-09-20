@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { getRegulations, getGlobalMonitoringData, getMonitoringFeed, triggerSurveillanceProbe } from './actions';
 import { LiveSurveillanceFeed, FeedEvent } from '@/components/compliance/live-surveillance-feed';
-import { WebsiteComplianceAuditor } from '@/components/compliance/website-compliance-auditor';
 import dynamic from 'next/dynamic';
 import { 
   Loader2, 
@@ -201,11 +200,6 @@ export function CoverageView() {
             <span>MAS & EDPB stream linked</span>
           </div>
         </div>
-      </div>
-
-      {/* Autonomous Website Compliance Auditor Module (Full-Stack Crawl • Zero Mocks) */}
-      <div id="website-compliance-auditor" className="w-full scroll-mt-6">
-        <WebsiteComplianceAuditor />
       </div>
 
       {/* Main Command Center: 3D Globe + Live Surveillance Feed */}

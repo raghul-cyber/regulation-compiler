@@ -17,7 +17,7 @@ const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState('coverage');
+  const [activeTab, setActiveTab] = useState('website_auditor');
 
   // Strict security gate: MiroFish Swarm Traffic is restricted exclusively to administrator logins (rcraghul12@gmail.com).
   // Non-admin accounts (and standard tenant organizations) must NEVER see or access swarm simulation.
@@ -39,10 +39,10 @@ export default function DashboardPage() {
     }
   }, [user, isLoaded]);
 
-  // Tab list dynamically includes Website Auditor, 24/7 Actions and MiroFish Swarm Traffic
+  // Tab list includes Website Audits first (before Global Monitoring), 24/7 Actions and MiroFish Swarm Traffic
   const tabs = [
+    { id: 'website_auditor', label: 'Website Audits', isNew: true },
     { id: 'coverage', label: 'Global Monitoring' },
-    { id: 'website_auditor', label: 'Website Audit Agent', isNew: true },
     { id: 'actions_24_7', label: '24/7 Actions' },
     ...(isAdmin ? [{ id: 'swarm', label: 'MiroFish Swarm Traffic', adminOnly: true }] : []),
     { id: 'policies', label: 'Policies & Evaluation' },
@@ -111,8 +111,8 @@ export default function DashboardPage() {
       </div>
 
       <div className="pt-4">
-        {activeTab === 'coverage' && <CoverageView />}
         {activeTab === 'website_auditor' && <WebsiteComplianceAuditor />}
+        {activeTab === 'coverage' && <CoverageView />}
         {activeTab === 'actions_24_7' && <Actions247View />}
         {activeTab === 'swarm' && isAdmin && <SwarmSimulationView />}
         {activeTab === 'policies' && <PoliciesView onNavigateTab={(tab) => setActiveTab(tab)} />}
