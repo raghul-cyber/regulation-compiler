@@ -641,11 +641,7 @@ export default function NewRegulationPage() {
 
       <PaywallModal
         isOpen={isPaywallOpen}
-        onClose={() => {
-          if (!isLimitReached) {
-            setIsPaywallOpen(false);
-          }
-        }}
+        onClose={() => setIsPaywallOpen(false)}
         freeUsesUsed={paywallData.used}
         freeUsesLimit={paywallData.limit}
         isBlocking={isLimitReached}

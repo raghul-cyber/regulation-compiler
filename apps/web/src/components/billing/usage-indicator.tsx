@@ -118,14 +118,10 @@ export function UsageIndicator() {
 
       <PaywallModal
         isOpen={isPaywallOpen}
-        onClose={() => {
-          if (!isExhausted) {
-            setIsPaywallOpen(false);
-          }
-        }}
+        onClose={() => setIsPaywallOpen(false)}
         freeUsesUsed={used}
         freeUsesLimit={limit}
-        isBlocking={isExhausted}
+        isBlocking={false}
       />
     </>
   );

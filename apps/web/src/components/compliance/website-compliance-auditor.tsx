@@ -967,11 +967,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       {/* Authoritative Blocking Paywall Modal */}
       <PaywallModal
         isOpen={isPaywallOpen}
-        onClose={() => {
-          if (!isLimitReached) {
-            setIsPaywallOpen(false);
-          }
-        }}
+        onClose={() => setIsPaywallOpen(false)}
         freeUsesUsed={billingStatus?.free_usage?.used ?? 3}
         freeUsesLimit={billingStatus?.free_usage?.limit ?? 3}
         reason={paywallReason}
