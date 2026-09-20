@@ -7,8 +7,9 @@ import { GapAnalysis } from '@/components/compliance/gap-analysis';
 import { ComplianceChecklist } from '@/components/compliance/compliance-checklist';
 import { SwarmSimulationView } from '@/components/compliance/swarm-simulation-view';
 import { Actions247View } from '@/components/compliance/actions-247-view';
+import { WebsiteComplianceAuditor } from '@/components/compliance/website-compliance-auditor';
 import { CoverageView } from './coverage-view';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Sparkles } from 'lucide-react';
 
 const SUPER_ADMIN_EMAIL = 'rcraghul12@gmail.com';
 const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
@@ -38,9 +39,10 @@ export default function DashboardPage() {
     }
   }, [user, isLoaded]);
 
-  // Tab list dynamically includes 24/7 Actions and MiroFish Swarm Traffic for administrative logins
+  // Tab list dynamically includes Website Auditor, 24/7 Actions and MiroFish Swarm Traffic
   const tabs = [
     { id: 'coverage', label: 'Global Monitoring' },
+    { id: 'website_auditor', label: 'Website Audit Agent', isNew: true },
     { id: 'actions_24_7', label: '24/7 Actions' },
     ...(isAdmin ? [{ id: 'swarm', label: 'MiroFish Swarm Traffic', adminOnly: true }] : []),
     { id: 'policies', label: 'Policies & Evaluation' },
@@ -92,6 +94,12 @@ export default function DashboardPage() {
             }`}
           >
             {tab.label}
+            {'isNew' in tab && tab.isNew && (
+              <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                <Sparkles className="w-2.5 h-2.5 text-blue-400" />
+                New
+              </span>
+            )}
             {'adminOnly' in tab && tab.adminOnly && (
               <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
                 <ShieldAlert className="w-2.5 h-2.5" />
@@ -104,6 +112,7 @@ export default function DashboardPage() {
 
       <div className="pt-4">
         {activeTab === 'coverage' && <CoverageView />}
+        {activeTab === 'website_auditor' && <WebsiteComplianceAuditor />}
         {activeTab === 'actions_24_7' && <Actions247View />}
         {activeTab === 'swarm' && isAdmin && <SwarmSimulationView />}
         {activeTab === 'policies' && <PoliciesView onNavigateTab={(tab) => setActiveTab(tab)} />}

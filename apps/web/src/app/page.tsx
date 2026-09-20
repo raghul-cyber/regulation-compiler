@@ -2,6 +2,7 @@ import { ComplianceField } from '@/components/landing/compliance-field/complianc
 import { LandingScrollHUD } from '@/components/landing/landing-scroll-hud';
 import { HeroSection } from '@/components/landing/sections/hero-section';
 import { CapabilitySignal } from '@/components/landing/sections/capability-signal';
+import { WebsiteAuditorSection } from '@/components/landing/sections/website-auditor-section';
 import { ProblemSection } from '@/components/landing/sections/problem-section';
 import { TransformationSection } from '@/components/landing/sections/transformation-section';
 import { HowItWorksSection } from '@/components/landing/sections/how-it-works-section';
@@ -27,6 +28,12 @@ export default function LandingPage() {
 
         {/* Section 03 — Slim Technical Capability Signal */}
         <CapabilitySignal />
+
+        {/* Laser Section Divider */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[#17222C] to-transparent pointer-events-none" />
+
+        {/* Section 03B — Automated Website Compliance Auditor (Autonomous Zero-Mock Agent) */}
+        <WebsiteAuditorSection />
 
         {/* Laser Section Divider */}
         <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[#17222C] to-transparent pointer-events-none" />

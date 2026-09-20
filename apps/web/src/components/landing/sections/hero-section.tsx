@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Show, SignInButton } from '@clerk/nextjs';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Globe } from 'lucide-react';
 import { HeroProductPreview } from './hero-product-preview';
 import { useScrollReveal, useCountUp } from '@/hooks/use-scroll-reveal';
 import { Courier_Prime } from 'next/font/google';
@@ -86,6 +86,13 @@ export function HeroSection() {
     }
   };
 
+  const scrollToWebsiteAuditor = () => {
+    const el = document.getElementById('website-auditor');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <section 
       id="product" 
@@ -134,6 +141,14 @@ export function HeroSection() {
               </Button>
             </Link>
             <button 
+              onClick={scrollToWebsiteAuditor}
+              className="rounded-xl font-semibold px-6 h-12 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-2 text-sm"
+            >
+              <Globe className="w-4 h-4 text-blue-400" />
+              <span>Instant Website Auditor</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 font-bold uppercase">New</span>
+            </button>
+            <button 
               onClick={scrollToHowItWorks}
               className="rounded-xl font-semibold px-8 h-12 bg-[#0C131B] text-[#F2F6F8] border border-[#17222C] hover:border-[#1E2C38] hover:bg-[#17222C]/60 transition-all cursor-pointer flex items-center gap-2 text-sm"
             >
@@ -151,6 +166,14 @@ export function HeroSection() {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </SignInButton>
+            <button 
+              onClick={scrollToWebsiteAuditor}
+              className="rounded-xl font-semibold px-6 h-12 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 transition-all cursor-pointer flex items-center gap-2 text-sm"
+            >
+              <Globe className="w-4 h-4 text-blue-400" />
+              <span>Instant Website Auditor</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 font-bold uppercase">New</span>
+            </button>
             <button 
               onClick={scrollToHowItWorks}
               className="rounded-xl font-semibold px-8 h-12 bg-[#0C131B] text-[#F2F6F8] border border-[#17222C] hover:border-[#1E2C38] hover:bg-[#17222C]/60 transition-all cursor-pointer flex items-center gap-2 text-sm"
