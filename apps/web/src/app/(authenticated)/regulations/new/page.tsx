@@ -6,6 +6,7 @@ import { uploadRegulationServerAction, ingestFrameworkAction, getFrameworksActio
 import { PipelineProgress } from '@/components/regulations/pipeline-progress';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { PaywallModal } from '@/components/billing/paywall-modal';
 
 interface Framework {
   id: string;
@@ -54,6 +55,8 @@ export default function NewRegulationPage() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [regulationId, setRegulationId] = useState<string | null>(null);
   const [ingesting, setIngesting] = useState<string | null>(null);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [paywallData, setPaywallData] = useState({ used: 3, limit: 3 });
 
   // Standard Framework State
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
@@ -143,6 +146,11 @@ export default function NewRegulationPage() {
         // On remote domains (e.g. Vercel), use Server Action directly to eliminate cross-origin preflight/CORS errors
         const res = await uploadRegulationServerAction(formData);
         if (!res.success) {
+          if (res.isPaymentRequired) {
+            setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
+            setIsPaywallOpen(true);
+            return;
+          }
           throw new Error(res.error || "Upload failed");
         }
         responseData = res.data;
@@ -159,16 +167,30 @@ export default function NewRegulationPage() {
             let errText = "Upload failed";
             try {
               const errJson = await directRes.json();
-              errText = errJson.detail || errText;
+              errText = errJson.detail || errJson.message || errText;
+              if (directRes.status === 402 || errJson.code === 'PAYMENT_REQUIRED') {
+                setPaywallData({ used: errJson.free_uses_used ?? 3, limit: errJson.free_uses_limit ?? 3 });
+                setIsPaywallOpen(true);
+                return;
+              }
             } catch {
               errText = await directRes.text() || errText;
             }
             throw new Error(errText);
           }
         } catch (directErr: any) {
+          if (directErr.message?.includes("PAYMENT_REQUIRED")) {
+            setIsPaywallOpen(true);
+            return;
+          }
           console.warn("Direct upload fallback to server action:", directErr);
           const res = await uploadRegulationServerAction(formData);
           if (!res.success) {
+            if (res.isPaymentRequired) {
+              setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
+              setIsPaywallOpen(true);
+              return;
+            }
             throw new Error(res.error || directErr.message || "Upload failed");
           }
           responseData = res.data;
@@ -186,7 +208,11 @@ export default function NewRegulationPage() {
       setRegulationId(returnedRegId || returnedJobId);
       
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during ingestion upload");
+      if (err.message?.includes("PAYMENT_REQUIRED") || err.message?.includes("3 free uses")) {
+        setIsPaywallOpen(true);
+      } else {
+        setError(err.message || "An unexpected error occurred during ingestion upload");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -202,7 +228,14 @@ export default function NewRegulationPage() {
 
       if (isRemote) {
         const res = await ingestFrameworkAction(acronym);
-        if (!res.success) throw new Error(res.error || "Failed to ingest framework");
+        if (!res.success) {
+          if (res.isPaymentRequired) {
+            setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
+            setIsPaywallOpen(true);
+            return;
+          }
+          throw new Error(res.error || "Failed to ingest framework");
+        }
         data = res.data;
       } else {
         const token = await getToken();
@@ -216,13 +249,24 @@ export default function NewRegulationPage() {
           headers
         });
         data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Failed to ingest framework");
+        if (!res.ok) {
+          if (res.status === 402 || data.code === 'PAYMENT_REQUIRED') {
+            setPaywallData({ used: data.free_uses_used ?? 3, limit: data.free_uses_limit ?? 3 });
+            setIsPaywallOpen(true);
+            return;
+          }
+          throw new Error(data.detail || data.message || "Failed to ingest framework");
+        }
       }
       
       setJobId(data.job_id);
       setRegulationId(data.regulation_id || data.regulation_version_id);
     } catch (err: any) {
-      setError(err.message);
+      if (err.message?.includes("PAYMENT_REQUIRED") || err.message?.includes("3 free uses")) {
+        setIsPaywallOpen(true);
+      } else {
+        setError(err.message || "Failed to ingest framework");
+      }
     } finally {
       setIsUploading(false);
       setIngesting(null);
@@ -488,6 +532,13 @@ export default function NewRegulationPage() {
           </div>
         </div>
       </div>
+
+      <PaywallModal
+        isOpen={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        freeUsesUsed={paywallData.used}
+        freeUsesLimit={paywallData.limit}
+      />
     </div>
   );
 }

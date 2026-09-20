@@ -83,6 +83,39 @@ export async function POST(request: NextRequest) {
       ? body.frameworks 
       : ['GDPR', 'HIPAA', 'SOC 2', 'WCAG 2.1', 'PCI-DSS', 'ISO 27001', 'DORA', 'NIST'];
 
+    // Entitlement & 3 Free Uses Verification for Authenticated Users
+    let userToken: string | null = null;
+    try {
+      const { auth } = await import('@clerk/nextjs/server');
+      const session = await auth();
+      userToken = await session.getToken();
+      if (userToken) {
+        const apiBase = (process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
+        const statusRes = await fetch(`${apiBase}/billing/status`, {
+          headers: { 'Authorization': `Bearer ${userToken}` },
+          cache: 'no-store'
+        });
+        if (statusRes.ok) {
+          const billing = await statusRes.json();
+          if (!billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
+            return NextResponse.json(
+              {
+                code: 'PAYMENT_REQUIRED',
+                message: 'Your 3 free uses have been used. Continue auditing websites by upgrading your access.',
+                free_uses_used: billing.free_usage?.used || 3,
+                free_uses_limit: billing.free_usage?.limit || 3,
+                upgrade_required: true,
+                upgrade_url: '/billing'
+              },
+              { status: 402 }
+            );
+          }
+        }
+      }
+    } catch (authErr) {
+      // Proceed gracefully if unauthenticated public preview
+    }
+
     const agentLogs: string[] = [];
     const startTime = Date.now();
 

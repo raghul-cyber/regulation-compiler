@@ -8,6 +8,7 @@ import { NavAuth } from './nav-auth';
 import { UploadCloud, Menu, X, ShieldAlert, ArrowRight } from 'lucide-react';
 import { Show, SignInButton, useUser, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
+import { UsageIndicator } from '@/components/billing/usage-indicator';
 
 export function TopNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,6 +94,7 @@ export function TopNav() {
           {/* Right: Auth CTA Buttons */}
           <div className="flex items-center gap-3">
             <Show when="signed-in">
+              <UsageIndicator />
               <Link href="/dashboard">
                 <Button
                   size="sm"
@@ -247,6 +249,9 @@ export function TopNav() {
               <Link href="/compliance-check" className="text-zinc-400 hover:text-white transition-colors">
                 Compliance
               </Link>
+              <Link href="/billing" className="text-zinc-400 hover:text-white transition-colors">
+                Billing
+              </Link>
               {isSuperAdmin && (
                 <Link
                   href="/admin"
@@ -293,6 +298,9 @@ export function TopNav() {
 
         {/* Right: Actions & Mobile Toggle */}
         <div className="flex items-center gap-3">
+          <Show when="signed-in">
+            <UsageIndicator />
+          </Show>
           <NavAuth />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -328,6 +336,13 @@ export function TopNav() {
               className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
             >
               Compliance
+            </Link>
+            <Link
+              href="/billing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
+            >
+              Billing
             </Link>
             {isSuperAdmin && (
               <Link

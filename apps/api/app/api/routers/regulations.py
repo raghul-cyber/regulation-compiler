@@ -35,6 +35,7 @@ from app.core.limiter import limiter
 from app.core.security_guard import sanitize_filename, validate_file_magic_bytes, MAX_UPLOAD_SIZE
 from app.services.spending_caps import check_spending_cap, SpendingCapExceededException
 from app.core.cache import ResponseCache
+from app.services.entitlement import EntitlementService
 
 logger = logging.getLogger(__name__)
 
@@ -81,120 +82,152 @@ async def upload_regulation(
     current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
-    # Check spending cap
-    org_id = current_user.org_id if current_user else None
+    # 1. Resolve and verify authenticated user
+    if not current_user:
+        current_user = db.query(User).first()
+        if not current_user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication is required to upload and compile regulations."
+            )
+
+    # 2. Enforce 3 Free Uses Policy & Atomic Concurrency-Safe Entitlement Reservation
+    entitlement_service = EntitlementService(db)
+    op_id = request.headers.get("X-Idempotency-Key") or f"upload-{uuid.uuid4()}"
+    usage_event = entitlement_service.reserve_usage(
+        user=current_user,
+        operation_type="regulation_compilation",
+        operation_id=op_id,
+        source="web_upload",
+        metadata={"regulation_name": name, "jurisdiction": jurisdiction}
+    )
+
     try:
-        check_spending_cap(db, org_id, expected_invocation_cost=0.02)
-    except SpendingCapExceededException as sce:
-        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
+        # Check spending cap
+        org_id = current_user.org_id if current_user else None
+        try:
+            check_spending_cap(db, org_id, expected_invocation_cost=0.02)
+        except SpendingCapExceededException as sce:
+            raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
 
-    # Sanitize filename to prevent directory traversal
-    clean_filename = sanitize_filename(file.filename)
+        # Sanitize filename to prevent directory traversal
+        clean_filename = sanitize_filename(file.filename)
 
-    # Validate file extension
-    ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
-    if ext == 'pdf':
-        file_type = FileTypeEnum.pdf
-    elif ext in ['htm', 'html']:
-        file_type = FileTypeEnum.html
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF and HTML files are supported."
-        )
+        # Validate file extension
+        ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
+        if ext == 'pdf':
+            file_type = FileTypeEnum.pdf
+        elif ext in ['htm', 'html']:
+            file_type = FileTypeEnum.html
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only PDF and HTML files are supported."
+            )
 
-    # Validate file size (strict 25MB enterprise limit)
-    content = await file.read()
-    if len(content) > MAX_UPLOAD_SIZE:
+        # Validate file size (strict 25MB enterprise limit)
+        content = await file.read()
+        if len(content) > MAX_UPLOAD_SIZE:
+            del content
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="File size exceeds the 25MB maximum limit."
+            )
+
+        # Validate magic bytes against malicious disguised payloads
+        if not validate_file_magic_bytes(content, ext):
+            del content
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Security verification failed: File contents do not match valid {ext.upper()} magic byte format."
+            )
+        await file.seek(0)
         del content
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="File size exceeds the 25MB maximum limit."
+        import gc
+        gc.collect()
+
+        # Upload file to S3
+        try:
+            storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
+        except Exception:
+            raise HTTPException(status_code=500, detail="Failed to upload file")
+
+        # Create Regulation
+        regulation = Regulation(
+            name=name,
+            jurisdiction=jurisdiction,
+            source_url=f"s3://{storage_path}",
         )
+        db.add(regulation)
+        db.flush()
 
-    # Validate magic bytes against malicious disguised payloads
-    if not validate_file_magic_bytes(content, ext):
-        del content
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Security verification failed: File contents do not match valid {ext.upper()} magic byte format."
+        # Create SourceDocument first since its regulation_version_id is nullable
+        source_doc = SourceDocument(
+            file_type=file_type,
+            storage_path=storage_path,
+            raw_text="",
+            ocr_used=False,
+            page_count=0
         )
-    await file.seek(0)
-    del content
-    import gc
-    gc.collect()
+        db.add(source_doc)
+        db.flush()
 
-    # 1. Upload file to S3
-    try:
-        storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to upload file")
+        # Create RegulationVersion linked to SourceDocument
+        version = RegulationVersion(
+            regulation_id=regulation.id,
+            version_label="v1",
+            published_date=datetime.now(timezone.utc).date(),
+            ingested_at=datetime.now(timezone.utc),
+            source_document_id=source_doc.id
+        )
+        db.add(version)
+        db.flush()
+        
+        # Link SourceDocument back to RegulationVersion
+        source_doc.regulation_version_id = version.id
+        
+        # Update regulation's current version
+        regulation.current_version_id = version.id
+        db.commit()
 
-    # 2. Create Regulation
-    regulation = Regulation(
-        name=name,
-        jurisdiction=jurisdiction,
-        source_url=f"s3://{storage_path}",
-    )
-    db.add(regulation)
-    db.flush()
+        # Enqueue task & trigger in-process execution fallback
+        job = BackgroundJob(
+            job_type=JobTypeEnum.ingestion,
+            entity_id=str(version.id)
+        )
+        db.add(job)
+        db.commit()
 
-    # 3. Create SourceDocument first since its regulation_version_id is nullable
-    source_doc = SourceDocument(
-        file_type=file_type,
-        storage_path=storage_path,
-        raw_text="",
-        ocr_used=False,
-        page_count=0
-    )
-    db.add(source_doc)
-    db.flush()
+        try:
+            task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
+            job.task_id = task.id
+        except Exception as cel_err:
+            logger.warning(f"Could not enqueue Celery task: {cel_err}")
+            job.task_id = str(uuid.uuid4())
+        db.commit()
 
-    # 4. Create RegulationVersion linked to SourceDocument
-    version = RegulationVersion(
-        regulation_id=regulation.id,
-        version_label="v1",
-        published_date=datetime.now(timezone.utc).date(),
-        ingested_at=datetime.now(timezone.utc),
-        source_document_id=source_doc.id
-    )
-    db.add(version)
-    db.flush()
-    
-    # 5. Link SourceDocument back to RegulationVersion
-    source_doc.regulation_version_id = version.id
-    
-    # Update regulation's current version
-    regulation.current_version_id = version.id
-    db.commit()
+        # Trigger reliable background execution immediately
+        run_pipeline_in_background(str(job.id), str(source_doc.id))
 
-    # Phase 14: Enqueue task & trigger in-process execution fallback
-    job = BackgroundJob(
-        job_type=JobTypeEnum.ingestion,
-        entity_id=str(version.id)
-    )
-    db.add(job)
-    db.commit()
+        # Invalidate cached regulation lists
+        ResponseCache.invalidate("regulations")
 
-    try:
-        task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
-        job.task_id = task.id
-    except Exception as cel_err:
-        logger.warning(f"Could not enqueue Celery task: {cel_err}")
-        job.task_id = str(uuid.uuid4())
-    db.commit()
+        # Mark usage successfully completed
+        entitlement_service.complete_usage(op_id)
 
-    # Trigger reliable background execution immediately
-    run_pipeline_in_background(str(job.id), str(source_doc.id))
+        return {
+            "regulation_id": str(regulation.id),
+            "regulation_version_id": str(version.id),
+            "job_id": str(job.id),
+            "operation_id": op_id
+        }
 
-    # Invalidate cached regulation lists
-    ResponseCache.invalidate("regulations")
-
-    return {
-        "regulation_id": str(regulation.id),
-        "regulation_version_id": str(version.id),
-        "job_id": str(job.id)
-    }
+    except HTTPException:
+        entitlement_service.release_usage(op_id, reason="client_http_exception")
+        raise
+    except Exception as fatal_ex:
+        entitlement_service.release_usage(op_id, reason=f"fatal_error: {str(fatal_ex)}")
+        raise
 
 
 @router.get("")
@@ -316,7 +349,9 @@ def list_frameworks(db: Session = Depends(get_db)):
 
 @router.post("/frameworks/{acronym}/ingest")
 async def ingest_framework(
+    request: Request,
     acronym: str,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     framework = db.query(FrameworkCatalog).filter(FrameworkCatalog.acronym == acronym).first()
@@ -325,75 +360,107 @@ async def ingest_framework(
         
     if not framework.is_fetchable:
         raise HTTPException(status_code=400, detail=f"{framework.name} requires a licensed custom upload.")
-        
-    fetcher = FrameworkFetcher()
-    html_bytes, filename = await fetcher.fetch_html(framework.source_url)
-    
-    path = storage_service.upload_file(io.BytesIO(html_bytes), filename, content_type="text/html")
-    
-    # 1. Regulation
-    is_local = not all([settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY, settings.S3_BUCKET_NAME])
-    prefix = "file://" if is_local else f"s3://{settings.S3_BUCKET_NAME}/"
-    regulation = db.query(Regulation).filter(Regulation.name == framework.name).first()
-    if not regulation:
-        regulation = Regulation(
-            name=framework.name,
-            jurisdiction=framework.jurisdiction,
-            source_url=f"{prefix}{path}"
-        )
-        db.add(regulation)
-        db.flush()
-        
-    # 2. SourceDocument
-    source_doc = SourceDocument(
-        file_type=FileTypeEnum.html,
-        storage_path=path,
-        raw_text="",
-        ocr_used=False,
-        page_count=1
+
+    # 1. Resolve and verify authenticated user
+    if not current_user:
+        current_user = db.query(User).first()
+        if not current_user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication is required to ingest statutory frameworks."
+            )
+
+    # 2. Enforce 3 Free Uses Policy & Atomic Concurrency-Safe Entitlement Reservation
+    entitlement_service = EntitlementService(db)
+    op_id = request.headers.get("X-Idempotency-Key") or f"ingest-{acronym}-{uuid.uuid4()}"
+    usage_event = entitlement_service.reserve_usage(
+        user=current_user,
+        operation_type="framework_ingestion",
+        operation_id=op_id,
+        source="framework_catalog",
+        metadata={"acronym": acronym}
     )
-    db.add(source_doc)
-    db.flush()
-    
-    # 3. Version
-    version = RegulationVersion(
-        regulation_id=regulation.id,
-        version_label="1.0",
-        published_date=datetime.now(timezone.utc).date(),
-        ingested_at=datetime.now(timezone.utc),
-        source_document_id=source_doc.id
-    )
-    db.add(version)
-    db.flush()
-    
-    source_doc.regulation_version_id = version.id
-    regulation.current_version_id = version.id
-    db.commit()
-    
-    job = BackgroundJob(
-        job_type=JobTypeEnum.ingestion,
-        entity_id=str(version.id)
-    )
-    db.add(job)
-    db.commit()
 
     try:
-        task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
-        job.task_id = task.id
-    except Exception as cel_err:
-        logger.warning(f"Could not enqueue Celery task: {cel_err}")
-        job.task_id = str(uuid.uuid4())
-    db.commit()
+        fetcher = FrameworkFetcher()
+        html_bytes, filename = await fetcher.fetch_html(framework.source_url)
+        
+        path = storage_service.upload_file(io.BytesIO(html_bytes), filename, content_type="text/html")
+        
+        # 1. Regulation
+        is_local = not all([settings.S3_ACCESS_KEY, settings.S3_SECRET_KEY, settings.S3_BUCKET_NAME])
+        prefix = "file://" if is_local else f"s3://{settings.S3_BUCKET_NAME}/"
+        regulation = db.query(Regulation).filter(Regulation.name == framework.name).first()
+        if not regulation:
+            regulation = Regulation(
+                name=framework.name,
+                jurisdiction=framework.jurisdiction,
+                source_url=f"{prefix}{path}"
+            )
+            db.add(regulation)
+            db.flush()
+            
+        # 2. SourceDocument
+        source_doc = SourceDocument(
+            file_type=FileTypeEnum.html,
+            storage_path=path,
+            raw_text="",
+            ocr_used=False,
+            page_count=1
+        )
+        db.add(source_doc)
+        db.flush()
+        
+        # 3. Version
+        version = RegulationVersion(
+            regulation_id=regulation.id,
+            version_label="1.0",
+            published_date=datetime.now(timezone.utc).date(),
+            ingested_at=datetime.now(timezone.utc),
+            source_document_id=source_doc.id
+        )
+        db.add(version)
+        db.flush()
+        
+        source_doc.regulation_version_id = version.id
+        regulation.current_version_id = version.id
+        db.commit()
+        
+        job = BackgroundJob(
+            job_type=JobTypeEnum.ingestion,
+            entity_id=str(version.id)
+        )
+        db.add(job)
+        db.commit()
 
-    # Trigger reliable background execution immediately
-    run_pipeline_in_background(str(job.id), str(source_doc.id))
+        try:
+            task = process_ingestion_pipeline.delay(str(job.id), str(source_doc.id))
+            job.task_id = task.id
+        except Exception as cel_err:
+            logger.warning(f"Could not enqueue Celery task: {cel_err}")
+            job.task_id = str(uuid.uuid4())
+        db.commit()
 
-    return {
-        "regulation_id": str(regulation.id),
-        "regulation_version_id": str(version.id),
-        "job_id": str(job.id),
-        "message": f"Started ingestion pipeline for {framework.name}"
-    }
+        # Trigger reliable background execution immediately
+        run_pipeline_in_background(str(job.id), str(source_doc.id))
+
+        # Mark usage successfully completed
+        entitlement_service.complete_usage(op_id)
+
+        return {
+            "regulation_id": str(regulation.id),
+            "regulation_version_id": str(version.id),
+            "job_id": str(job.id),
+            "operation_id": op_id,
+            "message": f"Started ingestion pipeline for {framework.name}"
+        }
+
+    except HTTPException:
+        entitlement_service.release_usage(op_id, reason="client_http_exception")
+        raise
+    except Exception as fatal_ex:
+        entitlement_service.release_usage(op_id, reason=f"fatal_error: {str(fatal_ex)}")
+        raise
 
 
 # ---------------------------------------------------------

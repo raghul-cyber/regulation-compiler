@@ -4,3 +4,4 @@ from .regulations import Regulation, RegulationVersion, SourceDocument, Document
 from .requirements import Requirement, Policy, ComplianceCheck, SystemMapping, RequirementEmbedding, ImpactRecord
 from .audit import Report, AuditLog, ApiKey, Notification, Webhook, LLMLog
 from .jobs import BackgroundJob
+from .billing import UserEntitlement, UsageEvent, PaymentTransaction, WebhookEvent

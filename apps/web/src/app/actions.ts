@@ -227,13 +227,21 @@ export async function uploadRegulationServerAction(formData: FormData) {
 
   if (!res.ok) {
     let errorDetail = "Failed to upload regulation";
+    let isPaymentRequired = res.status === 402;
+    let freeUsesUsed = 3;
+    let freeUsesLimit = 3;
     try {
       const errJson = await res.json();
-      errorDetail = errJson.detail || errorDetail;
+      errorDetail = errJson.detail || errJson.message || errorDetail;
+      if (errJson.code === 'PAYMENT_REQUIRED' || res.status === 402) {
+        isPaymentRequired = true;
+        freeUsesUsed = errJson.free_uses_used ?? 3;
+        freeUsesLimit = errJson.free_uses_limit ?? 3;
+      }
     } catch (e) {
       errorDetail = `Server returned ${res.status} ${res.statusText}`;
     }
-    return { success: false, error: errorDetail };
+    return { success: false, error: errorDetail, isPaymentRequired, freeUsesUsed, freeUsesLimit };
   }
 
   const data = await res.json();
@@ -315,8 +323,22 @@ export async function ingestFrameworkAction(acronym: string) {
       cache: 'no-store'
     });
     if (!res.ok) {
-      const errText = await res.text().catch(() => 'Failed to ingest framework');
-      return { success: false, error: errText };
+      let errText = "Failed to ingest framework";
+      let isPaymentRequired = res.status === 402;
+      let freeUsesUsed = 3;
+      let freeUsesLimit = 3;
+      try {
+        const errJson = await res.json();
+        errText = errJson.detail || errJson.message || errText;
+        if (errJson.code === 'PAYMENT_REQUIRED' || res.status === 402) {
+          isPaymentRequired = true;
+          freeUsesUsed = errJson.free_uses_used ?? 3;
+          freeUsesLimit = errJson.free_uses_limit ?? 3;
+        }
+      } catch {
+        errText = await res.text().catch(() => 'Failed to ingest framework');
+      }
+      return { success: false, error: errText, isPaymentRequired, freeUsesUsed, freeUsesLimit };
     }
     const data = await res.json();
     return { success: true, data };
@@ -354,4 +376,106 @@ export async function getFrameworksAction() {
     return { success: false, error: err.message };
   }
 }
+
+export async function getBillingStatusAction() {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/billing/status`, {
+      headers,
+      signal: AbortSignal.timeout(6000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      return { success: false, error: `Status ${res.status}` };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function createCheckoutAction(productId?: string, returnUrl?: string) {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  if (!token) {
+    return { success: false, error: "Authentication required" };
+  }
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/billing/checkout`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ product_id: productId, return_url: returnUrl }),
+      signal: AbortSignal.timeout(12000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => 'Checkout initialization failed');
+      return { success: false, error: errText };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function getCustomerPortalAction() {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  if (!token) {
+    return { success: false, error: "Authentication required" };
+  }
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/billing/portal`, {
+      headers,
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      return { success: false, error: `Status ${res.status}` };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
 

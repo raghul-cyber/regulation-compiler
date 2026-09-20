@@ -202,13 +202,17 @@ The Developer API exposes the compiled rules engine.
 
 | Method | Path | Auth | Purpose |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/regulations/upload` | Yes | Upload raw regulatory documents. |
+| `POST` | `/api/v1/regulations/upload` | Yes | Upload raw regulatory documents (metered: 3 free). |
 | `GET` | `/api/v1/regulations/{id}` | Yes | Fetch regulation details. |
 | `GET` | `/api/v1/regulations/{id}/requirements` | Yes | List extracted requirements. |
 | `GET` | `/api/v1/regulations/{id}/diff` | Yes | Compare two regulation versions. |
 | `POST` | `/api/v1/check-compliance` | Yes | Validate a JSON payload against rules. |
 | `GET` | `/api/v1/reports` | Yes | Generate compliance impact reports. |
 | `POST` | `/api/v1/webhooks` | Yes | Register endpoints for rule-change events. |
+| `GET` | `/api/v1/billing/status` | Yes | Get organization billing plan & free usage quota. |
+| `POST` | `/api/v1/billing/checkout` | Yes | Create real Dodo Payments checkout session. |
+| `POST` | `/api/v1/billing/portal` | Yes | Create Dodo Payments customer portal session. |
+| `POST` | `/api/v1/billing/webhooks/dodo` | Sig | Cryptographic HMAC SHA-256 Webhook handler. |
 
 ### Quickstart cURL
 
@@ -237,6 +241,17 @@ curl -X POST "https://api.antigravity-rac.com/api/v1/check-compliance" \
   "violations": []
 }
 ```
+
+## Usage Limits & Monetization (Dodo Payments)
+
+Regulation Compiler implements a server-enforced monetization architecture using **Dodo Payments**:
+
+- **3 Free Metered Operations**: Every new organization receives 3 complimentary regulation parsing/audit operations.
+- **Enforced Server-Side**: Entitlement decisions are executed atomically via PostgreSQL row-locks (`SELECT ... FOR UPDATE`), guaranteeing zero race conditions or bypasses via browser refresh, incognito windows, or localStorage manipulation.
+- **Paywall & Upgrade**: Upon consuming the 3rd free usage, subsequent expensive operations return HTTP `402 Payment Required`, automatically prompting the user to upgrade via a hosted Dodo Payments checkout session.
+- **Admin Exemption**: Super-administrators and platform admins enjoy unlimited compilations without paywalls or countdowns.
+- **Cryptographic Webhook Verification**: The backend verifies Dodo Payments webhooks using HMAC SHA-256 (Standard Webhooks specification) and enforces idempotency via the `webhook_events` table.
+- **Full Documentation**: Complete setup instructions, dashboard configuration, test vs. live mode instructions, and schema details are available in [docs/billing.md](docs/billing.md).
 
 ## Getting Started
 
