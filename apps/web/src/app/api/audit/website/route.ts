@@ -83,40 +83,97 @@ export async function POST(request: NextRequest) {
       ? body.frameworks 
       : ['GDPR', 'HIPAA', 'SOC 2', 'WCAG 2.1', 'PCI-DSS', 'ISO 27001', 'DORA', 'NIST'];
 
-    // Entitlement & 3 Free Uses Verification for Authenticated Users (with strict timeout)
+    // Entitlement & 3 Free Uses Verification for Authenticated & Anonymous Users
     let userToken: string | null = null;
+    let anonAuditsCount = 0;
+
     try {
       const { auth } = await import('@clerk/nextjs/server');
       const session = await auth();
       userToken = await session.getToken();
       if (userToken) {
         const apiBase = (process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
-        // Guard against hung connections in serverless environment with a strict 1.8s timeout
-        const statusRes = await fetch(`${apiBase}/billing/status`, {
-          headers: { 'Authorization': `Bearer ${userToken}` },
+        
+        // 1. Atomic reservation via /billing/reserve-usage
+        const reserveRes = await fetch(`${apiBase}/billing/reserve-usage`, {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            operation_type: 'website_audit',
+            operation_id: `web-audit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            source: 'website_compliance_auditor',
+            metadata: { target_url: rawUrl, domain: hostname }
+          }),
           cache: 'no-store',
-          signal: AbortSignal.timeout(1800)
+          signal: AbortSignal.timeout(3500)
         }).catch(() => null);
 
-        if (statusRes && statusRes.ok) {
-          const billing = await statusRes.json().catch(() => null);
-          if (billing && !billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
+        if (reserveRes) {
+          if (reserveRes.status === 402) {
+            const errJson = await reserveRes.json().catch(() => ({}));
+            const detail = errJson.detail || errJson;
             return NextResponse.json(
               {
                 code: 'PAYMENT_REQUIRED',
                 message: 'Your 3 free uses have been used. Continue auditing websites by upgrading your access.',
-                free_uses_used: billing.free_usage?.used || 3,
-                free_uses_limit: billing.free_usage?.limit || 3,
+                free_uses_used: detail?.free_uses_used ?? 3,
+                free_uses_limit: detail?.free_uses_limit ?? 3,
                 upgrade_required: true,
                 upgrade_url: '/billing'
               },
               { status: 402 }
             );
           }
+        } else {
+          // Fallback: If reserve-usage timed out or failed to connect, check status
+          const statusRes = await fetch(`${apiBase}/billing/status`, {
+            headers: { 'Authorization': `Bearer ${userToken}` },
+            cache: 'no-store',
+            signal: AbortSignal.timeout(2000)
+          }).catch(() => null);
+
+          if (statusRes && statusRes.ok) {
+            const billing = await statusRes.json().catch(() => null);
+            if (billing && !billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
+              return NextResponse.json(
+                {
+                  code: 'PAYMENT_REQUIRED',
+                  message: 'Your 3 free uses have been used. Continue auditing websites by upgrading your access.',
+                  free_uses_used: billing.free_usage?.used || 3,
+                  free_uses_limit: billing.free_usage?.limit || 3,
+                  upgrade_required: true,
+                  upgrade_url: '/billing'
+                },
+                { status: 402 }
+              );
+            }
+          }
         }
       }
     } catch (authErr) {
       // Proceed gracefully if unauthenticated public preview or billing endpoint is unreachable
+    }
+
+    // 2. Unauthenticated / anonymous visitor restriction: strictly enforce 3 free scans
+    if (!userToken) {
+      const anonCookie = request.cookies.get('reg_anon_audits')?.value;
+      anonAuditsCount = parseInt(anonCookie || '0', 10);
+      if (!isNaN(anonAuditsCount) && anonAuditsCount >= 3) {
+        return NextResponse.json(
+          {
+            code: 'PAYMENT_REQUIRED',
+            message: 'You have used your 3 complimentary website audits. Please sign in or upgrade to Pro to continue.',
+            free_uses_used: 3,
+            free_uses_limit: 3,
+            upgrade_required: true,
+            upgrade_url: '/billing'
+          },
+          { status: 402 }
+        );
+      }
     }
 
     const agentLogs: string[] = [];
@@ -845,13 +902,23 @@ export async function POST(request: NextRequest) {
       agent_logs: agentLogs.filter(Boolean).map(log => String(log || '')),
     };
 
-    return NextResponse.json(resultPayload, {
+    const jsonResp = NextResponse.json(resultPayload, {
       status: 200,
       headers: {
         'Cache-Control': 'no-store',
         'X-Auditor-Engine': 'RegCompiler-Autonomous-Agent-v2',
       }
     });
+
+    if (!userToken) {
+      jsonResp.cookies.set('reg_anon_audits', String(anonAuditsCount + 1), {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30,
+        sameSite: 'lax',
+      });
+    }
+
+    return jsonResp;
   } catch (err: any) {
     console.error('Website compliance audit exception:', err);
     return NextResponse.json(

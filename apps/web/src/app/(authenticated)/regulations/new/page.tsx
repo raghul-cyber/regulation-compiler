@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, BrainCircuit, FileSearch, ShieldCheck, Globe, Library } from 'lucide-react';
-import { uploadRegulationServerAction, ingestFrameworkAction, getFrameworksAction } from '@/app/actions';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, BrainCircuit, FileSearch, ShieldCheck, Globe, Library, Lock } from 'lucide-react';
+import { uploadRegulationServerAction, ingestFrameworkAction, getFrameworksAction, getBillingStatusAction } from '@/app/actions';
 import { PipelineProgress } from '@/components/regulations/pipeline-progress';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -56,7 +56,31 @@ export default function NewRegulationPage() {
   const [regulationId, setRegulationId] = useState<string | null>(null);
   const [ingesting, setIngesting] = useState<string | null>(null);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   const [paywallData, setPaywallData] = useState({ used: 3, limit: 3 });
+
+  // Check Billing Entitlement on Mount
+  useEffect(() => {
+    async function checkBilling() {
+      try {
+        const res = await getBillingStatusAction();
+        if (res.success && res.data) {
+          const remaining = res.data.free_usage?.remaining ?? 3;
+          if (!res.data.is_admin && !res.data.paid_access && remaining <= 0) {
+            setIsLimitReached(true);
+            setPaywallData({
+              used: res.data.free_usage?.used ?? 3,
+              limit: res.data.free_usage?.limit ?? 3
+            });
+            setIsPaywallOpen(true);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not check billing on regulations upload page:", e);
+      }
+    }
+    checkBilling();
+  }, []);
 
   // Standard Framework State
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
@@ -118,6 +142,11 @@ export default function NewRegulationPage() {
   };
 
   const handleUpload = async () => {
+    if (isLimitReached) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
     if (!file || !name || !jurisdiction) {
       setError("Please fill all required fields and select a file.");
       return;
@@ -147,6 +176,7 @@ export default function NewRegulationPage() {
         const res = await uploadRegulationServerAction(formData);
         if (!res.success) {
           if (res.isPaymentRequired) {
+            setIsLimitReached(true);
             setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
             setIsPaywallOpen(true);
             return;
@@ -169,6 +199,7 @@ export default function NewRegulationPage() {
               const errJson = await directRes.json();
               errText = errJson.detail || errJson.message || errText;
               if (directRes.status === 402 || errJson.code === 'PAYMENT_REQUIRED') {
+                setIsLimitReached(true);
                 setPaywallData({ used: errJson.free_uses_used ?? 3, limit: errJson.free_uses_limit ?? 3 });
                 setIsPaywallOpen(true);
                 return;
@@ -180,6 +211,7 @@ export default function NewRegulationPage() {
           }
         } catch (directErr: any) {
           if (directErr.message?.includes("PAYMENT_REQUIRED")) {
+            setIsLimitReached(true);
             setIsPaywallOpen(true);
             return;
           }
@@ -187,6 +219,7 @@ export default function NewRegulationPage() {
           const res = await uploadRegulationServerAction(formData);
           if (!res.success) {
             if (res.isPaymentRequired) {
+              setIsLimitReached(true);
               setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
               setIsPaywallOpen(true);
               return;
@@ -219,6 +252,11 @@ export default function NewRegulationPage() {
   };
 
   const handleIngestFramework = async (acronym: string) => {
+    if (isLimitReached) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
     setIsUploading(true);
     setError(null);
     try {
@@ -230,6 +268,7 @@ export default function NewRegulationPage() {
         const res = await ingestFrameworkAction(acronym);
         if (!res.success) {
           if (res.isPaymentRequired) {
+            setIsLimitReached(true);
             setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
             setIsPaywallOpen(true);
             return;
@@ -251,6 +290,7 @@ export default function NewRegulationPage() {
         data = await res.json();
         if (!res.ok) {
           if (res.status === 402 || data.code === 'PAYMENT_REQUIRED') {
+            setIsLimitReached(true);
             setPaywallData({ used: data.free_uses_used ?? 3, limit: data.free_uses_limit ?? 3 });
             setIsPaywallOpen(true);
             return;
@@ -263,6 +303,7 @@ export default function NewRegulationPage() {
       setRegulationId(data.regulation_id || data.regulation_version_id);
     } catch (err: any) {
       if (err.message?.includes("PAYMENT_REQUIRED") || err.message?.includes("3 free uses")) {
+        setIsLimitReached(true);
         setIsPaywallOpen(true);
       } else {
         setError(err.message || "Failed to ingest framework");
@@ -291,6 +332,33 @@ export default function NewRegulationPage() {
           Ingest a new regulatory framework into the Knowledge Graph. Our AI will automatically parse requirements, map policies, and identify compliance gaps.
         </p>
       </div>
+
+      {/* Account Action Locked Alert Banner (when 3 free uses are exhausted) */}
+      {isLimitReached && (
+        <div className="mb-8 p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-amber-200 shadow-xl shadow-amber-500/5 animate-in fade-in duration-300">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-300">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-bold text-amber-300 flex items-center gap-2">
+                <span>Account Action Locked • 3/3 Free Uses Consumed</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">Upgrade Required</span>
+              </div>
+              <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">
+                You have reached your limit of 3 free regulation compilations and website compliance audits. Ingestion and parsing are locked until you upgrade to Pro.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsPaywallOpen(true)}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Upgrade to Pro ($49/mo)</span>
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-center mb-8">
         <div className="bg-black/50 p-1 rounded-lg border border-gray-800 flex gap-1">
@@ -348,15 +416,28 @@ export default function NewRegulationPage() {
                             
                             {f.is_fetchable ? (
                                 <button 
-                                    onClick={() => handleIngestFramework(f.acronym)}
-                                    disabled={isUploading}
-                                    className={`w-full transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 ${
-                                        ingesting === f.acronym
+                                    onClick={() => {
+                                      if (isLimitReached) {
+                                        setIsPaywallOpen(true);
+                                        return;
+                                      }
+                                      handleIngestFramework(f.acronym);
+                                    }}
+                                    disabled={isUploading || isLimitReached}
+                                    className={`w-full transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 ${
+                                        isLimitReached
+                                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 cursor-pointer'
+                                            : ingesting === f.acronym
                                             ? 'bg-emerald-600 text-white border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
                                             : 'bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30'
                                     }`}
                                 >
-                                    {ingesting === f.acronym ? (
+                                    {isLimitReached ? (
+                                        <>
+                                            <Lock className="h-4 w-4 text-amber-400" />
+                                            <span>3/3 Used • Upgrade to Pro</span>
+                                        </>
+                                    ) : ingesting === f.acronym ? (
                                         <>
                                             <Loader2 className="h-4 w-4 animate-spin" />
                                             <span>Ingesting & Compiling {f.acronym}...</span>
@@ -371,7 +452,8 @@ export default function NewRegulationPage() {
                             ) : (
                                 <button 
                                     onClick={() => setTab('custom')}
-                                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors rounded py-2 text-sm font-medium flex items-center justify-center gap-2"
+                                    disabled={isLimitReached}
+                                    className={`w-full transition-colors rounded py-2 text-sm font-medium flex items-center justify-center gap-2 ${isLimitReached ? 'bg-gray-900 text-gray-600 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-700 text-gray-300'}`}
                                 >
                                     <UploadCloud className="h-4 w-4" />
                                     Requires Upload
@@ -401,7 +483,8 @@ export default function NewRegulationPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. GDPR, HIPAA"
-                  className="w-full bg-black border border-gray-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  disabled={isUploading || isLimitReached}
+                  className={`w-full bg-black border rounded-lg p-3 text-white transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'}`}
                 />
               </div>
               <div>
@@ -411,7 +494,8 @@ export default function NewRegulationPage() {
                   value={jurisdiction}
                   onChange={(e) => setJurisdiction(e.target.value)}
                   placeholder="e.g. EU, US, Global"
-                  className="w-full bg-black border border-gray-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none"
+                  disabled={isUploading || isLimitReached}
+                  className={`w-full bg-black border rounded-lg p-3 text-white transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'}`}
                 />
               </div>
             </div>
@@ -419,13 +503,14 @@ export default function NewRegulationPage() {
             {/* Drop Zone */}
             <div
               className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                isLimitReached ? 'border-amber-500/30 bg-amber-500/5 opacity-50 pointer-events-none cursor-not-allowed' :
                 isDragging ? 'border-emerald-500 bg-emerald-500/10' : 
                 file ? 'border-emerald-500/50 bg-emerald-500/5' : 
                 'border-gray-700 hover:border-gray-500 hover:bg-gray-800/50'
               }`}
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+              onDragOver={(e) => { e.preventDefault(); if (!isLimitReached) setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
+              onDrop={(e) => { if (!isLimitReached) handleDrop(e); }}
             >
               {file ? (
                 <div className="flex flex-col items-center">
@@ -443,16 +528,27 @@ export default function NewRegulationPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <div className="h-16 w-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                    <UploadCloud className="h-8 w-8 text-gray-400" />
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center mb-4 ${isLimitReached ? 'bg-amber-500/10 text-amber-400' : 'bg-gray-800 text-gray-400'}`}>
+                    {isLimitReached ? <Lock className="h-8 w-8 text-amber-400" /> : <UploadCloud className="h-8 w-8 text-gray-400" />}
                   </div>
-                  <p className="text-white font-medium mb-2">Drag and drop your regulatory document here</p>
-                  <p className="text-gray-400 text-sm mb-6">Supports PDF and HTML files up to 50MB</p>
+                  <p className="text-white font-medium mb-2">
+                    {isLimitReached ? "Upload Locked — Free Uses Exhausted (3/3 Used)" : "Drag and drop your regulatory document here"}
+                  </p>
+                  <p className="text-gray-400 text-sm mb-6">
+                    {isLimitReached ? "Upgrade to Pro to unlock unlimited document parsing" : "Supports PDF and HTML files up to 50MB"}
+                  </p>
                   <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-6 py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    onClick={() => {
+                      if (isLimitReached) {
+                        setIsPaywallOpen(true);
+                      } else {
+                        fileInputRef.current?.click();
+                      }
+                    }}
+                    disabled={isLimitReached}
+                    className={`px-6 py-2 font-medium rounded-lg transition-colors ${isLimitReached ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-white text-black hover:bg-gray-200'}`}
                   >
-                    Browse Files
+                    {isLimitReached ? "Action Locked" : "Browse Files"}
                   </button>
                   <input 
                     type="file" 
@@ -476,28 +572,38 @@ export default function NewRegulationPage() {
               </div>
             )}
 
-            {/* Submit Button */}
-            <button
-              onClick={handleUpload}
-              disabled={isUploading || !file || !name || !jurisdiction}
-              className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
-                isUploading || !file || !name || !jurisdiction
-                  ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
-              }`}
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  Ingesting Document...
-                </>
-              ) : (
-                <>
-                  <BrainCircuit className="h-6 w-6" />
-                  Start Ingestion Pipeline
-                </>
-              )}
-            </button>
+            {/* Submit Button / Locked Upgrade CTA */}
+            {isLimitReached ? (
+              <button
+                onClick={() => setIsPaywallOpen(true)}
+                className="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all cursor-pointer shadow-lg shadow-amber-500/10"
+              >
+                <Lock className="h-5 w-5 text-amber-400" />
+                <span>3/3 Free Uses Consumed • Upgrade to Pro</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleUpload}
+                disabled={isUploading || !file || !name || !jurisdiction}
+                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
+                  isUploading || !file || !name || !jurisdiction
+                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                }`}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    Ingesting Document...
+                  </>
+                ) : (
+                  <>
+                    <BrainCircuit className="h-6 w-6" />
+                    Start Ingestion Pipeline
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -535,9 +641,14 @@ export default function NewRegulationPage() {
 
       <PaywallModal
         isOpen={isPaywallOpen}
-        onClose={() => setIsPaywallOpen(false)}
+        onClose={() => {
+          if (!isLimitReached) {
+            setIsPaywallOpen(false);
+          }
+        }}
         freeUsesUsed={paywallData.used}
         freeUsesLimit={paywallData.limit}
+        isBlocking={isLimitReached}
       />
     </div>
   );

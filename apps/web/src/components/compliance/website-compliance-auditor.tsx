@@ -29,6 +29,8 @@ import {
   Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getBillingStatusAction } from '@/app/actions';
+import { PaywallModal } from '@/components/billing/paywall-modal';
 
 export interface AuditRemediation {
   description: string;
@@ -121,7 +123,50 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [selectedCodeTab, setSelectedCodeTab] = useState<Record<string, 'nginx' | 'nextjs' | 'apache'>>({});
 
+  // Billing Entitlement & 3 Free Uses State
+  const [billingStatus, setBillingStatus] = useState<any>(null);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
+
   const logsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Authoritative Billing Check on Mount & Client Session Verification
+  const refreshBilling = async () => {
+    try {
+      const res = await getBillingStatusAction();
+      if (res.success && res.data) {
+        setBillingStatus(res.data);
+        const remaining = res.data.free_usage?.remaining ?? 3;
+        const reached = !res.data.is_admin && !res.data.paid_access && remaining <= 0;
+        if (reached) {
+          setIsLimitReached(true);
+          setIsPaywallOpen(true);
+        } else {
+          setIsLimitReached(false);
+        }
+      } else {
+        // Check anonymous cookie client-side
+        if (typeof document !== 'undefined') {
+          const cookies = document.cookie.split(';');
+          const anonCookie = cookies.find(c => c.trim().startsWith('reg_anon_audits='));
+          if (anonCookie) {
+            const count = parseInt(anonCookie.split('=')[1] || '0', 10);
+            if (count >= 3) {
+              setIsLimitReached(true);
+              setIsPaywallOpen(true);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Could not check billing status:", e);
+    }
+  };
+
+  useEffect(() => {
+    refreshBilling();
+  }, []);
 
   // Auto-scroll logs terminal
   useEffect(() => {
@@ -147,6 +192,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   };
 
   const handleRunAudit = async (targetToScan?: string) => {
+    if (isLimitReached) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
     const rawTarget = (targetToScan || urlInput || '').trim();
     if (!rawTarget) {
       setError('Please enter a target domain or website URL.');
@@ -200,6 +250,12 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       if (!resp.ok) {
         const errJson = await resp.json().catch(() => ({}));
+        if (resp.status === 402 || errJson.code === 'PAYMENT_REQUIRED') {
+          setIsLimitReached(true);
+          setPaywallReason(errJson.message || "Your 3 free uses have been used. Continue auditing websites by upgrading your access.");
+          setIsPaywallOpen(true);
+          throw new Error(errJson.message || "Your 3 free uses have been consumed. Upgrade to Pro to continue auditing.");
+        }
         throw new Error(errJson.message || `Audit request failed with HTTP status ${resp.status}`);
       }
 
@@ -214,6 +270,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
         const firstFail = result.findings.find(f => f.status === 'FAIL');
         if (firstFail) setExpandedFinding(firstFail.id);
       }
+
+      // Re-query authoritative billing status to update usage telemetry
+      refreshBilling();
     } catch (err: any) {
       clearInterval(interval);
       console.error('Audit execution failed:', err);
@@ -350,6 +409,19 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               LIVE PROBE AGENT • ZERO MOCKS
             </span>
+
+            {/* Authoritative Usage Entitlement Pill */}
+            {billingStatus && !billingStatus.is_admin && !billingStatus.paid_access && (
+              <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-zinc-900 border border-zinc-800 flex items-center gap-1.5">
+                <span className="text-zinc-400">Free Uses:</span>
+                <span className={isLimitReached ? "text-rose-400 font-extrabold" : "text-blue-400 font-extrabold"}>
+                  {billingStatus.free_usage?.used ?? 0} / {billingStatus.free_usage?.limit ?? 3}
+                </span>
+                {isLimitReached && (
+                  <span className="text-amber-400 font-bold">• LOCKED</span>
+                )}
+              </div>
+            )}
           </div>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1.5 max-w-3xl leading-relaxed">
             Enter your website URL. Our autonomous auditor agent inspects live transport security, defense headers, cookie configurations, GDPR consent banners, and WCAG accessibility against statutory regulations.
@@ -368,7 +440,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               <span>Export Audit (JSON)</span>
             </Button>
             <Button
-              onClick={() => handleRunAudit()}
+              onClick={() => {
+                if (isLimitReached) {
+                  setIsPaywallOpen(true);
+                  return;
+                }
+                handleRunAudit();
+              }}
               disabled={isAuditing}
               size="sm"
               className="text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1.5"
@@ -380,31 +458,70 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
         )}
       </div>
 
+      {/* Account Action Locked Alert Banner (when 3 free uses are exhausted) */}
+      {isLimitReached && (
+        <div className="p-4 sm:p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-amber-200 text-sm shadow-xl shadow-amber-500/5 animate-in fade-in duration-300">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-300">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-bold text-amber-300 flex items-center gap-2">
+                <span>Account Action Locked • 3/3 Free Uses Consumed</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">Upgrade Required</span>
+              </div>
+              <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">
+                You have reached your limit of 3 free website compliance audits and regulation compilations. All audit actions are locked until you upgrade to the Pro plan.
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => setIsPaywallOpen(true)}
+            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Upgrade to Pro ($49/mo)</span>
+          </Button>
+        </div>
+      )}
+
       {/* Target URL Input Control Deck */}
-      <div className="p-4 sm:p-5 rounded-xl bg-[#0C131B] border border-[#17222C] flex flex-col gap-4">
+      <div className={`p-4 sm:p-5 rounded-xl bg-[#0C131B] border transition-all flex flex-col gap-4 ${isLimitReached ? 'border-amber-500/30 opacity-90' : 'border-[#17222C]'}`}>
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           {/* URL Input Bar */}
           <div className="relative flex-1">
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-zinc-500 font-mono select-none">
-              <Lock className="w-3.5 h-3.5 text-zinc-400" />
+              <Lock className={`w-3.5 h-3.5 ${isLimitReached ? 'text-amber-400' : 'text-zinc-400'}`} />
               <span>https://</span>
             </div>
             <input
               type="text"
-              value={urlInput.replace(/^https?:\/\//i, '')}
+              value={isLimitReached ? '' : urlInput.replace(/^https?:\/\//i, '')}
               onChange={(e) => setUrlInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !isAuditing && handleRunAudit()}
-              placeholder="example.com or client-portal.org"
-              disabled={isAuditing}
-              className="w-full pl-22 pr-4 py-2.5 rounded-lg bg-zinc-950/80 border border-zinc-700/80 text-sm text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isAuditing) {
+                  if (isLimitReached) {
+                    setIsPaywallOpen(true);
+                  } else {
+                    handleRunAudit();
+                  }
+                }
+              }}
+              placeholder={isLimitReached ? "Account Action Locked — 3/3 Free Uses Consumed (Upgrade to Pro)" : "example.com or client-portal.org"}
+              disabled={isAuditing || isLimitReached}
+              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-zinc-600 focus:outline-none transition-all ${
+                isLimitReached 
+                  ? 'bg-zinc-900/50 border-amber-500/30 text-amber-200/60 cursor-not-allowed' 
+                  : 'bg-zinc-950/80 border-zinc-700/80 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+              }`}
             />
           </div>
 
           {/* Depth Selector */}
-          <div className="flex items-center gap-1 bg-zinc-950/80 border border-zinc-800 p-1 rounded-lg text-xs font-mono">
+          <div className={`flex items-center gap-1 bg-zinc-950/80 border border-zinc-800 p-1 rounded-lg text-xs font-mono ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
               onClick={() => setScanDepth('surface')}
-              disabled={isAuditing}
+              disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors ${
                 scanDepth === 'surface'
                   ? 'bg-zinc-800 text-white font-bold'
@@ -415,7 +532,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             </button>
             <button
               onClick={() => setScanDepth('deep')}
-              disabled={isAuditing}
+              disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors flex items-center gap-1 ${
                 scanDepth === 'deep'
                   ? 'bg-blue-600 text-white font-bold shadow-sm shadow-blue-500/30'
@@ -427,24 +544,34 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             </button>
           </div>
 
-          {/* Trigger Scan Button */}
-          <Button
-            onClick={() => handleRunAudit()}
-            disabled={isAuditing}
-            className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-blue-900/30 transition-all shrink-0 flex items-center justify-center gap-2"
-          >
-            {isAuditing ? (
-              <>
-                <RefreshCw className="w-4 h-4 animate-spin text-cyan-200" />
-                <span>Crawling Website...</span>
-              </>
-            ) : (
-              <>
-                <Zap className="w-4 h-4 text-cyan-300" />
-                <span>Deploy Audit Agent</span>
-              </>
-            )}
-          </Button>
+          {/* Trigger Scan Button / Locked Pro Button */}
+          {isLimitReached ? (
+            <Button
+              onClick={() => setIsPaywallOpen(true)}
+              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 shadow-lg shadow-amber-500/10 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span>3/3 Used • Upgrade to Pro</span>
+            </Button>
+          ) : (
+            <Button
+              onClick={() => handleRunAudit()}
+              disabled={isAuditing}
+              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-blue-900/30 transition-all shrink-0 flex items-center justify-center gap-2"
+            >
+              {isAuditing ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin text-cyan-200" />
+                  <span>Crawling Website...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 text-cyan-300" />
+                  <span>Deploy Audit Agent</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Quick Presets & Framework Chips */}
@@ -456,11 +583,15 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               <button
                 key={target.url}
                 onClick={() => {
+                  if (isLimitReached) {
+                    setIsPaywallOpen(true);
+                    return;
+                  }
                   setUrlInput(target.url);
                   handleRunAudit(target.url);
                 }}
-                disabled={isAuditing}
-                className="px-2.5 py-1 rounded bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-300 hover:text-white transition-colors"
+                disabled={isAuditing || isLimitReached}
+                className={`px-2.5 py-1 rounded bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-300 hover:text-white transition-colors ${isLimitReached ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
                 {target.label}
               </button>
@@ -832,6 +963,20 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           </div>
         </div>
       )}
+
+      {/* Authoritative Blocking Paywall Modal */}
+      <PaywallModal
+        isOpen={isPaywallOpen}
+        onClose={() => {
+          if (!isLimitReached) {
+            setIsPaywallOpen(false);
+          }
+        }}
+        freeUsesUsed={billingStatus?.free_usage?.used ?? 3}
+        freeUsesLimit={billingStatus?.free_usage?.limit ?? 3}
+        reason={paywallReason}
+        isBlocking={isLimitReached}
+      />
     </div>
   );
 }

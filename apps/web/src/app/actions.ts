@@ -478,4 +478,65 @@ export async function getCustomerPortalAction() {
   }
 }
 
+export async function reserveUsageAction(
+  operationType = 'website_audit',
+  metadata: Record<string, any> = {}
+) {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  if (!token) {
+    return { success: false, error: "Authentication required" };
+  }
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/billing/reserve-usage`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        operation_type: operationType,
+        operation_id: `op-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        source: 'client_action',
+        metadata
+      }),
+      signal: AbortSignal.timeout(6000),
+      cache: 'no-store'
+    });
+
+    if (!res.ok) {
+      let isPaymentRequired = res.status === 402;
+      let freeUsesUsed = 3;
+      let freeUsesLimit = 3;
+      let errorDetail = `Operation reservation failed (${res.status})`;
+      try {
+        const errJson = await res.json();
+        const detail = errJson.detail || errJson;
+        errorDetail = detail.message || (typeof detail === 'string' ? detail : errorDetail);
+        if (detail.code === 'PAYMENT_REQUIRED' || res.status === 402) {
+          isPaymentRequired = true;
+          freeUsesUsed = detail.free_uses_used ?? 3;
+          freeUsesLimit = detail.free_uses_limit ?? 3;
+        }
+      } catch (e) {}
+      return { success: false, error: errorDetail, isPaymentRequired, freeUsesUsed, freeUsesLimit };
+    }
+
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+
 
