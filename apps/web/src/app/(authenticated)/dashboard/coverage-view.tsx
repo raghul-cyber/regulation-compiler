@@ -279,13 +279,13 @@ export function CoverageView() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jurisdictionsList.map((jur: any, jurIdx: number) => {
-            const isSelected = selectedJurisdiction?.toUpperCase() === jur.code.toUpperCase();
-            const isLiveSignal = activeSignalJurisdiction?.toUpperCase() === jur.code.toUpperCase();
+          {(jurisdictionsList || []).filter(Boolean).map((jur: any, jurIdx: number) => {
+            const isSelected = Boolean(selectedJurisdiction && jur?.code && selectedJurisdiction.toUpperCase() === jur.code.toUpperCase());
+            const isLiveSignal = Boolean(activeSignalJurisdiction && jur?.code && activeSignalJurisdiction.toUpperCase() === jur.code.toUpperCase());
             return (
               <div
-                key={`${jur.code || 'jur'}-${jurIdx}`}
-                onClick={() => setSelectedJurisdiction(jur.code)}
+                key={`${jur?.code || 'jur'}-${jurIdx}`}
+                onClick={() => jur?.code && setSelectedJurisdiction(jur.code)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer group relative ${
                   isSelected
                     ? 'bg-blue-950/30 border-blue-500/80 ring-2 ring-blue-500/50 shadow-lg shadow-blue-950/60'

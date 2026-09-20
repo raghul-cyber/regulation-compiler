@@ -25,12 +25,12 @@ export default function DashboardPage() {
     if (!isLoaded) return;
 
     if (user) {
-      const userEmails = user.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+      const userEmails = (user.emailAddresses || []).map(e => e?.emailAddress?.toLowerCase()).filter(Boolean) as string[];
       const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
 
       const isSuperAdmin = (
         primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() ||
-        userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+        Boolean(userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase())) ||
         user.id === SUPER_ADMIN_CLERK_ID
       );
       setIsAdmin(isSuperAdmin);

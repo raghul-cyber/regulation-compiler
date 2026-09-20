@@ -183,14 +183,15 @@ export function Actions247View() {
   // Filtered action stream
   const filteredActions = useMemo(() => {
     return actions.filter(act => {
+      if (!act) return false;
       if (filterType !== 'ALL' && act.action_type !== filterType) return false;
       if (filterJurisdiction !== 'ALL' && act.jurisdiction !== filterJurisdiction) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchTitle = act.title?.toLowerCase().includes(q);
-        const matchDesc = act.description?.toLowerCase().includes(q);
-        const matchAuth = act.authority?.toLowerCase().includes(q);
-        const matchJur = act.jurisdiction?.toLowerCase().includes(q);
+        const matchTitle = (act.title || '').toLowerCase().includes(q);
+        const matchDesc = (act.description || '').toLowerCase().includes(q);
+        const matchAuth = (act.authority || '').toLowerCase().includes(q);
+        const matchJur = (act.jurisdiction || '').toLowerCase().includes(q);
         if (!matchTitle && !matchDesc && !matchAuth && !matchJur) return false;
       }
       return true;

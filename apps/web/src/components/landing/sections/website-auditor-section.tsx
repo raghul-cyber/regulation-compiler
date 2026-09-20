@@ -280,14 +280,17 @@ export function WebsiteAuditorSection() {
                 <span>Autonomous Agent Stream // Live Telemetry</span>
               </div>
               <div className="space-y-1">
-                {terminalLog.map((log, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
-                    <span className="text-blue-500 select-none">&gt;</span>
-                    <span className={log.includes('[ERROR]') ? 'text-red-400' : log.includes('[REPORT]') ? 'text-emerald-400 font-semibold' : 'text-zinc-300'}>
-                      {log}
-                    </span>
-                  </div>
-                ))}
+                {(terminalLog || []).filter(Boolean).map((rawLog, idx) => {
+                  const log = typeof rawLog === 'string' ? rawLog : String(rawLog || '');
+                  return (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-500 select-none">&gt;</span>
+                      <span className={log.includes('[ERROR]') ? 'text-red-400' : log.includes('[REPORT]') ? 'text-emerald-400 font-semibold' : 'text-zinc-300'}>
+                        {log}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -23,12 +23,12 @@ export default function AdminPage() {
   }
 
   // Extract user email and Clerk user ID
-  const userEmails = user?.emailAddresses?.map(e => e.emailAddress.toLowerCase()) || [];
+  const userEmails = (user?.emailAddresses || []).map(e => e?.emailAddress?.toLowerCase()).filter(Boolean) as string[];
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || (userEmails[0] || '');
 
   const isSuperAdmin = 
     primaryEmail === SUPER_ADMIN_EMAIL.toLowerCase() || 
-    userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase()) ||
+    Boolean(userEmails.includes(SUPER_ADMIN_EMAIL.toLowerCase())) ||
     user?.id === SUPER_ADMIN_CLERK_ID;
 
   // If not super-admin, display strict security-grade 403 Access Denied

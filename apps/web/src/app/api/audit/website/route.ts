@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30; // 30s timeout for Next.js
+export const maxDuration = 60; // Extend duration ceiling on Vercel
 
 interface AuditRequest {
   url: string;
@@ -29,7 +29,7 @@ export interface AuditFinding {
 }
 
 function isPrivateIpOrHost(hostname: string): boolean {
-  const lower = hostname.toLowerCase();
+  const lower = (hostname || '').toLowerCase();
   if (lower === 'localhost' || lower === '127.0.0.1' || lower === '0.0.0.0' || lower === '::1') {
     return true;
   }
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       ? body.frameworks 
       : ['GDPR', 'HIPAA', 'SOC 2', 'WCAG 2.1', 'PCI-DSS', 'ISO 27001', 'DORA', 'NIST'];
 
-    // Entitlement & 3 Free Uses Verification for Authenticated Users
+    // Entitlement & 3 Free Uses Verification for Authenticated Users (with strict timeout)
     let userToken: string | null = null;
     try {
       const { auth } = await import('@clerk/nextjs/server');
@@ -91,13 +91,16 @@ export async function POST(request: NextRequest) {
       userToken = await session.getToken();
       if (userToken) {
         const apiBase = (process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
+        // Guard against hung connections in serverless environment with a strict 1.8s timeout
         const statusRes = await fetch(`${apiBase}/billing/status`, {
           headers: { 'Authorization': `Bearer ${userToken}` },
-          cache: 'no-store'
-        });
-        if (statusRes.ok) {
-          const billing = await statusRes.json();
-          if (!billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(1800)
+        }).catch(() => null);
+
+        if (statusRes && statusRes.ok) {
+          const billing = await statusRes.json().catch(() => null);
+          if (billing && !billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
             return NextResponse.json(
               {
                 code: 'PAYMENT_REQUIRED',
@@ -113,7 +116,7 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (authErr) {
-      // Proceed gracefully if unauthenticated public preview
+      // Proceed gracefully if unauthenticated public preview or billing endpoint is unreachable
     }
 
     const agentLogs: string[] = [];
@@ -123,7 +126,7 @@ export async function POST(request: NextRequest) {
     agentLogs.push(`[DNS-LOOKUP] Validating domain reachability for ${hostname}...`);
     agentLogs.push(`[FRAMEWORKS-LINKED] Active standard gates: ${requestedFrameworks.join(', ')}`);
 
-    // 1. Fetch main landing page
+    // 1. Fetch main landing page with strict 6s timeout to stay well within Vercel execution ceilings
     agentLogs.push(`[TLS-INSPECT] Establishing HTTPS/TLS connection and streaming headers...`);
     let mainResp: Response;
     try {
@@ -134,21 +137,24 @@ export async function POST(request: NextRequest) {
           'Accept-Language': 'en-US,en;q=0.9',
         },
         redirect: 'follow',
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(6000),
       });
     } catch (fetchErr: any) {
+      const isTimeout = fetchErr?.name === 'TimeoutError' || (fetchErr?.message || '').toLowerCase().includes('timeout');
       return NextResponse.json(
         {
           status: 'error',
-          message: `Unable to connect to target website (${hostname}): ${fetchErr?.message || 'Network unreachable or connection timed out'}. Please check that the URL is public and operational.`,
+          message: isTimeout
+            ? `Connection to ${hostname} timed out after 6 seconds. The target website may be slow, down, or blocking automated inspection.`
+            : `Unable to connect to target website (${hostname}): ${fetchErr?.message || 'Network unreachable'}. Please check that the URL is public and operational.`,
         },
-        { status: 502 }
+        { status: isTimeout ? 504 : 502 }
       );
     }
 
     const latencyMs = Date.now() - startTime;
-    const finalUrl = mainResp.url;
-    agentLogs.push(`[HANDSHAKE-SUCCESS] Connected: HTTP ${mainResp.status} ${mainResp.statusText} (${latencyMs}ms)`);
+    const finalUrl = mainResp.url || rawUrl;
+    agentLogs.push(`[HANDSHAKE-SUCCESS] Connected: HTTP ${mainResp.status} ${mainResp.statusText || 'OK'} (${latencyMs}ms)`);
 
     const headers: Record<string, string> = {};
     const rawHeadersList: { key: string; value: string }[] = [];
@@ -162,16 +168,16 @@ export async function POST(request: NextRequest) {
     const [secTxtResp, robotsResp, httpRedirectResp] = await Promise.all([
       fetch(`${origin}/.well-known/security.txt`, {
         headers: { 'User-Agent': 'RegCompiler-ComplianceBot/2.0' },
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(2000),
       }).catch(() => null),
       fetch(`${origin}/robots.txt`, {
         headers: { 'User-Agent': 'RegCompiler-ComplianceBot/2.0' },
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(2000),
       }).catch(() => null),
       fetch(`http://${hostname}`, {
         method: 'HEAD',
         redirect: 'manual',
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(2000),
       }).catch(() => null),
     ]);
 
@@ -759,8 +765,8 @@ export async function POST(request: NextRequest) {
 
     // Filter findings by user selected frameworks if requested
     const filteredFindings = findings.filter(f => {
-      if (requestedFrameworks.includes('ALL')) return true;
-      return requestedFrameworks.some(fw => f.framework.toUpperCase().includes(fw.toUpperCase()));
+      if ((requestedFrameworks || []).includes('ALL')) return true;
+      return (requestedFrameworks || []).some(fw => (f.framework || '').toUpperCase().includes((fw || '').toUpperCase()));
     });
 
     const activeFindings = filteredFindings.length > 0 ? filteredFindings : findings;
@@ -812,6 +818,7 @@ export async function POST(request: NextRequest) {
       domain: hostname,
       scanned_at: new Date().toISOString(),
       execution_time_ms: Date.now() - startTime,
+      latency_ms: latencyMs || (Date.now() - startTime),
       http_status: mainResp.status,
       html_bytes: htmlBytes,
       grade,
@@ -826,9 +833,16 @@ export async function POST(request: NextRequest) {
         medium: mediumCount,
         low: lowCount,
       },
-      findings: activeFindings,
+      findings: activeFindings.map(f => ({
+        ...f,
+        title: f.title || '',
+        framework: f.framework || '',
+        clause: f.clause || '',
+        affected: f.affected || '',
+        evidence: f.evidence || '',
+      })),
       raw_headers: rawHeadersList,
-      agent_logs: agentLogs,
+      agent_logs: agentLogs.filter(Boolean).map(log => String(log || '')),
     };
 
     return NextResponse.json(resultPayload, {

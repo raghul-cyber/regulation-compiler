@@ -461,7 +461,8 @@ export function CoverageGlobe({
   // Aggregate regulations count per jurisdiction
   const regCountsByJurisdiction = useMemo(() => {
     const counts: Record<string, { count: number; names: string[] }> = {};
-    regulations.forEach(reg => {
+    (regulations || []).forEach(reg => {
+      if (!reg) return;
       const j = (reg.jurisdiction || 'GLOBAL').trim().toUpperCase();
       if (!counts[j]) {
         counts[j] = { count: 0, names: [] };
@@ -477,15 +478,15 @@ export function CoverageGlobe({
   // Construct comprehensive worldwide markers
   const markers = useMemo<MarkerData[]>(() => {
     // If backend provided rich jurisdiction metadata, combine it with regulations
-    if (jurisdictionsData && jurisdictionsData.length > 0) {
-      return jurisdictionsData.map(jData => {
-        const code = jData.code.toUpperCase();
+    if (jurisdictionsData && Array.isArray(jurisdictionsData) && jurisdictionsData.length > 0) {
+      return jurisdictionsData.filter(Boolean).map(jData => {
+        const code = (jData.code || '').toUpperCase();
         const coords = JURISDICTION_COORDS[code] || jData.coordinates || [0, 0];
         const dbRegs = regCountsByJurisdiction[code] || { count: 0, names: [] };
         
         // Use greater of backend count or computed regulations count
         const totalCount = Math.max(jData.ruleset_count || 0, dbRegs.count);
-        const combinedNames = Array.from(new Set([...(jData.regulations || []), ...dbRegs.names]));
+        const combinedNames = Array.from(new Set([...(jData.regulations || []), ...(dbRegs.names || [])]));
 
         return {
           jurisdiction: code,

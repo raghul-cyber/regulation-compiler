@@ -618,16 +618,23 @@ export function AdminOverview() {
   };
 
   const filteredUsers = useMemo(() => {
-    if (!data?.users) return [];
+    if (!data?.users || !Array.isArray(data.users)) return [];
+    const q = (searchQuery || '').toLowerCase();
     return data.users.filter(u => {
+      if (!u) return false;
+      const uEmail = (u.email || '').toLowerCase();
+      const uName = (u.name || '').toLowerCase();
+      const uId = (u.id || '').toLowerCase();
+      const uRole = (u.role || '').toLowerCase();
+
       const matchesSearch = 
-        u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.id.toLowerCase().includes(searchQuery.toLowerCase());
+        uEmail.includes(q) ||
+        uName.includes(q) ||
+        uId.includes(q);
       
       if (filterRole === 'ALL') return matchesSearch;
-      if (filterRole === 'ADMIN') return matchesSearch && (u.is_super_admin || u.role.toLowerCase().includes('admin'));
-      return matchesSearch && u.role.toLowerCase() === filterRole.toLowerCase();
+      if (filterRole === 'ADMIN') return matchesSearch && (u.is_super_admin || uRole.includes('admin'));
+      return matchesSearch && uRole === (filterRole || '').toLowerCase();
     });
   }, [data?.users, searchQuery, filterRole]);
 

@@ -16,9 +16,9 @@ export function TopNav() {
   const pathname = usePathname();
   const { user } = useUser();
 
-  const userEmails = user?.emailAddresses?.map((e) => e.emailAddress.toLowerCase()) || [];
+  const userEmails = (user?.emailAddresses || []).map((e) => e?.emailAddress?.toLowerCase()).filter(Boolean) as string[];
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-  const isSuperAdmin = primaryEmail === 'rcraghul12@gmail.com' || userEmails.includes('rcraghul12@gmail.com');
+  const isSuperAdmin = primaryEmail === 'rcraghul12@gmail.com' || Boolean(userEmails?.includes('rcraghul12@gmail.com'));
 
   const isLanding = pathname === '/';
 

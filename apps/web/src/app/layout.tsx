@@ -10,11 +10,13 @@ import { ConsoleGuard } from "@/components/common/console-guard";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -51,7 +53,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
         style={{ colorScheme: 'dark' }}
       >
-        <body className="min-h-full flex flex-col bg-[#0a0a0c] text-gray-100">
+        <body className={`${geistSans.className} font-sans min-h-full flex flex-col bg-[#0a0a0c] text-gray-100`}>
           <IntraAppToastProvider>
             <ConsoleGuard />
             <TopNav />

@@ -136,7 +136,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       return;
     }
     setSelectedFrameworks(prev => {
-      const withoutAll = prev.filter(f => f !== 'ALL');
+      const withoutAll = (prev || []).filter(Boolean).filter(f => f !== 'ALL');
       if (withoutAll.includes(fw)) {
         const next = withoutAll.filter(f => f !== fw);
         return next.length === 0 ? ['ALL'] : next;
@@ -176,7 +176,10 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
     let step = 0;
     const interval = setInterval(() => {
       if (step < logMilestones.length) {
-        setStreamLogs(prev => [...prev, logMilestones[step]]);
+        const milestone = logMilestones[step];
+        if (milestone) {
+          setStreamLogs(prev => [...prev, milestone]);
+        }
         setAuditProgress(prev => Math.min(92, prev + 12));
         step++;
       }
@@ -202,7 +205,10 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       const result: AuditResult = await resp.json();
       setAuditProgress(100);
-      setStreamLogs(result.agent_logs || logMilestones);
+      const safeLogs = (result.agent_logs && Array.isArray(result.agent_logs))
+        ? result.agent_logs.filter(Boolean).map(l => String(l || ''))
+        : logMilestones;
+      setStreamLogs(safeLogs);
       setAuditResult(result);
       if (result.findings && result.findings.length > 0) {
         const firstFail = result.findings.find(f => f.status === 'FAIL');
@@ -238,8 +244,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
   // Filtered findings list
   const displayedFindings = useMemo(() => {
-    if (!auditResult?.findings) return [];
+    if (!auditResult?.findings || !Array.isArray(auditResult.findings)) return [];
     return auditResult.findings.filter(f => {
+      if (!f) return false;
       // Severity filter
       if (severityFilter === 'PASSED' && f.status !== 'PASS') return false;
       if (severityFilter !== 'ALL' && severityFilter !== 'PASSED') {
@@ -248,16 +255,18 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       // Framework filter
       if (frameworkFilter !== 'ALL') {
-        if (!f.framework.toUpperCase().includes(frameworkFilter.toUpperCase())) return false;
+        const fwStr = (f.framework || '').toUpperCase();
+        const filterStr = (frameworkFilter || '').toUpperCase();
+        if (!fwStr.includes(filterStr)) return false;
       }
 
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesTitle = f.title.toLowerCase().includes(q);
-        const matchesEvidence = f.evidence.toLowerCase().includes(q);
-        const matchesClause = f.clause.toLowerCase().includes(q);
-        const matchesAffected = f.affected.toLowerCase().includes(q);
+        const matchesTitle = (f.title || '').toLowerCase().includes(q);
+        const matchesEvidence = (f.evidence || '').toLowerCase().includes(q);
+        const matchesClause = (f.clause || '').toLowerCase().includes(q);
+        const matchesAffected = (f.affected || '').toLowerCase().includes(q);
         if (!matchesTitle && !matchesEvidence && !matchesClause && !matchesAffected) return false;
       }
 
@@ -507,14 +516,19 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             ref={logsContainerRef}
             className="font-mono text-[11px] text-zinc-300 space-y-1 max-h-40 overflow-y-auto pt-2 leading-relaxed"
           >
-            {streamLogs.map((log, idx) => (
-              <div key={idx} className="flex items-start gap-2">
-                <span className="text-zinc-600 select-none">&gt;</span>
-                <span className={log.includes('FAIL') || log.includes('MISSING') ? 'text-amber-300' : log.includes('PASS') || log.includes('FOUND') ? 'text-emerald-300' : 'text-zinc-300'}>
-                  {log}
-                </span>
-              </div>
-            ))}
+            {(streamLogs || []).filter(Boolean).map((rawLog, idx) => {
+              const log = typeof rawLog === 'string' ? rawLog : String(rawLog || '');
+              const isFail = log.includes('FAIL') || log.includes('MISSING');
+              const isPass = log.includes('PASS') || log.includes('FOUND');
+              return (
+                <div key={idx} className="flex items-start gap-2">
+                  <span className="text-zinc-600 select-none">&gt;</span>
+                  <span className={isFail ? 'text-amber-300' : isPass ? 'text-emerald-300' : 'text-zinc-300'}>
+                    {log}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

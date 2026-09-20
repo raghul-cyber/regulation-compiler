@@ -124,9 +124,9 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
       // Search query match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesName = reg.name.toLowerCase().includes(q);
+        const matchesName = (reg.name || '').toLowerCase().includes(q);
         const matchesDesc = (reg.description || '').toLowerCase().includes(q);
-        const matchesJur = reg.jurisdiction.toLowerCase().includes(q);
+        const matchesJur = (reg.jurisdiction || '').toLowerCase().includes(q);
         const matchesUrl = (reg.source_url || '').toLowerCase().includes(q);
         return matchesName || matchesDesc || matchesJur || matchesUrl;
       }

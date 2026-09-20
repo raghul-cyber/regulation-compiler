@@ -237,7 +237,7 @@ export function LiveSurveillanceFeed({
         return false;
       }
       seen.add(e.id);
-      if (filterJurisdiction !== 'ALL' && e.jurisdiction.toUpperCase() !== filterJurisdiction.toUpperCase()) {
+      if (filterJurisdiction !== 'ALL' && (e.jurisdiction || '').toUpperCase() !== (filterJurisdiction || '').toUpperCase()) {
         return false;
       }
       if (filterSeverity !== 'ALL' && e.severity !== filterSeverity) {
@@ -292,8 +292,8 @@ export function LiveSurveillanceFeed({
     }
   };
 
-  const getJurisdictionColor = (code: string) => {
-    switch (code.toUpperCase()) {
+  const getJurisdictionColor = (code?: string) => {
+    switch ((code || '').toUpperCase()) {
       case 'EU': return 'bg-blue-600/20 text-blue-400 border-blue-500/40';
       case 'US': return 'bg-emerald-600/20 text-emerald-400 border-emerald-500/40';
       case 'UK': return 'bg-indigo-600/20 text-indigo-400 border-indigo-500/40';
@@ -452,8 +452,8 @@ export function LiveSurveillanceFeed({
             <p className="text-xs text-zinc-600 mt-1">Switch filter back to "ALL" to inspect the global stream.</p>
           </div>
         ) : (
-          filteredEvents.map((evt, idx) => {
-            const isSelected = selectedJurisdiction && selectedJurisdiction.toUpperCase() === evt.jurisdiction.toUpperCase();
+          filteredEvents.filter(Boolean).map((evt, idx) => {
+            const isSelected = Boolean(selectedJurisdiction && selectedJurisdiction.toUpperCase() === (evt.jurisdiction || '').toUpperCase());
             return (
               <div
                 key={`${evt.id}-${idx}`}
@@ -467,10 +467,10 @@ export function LiveSurveillanceFeed({
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${getJurisdictionColor(evt.jurisdiction)}`}>
-                      {evt.jurisdiction}
+                      {evt.jurisdiction || 'GLOBAL'}
                     </span>
                     <span className="text-[10px] text-zinc-400 font-mono tracking-tight uppercase">
-                      {evt.category.replace(/_/g, ' ')}
+                      {(evt.category || 'TELEMETRY').replace(/_/g, ' ')}
                     </span>
                     {evt.citation && (
                       <span className="px-1.5 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/80 text-[10px] font-mono text-zinc-300">
@@ -506,7 +506,7 @@ export function LiveSurveillanceFeed({
                 <div className="mt-2.5 pt-2 border-t border-zinc-800/40 flex flex-wrap items-center justify-between gap-2 text-[11px]">
                   <span className="text-zinc-500 flex items-center gap-1">
                     <Globe2 className="w-3 h-3 text-zinc-400" />
-                    {evt.authority}
+                    {evt.authority || 'Regulatory Body'}
                   </span>
 
                   <div className="flex items-center gap-1.5">
@@ -531,29 +531,31 @@ export function LiveSurveillanceFeed({
                       
                       let match = null;
                       if (regulations && regulations.length > 0) {
+                        const getRegName = (r: any) => (r?.name || '').toUpperCase();
                         if (title.includes('DORA') || summary.includes('DORA')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('DORA'));
+                          match = regulations.find(r => getRegName(r).includes('DORA'));
                         } else if (title.includes('GDPR') || summary.includes('GDPR') || title.includes('EDPB') || summary.includes('EDPB')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('GDPR'));
+                          match = regulations.find(r => getRegName(r).includes('GDPR'));
                         } else if (title.includes('HIPAA') || summary.includes('HIPAA')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('HIPAA'));
+                          match = regulations.find(r => getRegName(r).includes('HIPAA'));
                         } else if (title.includes('CCPA') || summary.includes('CCPA') || title.includes('CPRA') || title.includes('CPPA')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('CCPA') || r.name.toUpperCase().includes('CALIFORNIA'));
+                          match = regulations.find(r => getRegName(r).includes('CCPA') || getRegName(r).includes('CALIFORNIA'));
                         } else if (title.includes('PIPEDA') || summary.includes('PIPEDA') || title.includes('OPC')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('PIPEDA'));
+                          match = regulations.find(r => getRegName(r).includes('PIPEDA'));
                         } else if (title.includes('PCI DSS') || summary.includes('PCI DSS') || title.includes('PCI SSC') || title.includes('PAYMENT CARD')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('PCI DSS') || r.name.toUpperCase().includes('PAYMENT CARD'));
+                          match = regulations.find(r => getRegName(r).includes('PCI DSS') || getRegName(r).includes('PAYMENT CARD'));
                         } else if (title.includes('ISO') || summary.includes('ISO') || title.includes('27001')) {
-                          match = regulations.find(r => r.name.toUpperCase().includes('27001'));
+                          match = regulations.find(r => getRegName(r).includes('27001'));
                         }
                         if (!match) {
-                          match = regulations.find(r => r.jurisdiction.toUpperCase() === jur);
+                          match = regulations.find(r => (r?.jurisdiction || '').toUpperCase() === jur);
                         }
                       }
 
-                      const label = match 
-                        ? (match.name.includes('(') ? match.name.split('(')[1].replace(')', '') : match.name.split(' ')[0])
-                        : `${evt.jurisdiction} Regulation`;
+                      const matchName = match?.name || '';
+                      const label = matchName 
+                        ? (matchName.includes('(') ? matchName.split('(')[1].replace(')', '') : matchName.split(' ')[0])
+                        : `${evt.jurisdiction || 'Global'} Regulation`;
 
                       return (
                         <button
@@ -561,11 +563,11 @@ export function LiveSurveillanceFeed({
                             if (match?.id) {
                               router.push(`/regulations/${match.id}/requirements`);
                             } else {
-                              router.push(`/regulations?jurisdiction=${encodeURIComponent(evt.jurisdiction)}`);
+                              router.push(`/regulations?jurisdiction=${encodeURIComponent(evt.jurisdiction || '')}`);
                             }
                           }}
                           className="text-emerald-400 hover:text-emerald-300 font-semibold text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 transition-all flex items-center gap-1 border border-emerald-500/30 hover:border-emerald-400/50 shadow-sm"
-                          title={match ? `Inspect extracted requirements for ${match.name}` : `Inspect ${evt.jurisdiction} regulations`}
+                          title={match ? `Inspect extracted requirements for ${matchName}` : `Inspect ${evt.jurisdiction || 'Global'} regulations`}
                         >
                           <Shield className="w-2.5 h-2.5 text-emerald-400" />
                           <span>Inspect {label}</span>
