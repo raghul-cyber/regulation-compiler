@@ -29,7 +29,8 @@ def test_phase1_upload():
 @pytest.mark.asyncio
 async def test_phase2_3_events():
     # Because 'mock-job-id' doesn't exist, the backend accurately returns 404
-    response = client.get("/api/v1/regulations/job/mock-job-id/events")
+    non_existent_job_id = uuid.uuid4()
+    response = client.get(f"/api/v1/jobs/{non_existent_job_id}")
     assert response.status_code == 404
 
 def test_phase4_report():

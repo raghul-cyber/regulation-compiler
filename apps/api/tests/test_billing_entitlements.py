@@ -137,7 +137,8 @@ def test_free_usage_progression_and_blocking(db_session, test_org_and_user):
         service.reserve_usage(user, "compile_regulation", "op_4")
 
     assert exc_info.value.status_code == 402
-    detail = exc_info.value.detail
+    assert isinstance(exc_info.value.detail, dict)
+    detail: dict = exc_info.value.detail
     assert detail["code"] == "PAYMENT_REQUIRED"
     assert detail["free_uses_used"] == 3
     assert detail["free_uses_limit"] == 3
