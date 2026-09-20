@@ -434,8 +434,15 @@ export async function createCheckoutAction(productId?: string, returnUrl?: strin
       cache: 'no-store'
     });
     if (!res.ok) {
-      const errText = await res.text().catch(() => 'Checkout initialization failed');
-      return { success: false, error: errText };
+      let errorMessage = 'Failed to initialize secure checkout';
+      try {
+        const errJson = await res.json();
+        errorMessage = errJson.error?.message || errJson.message || errJson.detail || errorMessage;
+      } catch {
+        const text = await res.text().catch(() => '');
+        if (text) errorMessage = text;
+      }
+      return { success: false, error: errorMessage };
     }
     const data = await res.json();
     return { success: true, data };

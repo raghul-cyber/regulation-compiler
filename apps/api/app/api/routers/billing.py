@@ -94,7 +94,6 @@ async def create_checkout(
     Initiates an authentic Dodo Payments checkout session.
     Returns the real checkout URL for user redirection.
     """
-    body = await request.json().catch(lambda: {}) if hasattr(request, "json") else {}
     try:
         body = await request.json()
     except Exception:

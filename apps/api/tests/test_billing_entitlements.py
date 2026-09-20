@@ -259,3 +259,66 @@ def test_refund_revocation(db_session, test_org_and_user):
     summary_after = service.get_usage_summary(user)
     assert summary_after["paid_access"] is False
     assert summary_after["status"] == "past_due"
+
+
+def test_checkout_endpoint_success(db_session, test_org_and_user):
+    """
+    Tests that POST /api/v1/billing/checkout correctly parses the JSON body,
+    calls Dodo service, and returns the checkout URL without any 500 error.
+    """
+    from unittest.mock import AsyncMock, patch
+    from app.core.auth import get_current_user
+    from app.db.session import get_db
+
+    org, user = test_org_and_user
+
+    app.dependency_overrides[get_current_user] = lambda: user
+    app.dependency_overrides[get_db] = lambda: db_session
+
+    try:
+        client = TestClient(app)
+        mock_checkout = AsyncMock(return_value={
+            "checkout_url": "https://test.dodopayments.com/buy/session_test_abc123",
+            "session_id": "session_test_abc123",
+            "mode": "test"
+        })
+
+        with patch("app.api.routers.billing.dodo_service.create_checkout_session", new=mock_checkout):
+            response = client.post(
+                "/api/v1/billing/checkout",
+                json={"product_id": "p_test_pro", "return_url": "https://example.com/return"}
+            )
+
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        data = response.json()
+        assert data["success"] is True
+        assert data["checkout_url"] == "https://test.dodopayments.com/buy/session_test_abc123"
+        assert data["session_id"] == "session_test_abc123"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_checkout_endpoint_admin_exempt(db_session, admin_user):
+    """
+    Tests that POST /api/v1/billing/checkout exempts admin users from checkout.
+    """
+    from app.core.auth import get_current_user
+    from app.db.session import get_db
+
+    org, user = admin_user
+
+    app.dependency_overrides[get_current_user] = lambda: user
+    app.dependency_overrides[get_db] = lambda: db_session
+
+    try:
+        client = TestClient(app)
+        response = client.post("/api/v1/billing/checkout", json={})
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "exempt"
+        assert data["is_admin"] is True
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
