@@ -1,4 +1,4 @@
-﻿import httpx
+import httpx
 import uuid
 import asyncio
 import os
@@ -53,7 +53,10 @@ def run_tests():
         
     print("\n--- 2. Standard Framework Ingestion Test (NOT GDPR) ---")
     dora = db.query(FrameworkCatalog).filter(FrameworkCatalog.acronym == 'DORA').first()
-    print(f"Selected Framework: {dora.name} ({dora.acronym}), Fetchable: {dora.is_fetchable}")
+    if dora:
+        print(f"Selected Framework: {dora.name} ({dora.acronym}), Fetchable: {dora.is_fetchable}")
+    else:
+        print("Framework DORA not found in database catalog (using fallback DORA parameter).")
     
     print("Simulating Admin triggering ingest...")
     app.dependency_overrides[get_current_user] = lambda: admin
@@ -69,9 +72,10 @@ def run_tests():
     # wait, TestClient uses Starlette, it can run it synchronously.
     # To prevent actual celery dispatch from hanging or throwing, we can patch `process_ingestion_pipeline.delay`
     from unittest.mock import patch
+    target_acronym = dora.acronym if dora else "DORA"
     with patch('app.workers.tasks.process_ingestion_pipeline.delay') as mock_delay:
         mock_delay.return_value.id = "mock_celery_task_123"
-        response = client.post(f"/api/v1/regulations/frameworks/{dora.acronym}/ingest")
+        response = client.post(f"/api/v1/regulations/frameworks/{target_acronym}/ingest")
         
         print(f"Ingest API Status Code: {response.status_code}")
         if response.status_code == 200:

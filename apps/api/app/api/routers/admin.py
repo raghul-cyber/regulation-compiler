@@ -228,11 +228,12 @@ def get_admin_overview(
     users_by_id = {u.id: u for u in all_db_users}
 
     # Bulk fetch audit log counts per actor in 1 query
-    audit_counts = dict(
-        db.query(AuditLog.actor_id, func.count(AuditLog.id))
+    audit_counts: Dict[Any, int] = {
+        row[0]: row[1]
+        for row in db.query(AuditLog.actor_id, func.count(AuditLog.id))
         .group_by(AuditLog.actor_id)
         .all()
-    )
+    }
 
     # Build structured user list with O(1) in-memory lookups
     users_list = []
@@ -276,7 +277,7 @@ def get_admin_overview(
             active_in_last_24h += 1
 
         # O(1) in-memory DB role and audit count
-        db_user = users_by_clerk_id.get(c_id)
+        db_user = users_by_clerk_id.get(str(c_id)) if c_id else None
         user_role = db_user.role.value if (db_user and hasattr(db_user.role, 'value')) else (db_user.role if db_user else "developer")
         if primary_email.lower() == SUPER_ADMIN_EMAIL.lower():
             user_role = "super_admin"

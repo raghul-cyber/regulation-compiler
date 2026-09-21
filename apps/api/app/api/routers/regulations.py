@@ -84,12 +84,10 @@ async def upload_regulation(
 ):
     # 1. Resolve and verify authenticated user
     if not current_user:
-        current_user = db.query(User).first()
-        if not current_user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication is required to upload and compile regulations."
-            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication is required to upload and compile regulations."
+        )
 
     # 2. Enforce 3 Free Uses Policy & Atomic Concurrency-Safe Entitlement Reservation
     entitlement_service = EntitlementService(db)
@@ -363,12 +361,10 @@ async def ingest_framework(
 
     # 1. Resolve and verify authenticated user
     if not current_user:
-        current_user = db.query(User).first()
-        if not current_user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication is required to ingest statutory frameworks."
-            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication is required to ingest statutory frameworks."
+        )
 
     # 2. Enforce 3 Free Uses Policy & Atomic Concurrency-Safe Entitlement Reservation
     entitlement_service = EntitlementService(db)

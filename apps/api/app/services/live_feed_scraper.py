@@ -1030,14 +1030,18 @@ class LiveRegulatoryScraperService:
             }
 
         # Record action
+        rec_authority = str(result_event.get("authority") or f"{jurisdiction} Regulatory Supervisory Authority")
+        raw_title = result_event.get("title")
+        rec_title = str(raw_title) if raw_title else "Autonomous Statutory Sync"
+        short_title = rec_title[:60]
         self.record_action(
             action_type="STATUTORY_PROBE",
             title=f"On-Demand Statutory Probe Executed ({jurisdiction})",
-            description=f"Probed {result_event.get('authority')}. Received statutory signal '{result_event.get('title')[:60]}...'",
+            description=f"Probed {rec_authority}. Received statutory signal '{short_title}...'",
             jurisdiction=jurisdiction,
-            authority=result_event.get("authority", "Supervisory Authority"),
+            authority=rec_authority,
             latency_ms=elapsed_ms,
-            metadata={"probe_id": result_event.get("id"), "citation": result_event.get("citation")}
+            metadata={"probe_id": str(result_event.get("id") or ""), "citation": str(result_event.get("citation") or "")}
         )
 
         return result_event

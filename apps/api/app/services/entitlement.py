@@ -30,7 +30,6 @@ class EntitlementService:
     def is_admin(self, user: Optional[User]) -> bool:
         """
         Server-side evaluation of administrative privileges.
-        Never relies on client-provided query parameters or payload properties.
         """
         if not user:
             return False

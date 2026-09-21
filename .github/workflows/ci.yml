@@ -54,9 +54,9 @@ jobs:
         uses: amondnet/vercel-action@v25
         continue-on-error: true
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-token: ${{ secrets['VERCEL_TOKEN'] }}
+          vercel-org-id: ${{ secrets['VERCEL_ORG_ID'] }}
+          vercel-project-id: ${{ secrets['VERCEL_PROJECT_ID'] }}
           working-directory: apps/web
           vercel-args: '--prod'
 
@@ -69,7 +69,7 @@ jobs:
       - name: Trigger Render Deploy Webhook
         continue-on-error: true
         env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets['RENDER_DEPLOY_HOOK_URL'] }}
         run: |
           if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
             echo "Triggering Render deployment webhook..."

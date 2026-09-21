@@ -47,6 +47,18 @@ export async function runComplianceCheck(regulationId: string, payload: any) {
   
   if (!token) throw new Error("Unauthorized");
 
+  // 0. Enforce 3 free actions quota before spinning up developer API key
+  const reserve = await reserveUsageAction('compliance_simulation', { regulation_id: regulationId });
+  if (!reserve.success && reserve.isPaymentRequired) {
+    return {
+      success: false,
+      isPaymentRequired: true,
+      error: "Your 3 free uses have been used. Upgrade to continue.",
+      freeUsesUsed: reserve.freeUsesUsed ?? 3,
+      freeUsesLimit: reserve.freeUsesLimit ?? 3
+    };
+  }
+
   const API_BASE = getApiBaseUrl();
 
   // 1. Generate a temporary API key using the user's Clerk Token
@@ -544,6 +556,41 @@ export async function reserveUsageAction(
     return { success: false, error: err.message };
   }
 }
+
+export async function getBillingUsageAction() {
+  let token: string | null = null;
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    token = await session.getToken();
+  } catch (e) {}
+
+  if (!token) {
+    return { success: false, error: "Authentication required", data: { events: [] } };
+  }
+
+  const API_BASE = getApiBaseUrl();
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/billing/usage`, {
+      headers,
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      return { success: false, error: `Status ${res.status}`, data: { events: [] } };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message, data: { events: [] } };
+  }
+}
+
 
 
 

@@ -1,5 +1,6 @@
 import time
 import json
+import inspect
 import functools
 import logging
 from typing import Any, Callable, Dict, Optional, Tuple
@@ -101,7 +102,7 @@ def cached_endpoint(ttl_seconds: int = 300, key_prefix: str = ""):
             if cached_val is not None:
                 return cached_val
 
-            result = await func(*args, **kwargs) if functools.iscoroutinefunction(func) else func(*args, **kwargs)
+            result = await func(*args, **kwargs) if inspect.iscoroutinefunction(func) else func(*args, **kwargs)
             ResponseCache.set(cache_key, result, ttl_seconds)
             return result
 
@@ -118,7 +119,7 @@ def cached_endpoint(ttl_seconds: int = 300, key_prefix: str = ""):
             ResponseCache.set(cache_key, result, ttl_seconds)
             return result
 
-        if functools.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
     return decorator

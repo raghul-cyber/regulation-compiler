@@ -20,6 +20,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { PaywallModal } from '@/components/billing/paywall-modal';
 
 interface LiveScanPreview {
   target_url: string;
@@ -69,6 +70,7 @@ export function WebsiteAuditorSection() {
   const [scanResult, setScanResult] = useState<LiveScanPreview | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   const [terminalLog, setTerminalLog] = useState<string[]>([]);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
   const handleRunScan = async (targetUrl?: string) => {
     const urlToTest = targetUrl || inputUrl;
@@ -92,7 +94,16 @@ export function WebsiteAuditorSection() {
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.error || `HTTP ${res.status}: Failed to execute live website audit`);
+        if (res.status === 402 || errJson.code === 'PAYMENT_REQUIRED') {
+          setIsPaywallOpen(true);
+          setScanError('Complimentary free tier quota (3/3 actions) exhausted. Upgrade to Pro to unlock unlimited audits.');
+          setTerminalLog((prev) => [
+            ...prev,
+            `[PAYWALL] 3 Free Actions quota exhausted. Upgrade required to continue.`
+          ]);
+          return;
+        }
+        throw new Error(errJson.error || errJson.message || `HTTP ${res.status}: Failed to execute live website audit`);
       }
 
       const data: LiveScanPreview = await res.json();
@@ -390,6 +401,15 @@ export function WebsiteAuditorSection() {
           </div>
         </div>
       </div>
+
+      <PaywallModal
+        isOpen={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        freeUsesUsed={3}
+        freeUsesLimit={3}
+        isBlocking={false}
+        reason="Your 3 free tier audits have been used. Upgrade to Pro to unlock unlimited website compliance crawling."
+      />
     </section>
   );
 }

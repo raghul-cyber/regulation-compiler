@@ -14,7 +14,7 @@ import {
   Layers,
   History
 } from 'lucide-react';
-import { getBillingStatusAction, createCheckoutAction, getCustomerPortalAction } from '@/app/actions';
+import { getBillingStatusAction, getBillingUsageAction, createCheckoutAction, getCustomerPortalAction } from '@/app/actions';
 import { PaywallModal } from '@/components/billing/paywall-modal';
 
 interface BillingData {
@@ -33,8 +33,19 @@ interface BillingData {
   dodo_customer_id: string | null;
 }
 
+interface UsageEventItem {
+  id: string;
+  operation_type: string;
+  operation_id: string;
+  status: string;
+  credits_consumed: number;
+  created_at: string | null;
+  metadata?: Record<string, any>;
+}
+
 export default function BillingPage() {
   const [billing, setBilling] = useState<BillingData | null>(null);
+  const [usageEvents, setUsageEvents] = useState<UsageEventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -47,9 +58,16 @@ export default function BillingPage() {
   const loadBilling = async () => {
     setLoading(true);
     try {
-      const res = await getBillingStatusAction();
-      if (res.success && res.data) {
-        setBilling(res.data);
+      const [statusRes, usageRes] = await Promise.all([
+        getBillingStatusAction(),
+        getBillingUsageAction()
+      ]);
+
+      if (statusRes.success && statusRes.data) {
+        setBilling(statusRes.data);
+      }
+      if (usageRes.success && usageRes.data?.events) {
+        setUsageEvents(usageRes.data.events);
       }
     } catch (e) {
       console.error("Failed to load billing status:", e);
@@ -225,6 +243,76 @@ export default function BillingPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Live Background Action & Audit Ledger */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-[#080D13] border border-zinc-800 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <History className="w-4 h-4 text-[#5CC8FF]" />
+              <span>Live Background Action & Audit Ledger</span>
+            </h3>
+            <p className="mt-1 text-xs text-zinc-400">
+              Authoritative PostgreSQL usage ledger tracking metered user actions in real-time. Persistent across logout and login.
+            </p>
+          </div>
+          <button
+            onClick={loadBilling}
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-mono transition-colors cursor-pointer"
+          >
+            Refresh Ledger
+          </button>
+        </div>
+
+        {usageEvents.length === 0 ? (
+          <div className="py-8 text-center text-zinc-500 font-mono text-xs border border-dashed border-zinc-800/80 rounded-xl">
+            No metered background operations recorded yet. Perform a website compliance audit or regulation compilation to see live telemetry.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-zinc-800 text-zinc-400 font-mono">
+                  <th className="pb-3 font-semibold">Timestamp (UTC)</th>
+                  <th className="pb-3 font-semibold">Operation Type</th>
+                  <th className="pb-3 font-semibold">Operation ID / Target</th>
+                  <th className="pb-3 font-semibold">Credits</th>
+                  <th className="pb-3 font-semibold text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/50 text-zinc-300 font-mono">
+                {usageEvents.map((evt) => (
+                  <tr key={evt.id} className="hover:bg-zinc-900/30 transition-colors">
+                    <td className="py-3 text-zinc-400 text-[11px]">
+                      {evt.created_at ? new Date(evt.created_at).toLocaleString() : 'Just now'}
+                    </td>
+                    <td className="py-3 font-semibold text-white capitalize">
+                      {evt.operation_type.replace(/_/g, ' ')}
+                    </td>
+                    <td className="py-3 text-zinc-400 truncate max-w-[220px]" title={evt.operation_id}>
+                      {evt.metadata?.target_url || evt.metadata?.regulation_name || evt.metadata?.acronym || evt.operation_id}
+                    </td>
+                    <td className="py-3 text-amber-400 font-bold">
+                      {evt.credits_consumed > 0 ? `-${evt.credits_consumed} Action` : '0 (Exempt)'}
+                    </td>
+                    <td className="py-3 text-right">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
+                        evt.status === 'completed'
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          : evt.status === 'reserved'
+                          ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                          : 'bg-zinc-800 text-zinc-400'
+                      }`}>
+                        {evt.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Plan Feature Comparison Table */}

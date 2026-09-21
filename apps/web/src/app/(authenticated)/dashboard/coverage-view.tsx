@@ -141,7 +141,7 @@ export function CoverageView() {
             <span className="text-2xl font-black text-white">
               {monitoringData?.active_jurisdictions_count || 4}
             </span>
-            <span className="text-xs text-zinc-500 font-mono">
+            <span className="text-xs text-zinc-500">
               / {monitoringData?.total_jurisdictions_count || 9} global nodes
             </span>
           </div>
@@ -174,7 +174,7 @@ export function CoverageView() {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black text-emerald-400">ONLINE</span>
-            <span className="text-xs text-zinc-500 font-mono">Continuous</span>
+            <span className="text-xs text-zinc-500">Continuous</span>
           </div>
           <div className="mt-1 text-[11px] text-zinc-400">
             <span>Auto-poll interval: 6s</span>

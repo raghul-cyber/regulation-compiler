@@ -121,7 +121,7 @@ export function UsageIndicator() {
         onClose={() => setIsPaywallOpen(false)}
         freeUsesUsed={used}
         freeUsesLimit={limit}
-        isBlocking={false}
+        isBlocking={isExhausted}
       />
     </>
   );

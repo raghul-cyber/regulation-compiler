@@ -4,6 +4,7 @@ import time
 import shutil
 import logging
 from typing import Optional
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -83,12 +84,26 @@ if sentry_dsn and not sentry_dsn.startswith("https://placeholder"):
     )
 
 # -------------------------------------------------------------
-# FastAPI Application Declaration
+# FastAPI Application Declaration & Lifespan
 # -------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Safely launch continuous 24/7 statutory surveillance daemon in background thread
+    try:
+        if os.getenv("ENABLE_SURVEILLANCE_DAEMON", "true").lower() != "false":
+            interval = int(os.getenv("SURVEILLANCE_INTERVAL", "10"))
+            from app.services.live_feed_scraper import start_24_7_surveillance_worker
+            start_24_7_surveillance_worker(interval_seconds=interval)
+            logging.getLogger("app.main").info(f"24/7 Live Regulatory Surveillance Worker spawned in background thread ({interval}s interval).")
+    except Exception as e:
+        logging.getLogger("app.main").error(f"Surveillance worker startup notice: {e}")
+    yield
+
 app = FastAPI(
     title="Regulation-as-Code Compiler API",
     description="Enterprise-Hardened API for the Regulation-as-Code Compiler",
     version="1.1.0",
+    lifespan=lifespan,
 )
 
 # -------------------------------------------------------------
@@ -166,7 +181,7 @@ async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
             "error": {
                 "code": "RATE_LIMIT_EXCEEDED",
                 "message": "Rate limit exceeded. Please throttle your requests.",
-                "details": str(exc.detail) if hasattr(exc, "detail") else "Too many requests"
+                "details": exc.detail if hasattr(exc, "detail") else "Too many requests"
             }
         },
         headers={
@@ -282,6 +297,7 @@ async def deep_health_check(request: Request):
 
     # 1. PostgreSQL Probe
     db_start = time.time()
+    db = None
     try:
         db = SessionLocal()
         db.execute(text("SELECT 1"))
@@ -292,10 +308,11 @@ async def deep_health_check(request: Request):
         is_degraded = True
         response["checks"]["database"] = f"error: {str(e)}"
     finally:
-        try:
-            db.close()
-        except Exception:
-            pass
+        if db is not None:
+            try:
+                db.close()
+            except Exception:
+                pass
 
     # 2. Redis Probe
     redis_start = time.time()
@@ -365,18 +382,6 @@ async def trigger_error():
         return JSONResponse(status_code=404, content={"detail": "Not found"})
     raise Exception("Test Sentry error")
 
-from app.services.live_feed_scraper import start_24_7_surveillance_worker
-
-@app.on_event("startup")
-def startup_event():
-    # Safely launch continuous 24/7 statutory surveillance daemon in background thread
-    try:
-        if os.getenv("ENABLE_SURVEILLANCE_DAEMON", "true").lower() != "false":
-            interval = int(os.getenv("SURVEILLANCE_INTERVAL", "10"))
-            start_24_7_surveillance_worker(interval_seconds=interval)
-            logging.getLogger("app.main").info(f"24/7 Live Regulatory Surveillance Worker spawned in background thread ({interval}s interval).")
-    except Exception as e:
-        logging.getLogger("app.main").error(f"Surveillance worker startup notice: {e}")
 
 if __name__ == "__main__":
     import uvicorn

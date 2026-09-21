@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { createCheckoutAction } from '@/app/actions';
 
+import { useClerk } from '@clerk/nextjs';
+
 interface PaywallModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,6 +35,7 @@ export function PaywallModal({
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signOut } = useClerk();
 
   useEffect(() => {
     setMounted(true);
@@ -52,13 +55,13 @@ export function PaywallModal({
   useEffect(() => {
     if (!isOpen || !mounted) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !isBlocking) {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, mounted, onClose]);
+  }, [isOpen, mounted, onClose, isBlocking]);
 
   if (!isOpen || !mounted) return null;
 
@@ -93,7 +96,7 @@ export function PaywallModal({
     <div 
       className="fixed inset-0 z-[999999] overflow-y-auto bg-black/85 backdrop-blur-md p-4 sm:p-6 flex min-h-screen w-screen items-center justify-center animate-in fade-in duration-200"
       style={{ margin: 0, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
-      onClick={onClose}
+      onClick={isBlocking ? undefined : onClose}
     >
       <div 
         className="relative w-full max-w-lg my-auto p-6 sm:p-8 rounded-2xl bg-[#0B131D] border border-[#1E2C38] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(92,200,255,0.15)] text-white overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
@@ -102,14 +105,16 @@ export function PaywallModal({
         {/* Subtle Ambient Glow */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-colors z-10 cursor-pointer"
-          aria-label="Close modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Close Button (Hidden if Blocking) */}
+        {!isBlocking && (
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-colors z-10 cursor-pointer"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
 
         {/* Header Badge */}
         <div className="flex items-center gap-2">
@@ -134,7 +139,7 @@ export function PaywallModal({
 
         {/* Usage Tracker Pill */}
         <div className="p-3 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs font-mono">
-          <span className="text-zinc-400">Free Audits & Compilations:</span>
+          <span className="text-zinc-400">Free Actions Quota:</span>
           <span className="font-bold text-rose-400 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
             {freeUsesUsed} / {freeUsesLimit} used (0 remaining)
@@ -190,13 +195,23 @@ export function PaywallModal({
             )}
           </button>
 
-          <button
-            onClick={onClose}
-            disabled={isLoading}
-            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-medium transition-colors cursor-pointer"
-          >
-            Maybe later
-          </button>
+          {isBlocking ? (
+            <button
+              onClick={() => signOut({ redirectUrl: '/' })}
+              disabled={isLoading}
+              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-medium transition-colors cursor-pointer"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              onClick={onClose}
+              disabled={isLoading}
+              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-medium transition-colors cursor-pointer"
+            >
+              Maybe later
+            </button>
+          )}
         </div>
 
         {/* Trust Footer */}

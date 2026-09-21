@@ -95,32 +95,68 @@ async def get_current_user(
         if not clerk_user_id:
             raise HTTPException(status_code=401, detail="Token missing subject")
             
-        # Fetch the user from the database
         user = db.query(User).filter(User.clerk_user_id == clerk_user_id).first()
+        from app.models.organizations import Organization, PlanEnum
+        from app.models.billing import UserEntitlement
+
+        user_email = (payload.get("email") or payload.get("email_address") or f"{clerk_user_id}@user.clerk").strip().lower()
+        is_super = (
+            user_email == "rcraghul12@gmail.com" or
+            clerk_user_id == "user_3HpP6350OcHxY6bu77tdXEtihSE"
+        )
+
         if not user:
-            # Auto-create user if not yet in database
-            from app.models.organizations import Organization, PlanEnum
-            
-            org = db.query(Organization).first()
-            if not org:
-                org = Organization(name="Primary Workspace", plan=PlanEnum.enterprise)
-                db.add(org)
+            # Auto-create user with isolated organization
+            if is_super:
+                super_org = db.query(Organization).filter(Organization.name == "SuperAdmin Workspace").first()
+                if not super_org:
+                    super_org = Organization(name="SuperAdmin Workspace", plan=PlanEnum.enterprise)
+                    db.add(super_org)
+                    db.flush()
+                target_org = super_org
+            else:
+                name_prefix = user_email.split('@')[0] if user_email else "User"
+                target_org = Organization(name=f"{name_prefix}'s Workspace", plan=PlanEnum.trial)
+                db.add(target_org)
                 db.flush()
-                
-            user_email = payload.get("email") or payload.get("email_address") or f"{clerk_user_id}@user.clerk"
-            is_super = (
-                (user_email or "").strip().lower() == "rcraghul12@gmail.com" or
-                clerk_user_id == "user_3HpP6350OcHxY6bu77tdXEtihSE"
-            )
+
             user = User(
-                org_id=org.id,
+                org_id=target_org.id,
                 clerk_user_id=clerk_user_id,
                 role=RoleEnum.admin if is_super else RoleEnum.developer,
                 email="rcraghul12@gmail.com" if is_super else user_email
             )
             db.add(user)
+            db.flush()
+
+            # Initialize dedicated UserEntitlement
+            entitlement = UserEntitlement(
+                org_id=target_org.id,
+                user_id=user.id,
+                plan="enterprise" if is_super else "free",
+                status="active",
+                free_usage_limit=3,
+                free_usage_used=0,
+                paid_credits=9999 if is_super else 0
+            )
+            db.add(entitlement)
             db.commit()
             db.refresh(user)
+        else:
+            # Ensure existing user has a UserEntitlement record
+            entitlement = db.query(UserEntitlement).filter(UserEntitlement.org_id == user.org_id).first()
+            if not entitlement:
+                entitlement = UserEntitlement(
+                    org_id=user.org_id,
+                    user_id=user.id,
+                    plan="enterprise" if is_super else "free",
+                    status="active",
+                    free_usage_limit=3,
+                    free_usage_used=0,
+                    paid_credits=9999 if is_super else 0
+                )
+                db.add(entitlement)
+                db.commit()
             
         # Optional: In a multi-tenant app, we might set a DB context/GUC here for RLS
         try:
