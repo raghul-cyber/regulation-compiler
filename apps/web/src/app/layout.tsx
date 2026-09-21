@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Regulation Compiler",
+  title: "RegCompiler | Regulation as Code",
   description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
   icons: {
     icon: [

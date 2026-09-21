@@ -1,6 +1,6 @@
 # Dodo Payments & Entitlement System Documentation
 
-This document describes the production monetization and usage-control architecture for **Regulation Compiler**, powered by **Dodo Payments**.
+This document describes the production monetization and usage-control architecture for **RegCompiler**, powered by **Dodo Payments**.
 
 ---
 
@@ -71,7 +71,7 @@ This document describes the production monetization and usage-control architectu
 
 ### Step 2: Create a Product / Plan
 1. In the Dodo dashboard, navigate to **Products** > **Create Product**.
-2. Name: `Regulation Compiler Pro` (or `Compiler Unlimited`).
+2. Name: `RegCompiler Pro` (or `Compiler Unlimited`).
 3. Pricing: Set price (e.g., `$49.00 / month` or one-time license).
 4. Save and copy the **Product ID** (e.g., `prod_01j9...`).
 

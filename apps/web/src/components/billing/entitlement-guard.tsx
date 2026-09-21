@@ -113,7 +113,7 @@ export function EntitlementGuard() {
       freeUsesUsed={billingStatus?.free_usage?.used ?? 3}
       freeUsesLimit={billingStatus?.free_usage?.limit ?? 3}
       isBlocking={isExhausted}
-      reason="You have used all 3 complimentary free actions across Regulation Compiler. To continue running compliance checks, compiling statutory regulations, and deploying audits, please upgrade to the Pro plan."
+      reason="You have used all 3 complimentary free actions across RegCompiler. To continue running compliance checks, compiling statutory regulations, and deploying audits, please upgrade to the Pro plan."
     />
   );
 }

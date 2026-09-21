@@ -9,7 +9,7 @@ export function Footer() {
           <div className="w-6 h-6 rounded-md bg-zinc-900 border border-zinc-800 p-0.5 flex items-center justify-center shrink-0">
             <Image 
               src="/logo-icon.png" 
-              alt="Regulation Compiler Logo" 
+              alt="RegCompiler Logo" 
               width={20} 
               height={20}
               className="w-full h-full object-contain" 
@@ -18,7 +18,7 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <p className="text-sm text-zinc-500">
-              &copy; {new Date().getFullYear()} Regulation Compiler. Deterministic Statutory Enforcement.
+              &copy; {new Date().getFullYear()} RegCompiler. Deterministic Statutory Enforcement.
             </p>
           </div>
         </div>

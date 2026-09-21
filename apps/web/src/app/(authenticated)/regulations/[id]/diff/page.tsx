@@ -4,7 +4,8 @@ import { getRegulationDiff } from '@/lib/api';
 import { DiffViewer } from '@/components/diff/diff-viewer';
 
 export const metadata = {
-  title: 'Diff Engine | Regulation Compiler',
+  title: 'Diff Engine | RegCompiler',
+  description: 'Track semantic amendments, textual deltas, and cross-statute structural drift.',
 };
 
 async function DiffContent({ 

@@ -7,7 +7,8 @@ import { Shield } from 'lucide-react';
 import { RegulationsClient } from './regulations-client';
 
 export const metadata = {
-  title: 'Canonical Regulations Directory | Regulation Compiler',
+  title: 'Canonical Regulations Directory | RegCompiler',
+  description: 'Explore compiled regulatory frameworks, version branches, and structural metadata.',
 };
 
 export const dynamic = 'force-dynamic';

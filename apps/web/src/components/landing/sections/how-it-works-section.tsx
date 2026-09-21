@@ -25,7 +25,7 @@ export function HowItWorksSection() {
           Compiler Architecture
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F2F6F8] tracking-tight leading-tight">
-          How Regulation Compiler Works
+          How RegCompiler Works
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#9AA9B5] leading-relaxed">
           The end-to-end statutory compilation lifecycle. From raw governmental gazettes to real-time machine policy enforcement.

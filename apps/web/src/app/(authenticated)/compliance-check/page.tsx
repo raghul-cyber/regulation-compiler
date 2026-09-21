@@ -2,7 +2,8 @@ import { getRegulations } from '@/lib/api';
 import { ComplianceTester } from '@/components/compliance/tester';
 
 export const metadata = {
-  title: 'Compliance Simulator | Regulation Compiler',
+  title: 'Compliance Simulator | RegCompiler',
+  description: 'Simulate, validate, and verify system compliance against compiled statutory rules.',
 };
 
 export default async function ComplianceCheckPage() {

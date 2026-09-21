@@ -3,7 +3,8 @@ import { ReportsGrid } from '@/components/reports/reports-grid';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Reports Library | Regulation Compiler',
+  title: 'Reports Library | RegCompiler',
+  description: 'Generate, preview, and download formal compliance audit reports in Markdown and PDF.',
 };
 
 export default async function ReportsPage({ params }: { params: Promise<{ id: string }> }) {

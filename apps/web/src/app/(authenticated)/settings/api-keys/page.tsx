@@ -4,7 +4,8 @@ import { ApiKeysList } from '@/components/settings/api-keys-list';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'API Keys | Regulation Compiler',
+  title: 'API Keys | RegCompiler',
+  description: 'Manage programmatic API keys and webhook secrets for statutory audit automation.',
 };
 
 export default async function ApiKeysPage() {

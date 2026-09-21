@@ -52,7 +52,7 @@ export function TopNav() {
             <div className="w-8 h-8 rounded-lg bg-[#0E151D] border border-[#22313E] flex items-center justify-center p-1.5 shadow-inner transition-transform group-hover:scale-105">
               <Image
                 src="/icon.png"
-                alt="Regulation Compiler Monogram"
+                alt="RegCompiler Monogram"
                 width={20}
                 height={20}
                 className="w-5 h-5 object-contain"
@@ -220,7 +220,7 @@ export function TopNav() {
             <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center p-0.5 bg-zinc-900/90 border border-zinc-800 group-hover:border-blue-500/50 transition-colors shadow-sm shadow-blue-500/10 shrink-0">
               <Image
                 src="/logo-icon.png"
-                alt="Regulation Compiler Logo"
+                alt="RegCompiler Logo"
                 width={32}
                 height={32}
                 className="w-full h-full object-contain"

@@ -3,8 +3,8 @@ import { ArrowLeft, ShieldCheck, Lock, Database, EyeOff, Server, Globe2, AlertCi
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Privacy Policy | Regulation Compiler',
-  description: 'Privacy Policy and data protection standards for the Regulation-as-Code Compiler platform.',
+  title: 'Privacy Policy | RegCompiler',
+  description: 'How RegCompiler collects, processes, and protects your enterprise statutory and audit data.',
 };
 
 export default function PrivacyPage() {

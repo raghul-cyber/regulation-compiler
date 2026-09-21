@@ -104,14 +104,14 @@ export function HeroSection() {
           <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center shrink-0">
             <Image 
               src="/logo-icon.png" 
-              alt="Regulation Compiler Logo" 
+              alt="RegCompiler Logo" 
               width={16} 
               height={16}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain" 
               priority
             />
           </div>
-          <span className="text-[#F2F6F8] font-medium">Regulation Compiler</span>
+          <span className="text-[#F2F6F8] font-medium">RegCompiler</span>
           <span className="text-[#62717C]">•</span>
           <span className="text-[#5CC8FF] font-mono tracking-wider text-[11px] uppercase">
             REGULATORY INTELLIGENCE / COMPLIANCE COMPILER

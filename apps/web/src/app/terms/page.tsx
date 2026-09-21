@@ -3,8 +3,8 @@ import { ArrowLeft, Shield, FileText, CheckCircle, Scale, AlertTriangle, HelpCir
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Terms of Service | Regulation Compiler',
-  description: 'Terms and conditions governing the use of the Regulation-as-Code Compiler platform.',
+  title: 'Terms of Service | RegCompiler',
+  description: 'Terms of Service and legal disclaimer for the RegCompiler statutory automation platform.',
 };
 
 export default function TermsPage() {

@@ -6,7 +6,8 @@ import { RequirementCard } from '@/components/requirements/requirement-card';
 import { Shield, BookOpen, ExternalLink, ChevronRight, CheckCircle2, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Requirements Browser | Regulation Compiler',
+  title: 'Requirements Browser | RegCompiler',
+  description: 'Search, filter, and review parsed obligations with verifiable source traces.',
 };
 
 async function RequirementsContent({ 
