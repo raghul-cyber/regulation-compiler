@@ -242,6 +242,11 @@ export function WebsiteAuditorSection() {
                 type="url"
                 value={inputUrl}
                 onChange={(e) => setInputUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isScanning) {
+                    handleRunScan();
+                  }
+                }}
                 placeholder="https://your-company.com"
                 className="w-full bg-[#080D13] border border-zinc-700 focus:border-blue-500 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-mono"
               />

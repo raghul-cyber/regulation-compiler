@@ -17,7 +17,8 @@ export function ConsoleGuard() {
       const firstArg = typeof args[0] === 'string' ? args[0] : '';
       if (
         firstArg.includes('THREE.Clock: This module has been deprecated') ||
-        firstArg.includes('Clerk: Clerk has been loaded with development keys')
+        firstArg.includes('Clerk: Clerk has been loaded with development keys') ||
+        firstArg.includes('was preloaded using link preload but not used')
       ) {
         return;
       }

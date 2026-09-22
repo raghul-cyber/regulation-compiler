@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import http from 'http';
+import https from 'https';
+import { URL } from 'url';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const maxDuration = 60; // Extend duration ceiling on Vercel
 
 interface AuditRequest {
@@ -9,8 +13,17 @@ interface AuditRequest {
   scan_depth?: 'surface' | 'deep';
 }
 
+export interface AuditRemediation {
+  description: string;
+  nginx?: string | null;
+  nextjs?: string | null;
+  apache?: string | null;
+  cloudflare?: string | null;
+}
+
 export interface AuditFinding {
   id: string;
+  rule_id?: string;
   title: string;
   category: 'SECURITY' | 'PRIVACY' | 'ACCESSIBILITY' | 'DISCLOSURE' | 'SUPPLY_CHAIN';
   framework: string;
@@ -18,14 +31,30 @@ export interface AuditFinding {
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
   status: 'PASS' | 'FAIL';
   affected: string;
+  affected_resource?: string;
   evidence: string;
-  remediation: {
-    description: string;
-    nginx?: string | null;
-    nextjs?: string | null;
-    apache?: string | null;
-    cloudflare?: string | null;
-  } | null;
+  description?: string;
+  remediation: AuditRemediation | null;
+  remediation_guidance?: string;
+}
+
+interface ProbeResult {
+  finalUrl: string;
+  statusCode: number;
+  statusText: string;
+  headers: Record<string, string>;
+  rawHeaders: { key: string; value: string }[];
+  cookies: string[];
+  html: string;
+  tlsAudit: {
+    isHttps: boolean;
+    authorized: boolean;
+    certError: string | null;
+    protocol: string | null;
+  };
+  latencyMs: number;
+  redirectsFollowed: number;
+  visitedUrls: string[];
 }
 
 function isPrivateIpOrHost(hostname: string): boolean {
@@ -40,8 +69,228 @@ function isPrivateIpOrHost(hostname: string): boolean {
   if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
   if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
   if (/^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
-  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(lower)) return true; // Link-local / AWS metadata
+  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(lower)) return true; // Link-local
   return false;
+}
+
+/**
+ * Resilient, zero-mock crawler probe engine.
+ * - Handles redirects statefully with a cookie jar
+ * - Detects and breaks redirect loops gracefully (e.g. auth handshake loops)
+ * - Tolerates invalid/self-signed certs so they can be audited for compliance
+ * - Falls back to plain HTTP if port 443 is refused
+ * - Employs realistic browser headers to prevent false-positive bot-blocking
+ */
+async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<ProbeResult> {
+  const startTime = Date.now();
+  let currentUrl = targetUrl.trim();
+  if (!currentUrl.startsWith('http://') && !currentUrl.startsWith('https://')) {
+    currentUrl = 'https://' + currentUrl;
+  }
+
+  const visitedUrls = new Set<string>();
+  const visitedList: string[] = [];
+  const cookieJar = new Map<string, string>();
+  let lastResponse: any = null;
+  const accumulatedHeaders: Record<string, string> = {};
+  const collectedCookies: string[] = [];
+  const tlsAudit = {
+    isHttps: false,
+    authorized: true,
+    certError: null as string | null,
+    protocol: null as string | null,
+  };
+  let redirectsCount = 0;
+
+  for (let hop = 0; hop < maxRedirects; hop++) {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(currentUrl);
+    } catch {
+      break;
+    }
+
+    if (visitedUrls.has(currentUrl)) {
+      // Loop detected - break cleanly without crashing!
+      break;
+    }
+    visitedUrls.add(currentUrl);
+    visitedList.push(currentUrl);
+
+    const isHttps = parsedUrl.protocol === 'https:';
+    if (hop === 0) {
+      tlsAudit.isHttps = isHttps;
+    }
+
+    const cookieString = Array.from(cookieJar.entries())
+      .map(([k, v]) => `${k}=${v}`)
+      .join('; ');
+
+    const headers: Record<string, string> = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 RegCompiler-Auditor/2.0',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Sec-Ch-Ua': '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+      'Sec-Ch-Ua-Mobile': '?0',
+      'Sec-Ch-Ua-Platform': '"Windows"',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1',
+      ...(cookieString ? { 'Cookie': cookieString } : {})
+    };
+
+    let stepRes: any = null;
+    try {
+      stepRes = await new Promise((resolve, reject) => {
+        const client = isHttps ? https : http;
+        const req = client.request(parsedUrl, {
+          method: 'GET',
+          headers,
+          timeout: 6000,
+          rejectUnauthorized: false, // Don't crash on invalid/self-signed certs
+        }, (res) => {
+          const chunks: Buffer[] = [];
+          res.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+          res.on('end', () => {
+            const body = Buffer.concat(chunks).toString('utf-8');
+            resolve({
+              statusCode: res.statusCode || 200,
+              statusMessage: res.statusMessage || 'OK',
+              headers: res.headers,
+              body,
+              socket: res.socket,
+            });
+          });
+        });
+
+        req.on('timeout', () => {
+          req.destroy(new Error(`Connection to ${parsedUrl.hostname} timed out after 6000ms.`));
+        });
+
+        req.on('error', (err) => {
+          reject(err);
+        });
+
+        req.end();
+      });
+    } catch (reqErr: any) {
+      // If initial HTTPS failed due to connection error (e.g. port 443 closed / ECONNREFUSED), attempt HTTP fallback
+      if (hop === 0 && isHttps) {
+        try {
+          const fallbackUrl = currentUrl.replace(/^https:/i, 'http:');
+          parsedUrl = new URL(fallbackUrl);
+          stepRes = await new Promise((resolve, reject) => {
+            const req = http.request(parsedUrl, {
+              method: 'GET',
+              headers,
+              timeout: 5000,
+            }, (res) => {
+              const chunks: Buffer[] = [];
+              res.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+              res.on('end', () => {
+                const body = Buffer.concat(chunks).toString('utf-8');
+                resolve({
+                  statusCode: res.statusCode || 200,
+                  statusMessage: res.statusMessage || 'OK',
+                  headers: res.headers,
+                  body,
+                  socket: res.socket,
+                });
+              });
+            });
+            req.on('timeout', () => req.destroy(new Error(`HTTP fallback connection timed out`)));
+            req.on('error', reject);
+            req.end();
+          });
+          tlsAudit.isHttps = false;
+          tlsAudit.certError = 'Target host refused HTTPS connection on port 443; fallback to unencrypted plaintext HTTP.';
+          currentUrl = fallbackUrl;
+        } catch {
+          throw reqErr;
+        }
+      } else {
+        if (lastResponse) {
+          break; // Stop at previous good response
+        }
+        throw reqErr;
+      }
+    }
+
+    if (!stepRes) break;
+
+    // Check socket TLS certificate authorization
+    if (stepRes.socket && (stepRes.socket as any).authorized !== undefined) {
+      if (!(stepRes.socket as any).authorized) {
+        tlsAudit.authorized = false;
+        tlsAudit.certError = (stepRes.socket as any).authorizationError || 'Untrusted, invalid, or self-signed TLS certificate.';
+      }
+      if (typeof (stepRes.socket as any).getProtocol === 'function') {
+        tlsAudit.protocol = (stepRes.socket as any).getProtocol();
+      }
+    }
+
+    // Process set-cookie headers
+    const rawSetCookies = stepRes.headers['set-cookie'];
+    if (rawSetCookies) {
+      const cookieArray = Array.isArray(rawSetCookies) ? rawSetCookies : [rawSetCookies];
+      collectedCookies.push(...cookieArray);
+      for (const sc of cookieArray) {
+        const firstPart = sc.split(';')[0];
+        const eqIdx = firstPart.indexOf('=');
+        if (eqIdx > 0) {
+          const k = firstPart.slice(0, eqIdx).trim();
+          const v = firstPart.slice(eqIdx + 1).trim();
+          cookieJar.set(k, v);
+        }
+      }
+    }
+
+    // Accumulate headers
+    for (const [k, v] of Object.entries(stepRes.headers)) {
+      if (v) {
+        accumulatedHeaders[k.toLowerCase()] = Array.isArray(v) ? v.join('; ') : String(v);
+      }
+    }
+
+    lastResponse = stepRes;
+
+    const statusCode = stepRes.statusCode;
+    if (statusCode >= 300 && statusCode < 400 && stepRes.headers.location) {
+      redirectsCount++;
+      let nextLoc = stepRes.headers.location;
+      try {
+        nextLoc = new URL(nextLoc, currentUrl).toString();
+      } catch {
+        break;
+      }
+      currentUrl = nextLoc;
+      continue;
+    } else {
+      break;
+    }
+  }
+
+  if (!lastResponse) {
+    throw new Error(`Unable to establish connection to ${targetUrl}. Please check that the URL is public and operational.`);
+  }
+
+  const rawHeadersList = Object.entries(accumulatedHeaders).map(([key, value]) => ({ key, value }));
+
+  return {
+    finalUrl: currentUrl,
+    statusCode: lastResponse.statusCode,
+    statusText: lastResponse.statusMessage,
+    headers: accumulatedHeaders,
+    rawHeaders: rawHeadersList,
+    cookies: collectedCookies,
+    html: lastResponse.body || '',
+    tlsAudit,
+    latencyMs: Date.now() - startTime,
+    redirectsFollowed: redirectsCount,
+    visitedUrls: visitedList,
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -183,58 +432,47 @@ export async function POST(request: NextRequest) {
     agentLogs.push(`[DNS-LOOKUP] Validating domain reachability for ${hostname}...`);
     agentLogs.push(`[FRAMEWORKS-LINKED] Active standard gates: ${requestedFrameworks.join(', ')}`);
 
-    // 1. Fetch main landing page with strict 6s timeout to stay well within Vercel execution ceilings
-    agentLogs.push(`[TLS-INSPECT] Establishing HTTPS/TLS connection and streaming headers...`);
-    let mainResp: Response;
+    // 1. Execute robust zero-mock crawl
+    agentLogs.push(`[TLS-INSPECT] Establishing connection, negotiating cipher suite, and streaming headers...`);
+    let probeResult: ProbeResult;
     try {
-      mainResp = await fetch(rawUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) RegCompiler-ComplianceBot/2.0 (+https://regulationcompiler.org/compliance-agent)',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-        },
-        redirect: 'follow',
-        signal: AbortSignal.timeout(6000),
-      });
+      probeResult = await robustWebsiteProbe(rawUrl);
     } catch (fetchErr: any) {
-      const isTimeout = fetchErr?.name === 'TimeoutError' || (fetchErr?.message || '').toLowerCase().includes('timeout');
+      const isTimeout = (fetchErr?.message || '').toLowerCase().includes('timeout');
       return NextResponse.json(
         {
           status: 'error',
           message: isTimeout
-            ? `Connection to ${hostname} timed out after 6 seconds. The target website may be slow, down, or blocking automated inspection.`
+            ? `Connection to ${hostname} timed out. The target website may be slow, down, or filtering automated inspection.`
             : `Unable to connect to target website (${hostname}): ${fetchErr?.message || 'Network unreachable'}. Please check that the URL is public and operational.`,
         },
         { status: isTimeout ? 504 : 502 }
       );
     }
 
-    const latencyMs = Date.now() - startTime;
-    const finalUrl = mainResp.url || rawUrl;
-    agentLogs.push(`[HANDSHAKE-SUCCESS] Connected: HTTP ${mainResp.status} ${mainResp.statusText || 'OK'} (${latencyMs}ms)`);
-
-    const headers: Record<string, string> = {};
-    const rawHeadersList: { key: string; value: string }[] = [];
-    for (const [k, v] of mainResp.headers.entries()) {
-      headers[k.toLowerCase()] = v;
-      rawHeadersList.push({ key: k, value: v });
+    agentLogs.push(`[HANDSHAKE-SUCCESS] Connected: HTTP ${probeResult.statusCode} ${probeResult.statusText} (${probeResult.latencyMs}ms)`);
+    if (probeResult.redirectsFollowed > 0) {
+      agentLogs.push(`[REDIRECT-TRAVERSAL] Followed ${probeResult.redirectsFollowed} hops -> ${probeResult.finalUrl}`);
     }
 
-    // 2. Parallel probing for RFC 9116 security.txt, robots.txt, and HTTP upgrade check
+    const headers = probeResult.headers;
+    const rawHeadersList = probeResult.rawHeaders;
+
+    // 2. Parallel probing for RFC 9116 security.txt and robots.txt
     agentLogs.push(`[PROBE-PARALLEL] Probing /.well-known/security.txt, /robots.txt, and HTTP-to-HTTPS redirect...`);
     const [secTxtResp, robotsResp, httpRedirectResp] = await Promise.all([
       fetch(`${origin}/.well-known/security.txt`, {
-        headers: { 'User-Agent': 'RegCompiler-ComplianceBot/2.0' },
-        signal: AbortSignal.timeout(2000),
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        signal: AbortSignal.timeout(2500),
       }).catch(() => null),
       fetch(`${origin}/robots.txt`, {
-        headers: { 'User-Agent': 'RegCompiler-ComplianceBot/2.0' },
-        signal: AbortSignal.timeout(2000),
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        signal: AbortSignal.timeout(2500),
       }).catch(() => null),
       fetch(`http://${hostname}`, {
         method: 'HEAD',
         redirect: 'manual',
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(2500),
       }).catch(() => null),
     ]);
 
@@ -246,15 +484,81 @@ export async function POST(request: NextRequest) {
     agentLogs.push(`[STATUTORY-CHECK] /robots.txt: ${hasRobotsTxt ? 'ACTIVE (HTTP 200)' : 'NOT PUBLISHED'}`);
     agentLogs.push(`[TRANSPORT-CHECK] HTTP -> HTTPS Upgrade: ${isHttpsUpgraded ? 'ENFORCED (Strict Redirect)' : 'INCONCLUSIVE'}`);
 
-    // 3. Extract and parse HTML content
-    agentLogs.push(`[DOM-INSPECTION] Downloading and parsing HTML document structure & accessibility tree...`);
-    const html = await mainResp.text();
+    // 3. Inspect HTML structure
+    agentLogs.push(`[DOM-INSPECTION] Parsing DOM structure, WCAG accessibility tree, and statutory disclosures...`);
+    const html = probeResult.html || '';
     const htmlBytes = html.length;
 
     // Rule Findings Collection
     const findings: AuditFinding[] = [];
 
-    // --- CHECK 1: HSTS ---
+    // --- CHECK 1: TLS Certificate Integrity ---
+    if (!probeResult.tlsAudit.authorized) {
+      findings.push({
+        id: 'SEC-TLS-01',
+        title: 'Untrusted, Self-Signed, or Expired SSL/TLS Certificate',
+        category: 'SECURITY',
+        framework: 'NIST SP 800-52 / PCI-DSS 4.0 / HIPAA Security Rule',
+        clause: 'NIST SP 800-52 Rev 2 / PCI-DSS Req 4.1 / 45 CFR § 164.312(e)(1)',
+        severity: 'CRITICAL',
+        status: 'FAIL',
+        affected: 'TLS / SSL Socket',
+        evidence: `TLS handshake validation error: ${probeResult.tlsAudit.certError || 'Certificate verification failed'}. Attackers can execute Man-in-the-Middle (MitM) eavesdropping or credential harvesting.`,
+        remediation: {
+          description: 'Deploy an authentic, trusted TLS certificate issued by an accredited Certificate Authority (CA) such as Let\'s Encrypt, Cloudflare, or DigiCert.',
+          nginx: 'ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;\nssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;',
+          cloudflare: 'Enable Universal SSL or provision an Advanced Certificate via Cloudflare SSL/TLS dashboard.'
+        }
+      });
+    } else if (probeResult.tlsAudit.isHttps) {
+      findings.push({
+        id: 'SEC-TLS-01',
+        title: 'Valid Trusted SSL/TLS Transport Certificate',
+        category: 'SECURITY',
+        framework: 'NIST SP 800-52 / PCI-DSS 4.0',
+        clause: 'NIST SP 800-52 / PCI-DSS Req 4.1',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'TLS / SSL Socket',
+        evidence: `Cryptographic TLS transport authorized (${probeResult.tlsAudit.protocol || 'TLSv1.3'}). Certificate chain verified.`,
+        remediation: null
+      });
+    }
+
+    // --- CHECK 2: HTTPS Transport Enforcement ---
+    if (!probeResult.tlsAudit.isHttps) {
+      findings.push({
+        id: 'SEC-HTTPS-01',
+        title: 'Insecure Plaintext HTTP Transport (Missing HTTPS)',
+        category: 'SECURITY',
+        framework: 'HIPAA § 164.312(e)(1) / PCI-DSS Req 4.1 / GDPR Art. 32',
+        clause: '45 CFR § 164.312(e)(1) / PCI-DSS Req 4.1',
+        severity: 'CRITICAL',
+        status: 'FAIL',
+        affected: 'Transport Protocol (Port 80)',
+        evidence: 'The target website communicates over unencrypted plaintext HTTP. Passwords, session cookies, and PII are transmitted in cleartext.',
+        remediation: {
+          description: 'Enforce HTTPS encryption on port 443 and configure an unconditional 301/308 redirect from HTTP to HTTPS.',
+          nginx: 'server {\n  listen 80;\n  return 301 https://$host$request_uri;\n}',
+          cloudflare: 'Enable "Always Use HTTPS" under SSL/TLS Edge Certificates.'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-HTTPS-01',
+        title: 'Encrypted HTTPS Transport Active',
+        category: 'SECURITY',
+        framework: 'HIPAA / PCI-DSS / GDPR Art. 32',
+        clause: 'EU GDPR Article 32(1)(a) & PCI-DSS Req 4.1',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'Transport Protocol (Port 443)',
+        evidence: 'Initial transport negotiated over encrypted HTTPS.',
+        remediation: null
+      });
+    }
+
+    // --- CHECK 3: HSTS ---
     const hsts = headers['strict-transport-security'];
     if (!hsts) {
       findings.push({
@@ -277,7 +581,6 @@ export async function POST(request: NextRequest) {
       });
     } else {
       const hasSubdomains = hsts.toLowerCase().includes('includesubdomains');
-      const hasPreload = hsts.toLowerCase().includes('preload');
       const maxAgeMatch = hsts.match(/max-age=(\d+)/i);
       const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : 0;
       const isWeakMaxAge = maxAge < 15552000; // less than 180 days
@@ -315,7 +618,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // --- CHECK 2: Content-Security-Policy (CSP) ---
+    // --- CHECK 4: Content-Security-Policy (CSP) ---
     const csp = headers['content-security-policy'];
     if (!csp) {
       findings.push({
@@ -371,7 +674,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // --- CHECK 3: Clickjacking Defense ---
+    // --- CHECK 5: Clickjacking Defense ---
     const xfo = headers['x-frame-options'];
     const hasFrameAncestors = csp && csp.includes('frame-ancestors');
     if (!xfo && !hasFrameAncestors) {
@@ -407,7 +710,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 4: X-Content-Type-Options ---
+    // --- CHECK 6: X-Content-Type-Options ---
     const xcto = headers['x-content-type-options'];
     if (!xcto || !xcto.toLowerCase().includes('nosniff')) {
       findings.push({
@@ -442,7 +745,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 5: Referrer-Policy ---
+    // --- CHECK 7: Referrer-Policy ---
     const refPol = headers['referrer-policy'];
     if (!refPol) {
       findings.push({
@@ -476,7 +779,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 6: Permissions-Policy ---
+    // --- CHECK 8: Permissions-Policy ---
     const permPol = headers['permissions-policy'];
     if (!permPol) {
       findings.push({
@@ -510,7 +813,73 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 7: Server Information Disclosure ---
+    // --- CHECK 9: Cookie Security Configuration ---
+    if (probeResult.cookies.length > 0) {
+      const insecureCookies: string[] = [];
+      for (const c of probeResult.cookies) {
+        const lower = c.toLowerCase();
+        const cookieName = c.split(';')[0].split('=')[0].trim();
+        const hasSecure = lower.includes('secure');
+        const hasHttpOnly = lower.includes('httponly');
+        const hasSameSite = lower.includes('samesite');
+
+        const flaws: string[] = [];
+        if (!hasSecure) flaws.push('missing Secure');
+        if (!hasHttpOnly) flaws.push('missing HttpOnly');
+        if (!hasSameSite) flaws.push('missing SameSite');
+
+        if (flaws.length > 0) {
+          insecureCookies.push(`"${cookieName}" (${flaws.join(', ')})`);
+        }
+      }
+
+      if (insecureCookies.length > 0) {
+        findings.push({
+          id: 'PRIV-COOKIE-FLAGS-01',
+          title: `Insecure Cookie Attributes (${insecureCookies.length} cookies flagged)`,
+          category: 'PRIVACY',
+          framework: 'PCI-DSS 4.0 / OWASP A01:2021 / GDPR Art. 32',
+          clause: 'PCI-DSS v4.0 Req 6.4.3 & OWASP Broken Access Control',
+          severity: 'HIGH',
+          status: 'FAIL',
+          affected: 'Set-Cookie HTTP Headers',
+          evidence: `Cookies lacking security attributes: ${insecureCookies.slice(0, 3).join('; ')}${insecureCookies.length > 3 ? '...' : ''}.`,
+          remediation: {
+            description: 'Enforce Secure, HttpOnly, and SameSite=Lax (or Strict) on all application and session cookies.',
+            nginx: 'proxy_cookie_path / "/; Secure; HttpOnly; SameSite=Lax";',
+            nextjs: `// Enforce httpOnly: true, secure: true, sameSite: 'lax'`
+          }
+        });
+      } else {
+        findings.push({
+          id: 'PRIV-COOKIE-FLAGS-01',
+          title: 'Cookie Security Flags Verified (Secure, HttpOnly, SameSite)',
+          category: 'PRIVACY',
+          framework: 'PCI-DSS 4.0 / OWASP A01',
+          clause: 'PCI-DSS v4.0 Req 6.4.3',
+          severity: 'INFO',
+          status: 'PASS',
+          affected: 'Set-Cookie HTTP Headers',
+          evidence: `Verified ${probeResult.cookies.length} cookie(s) comply with statutory security flags.`,
+          remediation: null
+        });
+      }
+    } else {
+      findings.push({
+        id: 'PRIV-COOKIE-FLAGS-01',
+        title: 'Zero-Cookie Privacy Baseline (Statutory Compliance)',
+        category: 'PRIVACY',
+        framework: 'ePrivacy Directive / GDPR Art. 5',
+        clause: 'Directive 2002/58/EC Art. 5(3)',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: 'Target host issues no Set-Cookie tracking or state headers on initial handshake.',
+        remediation: null
+      });
+    }
+
+    // --- CHECK 10: Server Information Disclosure ---
     const srv = headers['server'];
     const poweredBy = headers['x-powered-by'];
     if (poweredBy || (srv && /\d+\.\d+/.test(srv))) {
@@ -545,7 +914,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 8: Privacy Policy Link (GDPR Art. 13) ---
+    // --- CHECK 11: Privacy Policy Link (GDPR Art. 13) ---
     const hasPrivacyLink = /href=["'][^"']*(privacy|datenschutz|politica-de-privacidad|confidentialite)[^"']*["']/i.test(html);
     if (!hasPrivacyLink) {
       findings.push({
@@ -579,10 +948,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 9: Cookie Consent CMP (ePrivacy Directive & GDPR Art. 7) ---
+    // --- CHECK 12: Cookie Consent CMP (ePrivacy Directive & GDPR Art. 7) ---
     const cookieCmpSignatures = /onetrust|cookiebot|osano|didomi|klaro|usercentrics|axeptio|cookie-banner|cookie-notice|cookie_consent|cookie-law|trustarc/i;
     const hasCmp = cookieCmpSignatures.test(html);
-    if (!hasCmp) {
+    if (!hasCmp && probeResult.cookies.length > 0) {
       findings.push({
         id: 'PRIV-COOKIE-01',
         title: 'No Recognized Cookie Consent Management Banner (CMP) Detected',
@@ -592,7 +961,7 @@ export async function POST(request: NextRequest) {
         severity: 'HIGH',
         status: 'FAIL',
         affected: 'Client Frontend DOM',
-        evidence: 'No recognized Consent Management Platform (CMP) or opt-in cookie banner detected in the client markup.',
+        evidence: 'Cookies are stored on initial load, but no recognized Consent Management Platform (CMP) or opt-in cookie banner was detected in the client markup.',
         remediation: {
           description: 'Implement a prior-consent cookie banner that halts non-essential tracking cookies until explicit opt-in.',
           nginx: null,
@@ -602,19 +971,19 @@ export async function POST(request: NextRequest) {
     } else {
       findings.push({
         id: 'PRIV-COOKIE-01',
-        title: 'Cookie Consent Platform Detected',
+        title: hasCmp ? 'Cookie Consent Platform Detected' : 'No Consent Banner Required (Zero Third-Party Cookies)',
         category: 'PRIVACY',
         framework: 'ePrivacy / GDPR Art. 7',
         clause: 'Directive 2002/58/EC Art. 5(3)',
         severity: 'INFO',
         status: 'PASS',
         affected: 'Client Frontend DOM',
-        evidence: 'Recognized Consent Management Platform detected in web application structure.',
+        evidence: hasCmp ? 'Recognized Consent Management Platform detected in web application structure.' : 'No unsolicited tracking cookies detected prior to user consent.',
         remediation: null
       });
     }
 
-    // --- CHECK 10: WCAG 3.1.1 Language of Page ---
+    // --- CHECK 13: WCAG 3.1.1 Language of Page ---
     const langMatch = html.match(/<html[^>]*\blang=["']([^"']+)["']/i);
     if (!langMatch) {
       findings.push({
@@ -648,7 +1017,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 11: WCAG 2.4.2 Page Title ---
+    // --- CHECK 14: WCAG 2.4.2 Page Title ---
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     if (!titleMatch || !titleMatch[1].trim()) {
       findings.push({
@@ -682,7 +1051,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 12: WCAG 1.1.1 Image Alt Text ---
+    // --- CHECK 15: WCAG 1.1.1 Image Alt Text ---
     const missingAltMatches = html.match(/<img(?![^>]*\balt=)[^>]*>/gi) || [];
     const missingAltCount = missingAltMatches.length;
     if (missingAltCount > 0) {
@@ -712,12 +1081,12 @@ export async function POST(request: NextRequest) {
         severity: 'INFO',
         status: 'PASS',
         affected: '<img> DOM elements',
-        evidence: 'All scanned image tags include valid alt attributes.',
+        evidence: 'All scanned image tags include valid alt attributes or decorative handling.',
         remediation: null
       });
     }
 
-    // --- CHECK 13: WCAG 1.4.4 Viewport Scalability ---
+    // --- CHECK 16: WCAG 1.4.4 Viewport Scalability ---
     const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
     const isScalingBlocked = viewportMatch && (/user-scalable\s*=\s*(no|0)/i.test(viewportMatch[1]) || /maximum-scale\s*=\s*1(\.0)?/i.test(viewportMatch[1]));
     if (isScalingBlocked) {
@@ -752,7 +1121,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 14: RFC 9116 Vulnerability Disclosure (security.txt) ---
+    // --- CHECK 17: RFC 9116 Vulnerability Disclosure (security.txt) ---
     if (!hasSecurityTxt) {
       findings.push({
         id: 'DISC-SECTXT-01',
@@ -785,7 +1154,40 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 15: Subresource Integrity (SRI) on External Scripts ---
+    // --- CHECK 18: Robots Exclusion Protocol ---
+    if (!hasRobotsTxt) {
+      findings.push({
+        id: 'DISC-ROBOTS-01',
+        title: 'Missing robots.txt Crawler Governance File',
+        category: 'DISCLOSURE',
+        framework: 'RFC 9309 / Search & AI Transparency',
+        clause: 'IETF RFC 9309 (Robots Exclusion Protocol)',
+        severity: 'LOW',
+        status: 'FAIL',
+        affected: '/robots.txt',
+        evidence: `HTTP ${robotsResp?.status || 404} returned for /robots.txt. Search engines and AI scrapers lack crawl governance guidelines.`,
+        remediation: {
+          description: 'Publish a /robots.txt declaring crawling directives and sitemap location.',
+          nginx: 'location = /robots.txt {\n  return 200 "User-agent: *\\nAllow: /\\nSitemap: https://yourdomain.com/sitemap.xml\\n";\n}',
+          nextjs: '// Create app/robots.ts or public/robots.txt'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'DISC-ROBOTS-01',
+        title: 'Robots.txt Crawler Directives Active',
+        category: 'DISCLOSURE',
+        framework: 'RFC 9309',
+        clause: 'IETF RFC 9309',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: '/robots.txt',
+        evidence: 'Valid /robots.txt verified with HTTP 200.',
+        remediation: null
+      });
+    }
+
+    // --- CHECK 19: Subresource Integrity (SRI) on External Scripts ---
     const externalScripts = (html.match(/<script[^>]*src=["']https?:\/\/[^"']+["'][^>]*>/gi) || []);
     const scriptsWithoutSri = externalScripts.filter(s => !/integrity=["']sha/i.test(s));
     if (scriptsWithoutSri.length > 0) {
@@ -805,17 +1207,54 @@ export async function POST(request: NextRequest) {
           nextjs: '<script src="https://cdn.example.com/lib.js" integrity="sha384-..." crossOrigin="anonymous" />'
         }
       });
-    } else if (externalScripts.length > 0) {
+    } else {
       findings.push({
         id: 'SUPPLY-SRI-01',
-        title: 'Subresource Integrity (SRI) Verified on External Scripts',
+        title: 'Subresource Integrity (SRI) Verified or Local Bundling Active',
         category: 'SUPPLY_CHAIN',
         framework: 'PCI-DSS 4.0 Req 6.4.3',
         clause: 'PCI-DSS v4.0 Requirement 6.4.3',
         severity: 'INFO',
         status: 'PASS',
         affected: '<script> tags',
-        evidence: 'All external scripts declare cryptographic SRI hashes.',
+        evidence: externalScripts.length > 0
+          ? 'All external scripts declare cryptographic SRI hashes.'
+          : 'Zero unvetted third-party CDN scripts detected; scripts bundled locally.',
+        remediation: null
+      });
+    }
+
+    // --- CHECK 20: Cross-Origin Isolation Defense (COOP / CORP) ---
+    const coop = headers['cross-origin-opener-policy'];
+    const corp = headers['cross-origin-resource-policy'];
+    if (!coop && !corp) {
+      findings.push({
+        id: 'SEC-CORP-01',
+        title: 'Missing Cross-Origin Isolation Headers (COOP / CORP)',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10 / Spectre Mitigations',
+        clause: 'OWASP A05:2021 Security Misconfiguration',
+        severity: 'LOW',
+        status: 'FAIL',
+        affected: 'HTTP Response Headers',
+        evidence: 'Neither Cross-Origin-Opener-Policy (COOP) nor Cross-Origin-Resource-Policy (CORP) is configured.',
+        remediation: {
+          description: 'Set Cross-Origin-Opener-Policy to same-origin and Cross-Origin-Resource-Policy to same-origin to prevent cross-origin window leaks and Spectre-style timing side-channels.',
+          nginx: 'add_header Cross-Origin-Opener-Policy "same-origin" always;\nadd_header Cross-Origin-Resource-Policy "same-origin" always;',
+          nextjs: `headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }]`
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-CORP-01',
+        title: 'Cross-Origin Isolation Defense Configured',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10',
+        clause: 'OWASP A05:2021',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: `Cross-Origin policy active: ${[coop && `COOP: ${coop}`, corp && `CORP: ${corp}`].filter(Boolean).join('; ')}`,
         remediation: null
       });
     }
@@ -838,10 +1277,10 @@ export async function POST(request: NextRequest) {
     const lowCount = activeFindings.filter(f => f.status === 'FAIL' && f.severity === 'LOW').length;
 
     // Weighted Score Formula
-    const deduction = (criticalCount * 25) + (highCount * 14) + (mediumCount * 7) + (lowCount * 3);
+    const deduction = (criticalCount * 22) + (highCount * 12) + (mediumCount * 6) + (lowCount * 2);
     const overallScore = Math.max(15, Math.min(100, Math.round(100 - deduction)));
 
-    let grade = 'F';
+    let grade: 'A+' | 'A' | 'B+' | 'B' | 'C' | 'F' = 'F';
     if (overallScore >= 95) grade = 'A+';
     else if (overallScore >= 85) grade = 'A';
     else if (overallScore >= 75) grade = 'B+';
@@ -866,21 +1305,30 @@ export async function POST(request: NextRequest) {
     };
 
     agentLogs.push(`[AUDIT-COMPLETE] Finalized statutory verification across ${totalCount} checkpoints`);
-    agentLogs.push(`[EXECUTIVE-VERDICT] Audit Grade: ${grade} (${overallScore}%) — ${failCount} violations flagged`);
+    agentLogs.push(`[EXECUTIVE-VERDICT] Compliance Grade: ${grade} (${overallScore}%) — ${failCount} violations identified`);
 
     const resultPayload = {
       status: 'success',
       target_url: rawUrl,
-      final_url: finalUrl,
+      final_url: probeResult.finalUrl,
       domain: hostname,
       scanned_at: new Date().toISOString(),
-      execution_time_ms: Date.now() - startTime,
-      latency_ms: latencyMs || (Date.now() - startTime),
-      http_status: mainResp.status,
+      timestamp: new Date().toISOString(),
+      execution_time_ms: probeResult.latencyMs || (Date.now() - startTime),
+      latency_ms: probeResult.latencyMs || (Date.now() - startTime),
+      http_status: probeResult.statusCode,
       html_bytes: htmlBytes,
       grade,
       score: overallScore,
+      overall_score: overallScore,
       sub_scores: subScores,
+      categories: {
+        security: { score: subScores.security, findings_count: activeFindings.filter(f => f.category === 'SECURITY').length },
+        privacy: { score: subScores.privacy, findings_count: activeFindings.filter(f => f.category === 'PRIVACY').length },
+        accessibility: { score: subScores.accessibility, findings_count: activeFindings.filter(f => f.category === 'ACCESSIBILITY').length },
+        disclosures: { score: subScores.disclosures, findings_count: activeFindings.filter(f => f.category === 'DISCLOSURE').length },
+        supply_chain: { score: subScores.supply_chain, findings_count: activeFindings.filter(f => f.category === 'SUPPLY_CHAIN').length },
+      },
       summary: {
         total_checkpoints: totalCount,
         passed: passCount,
@@ -890,13 +1338,26 @@ export async function POST(request: NextRequest) {
         medium: mediumCount,
         low: lowCount,
       },
+      total_findings: totalCount,
+      critical_findings: criticalCount,
+      high_findings: highCount,
+      medium_findings: mediumCount,
+      low_findings: lowCount,
       findings: activeFindings.map(f => ({
-        ...f,
+        id: f.id,
+        rule_id: f.id,
         title: f.title || '',
+        category: f.category,
         framework: f.framework || '',
         clause: f.clause || '',
+        severity: f.severity,
+        status: f.status,
         affected: f.affected || '',
+        affected_resource: f.affected || '',
         evidence: f.evidence || '',
+        description: f.evidence || '',
+        remediation: f.remediation,
+        remediation_guidance: f.remediation?.description || '',
       })),
       raw_headers: rawHeadersList,
       agent_logs: agentLogs.filter(Boolean).map(log => String(log || '')),

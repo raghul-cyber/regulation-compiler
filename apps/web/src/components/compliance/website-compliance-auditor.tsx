@@ -497,7 +497,18 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             <input
               type="text"
               value={isLimitReached ? '' : urlInput.replace(/^https?:\/\//i, '')}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.trim().replace(/^https?:\/\//i, '');
+                setUrlInput(val);
+              }}
+              onPaste={(e) => {
+                const pasted = e.clipboardData.getData('text');
+                if (pasted) {
+                  e.preventDefault();
+                  const clean = pasted.trim().replace(/^https?:\/\//i, '');
+                  setUrlInput(clean);
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !isAuditing) {
                   if (isLimitReached) {
