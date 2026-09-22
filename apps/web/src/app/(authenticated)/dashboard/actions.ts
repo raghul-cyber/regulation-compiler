@@ -66,7 +66,7 @@ async function fetchWithAuth(endpoint: string, options: FetchAuthOptions = {}) {
 // Canonical Fallback Datasets for Instant, Zero-Hang Loading
 const FALLBACK_REGULATIONS = [
   {
-    id: "e50c766e-9a1b-4b2c-8d3e-4f5a6b7c8d9e",
+    id: "a6491f18-4e2d-40f4-9344-479e7c7055a0",
     name: "General Data Protection Regulation (GDPR)",
     jurisdiction: "EU",
     description: "Comprehensive EU privacy legislation establishing stringent principles for lawful personal data processing, data subject rights, and cross-border data transfer controls.",
@@ -76,7 +76,7 @@ const FALLBACK_REGULATIONS = [
     created_at: new Date().toISOString()
   },
   {
-    id: "f61d877f-0b2c-5c3d-9e4f-5a6b7c8d9e0f",
+    id: "4e95164f-d37b-4f73-9e26-230e1d0d9475",
     name: "Digital Operational Resilience Act (DORA)",
     jurisdiction: "EU",
     description: "EU regulation strengthening the operational resilience of financial entities and their critical third-party ICT service providers against cyber disruption.",
@@ -86,7 +86,17 @@ const FALLBACK_REGULATIONS = [
     created_at: new Date().toISOString()
   },
   {
-    id: "a72e988a-1c3d-6d4e-0f5a-6b7c8d9e0f1a",
+    id: "6dd9a705-c0ac-4117-bb38-8c3a1c607874",
+    name: "European Union Artificial Intelligence Act (EU AI Act)",
+    jurisdiction: "EU",
+    description: "Landmark European regulation establishing mandatory risk tiers, transparency obligations, human oversight, and data governance controls for AI systems.",
+    requirements_count: 85,
+    current_version_id: "ver-aiact-current",
+    source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "1d618bb3-78e2-418b-992c-562096645973",
     name: "Health Insurance Portability and Accountability Act (HIPAA)",
     jurisdiction: "US",
     description: "United States federal statutory standard establishing strict safeguards for Protected Health Information (PHI) and electronic privacy.",
@@ -96,7 +106,7 @@ const FALLBACK_REGULATIONS = [
     created_at: new Date().toISOString()
   },
   {
-    id: "b83f099b-2d4e-7e5f-1a6b-7c8d9e0f1a2b",
+    id: "062db9fb-0ddf-4499-bda5-4b61f8c8c2f0",
     name: "California Consumer Privacy Act (CCPA / CPRA)",
     jurisdiction: "US",
     description: "California state landmark privacy legislation providing consumers transparent opt-out rights, non-discrimination protections, and strict automated profiling controls.",
@@ -106,7 +116,7 @@ const FALLBACK_REGULATIONS = [
     created_at: new Date().toISOString()
   },
   {
-    id: "c94a100c-3e5f-8f6a-2b7c-8d9e0f1a2b3c",
+    id: "53369dc8-ac7e-4739-a592-13110238c37c",
     name: "ISO/IEC 27001:2022",
     jurisdiction: "GLOBAL",
     description: "International flagship security standard defining requirements for establishing, implementing, maintaining, and continually improving an Information Security Management System (ISMS).",
@@ -116,13 +126,33 @@ const FALLBACK_REGULATIONS = [
     created_at: new Date().toISOString()
   },
   {
-    id: "d05b211d-4f6a-9a7b-3c8d-9e0f1a2b3c4d",
+    id: "bcd8f192-8989-4004-b5c8-57b128f883bf",
     name: "Payment Card Industry Data Security Standard (PCI DSS 4.0)",
     jurisdiction: "GLOBAL",
     description: "Global cardholder data security architecture enforcing network segmentation, multi-factor authentication, end-to-end cryptographic safeguards, and strict vulnerability testing.",
     requirements_count: 82,
     current_version_id: "ver-pci-current",
     source_url: "https://www.pcisecuritystandards.org",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "74874484-ad20-4f04-80ef-897e055ba1fa",
+    name: "Personal Information Protection and Electronic Documents Act (PIPEDA)",
+    jurisdiction: "CA",
+    description: "Canadian federal privacy law for private-sector organizations governing fair information principles, consent requirements, and breach disclosures.",
+    requirements_count: 52,
+    current_version_id: "ver-pipeda-current",
+    source_url: "https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "fab50b80-3f7d-4f18-b35d-7f3faeea780d",
+    name: "MAS Notice 655: Cyber Hygiene & Perimeter Defense Standards",
+    jurisdiction: "SG",
+    description: "Monetary Authority of Singapore enforceable baseline cybersecurity requirements covering multi-factor authentication, administrative access controls, and patch management.",
+    requirements_count: 48,
+    current_version_id: "ver-mas-current",
+    source_url: "https://www.mas.gov.sg/regulation/notices/notice-655",
     created_at: new Date().toISOString()
   }
 ];
@@ -659,7 +689,7 @@ const FALLBACK_DAEMON_STATUS = {
     { code: "CA", name: "Canada Open Government / Justice Canada", status: "ONLINE", type: "Open Data API", last_ping: "45s ago", latency_ms: 128 },
     { code: "SG", name: "Monetary Authority of Singapore (MAS)", status: "ONLINE", type: "Statutory Circulars", last_ping: "1m ago", latency_ms: 140 },
     { code: "AU", name: "Office of the Australian Information Comm (OAIC)", status: "ONLINE", type: "Statutory Guidelines", last_ping: "1m ago", latency_ms: 165 },
-    { code: "GLOBAL", name: "PCI Security Standards & ISO/IEC Standards", status: "ONLINE", type: "Technical Standards", last_ping: "2m ago", latency_ms: 78 }
+    { code: "GLOBAL", name: "PCI Security Standards and ISO/IEC Standards", status: "ONLINE", type: "Technical Standards", last_ping: "2m ago", latency_ms: 78 }
   ],
   recent_actions_count: 15
 };
@@ -675,7 +705,7 @@ const FALLBACK_SURVEILLANCE_ACTIONS = [
     timestamp: new Date(Date.now() - 1000 * 35).toISOString(),
     latency_ms: 18.4,
     status: "success",
-    metadata: { signals_found: 12, new_ingested: 2, extractions: 1 }
+    metadata: { regulation_id: "6dd9a705-c0ac-4117-bb38-8c3a1c607874", signals_found: 12, new_ingested: 2, extractions: 1 }
   },
   {
     action_id: "act-002",
@@ -683,11 +713,11 @@ const FALLBACK_SURVEILLANCE_ACTIONS = [
     title: "On-Demand Statutory Probe Executed (EU)",
     description: "Queried EUR-Lex Official Journal. Ingested AI Act (2024/1689) and DORA (2022/2554) statutory requirements.",
     jurisdiction: "EU",
-    authority: "European Parliament & Council",
+    authority: "European Parliament and Council",
     timestamp: new Date(Date.now() - 1000 * 95).toISOString(),
     latency_ms: 14.2,
     status: "success",
-    metadata: { citation: "OJ L, 2024/1689", rules_found: 18 }
+    metadata: { regulation_id: "6dd9a705-c0ac-4117-bb38-8c3a1c607874", citation: "OJ L, 2024/1689", rules_found: 18 }
   },
   {
     action_id: "act-003",
@@ -699,7 +729,7 @@ const FALLBACK_SURVEILLANCE_ACTIONS = [
     timestamp: new Date(Date.now() - 1000 * 180).toISOString(),
     latency_ms: 22.0,
     status: "success",
-    metadata: { policies_audited: 8, drift_notices: 0, alignment_score: 99.2 }
+    metadata: { regulation_id: "a6491f18-4e2d-40f4-9344-479e7c7055a0", policies_audited: 8, drift_notices: 0, alignment_score: 99.2 }
   },
   {
     action_id: "act-004",
@@ -711,7 +741,7 @@ const FALLBACK_SURVEILLANCE_ACTIONS = [
     timestamp: new Date(Date.now() - 1000 * 300).toISOString(),
     latency_ms: 19.8,
     status: "success",
-    metadata: { signal_id: "fr-2024-sec-cyber", ast_nodes: 42 }
+    metadata: { regulation_id: "d9c24097-ba71-460f-901d-cb39158c353f", signal_id: "fr-2024-sec-cyber", ast_nodes: 42 }
   },
   {
     action_id: "act-005",
@@ -723,7 +753,7 @@ const FALLBACK_SURVEILLANCE_ACTIONS = [
     timestamp: new Date(Date.now() - 1000 * 600).toISOString(),
     latency_ms: 16.5,
     status: "success",
-    metadata: { notice: "MAS 655", mandatory_mfa: true }
+    metadata: { regulation_id: "fab50b80-3f7d-4f18-b35d-7f3faeea780d", notice: "MAS 655", mandatory_mfa: true }
   }
 ];
 
@@ -763,3 +793,4 @@ export async function triggerSurveillanceAction(actionType: string, params: Reco
     details: { timestamp: new Date().toISOString() }
   };
 }
+

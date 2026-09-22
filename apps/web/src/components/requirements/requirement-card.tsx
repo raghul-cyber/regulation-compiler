@@ -62,27 +62,84 @@ export function RequirementCard({ req }: { req: any }) {
       <p className="text-sm text-zinc-400 mb-6">{req.description}</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {req.actions?.items && req.actions.items.length > 0 && (
-          <div className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-800/50">
-            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Required Actions</h4>
+        {/* Required Actions / Enforcement Controls */}
+        <div className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-800/50">
+          <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+            <span>Required Actions & Enforcement</span>
+            {req.evidence_required?.enforced && (
+              <span className="text-[10px] text-emerald-400 font-mono uppercase bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                Enforced Control
+              </span>
+            )}
+          </h4>
+          {req.actions?.items && req.actions.items.length > 0 ? (
             <ul className="list-disc list-inside text-sm text-zinc-300 space-y-1.5">
               {req.actions.items.map((action: string, i: number) => (
                 <li key={i}>{action}</li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : req.actions?.action ? (
+            <div className="space-y-1.5 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-zinc-500">Action Type:</span>
+                <span className="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 font-mono font-bold text-[11px]">
+                  {req.actions.action}
+                </span>
+              </div>
+              {req.actions.authority && (
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                  <span className="text-zinc-500">Authority:</span>
+                  <span className="text-zinc-300">{req.actions.authority}</span>
+                </div>
+              )}
+              {req.evidence_required?.type && (
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/60">
+                  <span className="text-zinc-500">Evidence Required:</span>
+                  <span className="text-emerald-400 font-mono text-[10px]">{req.evidence_required.type}</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-500">Statutory verification and compliance logging required.</p>
+          )}
+        </div>
 
-        {req.conditions?.items && req.conditions.items.length > 0 && (
-          <div className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-800/50">
-            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Trigger Conditions</h4>
+        {/* Trigger Conditions / Machine-Executable AST Rules */}
+        <div className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-800/50">
+          <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+            <span>Trigger Conditions (AST Logic)</span>
+            {req.conditions?.operator && (
+              <span className="text-[10px] text-purple-400 font-mono font-bold uppercase bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">
+                OP: {req.conditions.operator}
+              </span>
+            )}
+          </h4>
+          {req.conditions?.items && req.conditions.items.length > 0 ? (
             <ul className="list-disc list-inside text-sm text-zinc-300 space-y-1.5">
               {req.conditions.items.map((cond: string, i: number) => (
                 <li key={i}>{cond}</li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : req.conditions?.rules && Array.isArray(req.conditions.rules) && req.conditions.rules.length > 0 ? (
+            <div className="space-y-2">
+              {req.conditions.rules.map((rule: any, i: number) => (
+                <div key={i} className="p-2 rounded bg-zinc-950/70 border border-zinc-800/70 text-xs font-mono flex flex-wrap items-center gap-1.5">
+                  <span className="text-cyan-300">{rule.field || 'target'}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">
+                    {rule.operator || 'EQUALS'}
+                  </span>
+                  <span className="text-emerald-400 font-bold">{String(rule.value !== undefined ? rule.value : true)}</span>
+                </div>
+              ))}
+            </div>
+          ) : typeof req.conditions === 'object' && Object.keys(req.conditions).length > 0 ? (
+            <pre className="p-2 rounded bg-zinc-950/70 border border-zinc-800/70 text-[11px] font-mono text-zinc-300 overflow-x-auto max-h-24">
+              {JSON.stringify(req.conditions, null, 2)}
+            </pre>
+          ) : (
+            <p className="text-xs text-zinc-500">Autonomous evaluation active on statutory events.</p>
+          )}
+        </div>
       </div>
 
       <div className="border-t border-zinc-800 pt-4 mt-2">

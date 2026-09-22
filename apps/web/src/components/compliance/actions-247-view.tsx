@@ -26,8 +26,11 @@ import {
   FileCheck,
   Compass,
   FileText,
-  X
+  X,
+  ArrowUpRight,
+  BookOpen
 } from 'lucide-react';
+import Link from 'next/link';
 import {
   getSurveillanceDaemonStatus,
   getSurveillanceActions,
@@ -116,6 +119,47 @@ const ACTION_TYPE_STYLES: Record<string, { bg: string; text: string; border: str
     label: 'System Audit'
   }
 };
+
+
+const REGULATION_LOOKUP: Record<string, { id: string; name: string }> = {
+  'EU AI ACT': { id: '6dd9a705-c0ac-4117-bb38-8c3a1c607874', name: 'Regulation (EU) 2024/1689 (EU AI Act)' },
+  'AI ACT': { id: '6dd9a705-c0ac-4117-bb38-8c3a1c607874', name: 'Regulation (EU) 2024/1689 (EU AI Act)' },
+  'DORA': { id: '4e95164f-d37b-4f73-9e26-230e1d0d9475', name: 'Regulation (EU) 2022/2554 (DORA Framework)' },
+  'GDPR': { id: 'a6491f18-4e2d-40f4-9344-479e7c7055a0', name: 'Regulation (EU) 2016/679 (General Data Protection Regulation)' },
+  'HIPAA': { id: '1d618bb3-78e2-418b-992c-562096645973', name: 'HIPAA Security Rule (45 CFR Part 164)' },
+  'CCPA': { id: '062db9fb-0ddf-4499-bda5-4b61f8c8c2f0', name: 'California Consumer Privacy Act (CCPA/CPRA)' },
+  'CPRA': { id: '062db9fb-0ddf-4499-bda5-4b61f8c8c2f0', name: 'California Consumer Privacy Act (CCPA/CPRA)' },
+  'PIPEDA': { id: '74874484-ad20-4f04-80ef-897e055ba1fa', name: 'Personal Information Protection and Electronic Documents Act (PIPEDA)' },
+  'MAS': { id: 'fab50b80-3f7d-4f18-b35d-7f3faeea780d', name: 'MAS Notice 655: Cyber Hygiene & Perimeter Defense Standards' },
+  'PCI': { id: 'bcd8f192-8989-4004-b5c8-57b128f883bf', name: 'PCI DSS v4.0.1 Payment Card Security Standards' },
+  'ISO': { id: '53369dc8-ac7e-4739-a592-13110238c37c', name: 'ISO/IEC 27001:2022 Information Security Management' },
+  '27001': { id: '53369dc8-ac7e-4739-a592-13110238c37c', name: 'ISO/IEC 27001:2022 Information Security Management' },
+  'SEC': { id: 'd9c24097-ba71-460f-901d-cb39158c353f', name: 'SEC Cybersecurity Risk Management Standards (17 CFR Part 229)' },
+  'FCA': { id: '455d6b41-e129-411d-84fb-4b2aee08e64b', name: 'FCA Senior Management & Operational Resilience Standards' }
+};
+
+const DEFAULT_JURISDICTION_REG: Record<string, { id: string; name: string }> = {
+  EU: { id: '6dd9a705-c0ac-4117-bb38-8c3a1c607874', name: 'Regulation (EU) 2024/1689 (EU AI Act)' },
+  US: { id: 'd9c24097-ba71-460f-901d-cb39158c353f', name: 'SEC Cybersecurity Risk Management Standards' },
+  UK: { id: '455d6b41-e129-411d-84fb-4b2aee08e64b', name: 'FCA Senior Management & Operational Resilience Standards' },
+  CA: { id: '74874484-ad20-4f04-80ef-897e055ba1fa', name: 'Personal Information Protection and Electronic Documents Act (PIPEDA)' },
+  SG: { id: 'fab50b80-3f7d-4f18-b35d-7f3faeea780d', name: 'MAS Notice 655 Cyber Hygiene Standards' },
+  GLOBAL: { id: 'bcd8f192-8989-4004-b5c8-57b128f883bf', name: 'PCI DSS v4.0.1 Global Standards' }
+};
+
+function resolveActionRegulation(act: SurveillanceAction): { id: string; name: string } {
+  if (act.metadata?.regulation_id) {
+    for (const item of Object.values(REGULATION_LOOKUP)) {
+      if (item.id === act.metadata.regulation_id) return item;
+    }
+    return { id: act.metadata.regulation_id, name: act.metadata.citation || 'Statutory Regulation Framework' };
+  }
+  const text = `${act.title} ${act.description} ${act.authority}`.toUpperCase();
+  for (const [k, v] of Object.entries(REGULATION_LOOKUP)) {
+    if (text.includes(k)) return v;
+  }
+  return DEFAULT_JURISDICTION_REG[act.jurisdiction.toUpperCase()] || DEFAULT_JURISDICTION_REG.GLOBAL;
+}
 
 export function Actions247View() {
   const [daemonStatus, setDaemonStatus] = useState<DaemonStatus | null>(null);
@@ -243,7 +287,15 @@ export function Actions247View() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <Link
+              href="/regulations"
+              className="px-3.5 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-sm font-medium transition-colors border border-blue-500/40 flex items-center gap-2 cursor-pointer shadow-sm"
+              title="Inspect Canonical Regulations Catalog"
+            >
+              <BookOpen className="w-4 h-4 text-blue-400" />
+              <span>Inspect Catalog</span>
+            </Link>
             <button
               onClick={() => handleTriggerAction('full_sweep')}
               disabled={isDispatching !== null}
@@ -558,10 +610,18 @@ export function Actions247View() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+                  <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
                     <span className="text-[11px] font-mono px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
                       {act.latency_ms}ms
                     </span>
+                    <Link
+                      href={`/regulations/${resolveActionRegulation(act).id}/requirements`}
+                      className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-600/15 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Inspect Regulation & Compiled AST"
+                    >
+                      <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Inspect AST</span>
+                    </Link>
                     <button
                       onClick={() => setSelectedAction(act)}
                       className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white transition-colors border border-zinc-700/60 flex items-center gap-1 cursor-pointer"
@@ -578,65 +638,115 @@ export function Actions247View() {
       </div>
 
       {/* Action Inspector Modal */}
-      {selectedAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl relative flex flex-col gap-4">
-            <button
-              onClick={() => setSelectedAction(null)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{JURISDICTION_FLAGS[selectedAction.jurisdiction] || '🌐'}</span>
-              <div>
-                <span className="text-xs font-mono text-zinc-500 uppercase">{selectedAction.action_id}</span>
-                <h3 className="text-lg font-bold text-white">{selectedAction.title}</h3>
-              </div>
-            </div>
-
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              {selectedAction.description}
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-800 text-xs">
-              <div className="p-2 rounded bg-zinc-900 border border-zinc-800">
-                <span className="text-zinc-500 text-[10px] uppercase">Jurisdiction</span>
-                <p className="text-white font-medium mt-0.5">{selectedAction.jurisdiction}</p>
-              </div>
-              <div className="p-2 rounded bg-zinc-900 border border-zinc-800">
-                <span className="text-zinc-500 text-[10px] uppercase">Authority</span>
-                <p className="text-white font-medium mt-0.5 truncate">{selectedAction.authority}</p>
-              </div>
-              <div className="p-2 rounded bg-zinc-900 border border-zinc-800">
-                <span className="text-zinc-500 text-[10px] uppercase">Execution Latency</span>
-                <p className="text-emerald-400 font-mono font-medium mt-0.5">{selectedAction.latency_ms} ms</p>
-              </div>
-              <div className="p-2 rounded bg-zinc-900 border border-zinc-800">
-                <span className="text-zinc-500 text-[10px] uppercase">Status</span>
-                <p className="text-emerald-400 font-medium mt-0.5 uppercase">{selectedAction.status}</p>
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs font-semibold text-zinc-400 mb-1.5 block">Audit Metadata & Cryptographic Trace:</span>
-              <pre className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300 overflow-x-auto max-h-48">
-                {JSON.stringify(selectedAction.metadata || {}, null, 2)}
-              </pre>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
+      {selectedAction && (() => {
+        const regTarget = resolveActionRegulation(selectedAction);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl relative flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setSelectedAction(null)}
-                className="px-4 py-2 text-xs font-medium rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
+                className="absolute top-4 right-4 p-1.5 text-zinc-500 hover:text-white transition-colors rounded-lg hover:bg-zinc-900"
               >
-                Close Inspector
+                <X className="w-5 h-5" />
               </button>
+
+              <div className="flex items-center gap-3">
+                <span className="text-3xl p-2 rounded-xl bg-zinc-900 border border-zinc-800">{JURISDICTION_FLAGS[selectedAction.jurisdiction] || '🌐'}</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-zinc-500 uppercase">{selectedAction.action_id}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      {selectedAction.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mt-0.5">{selectedAction.title}</h3>
+                </div>
+              </div>
+
+              <p className="text-xs text-zinc-300 leading-relaxed bg-zinc-900/40 p-3 rounded-xl border border-zinc-800/80">
+                {selectedAction.description}
+              </p>
+
+              {/* Direct Regulation & AST Inspector Card */}
+              <div className="p-4 rounded-xl bg-gradient-to-r from-blue-950/40 via-zinc-900/60 to-purple-950/30 border border-blue-500/30 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400 flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-blue-400" />
+                      Associated Sovereign Statutory Framework
+                    </span>
+                    <h4 className="text-sm font-bold text-white mt-1">
+                      {regTarget.name}
+                    </h4>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                      Compiled into verified deterministic AST nodes with automated continuous enforcement.
+                    </p>
+                  </div>
+                  <span className="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 flex items-center gap-1">
+                    <Code2 className="w-3 h-3 text-blue-300" />
+                    AST Compiled
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5 pt-2 border-t border-blue-500/20 flex-wrap">
+                  <Link
+                    href={`/regulations/${regTarget.id}/requirements`}
+                    className="px-4 py-2 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all flex items-center gap-2 shadow-lg shadow-blue-950/60 cursor-pointer"
+                  >
+                    <Code2 className="w-4 h-4 text-blue-200" />
+                    Inspect Regulation & AST Requirements
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+
+                  <Link
+                    href={`/regulations?jurisdiction=${encodeURIComponent(selectedAction.jurisdiction)}`}
+                    className="px-3.5 py-2 text-xs font-medium rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors border border-zinc-700/60 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
+                    All {selectedAction.jurisdiction} Regulations
+                  </Link>
+                </div>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                  <span className="text-zinc-500 text-[10px] uppercase font-semibold">Jurisdiction</span>
+                  <p className="text-white font-medium mt-0.5">{selectedAction.jurisdiction}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                  <span className="text-zinc-500 text-[10px] uppercase font-semibold">Authority</span>
+                  <p className="text-white font-medium mt-0.5 truncate">{selectedAction.authority}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                  <span className="text-zinc-500 text-[10px] uppercase font-semibold">Latency</span>
+                  <p className="text-emerald-400 font-mono font-medium mt-0.5">{selectedAction.latency_ms} ms</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                  <span className="text-zinc-500 text-[10px] uppercase font-semibold">Logged At</span>
+                  <p className="text-zinc-300 font-mono text-[11px] mt-0.5">{formatTimeAgo(selectedAction.timestamp)}</p>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs font-semibold text-zinc-400 mb-1.5 block">Audit Metadata & Cryptographic Trace:</span>
+                <pre className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 text-[11px] font-mono text-zinc-300 overflow-x-auto max-h-40">
+                  {JSON.stringify(selectedAction.metadata || {}, null, 2)}
+                </pre>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+                <button
+                  onClick={() => setSelectedAction(null)}
+                  className="px-4 py-2 text-xs font-medium rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-colors cursor-pointer"
+                >
+                  Close Inspector
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
