@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     # Dodo Payments config
     DODO_PAYMENTS_API_KEY: str | None = None
     DODO_PAYMENTS_WEBHOOK_SECRET: str | None = None
-    DODO_PAYMENTS_ENVIRONMENT: str = "test_mode"  # "test_mode" or "live_mode"
-    DODO_PAYMENTS_RETURN_URL: str | None = None
-    DODO_PAYMENTS_PRODUCT_ID: str | None = None
+    DODO_PAYMENTS_ENVIRONMENT: str = "live_mode"  # "test_mode" or "live_mode"
+    DODO_PAYMENTS_RETURN_URL: str | None = "https://regcompiler.app/billing/success"
+    DODO_PAYMENTS_PRODUCT_ID: str | None = "pdt_0No8F8CjUtvrFPVnafxSr"
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../../.env"), 

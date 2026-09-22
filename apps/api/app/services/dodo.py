@@ -21,9 +21,11 @@ class DodoService:
     def __init__(self):
         self.api_key = settings.DODO_PAYMENTS_API_KEY or os.getenv("DODO_PAYMENTS_API_KEY", "")
         self.webhook_secret = settings.DODO_PAYMENTS_WEBHOOK_SECRET or os.getenv("DODO_PAYMENTS_WEBHOOK_SECRET", "")
-        self.environment = (settings.DODO_PAYMENTS_ENVIRONMENT or os.getenv("DODO_PAYMENTS_ENVIRONMENT", "test_mode")).lower()
-        self.product_id = settings.DODO_PAYMENTS_PRODUCT_ID or os.getenv("DODO_PAYMENTS_PRODUCT_ID", "pdt_regulation_compiler_pro")
-        self.default_return_url = settings.DODO_PAYMENTS_RETURN_URL or os.getenv("DODO_PAYMENTS_RETURN_URL", "http://localhost:3000/billing/success")
+        default_env = "live_mode" if (self.api_key and self.api_key.startswith("wMe")) else "test_mode"
+        self.environment = (settings.DODO_PAYMENTS_ENVIRONMENT or os.getenv("DODO_PAYMENTS_ENVIRONMENT", default_env)).lower()
+        self.product_id = settings.DODO_PAYMENTS_PRODUCT_ID or os.getenv("DODO_PAYMENTS_PRODUCT_ID", "pdt_0No8F8CjUtvrFPVnafxSr")
+        self.default_return_url = settings.DODO_PAYMENTS_RETURN_URL or os.getenv("DODO_PAYMENTS_RETURN_URL", "https://regcompiler.app/billing/success")
+        self.business_id = "bus_0No0ywyg9JEELW3V5AXD2"
 
         # Select Dodo Payments API Base URL based on environment
         if self.environment == "live_mode":
@@ -84,35 +86,37 @@ class DodoService:
             try:
                 async with httpx.AsyncClient(timeout=15.0) as client:
                     resp = await client.post(
-                        f"{self.base_url}/checkout_sessions",
+                        f"{self.base_url}/checkouts",
                         headers=headers,
                         json=payload
                     )
                     if resp.status_code in (200, 201):
                         data = resp.json()
-                        logger.info(f"Dodo Payments checkout session created successfully for org {org_id}")
+                        logger.info(f"Dodo Payments checkout created successfully for org {org_id}: {data.get('checkout_url')}")
                         return {
                             "checkout_url": data.get("checkout_url"),
-                            "session_id": data.get("session_id"),
+                            "session_id": data.get("session_id") or data.get("checkout_id"),
                             "customer_id": data.get("customer_id")
                         }
                     else:
-                        err_msg = f"Dodo Payments API returned HTTP {resp.status_code}: {resp.text}"
+                        err_text = resp.text
+                        try:
+                            err_json = resp.json()
+                            if err_json.get("code") == "MERCHANT_NOT_LIVE":
+                                err_msg = "Live payments not enabled for merchant in Dodo Payments. In your Dodo Payments dashboard, please complete merchant verification (KYC), or toggle to Test Mode to generate test keys."
+                            else:
+                                err_msg = f"Dodo Payments error: {err_json.get('message', err_text)}"
+                        except Exception:
+                            err_msg = f"Dodo Payments API returned HTTP {resp.status_code}: {err_text}"
                         logger.error(err_msg)
                         raise DodoPaymentError(err_msg)
             except httpx.RequestError as req_err:
                 logger.error(f"Network error connecting to Dodo Payments: {req_err}")
                 raise DodoPaymentError(f"Could not reach Dodo Payments gateway: {req_err}")
 
-        # When API key is not yet set in development/test mode, provide a valid structured response pointing to the return URL or test checkout
-        logger.warning("DODO_PAYMENTS_API_KEY is not configured. Falling back to test checkout redirect.")
-        fallback_checkout_url = f"{self.base_url}/buy/{target_product_id}?return_url={target_return_url}&email={user_email}"
-        return {
-            "checkout_url": fallback_checkout_url,
-            "session_id": f"sess_test_{org_id}",
-            "customer_id": f"cus_test_{user_id}",
-            "mode": "test_mode_unconfigured"
-        }
+        # When API key is not configured on the server
+        logger.warning("DODO_PAYMENTS_API_KEY is not configured.")
+        raise DodoPaymentError("Dodo Payments API Key is not configured on the server. Please set DODO_PAYMENTS_API_KEY in your environment variables.")
 
     def verify_webhook_signature(
         self,
@@ -160,24 +164,10 @@ class DodoService:
 
     async def get_customer_portal_url(self, customer_id: str) -> Optional[str]:
         """Generates a customer billing portal URL for managing payment methods and subscriptions."""
-        if not self.is_configured() or not customer_id:
-            return None
-
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
-        try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                resp = await client.post(
-                    f"{self.base_url}/customers/{customer_id}/customer_portal",
-                    headers=headers
-                )
-                if resp.status_code == 200:
-                    return resp.json().get("portal_url")
-        except Exception as ex:
-            logger.warning(f"Could not generate customer portal session: {ex}")
-        return None
+        if self.environment == "live_mode":
+            return f"https://customer.dodopayments.com/login/{self.business_id}"
+        else:
+            return f"https://test.customer.dodopayments.com/login/{self.business_id}"
 
 
 dodo_service = DodoService()
