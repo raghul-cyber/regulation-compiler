@@ -34,6 +34,7 @@ export const metadata: Metadata = {
 import { Suspense } from "react";
 import { IntraAppToastProvider } from "@/components/ui/intra-app-toast";
 import { EntitlementGuard } from "@/components/billing/entitlement-guard";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -67,6 +68,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </IntraAppToastProvider>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
