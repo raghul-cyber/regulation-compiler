@@ -355,7 +355,7 @@ export default function NewRegulationPage() {
             className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <Lock className="w-3.5 h-3.5" />
-            <span>Upgrade to Pro ($49/mo)</span>
+            <span>Upgrade to Pro ($10.02/mo)</span>
           </button>
         </div>
       )}

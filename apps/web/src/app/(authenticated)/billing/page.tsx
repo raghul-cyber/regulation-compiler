@@ -222,7 +222,7 @@ export default function BillingPage() {
                 onClick={() => setIsPaywallOpen(true)}
                 className="w-full py-2.5 px-4 rounded-xl bg-[#5CC8FF] hover:bg-[#4bb3e6] text-[#05070A] font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/20 cursor-pointer"
               >
-                <span>Upgrade to Pro Plan</span>
+                <span>Upgrade to Pro ($10.02/mo)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -324,7 +324,7 @@ export default function BillingPage() {
               <tr className="border-b border-zinc-800 text-zinc-400 font-mono">
                 <th className="pb-3 font-semibold">Capability</th>
                 <th className="pb-3 font-semibold">Free Tier</th>
-                <th className="pb-3 font-semibold text-[#5CC8FF]">Pro Tier</th>
+                <th className="pb-3 font-semibold text-[#5CC8FF]">Pro Tier ($10.02/mo)</th>
                 <th className="pb-3 font-semibold text-emerald-400">Enterprise</th>
               </tr>
             </thead>

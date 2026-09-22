@@ -129,7 +129,7 @@ export function PaywallModal({
           <h3 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Upgrade to Pro</span>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-[#5CC8FF] border border-blue-500/30 font-mono font-normal">
-              $49/month
+              $10.02/month
             </span>
           </h3>
           <p className="text-sm text-zinc-300 leading-relaxed">
