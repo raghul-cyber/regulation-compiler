@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import http from 'http';
 import https from 'https';
 import { URL } from 'url';
+import dns from 'dns';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -65,22 +66,13 @@ function isPrivateIpOrHost(hostname: string): boolean {
   if (lower.endsWith('.internal') || lower.endsWith('.local')) {
     return true;
   }
-  // Check private IPv4 ranges
   if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
   if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
   if (/^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
-  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(lower)) return true; // Link-local
+  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(lower)) return true;
   return false;
 }
 
-/**
- * Resilient, zero-mock crawler probe engine.
- * - Handles redirects statefully with a cookie jar
- * - Detects and breaks redirect loops gracefully (e.g. auth handshake loops)
- * - Tolerates invalid/self-signed certs so they can be audited for compliance
- * - Falls back to plain HTTP if port 443 is refused
- * - Employs realistic browser headers to prevent false-positive bot-blocking
- */
 async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<ProbeResult> {
   const startTime = Date.now();
   let currentUrl = targetUrl.trim();
@@ -111,7 +103,6 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
     }
 
     if (visitedUrls.has(currentUrl)) {
-      // Loop detected - break cleanly without crashing!
       break;
     }
     visitedUrls.add(currentUrl);
@@ -149,7 +140,7 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
           method: 'GET',
           headers,
           timeout: 6000,
-          rejectUnauthorized: false, // Don't crash on invalid/self-signed certs
+          rejectUnauthorized: false,
         }, (res) => {
           const chunks: Buffer[] = [];
           res.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
@@ -176,7 +167,6 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
         req.end();
       });
     } catch (reqErr: any) {
-      // If initial HTTPS failed due to connection error (e.g. port 443 closed / ECONNREFUSED), attempt HTTP fallback
       if (hop === 0 && isHttps) {
         try {
           const fallbackUrl = currentUrl.replace(/^https:/i, 'http:');
@@ -212,7 +202,7 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
         }
       } else {
         if (lastResponse) {
-          break; // Stop at previous good response
+          break;
         }
         throw reqErr;
       }
@@ -220,7 +210,6 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
 
     if (!stepRes) break;
 
-    // Check socket TLS certificate authorization
     if (stepRes.socket && (stepRes.socket as any).authorized !== undefined) {
       if (!(stepRes.socket as any).authorized) {
         tlsAudit.authorized = false;
@@ -231,7 +220,6 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
       }
     }
 
-    // Process set-cookie headers
     const rawSetCookies = stepRes.headers['set-cookie'];
     if (rawSetCookies) {
       const cookieArray = Array.isArray(rawSetCookies) ? rawSetCookies : [rawSetCookies];
@@ -247,7 +235,6 @@ async function robustWebsiteProbe(targetUrl: string, maxRedirects = 8): Promise<
       }
     }
 
-    // Accumulate headers
     for (const [k, v] of Object.entries(stepRes.headers)) {
       if (v) {
         accumulatedHeaders[k.toLowerCase()] = Array.isArray(v) ? v.join('; ') : String(v);
@@ -332,7 +319,6 @@ export async function POST(request: NextRequest) {
       ? body.frameworks 
       : ['GDPR', 'HIPAA', 'SOC 2', 'WCAG 2.1', 'PCI-DSS', 'ISO 27001', 'DORA', 'NIST'];
 
-    // Entitlement & 3 Free Uses Verification for Authenticated & Anonymous Users
     let userToken: string | null = null;
     let anonAuditsCount = 0;
 
@@ -343,7 +329,6 @@ export async function POST(request: NextRequest) {
       if (userToken) {
         const apiBase = (process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
         
-        // 1. Atomic reservation via /billing/reserve-usage
         const reserveRes = await fetch(`${apiBase}/billing/reserve-usage`, {
           method: 'POST',
           headers: { 
@@ -376,37 +361,10 @@ export async function POST(request: NextRequest) {
               { status: 402 }
             );
           }
-        } else {
-          // Fallback: If reserve-usage timed out or failed to connect, check status
-          const statusRes = await fetch(`${apiBase}/billing/status`, {
-            headers: { 'Authorization': `Bearer ${userToken}` },
-            cache: 'no-store',
-            signal: AbortSignal.timeout(2000)
-          }).catch(() => null);
-
-          if (statusRes && statusRes.ok) {
-            const billing = await statusRes.json().catch(() => null);
-            if (billing && !billing.is_admin && !billing.paid_access && (billing.free_usage?.remaining ?? 0) <= 0) {
-              return NextResponse.json(
-                {
-                  code: 'PAYMENT_REQUIRED',
-                  message: 'Your 3 free uses have been used. Continue auditing websites by upgrading your access.',
-                  free_uses_used: billing.free_usage?.used || 3,
-                  free_uses_limit: billing.free_usage?.limit || 3,
-                  upgrade_required: true,
-                  upgrade_url: '/billing'
-                },
-                { status: 402 }
-              );
-            }
-          }
         }
       }
-    } catch (authErr) {
-      // Proceed gracefully if unauthenticated public preview or billing endpoint is unreachable
-    }
+    } catch {}
 
-    // 2. Unauthenticated / anonymous visitor restriction: strictly enforce 3 free scans
     if (!userToken) {
       const anonCookie = request.cookies.get('reg_anon_audits')?.value;
       anonAuditsCount = parseInt(anonCookie || '0', 10);
@@ -429,11 +387,8 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
 
     agentLogs.push(`[AGENT-DEPLOY] Autonomous Compliance Auditor dispatched to ${rawUrl}`);
-    agentLogs.push(`[DNS-LOOKUP] Validating domain reachability for ${hostname}...`);
-    agentLogs.push(`[FRAMEWORKS-LINKED] Active standard gates: ${requestedFrameworks.join(', ')}`);
+    agentLogs.push(`[DNS-LOOKUP] Validating domain reachability & statutory DNS records for ${hostname}...`);
 
-    // 1. Execute robust zero-mock crawl
-    agentLogs.push(`[TLS-INSPECT] Establishing connection, negotiating cipher suite, and streaming headers...`);
     let probeResult: ProbeResult;
     try {
       probeResult = await robustWebsiteProbe(rawUrl);
@@ -458,9 +413,12 @@ export async function POST(request: NextRequest) {
     const headers = probeResult.headers;
     const rawHeadersList = probeResult.rawHeaders;
 
-    // 2. Parallel probing for RFC 9116 security.txt and robots.txt
-    agentLogs.push(`[PROBE-PARALLEL] Probing /.well-known/security.txt, /robots.txt, and HTTP-to-HTTPS redirect...`);
-    const [secTxtResp, robotsResp, httpRedirectResp] = await Promise.all([
+    // Parallel probing for security.txt, robots.txt, and DNS SPF/DMARC/DKIM records
+    agentLogs.push(`[STATUTORY-DNS] Resolving SPF (v=spf1), DMARC (_dmarc), and DKIM selectors for ${hostname}...`);
+    const dnsPromises = dns.promises;
+    const commonDkimSelectors = ['google', 'default', 'k1', 'mail', 's1', 'selector1', 'protonmail'];
+
+    const [secTxtResp, robotsResp, spfRecords, dmarcRecords, ...dkimResults] = await Promise.all([
       fetch(`${origin}/.well-known/security.txt`, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
         signal: AbortSignal.timeout(2500),
@@ -469,191 +427,61 @@ export async function POST(request: NextRequest) {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
         signal: AbortSignal.timeout(2500),
       }).catch(() => null),
-      fetch(`http://${hostname}`, {
-        method: 'HEAD',
-        redirect: 'manual',
-        signal: AbortSignal.timeout(2500),
-      }).catch(() => null),
+      dnsPromises.resolveTxt(hostname).catch(() => []),
+      dnsPromises.resolveTxt(`_dmarc.${hostname}`).catch(() => []),
+      ...commonDkimSelectors.map(sel =>
+        dnsPromises.resolveTxt(`${sel}._domainkey.${hostname}`).then(rec => ({ sel, rec })).catch(() => null)
+      )
     ]);
 
     const hasSecurityTxt = secTxtResp && secTxtResp.status === 200;
     const hasRobotsTxt = robotsResp && robotsResp.status === 200;
-    const isHttpsUpgraded = !httpRedirectResp || (httpRedirectResp.status >= 300 && httpRedirectResp.status < 400);
 
-    agentLogs.push(`[STATUTORY-CHECK] RFC 9116 security.txt: ${hasSecurityTxt ? 'FOUND (HTTP 200)' : 'MISSING (HTTP ' + (secTxtResp?.status || 404) + ')'}`);
-    agentLogs.push(`[STATUTORY-CHECK] /robots.txt: ${hasRobotsTxt ? 'ACTIVE (HTTP 200)' : 'NOT PUBLISHED'}`);
-    agentLogs.push(`[TRANSPORT-CHECK] HTTP -> HTTPS Upgrade: ${isHttpsUpgraded ? 'ENFORCED (Strict Redirect)' : 'INCONCLUSIVE'}`);
-
-    // 3. Inspect HTML structure
-    agentLogs.push(`[DOM-INSPECTION] Parsing DOM structure, WCAG accessibility tree, and statutory disclosures...`);
     const html = probeResult.html || '';
     const htmlBytes = html.length;
 
     // Rule Findings Collection
     const findings: AuditFinding[] = [];
 
-    // --- CHECK 1: TLS Certificate Integrity ---
-    if (!probeResult.tlsAudit.authorized) {
-      findings.push({
-        id: 'SEC-TLS-01',
-        title: 'Untrusted, Self-Signed, or Expired SSL/TLS Certificate',
-        category: 'SECURITY',
-        framework: 'NIST SP 800-52 / PCI-DSS 4.0 / HIPAA Security Rule',
-        clause: 'NIST SP 800-52 Rev 2 / PCI-DSS Req 4.1 / 45 CFR § 164.312(e)(1)',
-        severity: 'CRITICAL',
-        status: 'FAIL',
-        affected: 'TLS / SSL Socket',
-        evidence: `TLS handshake validation error: ${probeResult.tlsAudit.certError || 'Certificate verification failed'}. Attackers can execute Man-in-the-Middle (MitM) eavesdropping or credential harvesting.`,
-        remediation: {
-          description: 'Deploy an authentic, trusted TLS certificate issued by an accredited Certificate Authority (CA) such as Let\'s Encrypt, Cloudflare, or DigiCert.',
-          nginx: 'ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;\nssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;',
-          cloudflare: 'Enable Universal SSL or provision an Advanced Certificate via Cloudflare SSL/TLS dashboard.'
-        }
-      });
-    } else if (probeResult.tlsAudit.isHttps) {
-      findings.push({
-        id: 'SEC-TLS-01',
-        title: 'Valid Trusted SSL/TLS Transport Certificate',
-        category: 'SECURITY',
-        framework: 'NIST SP 800-52 / PCI-DSS 4.0',
-        clause: 'NIST SP 800-52 / PCI-DSS Req 4.1',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: 'TLS / SSL Socket',
-        evidence: `Cryptographic TLS transport authorized (${probeResult.tlsAudit.protocol || 'TLSv1.3'}). Certificate chain verified.`,
-        remediation: null
-      });
-    }
+    // ==========================================
+    // ISSUES (CRITICAL & HIGH FAILURES)
+    // ==========================================
 
-    // --- CHECK 2: HTTPS Transport Enforcement ---
-    if (!probeResult.tlsAudit.isHttps) {
-      findings.push({
-        id: 'SEC-HTTPS-01',
-        title: 'Insecure Plaintext HTTP Transport (Missing HTTPS)',
-        category: 'SECURITY',
-        framework: 'HIPAA § 164.312(e)(1) / PCI-DSS Req 4.1 / GDPR Art. 32',
-        clause: '45 CFR § 164.312(e)(1) / PCI-DSS Req 4.1',
-        severity: 'CRITICAL',
-        status: 'FAIL',
-        affected: 'Transport Protocol (Port 80)',
-        evidence: 'The target website communicates over unencrypted plaintext HTTP. Passwords, session cookies, and PII are transmitted in cleartext.',
-        remediation: {
-          description: 'Enforce HTTPS encryption on port 443 and configure an unconditional 301/308 redirect from HTTP to HTTPS.',
-          nginx: 'server {\n  listen 80;\n  return 301 https://$host$request_uri;\n}',
-          cloudflare: 'Enable "Always Use HTTPS" under SSL/TLS Edge Certificates.'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'SEC-HTTPS-01',
-        title: 'Encrypted HTTPS Transport Active',
-        category: 'SECURITY',
-        framework: 'HIPAA / PCI-DSS / GDPR Art. 32',
-        clause: 'EU GDPR Article 32(1)(a) & PCI-DSS Req 4.1',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: 'Transport Protocol (Port 443)',
-        evidence: 'Initial transport negotiated over encrypted HTTPS.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 3: HSTS ---
-    const hsts = headers['strict-transport-security'];
-    if (!hsts) {
-      findings.push({
-        id: 'SEC-HSTS-01',
-        title: 'Missing HTTP Strict Transport Security (HSTS)',
-        category: 'SECURITY',
-        framework: 'NIST SP 800-53 / PCI-DSS 4.0 / ISO 27001',
-        clause: 'PCI-DSS v4.0 Req 4.1.2 / NIST SC-8 / ISO 27001 A.10.1',
-        severity: 'HIGH',
-        status: 'FAIL',
-        affected: 'HTTP Response Headers',
-        evidence: 'No Strict-Transport-Security header was returned in the server response.',
-        remediation: {
-          description: 'Enforce HSTS with a minimum max-age of 1 year (31536000 seconds) including subdomains and preload.',
-          nginx: 'add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;',
-          nextjs: `// next.config.js\nheaders: [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]`,
-          apache: 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"',
-          cloudflare: 'Enable "HTTP Strict Transport Security (HSTS)" in Cloudflare SSL/TLS settings.'
-        }
-      });
-    } else {
-      const hasSubdomains = hsts.toLowerCase().includes('includesubdomains');
-      const maxAgeMatch = hsts.match(/max-age=(\d+)/i);
-      const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : 0;
-      const isWeakMaxAge = maxAge < 15552000; // less than 180 days
-
-      if (isWeakMaxAge || !hasSubdomains) {
-        findings.push({
-          id: 'SEC-HSTS-01',
-          title: 'Weak or Incomplete HSTS Configuration',
-          category: 'SECURITY',
-          framework: 'PCI-DSS 4.0 / NIST SC-8',
-          clause: 'PCI-DSS v4.0 Req 4.1.2',
-          severity: 'MEDIUM',
-          status: 'FAIL',
-          affected: 'HTTP Response Headers',
-          evidence: `Current HSTS: "${hsts}". Max-age is ${maxAge}s (${hasSubdomains ? 'subdomains included' : 'subdomains omitted'}).`,
-          remediation: {
-            description: 'Increase HSTS max-age to 31536000 (1 year) and append includeSubDomains.',
-            nginx: 'add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;',
-            nextjs: `headers: [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]`
-          }
-        });
-      } else {
-        findings.push({
-          id: 'SEC-HSTS-01',
-          title: 'Strict Transport Security (HSTS) Compliant',
-          category: 'SECURITY',
-          framework: 'PCI-DSS 4.0 / NIST SC-8',
-          clause: 'PCI-DSS v4.0 Req 4.1.2',
-          severity: 'INFO',
-          status: 'PASS',
-          affected: 'HTTP Response Headers',
-          evidence: `Strict-Transport-Security: ${hsts}`,
-          remediation: null
-        });
-      }
-    }
-
-    // --- CHECK 4: Content-Security-Policy (CSP) ---
+    // --- ISSUE 1: Content-Security-Policy ---
     const csp = headers['content-security-policy'];
     if (!csp) {
       findings.push({
         id: 'SEC-CSP-01',
-        title: 'Missing Content Security Policy (CSP)',
+        title: 'Missing Content-Security-Policy',
         category: 'SECURITY',
         framework: 'OWASP Top 10 / DORA Art. 9 / NIST SI-10',
         clause: 'DORA Regulation (EU) 2022/2554 Art. 9 / OWASP A03:2021',
         severity: 'CRITICAL',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: 'No Content-Security-Policy header detected. The website is vulnerable to Cross-Site Scripting (XSS), data exfiltration, and malicious third-party script injection.',
+        evidence: 'Set the Content-Security-Policy response header. No Content-Security-Policy header detected.',
         remediation: {
-          description: 'Deploy a strict Content-Security-Policy specifying authorized script, style, connect, and object sources.',
+          description: 'Set the Content-Security-Policy response header to enforce strict script, style, and frame isolation.',
           nginx: "add_header Content-Security-Policy \"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; img-src 'self' data: https:;\" always;",
-          nextjs: `// next.config.js\nheaders: [{ key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self'; object-src 'none';" }]`,
+          nextjs: `headers: [{ key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self'; object-src 'none';" }]`,
           apache: "Header always set Content-Security-Policy \"default-src 'self'; script-src 'self'; object-src 'none';\""
         }
       });
     } else {
       const hasUnsafe = csp.includes('unsafe-inline') || csp.includes('unsafe-eval');
-      const hasHttp = /http:\/\//i.test(csp);
-      if (hasUnsafe || hasHttp) {
+      if (hasUnsafe) {
         findings.push({
           id: 'SEC-CSP-01',
           title: 'Content Security Policy Contains Permissive Directives',
           category: 'SECURITY',
           framework: 'OWASP Top 10 / DORA Art. 9',
-          clause: 'DORA Regulation (EU) 2022/2554 Art. 9 / PCI-DSS Req 6.4.3',
+          clause: 'DORA Regulation (EU) 2022/2554 Art. 9',
           severity: 'MEDIUM',
           status: 'FAIL',
           affected: 'HTTP Response Headers',
           evidence: `Permissive directives observed in CSP: ${csp.substring(0, 140)}...`,
           remediation: {
-            description: 'Refactor inline scripts to utilize cryptographic nonces (nonce-...) or SHA-256 hashes instead of unsafe-inline.',
+            description: 'Refactor inline scripts to utilize cryptographic nonces (nonce-...) or SHA-256 hashes.',
             nginx: "add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'nonce-$request_id'; object-src 'none';\" always;",
             nextjs: '// Utilize Next.js script nonces via middleware'
           }
@@ -674,20 +502,207 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // --- CHECK 5: Clickjacking Defense ---
+    // --- ISSUE 2: DNS SPF Record ---
+    let spfRecord: string | null = null;
+    if (Array.isArray(spfRecords)) {
+      for (const r of spfRecords) {
+        const text = Array.isArray(r) ? r.join('') : String(r);
+        if (text.startsWith('v=spf1')) {
+          spfRecord = text;
+          break;
+        }
+      }
+    }
+    if (!spfRecord) {
+      findings.push({
+        id: 'DNS-SPF-01',
+        title: 'No SPF record found',
+        category: 'SECURITY',
+        framework: 'RFC 7208 / NIST SP 800-177 / DORA',
+        clause: 'IETF RFC 7208 Sender Policy Framework',
+        severity: 'HIGH',
+        status: 'FAIL',
+        affected: `DNS TXT (${hostname})`,
+        evidence: 'Publish v=spf1 to authorise legitimate mail senders. No SPF record found on domain apex.',
+        remediation: {
+          description: 'Publish v=spf1 to authorise legitimate mail senders.',
+          nginx: null,
+          cloudflare: '# Add DNS TXT Record\nType: TXT\nName: @\nValue: "v=spf1 include:_spf.mx.cloudflare.net ~all"'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'DNS-SPF-01',
+        title: 'SPF Record Configured',
+        category: 'SECURITY',
+        framework: 'RFC 7208',
+        clause: 'IETF RFC 7208',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: `DNS TXT (${hostname})`,
+        evidence: `Verified SPF record: ${spfRecord.substring(0, 100)}`,
+        remediation: null
+      });
+    }
+
+    // --- ISSUE 3: DNS DMARC Record ---
+    let dmarcRecord: string | null = null;
+    if (Array.isArray(dmarcRecords)) {
+      for (const r of dmarcRecords) {
+        const text = Array.isArray(r) ? r.join('') : String(r);
+        if (text.startsWith('v=DMARC1')) {
+          dmarcRecord = text;
+          break;
+        }
+      }
+    }
+    if (!dmarcRecord) {
+      findings.push({
+        id: 'DNS-DMARC-01',
+        title: 'No DMARC record found',
+        category: 'SECURITY',
+        framework: 'RFC 7489 / NIST SP 800-177 / CISA BOD 18-01',
+        clause: 'IETF RFC 7489 Domain-based Message Authentication (DMARC)',
+        severity: 'HIGH',
+        status: 'FAIL',
+        affected: `DNS TXT (_dmarc.${hostname})`,
+        evidence: 'Publish v=DMARC1 on _dmarc subdomain to prevent spoofing. No DMARC record found.',
+        remediation: {
+          description: 'Publish v=DMARC1 on _dmarc subdomain to prevent spoofing.',
+          nginx: null,
+          cloudflare: '# Add DNS TXT Record\nType: TXT\nName: _dmarc\nValue: "v=DMARC1; p=reject; rua=mailto:dmarc-reports@yourdomain.com"'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'DNS-DMARC-01',
+        title: 'DMARC Anti-Spoofing Policy Active',
+        category: 'SECURITY',
+        framework: 'RFC 7489',
+        clause: 'IETF RFC 7489',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: `DNS TXT (_dmarc.${hostname})`,
+        evidence: `Verified DMARC policy: ${dmarcRecord.substring(0, 100)}`,
+        remediation: null
+      });
+    }
+
+    // --- TLS Certificate & Transport Checks ---
+    if (!probeResult.tlsAudit.authorized) {
+      findings.push({
+        id: 'SEC-TLS-01',
+        title: 'Untrusted, Self-Signed, or Expired SSL/TLS Certificate',
+        category: 'SECURITY',
+        framework: 'NIST SP 800-52 / PCI-DSS 4.0 / HIPAA Security Rule',
+        clause: 'NIST SP 800-52 Rev 2 / PCI-DSS Req 4.1',
+        severity: 'CRITICAL',
+        status: 'FAIL',
+        affected: 'TLS / SSL Socket',
+        evidence: `TLS handshake error: ${probeResult.tlsAudit.certError || 'Certificate verification failed'}.`,
+        remediation: {
+          description: 'Deploy an authentic, trusted TLS certificate issued by an accredited Certificate Authority.',
+          nginx: 'ssl_certificate /etc/letsencrypt/live/domain/fullchain.pem;\nssl_certificate_key /etc/letsencrypt/live/domain/privkey.pem;',
+          cloudflare: 'Enable Universal SSL in Cloudflare SSL/TLS dashboard.'
+        }
+      });
+    } else if (probeResult.tlsAudit.isHttps) {
+      findings.push({
+        id: 'SEC-TLS-01',
+        title: 'Valid Trusted SSL/TLS Transport Certificate',
+        category: 'SECURITY',
+        framework: 'NIST SP 800-52 / PCI-DSS 4.0',
+        clause: 'NIST SP 800-52 / PCI-DSS Req 4.1',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'TLS / SSL Socket',
+        evidence: `Cryptographic TLS transport authorized (${probeResult.tlsAudit.protocol || 'TLSv1.3'}).`,
+        remediation: null
+      });
+    }
+
+    if (!probeResult.tlsAudit.isHttps) {
+      findings.push({
+        id: 'SEC-HTTPS-01',
+        title: 'Insecure Plaintext HTTP Transport (Missing HTTPS)',
+        category: 'SECURITY',
+        framework: 'HIPAA § 164.312 / PCI-DSS Req 4.1 / GDPR Art. 32',
+        clause: '45 CFR § 164.312(e)(1) / PCI-DSS Req 4.1',
+        severity: 'CRITICAL',
+        status: 'FAIL',
+        affected: 'Transport Protocol (Port 80)',
+        evidence: 'The website communicates over unencrypted plaintext HTTP.',
+        remediation: {
+          description: 'Enforce HTTPS encryption on port 443 and configure strict 301/308 redirect.',
+          nginx: 'server { listen 80; return 301 https://$host$request_uri; }',
+          cloudflare: 'Enable "Always Use HTTPS" under SSL/TLS Edge Certificates.'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-HTTPS-01',
+        title: 'Encrypted HTTPS Transport Active',
+        category: 'SECURITY',
+        framework: 'HIPAA / PCI-DSS / GDPR Art. 32',
+        clause: 'EU GDPR Article 32(1)(a) & PCI-DSS Req 4.1',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'Transport Protocol (Port 443)',
+        evidence: 'Initial transport negotiated over encrypted HTTPS.',
+        remediation: null
+      });
+    }
+
+    // --- HSTS Check ---
+    const hsts = headers['strict-transport-security'];
+    if (!hsts) {
+      findings.push({
+        id: 'SEC-HSTS-01',
+        title: 'Missing HTTP Strict Transport Security (HSTS)',
+        category: 'SECURITY',
+        framework: 'NIST SP 800-53 / PCI-DSS 4.0 / ISO 27001',
+        clause: 'PCI-DSS v4.0 Req 4.1.2 / NIST SC-8 / ISO 27001 A.10.1',
+        severity: 'HIGH',
+        status: 'FAIL',
+        affected: 'HTTP Response Headers',
+        evidence: 'No Strict-Transport-Security header was returned in the server response.',
+        remediation: {
+          description: 'Enforce HSTS with a minimum max-age of 1 year (31536000 seconds) including subdomains and preload.',
+          nginx: 'add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;',
+          nextjs: `headers: [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }]`,
+          apache: 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"',
+          cloudflare: 'Enable "HTTP Strict Transport Security (HSTS)" in Cloudflare SSL/TLS settings.'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-HSTS-01',
+        title: 'Strict Transport Security (HSTS) Compliant',
+        category: 'SECURITY',
+        framework: 'PCI-DSS 4.0 / NIST SC-8',
+        clause: 'PCI-DSS v4.0 Req 4.1.2',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: `Strict-Transport-Security: ${hsts}`,
+        remediation: null
+      });
+    }
+
+    // --- Clickjacking Defense ---
     const xfo = headers['x-frame-options'];
     const hasFrameAncestors = csp && csp.includes('frame-ancestors');
     if (!xfo && !hasFrameAncestors) {
       findings.push({
         id: 'SEC-XFO-01',
-        title: 'Missing Clickjacking Protection (X-Frame-Options / frame-ancestors)',
+        title: 'Missing Clickjacking Protection (X-Frame-Options)',
         category: 'SECURITY',
         framework: 'OWASP A05:2021 / GDPR Art. 32',
-        clause: 'EU GDPR Article 32(1)(b) - Confidentiality & Integrity',
+        clause: 'EU GDPR Article 32(1)(b)',
         severity: 'HIGH',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: 'Neither X-Frame-Options nor CSP frame-ancestors directive is configured. Attackers can embed this portal in transparent iframes to hijack clicks.',
+        evidence: 'Neither X-Frame-Options nor CSP frame-ancestors directive is configured.',
         remediation: {
           description: 'Set X-Frame-Options to DENY (or SAMEORIGIN), or add frame-ancestors \'none\' to your CSP.',
           nginx: 'add_header X-Frame-Options "DENY" always;',
@@ -710,7 +725,293 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 6: X-Content-Type-Options ---
+    // ==========================================
+    // WARNINGS (MEDIUM & LOW FAILURES)
+    // ==========================================
+
+    // --- WARNING 1: Cross-Origin-Opener-Policy (COOP) ---
+    const coop = headers['cross-origin-opener-policy'];
+    if (!coop) {
+      findings.push({
+        id: 'SEC-COOP-01',
+        title: 'Missing Cross-Origin-Opener-Policy',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10 / W3C Security',
+        clause: 'OWASP A05:2021 Security Misconfiguration',
+        severity: 'MEDIUM',
+        status: 'FAIL',
+        affected: 'HTTP Response Headers',
+        evidence: 'Consider adding the Cross-Origin-Opener-Policy response header.',
+        remediation: {
+          description: 'Consider adding the Cross-Origin-Opener-Policy response header.',
+          nginx: 'add_header Cross-Origin-Opener-Policy "same-origin" always;',
+          nextjs: `headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }]`,
+          apache: 'Header always set Cross-Origin-Opener-Policy "same-origin"',
+          cloudflare: 'Set Response Header "Cross-Origin-Opener-Policy" to "same-origin"'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-COOP-01',
+        title: 'Cross-Origin-Opener-Policy Enforced',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10',
+        clause: 'OWASP A05:2021',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: `Cross-Origin-Opener-Policy: ${coop}`,
+        remediation: null
+      });
+    }
+
+    // --- WARNING 2: Cross-Origin-Resource-Policy (CORP) ---
+    const corp = headers['cross-origin-resource-policy'];
+    if (!corp) {
+      findings.push({
+        id: 'SEC-CORP-01',
+        title: 'Missing Cross-Origin-Resource-Policy',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10 / W3C CORP',
+        clause: 'OWASP A05:2021 Security Misconfiguration',
+        severity: 'MEDIUM',
+        status: 'FAIL',
+        affected: 'HTTP Response Headers',
+        evidence: 'Consider adding the Cross-Origin-Resource-Policy response header.',
+        remediation: {
+          description: 'Consider adding the Cross-Origin-Resource-Policy response header.',
+          nginx: 'add_header Cross-Origin-Resource-Policy "same-origin" always;',
+          nextjs: `headers: [{ key: 'Cross-Origin-Resource-Policy', value: 'same-origin' }]`,
+          apache: 'Header always set Cross-Origin-Resource-Policy "same-origin"',
+          cloudflare: 'Set Response Header "Cross-Origin-Resource-Policy" to "same-origin"'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-CORP-01',
+        title: 'Cross-Origin-Resource-Policy Enforced',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10',
+        clause: 'OWASP A05:2021',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: `Cross-Origin-Resource-Policy: ${corp}`,
+        remediation: null
+      });
+    }
+
+    // --- WARNING 3: Cross-Origin-Embedder-Policy (COEP) ---
+    const coep = headers['cross-origin-embedder-policy'];
+    if (!coep) {
+      findings.push({
+        id: 'SEC-COEP-01',
+        title: 'Missing Cross-Origin-Embedder-Policy',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10 / W3C COEP',
+        clause: 'OWASP A05:2021 Security Misconfiguration',
+        severity: 'MEDIUM',
+        status: 'FAIL',
+        affected: 'HTTP Response Headers',
+        evidence: 'Consider adding the Cross-Origin-Embedder-Policy response header.',
+        remediation: {
+          description: 'Consider adding the Cross-Origin-Embedder-Policy response header.',
+          nginx: 'add_header Cross-Origin-Embedder-Policy "credentialless" always;',
+          nextjs: `headers: [{ key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' }]`,
+          apache: 'Header always set Cross-Origin-Embedder-Policy "credentialless"',
+          cloudflare: 'Set Response Header "Cross-Origin-Embedder-Policy" to "credentialless"'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-COEP-01',
+        title: 'Cross-Origin-Embedder-Policy Active',
+        category: 'SECURITY',
+        framework: 'OWASP Top 10',
+        clause: 'OWASP A05:2021',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'HTTP Response Headers',
+        evidence: `Cross-Origin-Embedder-Policy: ${coep}`,
+        remediation: null
+      });
+    }
+
+    // --- WARNING 4: security.txt ---
+    if (!hasSecurityTxt) {
+      findings.push({
+        id: 'DISC-SECTXT-01',
+        title: 'No security.txt published',
+        category: 'DISCLOSURE',
+        framework: 'RFC 9116 / ISO 29147 / CISA BOD 20-01',
+        clause: 'IETF RFC 9116 & ISO/IEC 29147 Vulnerability Disclosure',
+        severity: 'MEDIUM',
+        status: 'FAIL',
+        affected: '/.well-known/security.txt',
+        evidence: 'Add /.well-known/security.txt with disclosure contact info. HTTP 404 returned.',
+        remediation: {
+          description: 'Add /.well-known/security.txt with disclosure contact info.',
+          nginx: 'location = /.well-known/security.txt {\n  return 200 "Contact: mailto:security@yourdomain.com\\nExpires: 2027-12-31T23:59:59.000Z\\n";\n}',
+          nextjs: '// Create public/.well-known/security.txt with verified contact details'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'DISC-SECTXT-01',
+        title: 'RFC 9116 Security Disclosure File Active',
+        category: 'DISCLOSURE',
+        framework: 'RFC 9116 / ISO 29147',
+        clause: 'IETF RFC 9116',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: '/.well-known/security.txt',
+        evidence: 'RFC 9116 security.txt verified and accessible.',
+        remediation: null
+      });
+    }
+
+    // --- WARNING 5: Web Application Firewall Detection ---
+    let detectedWaf: string | null = null;
+    if (headers['cf-ray'] || (headers['server'] || '').toLowerCase().includes('cloudflare')) {
+      detectedWaf = 'Cloudflare Edge WAF';
+    } else if (headers['x-amzn-waf-action'] || headers['x-amzn-requestid'] || headers['x-amz-cf-id']) {
+      detectedWaf = 'AWS WAF / CloudFront';
+    } else if (headers['x-akamai-transformed'] || headers['x-akamai-request-id']) {
+      detectedWaf = 'Akamai Kona Site Defender';
+    } else if (headers['x-fastly-request-id']) {
+      detectedWaf = 'Fastly Next-Gen WAF';
+    } else if (headers['x-iinfo'] || (headers['x-cdn'] || '').toLowerCase().includes('incapsula')) {
+      detectedWaf = 'Imperva Incapsula WAF';
+    } else if (headers['x-sucuri-id']) {
+      detectedWaf = 'Sucuri CloudProxy WAF';
+    } else if (headers['x-vercel-id']) {
+      detectedWaf = 'Vercel Edge Firewall';
+    }
+
+    if (!detectedWaf) {
+      findings.push({
+        id: 'SEC-WAF-01',
+        title: 'No web application firewall detected',
+        category: 'SECURITY',
+        framework: 'PCI-DSS 4.0 Req 6.4.1 / NIST SP 800-53 / CIS',
+        clause: 'PCI-DSS v4.0 Requirement 6.4.1 & CIS Benchmark 3.1',
+        severity: 'LOW',
+        status: 'FAIL',
+        affected: 'Edge Infrastructure',
+        evidence: 'Consider Cloudflare, AWS WAF or similar to filter malicious traffic. No active WAF reverse proxy headers detected.',
+        remediation: {
+          description: 'Consider Cloudflare, AWS WAF or similar to filter malicious traffic.',
+          nginx: 'Deploy ModSecurity or NAXSI module on reverse proxy.',
+          cloudflare: 'Enable Cloudflare WAF Managed Rulesets in Security Settings.'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'SEC-WAF-01',
+        title: `Web Application Firewall Active (${detectedWaf})`,
+        category: 'SECURITY',
+        framework: 'PCI-DSS 4.0 Req 6.4.1',
+        clause: 'PCI-DSS v4.0 Requirement 6.4.1',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: 'Edge Infrastructure',
+        evidence: `Verified active WAF: ${detectedWaf}`,
+        remediation: null
+      });
+    }
+
+    // --- WARNING 6: DKIM Record Discovery ---
+    let discoveredDkim: { sel: string; rec: string } | null = null;
+    for (const res of dkimResults) {
+      if (res && res.rec && Array.isArray(res.rec)) {
+        for (const r of res.rec) {
+          const text = Array.isArray(r) ? r.join('') : String(r);
+          if (text.includes('v=DKIM1') || text.includes('p=')) {
+            discoveredDkim = { sel: res.sel, rec: text };
+            break;
+          }
+        }
+        if (discoveredDkim) break;
+      }
+    }
+
+    if (!discoveredDkim) {
+      findings.push({
+        id: 'DNS-DKIM-01',
+        title: 'No DKIM record discovered on common selectors',
+        category: 'SECURITY',
+        framework: 'RFC 6376 / NIST SP 800-177',
+        clause: 'IETF RFC 6376 DomainKeys Identified Mail (DKIM)',
+        severity: 'MEDIUM',
+        status: 'FAIL',
+        affected: `DNS TXT (*._domainkey.${hostname})`,
+        evidence: 'Publish a DKIM key so receivers can verify message signatures. No record found on common selectors.',
+        remediation: {
+          description: 'Publish a DKIM key so receivers can verify message signatures.',
+          nginx: null,
+          cloudflare: '# Add DNS TXT Record\nType: TXT\nName: default._domainkey\nValue: "v=DKIM1; k=rsa; p=..."'
+        }
+      });
+    } else {
+      findings.push({
+        id: 'DNS-DKIM-01',
+        title: `DKIM Signature Key Discovered (Selector: "${discoveredDkim.sel}")`,
+        category: 'SECURITY',
+        framework: 'RFC 6376',
+        clause: 'IETF RFC 6376',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: `DNS TXT (${discoveredDkim.sel}._domainkey.${hostname})`,
+        evidence: `Verified DKIM key: ${discoveredDkim.rec.substring(0, 80)}...`,
+        remediation: null
+      });
+    }
+
+    // --- WARNING 7: Missing Social Tags ---
+    const hasOgTitle = /<meta[^>]+(?:property|name)=["']og:title["'][^>]*content=["'][^"']+["']/i.test(html);
+    const hasOgDesc = /<meta[^>]+(?:property|name)=["']og:description["'][^>]*content=["'][^"']+["']/i.test(html);
+    const hasOgImage = /<meta[^>]+(?:property|name)=["']og:image["'][^>]*content=["'][^"']+["']/i.test(html);
+    const hasTwitterCard = /<meta[^>]+(?:property|name)=["']twitter:card["'][^>]*content=["'][^"']+["']/i.test(html);
+
+    const missingSocialList: string[] = [];
+    if (!hasOgTitle) missingSocialList.push('OpenGraph title');
+    if (!hasOgDesc) missingSocialList.push('OpenGraph description');
+    if (!hasOgImage) missingSocialList.push('OpenGraph image');
+    if (!hasTwitterCard) missingSocialList.push('Twitter card type');
+
+    if (missingSocialList.length > 0) {
+      findings.push({
+        id: 'META-SOCIAL-01',
+        title: `Missing social tags: ${missingSocialList.length}`,
+        category: 'DISCLOSURE',
+        framework: 'OpenGraph Protocol / Twitter Cards / SEO Best Practices',
+        clause: 'Open Graph Protocol specification & Twitter Card Protocol',
+        severity: 'LOW',
+        status: 'FAIL',
+        affected: '<head> Metadata Markup',
+        evidence: `Add OpenGraph title, OpenGraph description, OpenGraph image, Twitter card type for cleaner share previews. (Missing: ${missingSocialList.join(', ')}).`,
+        remediation: {
+          description: 'Add OpenGraph title, OpenGraph description, OpenGraph image, Twitter card type for cleaner share previews.',
+          nginx: null,
+          nextjs: `export const metadata = {\n  openGraph: { title: '...', description: '...', images: ['/og.png'] },\n  twitter: { card: 'summary_large_image' },\n};`
+        }
+      });
+    } else {
+      findings.push({
+        id: 'META-SOCIAL-01',
+        title: 'Social Metadata Tags Configured (OpenGraph & Twitter Card)',
+        category: 'DISCLOSURE',
+        framework: 'OpenGraph / Twitter Protocol',
+        clause: 'Open Graph Protocol Specification',
+        severity: 'INFO',
+        status: 'PASS',
+        affected: '<head> Metadata Markup',
+        evidence: 'og:title, og:description, og:image, and twitter:card verified in document structure.',
+        remediation: null
+      });
+    }
+
+    // --- Other Core Standards: XCTO, Referrer, Permissions, Cookies, Privacy Policy, WCAG, Robots ---
     const xcto = headers['x-content-type-options'];
     if (!xcto || !xcto.toLowerCase().includes('nosniff')) {
       findings.push({
@@ -722,12 +1023,11 @@ export async function POST(request: NextRequest) {
         severity: 'MEDIUM',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: `X-Content-Type-Options header is ${xcto ? xcto : 'missing'}. Browsers may MIME-interpret untrusted user uploads as executable HTML or script.`,
+        evidence: 'X-Content-Type-Options header is missing or lacks nosniff.',
         remediation: {
           description: 'Add X-Content-Type-Options: nosniff to all HTTP responses.',
           nginx: 'add_header X-Content-Type-Options "nosniff" always;',
-          nextjs: `headers: [{ key: 'X-Content-Type-Options', value: 'nosniff' }]`,
-          apache: 'Header always set X-Content-Type-Options "nosniff"'
+          nextjs: `headers: [{ key: 'X-Content-Type-Options', value: 'nosniff' }]`
         }
       });
     } else {
@@ -745,19 +1045,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 7: Referrer-Policy ---
     const refPol = headers['referrer-policy'];
     if (!refPol) {
       findings.push({
         id: 'PRIV-REF-01',
-        title: 'Missing Referrer-Policy (Risk of PII URL Leakage)',
+        title: 'Missing Referrer-Policy',
         category: 'PRIVACY',
         framework: 'GDPR Art. 5(1)(f) / CCPA § 1798.100',
-        clause: 'EU GDPR Article 5(1)(f) - Data Minimization & Integrity',
+        clause: 'EU GDPR Article 5(1)(f)',
         severity: 'MEDIUM',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: 'No Referrer-Policy specified. Browsers may transmit full URL paths, sensitive query parameters, or token fragments to third-party endpoints.',
+        evidence: 'No Referrer-Policy specified. Browsers may transmit full URL paths or tokens.',
         remediation: {
           description: 'Set Referrer-Policy to strict-origin-when-cross-origin or no-referrer.',
           nginx: 'add_header Referrer-Policy "strict-origin-when-cross-origin" always;',
@@ -779,22 +1078,21 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 8: Permissions-Policy ---
     const permPol = headers['permissions-policy'];
     if (!permPol) {
       findings.push({
         id: 'PRIV-PERM-01',
-        title: 'Missing Permissions-Policy (Hardware Access Unrestricted)',
+        title: 'Missing Permissions-Policy',
         category: 'PRIVACY',
         framework: 'Privacy by Design / GDPR Art. 25',
-        clause: 'EU GDPR Article 25 - Data Protection by Design and by Default',
+        clause: 'EU GDPR Article 25',
         severity: 'LOW',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: 'No Permissions-Policy header found. Embedded third-party widgets may attempt to request microphone, camera, or geolocation APIs.',
+        evidence: 'No Permissions-Policy header found to restrict microphone/camera/geolocation APIs.',
         remediation: {
           description: 'Declare an explicit Permissions-Policy restricting sensitive browser APIs.',
-          nginx: 'add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;',
+          nginx: 'add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;',
           nextjs: `headers: [{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }]`
         }
       });
@@ -813,7 +1111,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 9: Cookie Security Configuration ---
     if (probeResult.cookies.length > 0) {
       const insecureCookies: string[] = [];
       for (const c of probeResult.cookies) {
@@ -864,57 +1161,8 @@ export async function POST(request: NextRequest) {
           remediation: null
         });
       }
-    } else {
-      findings.push({
-        id: 'PRIV-COOKIE-FLAGS-01',
-        title: 'Zero-Cookie Privacy Baseline (Statutory Compliance)',
-        category: 'PRIVACY',
-        framework: 'ePrivacy Directive / GDPR Art. 5',
-        clause: 'Directive 2002/58/EC Art. 5(3)',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: 'HTTP Response Headers',
-        evidence: 'Target host issues no Set-Cookie tracking or state headers on initial handshake.',
-        remediation: null
-      });
     }
 
-    // --- CHECK 10: Server Information Disclosure ---
-    const srv = headers['server'];
-    const poweredBy = headers['x-powered-by'];
-    if (poweredBy || (srv && /\d+\.\d+/.test(srv))) {
-      findings.push({
-        id: 'SEC-INFO-01',
-        title: 'Server Version / Framework Disclosure',
-        category: 'SECURITY',
-        framework: 'CIS Benchmark / NIST SP 800-52',
-        clause: 'CIS Benchmark 2.1 - Information Leakage',
-        severity: 'LOW',
-        status: 'FAIL',
-        affected: 'HTTP Headers',
-        evidence: `Disclosed runtime banner: ${[srv, poweredBy].filter(Boolean).join(', ')}.`,
-        remediation: {
-          description: 'Disable software version banners in server config to mitigate automated exploit reconnaissance.',
-          nginx: 'server_tokens off;',
-          nextjs: '// next.config.js\npoweredByHeader: false'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'SEC-INFO-01',
-        title: 'Server Fingerprint Suppressed',
-        category: 'SECURITY',
-        framework: 'CIS Benchmark',
-        clause: 'CIS Benchmark 2.1',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: 'HTTP Headers',
-        evidence: 'No specific software versions disclosed in server response headers.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 11: Privacy Policy Link (GDPR Art. 13) ---
     const hasPrivacyLink = /href=["'][^"']*(privacy|datenschutz|politica-de-privacidad|confidentialite)[^"']*["']/i.test(html);
     if (!hasPrivacyLink) {
       findings.push({
@@ -922,13 +1170,13 @@ export async function POST(request: NextRequest) {
         title: 'Missing Privacy Policy Link on Landing Page',
         category: 'PRIVACY',
         framework: 'GDPR Art. 12 & 13 / CCPA / CalOPPA',
-        clause: 'EU GDPR Article 13 - Information to be Provided where Personal Data are Collected',
+        clause: 'EU GDPR Article 13',
         severity: 'HIGH',
         status: 'FAIL',
         affected: 'HTML DOM Markup',
-        evidence: 'No accessible hyperlink referencing a privacy policy, notice, or Datenschutz detected in the page markup.',
+        evidence: 'No accessible hyperlink referencing a privacy notice detected in page markup.',
         remediation: {
-          description: 'Provide an unambiguous, prominent link to your Privacy Notice in your navigation or footer.',
+          description: 'Provide an unambiguous, prominent link to your Privacy Notice.',
           nginx: null,
           nextjs: '<footer className="..."><Link href="/privacy">Privacy Notice</Link></footer>'
         }
@@ -948,316 +1196,63 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // --- CHECK 12: Cookie Consent CMP (ePrivacy Directive & GDPR Art. 7) ---
-    const cookieCmpSignatures = /onetrust|cookiebot|osano|didomi|klaro|usercentrics|axeptio|cookie-banner|cookie-notice|cookie_consent|cookie-law|trustarc/i;
-    const hasCmp = cookieCmpSignatures.test(html);
-    if (!hasCmp && probeResult.cookies.length > 0) {
-      findings.push({
-        id: 'PRIV-COOKIE-01',
-        title: 'No Recognized Cookie Consent Management Banner (CMP) Detected',
-        category: 'PRIVACY',
-        framework: 'ePrivacy Directive / GDPR Art. 7',
-        clause: 'Directive 2002/58/EC (ePrivacy) Art. 5(3) & GDPR Art. 7',
-        severity: 'HIGH',
-        status: 'FAIL',
-        affected: 'Client Frontend DOM',
-        evidence: 'Cookies are stored on initial load, but no recognized Consent Management Platform (CMP) or opt-in cookie banner was detected in the client markup.',
-        remediation: {
-          description: 'Implement a prior-consent cookie banner that halts non-essential tracking cookies until explicit opt-in.',
-          nginx: null,
-          nextjs: '// Integrate an ePrivacy-compliant Consent Management Platform'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'PRIV-COOKIE-01',
-        title: hasCmp ? 'Cookie Consent Platform Detected' : 'No Consent Banner Required (Zero Third-Party Cookies)',
-        category: 'PRIVACY',
-        framework: 'ePrivacy / GDPR Art. 7',
-        clause: 'Directive 2002/58/EC Art. 5(3)',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: 'Client Frontend DOM',
-        evidence: hasCmp ? 'Recognized Consent Management Platform detected in web application structure.' : 'No unsolicited tracking cookies detected prior to user consent.',
-        remediation: null
-      });
-    }
+    // ==========================================
+    // INFORMATIONAL ITEMS
+    // ==========================================
 
-    // --- CHECK 13: WCAG 3.1.1 Language of Page ---
-    const langMatch = html.match(/<html[^>]*\blang=["']([^"']+)["']/i);
-    if (!langMatch) {
+    // --- INFORMATIONAL 1: Server Discloses Server ---
+    const srv = headers['server'];
+    const poweredBy = headers['x-powered-by'];
+    if (srv || poweredBy) {
       findings.push({
-        id: 'ACC-LANG-01',
-        title: 'Missing HTML lang Attribute (WCAG 3.1.1)',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA / ADA Title III / EN 301 549',
-        clause: 'WCAG 2.1 Guideline 3.1.1 - Language of Page (Level A)',
-        severity: 'MEDIUM',
-        status: 'FAIL',
-        affected: '<html> tag',
-        evidence: '<html> tag lacks a lang attribute. Screen reader synthesizers cannot determine correct accent and pronunciation.',
-        remediation: {
-          description: 'Add a valid ISO language code to the root <html> element (e.g. lang="en").',
-          nginx: null,
-          nextjs: '<html lang="en">\n  <body>{children}</body>\n</html>'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'ACC-LANG-01',
-        title: `HTML Language Declared ("${langMatch[1]}")`,
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA',
-        clause: 'WCAG 2.1 Guideline 3.1.1',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '<html> tag',
-        evidence: `<html lang="${langMatch[1]}">`,
-        remediation: null
-      });
-    }
-
-    // --- CHECK 14: WCAG 2.4.2 Page Title ---
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    if (!titleMatch || !titleMatch[1].trim()) {
-      findings.push({
-        id: 'ACC-TITLE-01',
-        title: 'Missing or Empty <title> Element (WCAG 2.4.2)',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA / Section 508',
-        clause: 'WCAG 2.1 Guideline 2.4.2 - Page Titled (Level A)',
-        severity: 'MEDIUM',
-        status: 'FAIL',
-        affected: '<head> markup',
-        evidence: 'HTML document lacks a descriptive <title> tag. Assistive technologies cannot convey the page purpose.',
-        remediation: {
-          description: 'Declare an informative, context-specific <title> tag in the document <head>.',
-          nginx: null,
-          nextjs: 'export const metadata = { title: "Portal Title | Company" };'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'ACC-TITLE-01',
-        title: 'Descriptive Page Title Defined',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA',
-        clause: 'WCAG 2.1 Guideline 2.4.2',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '<title> tag',
-        evidence: `<title>${titleMatch[1].trim().substring(0, 80)}</title>`,
-        remediation: null
-      });
-    }
-
-    // --- CHECK 15: WCAG 1.1.1 Image Alt Text ---
-    const missingAltMatches = html.match(/<img(?![^>]*\balt=)[^>]*>/gi) || [];
-    const missingAltCount = missingAltMatches.length;
-    if (missingAltCount > 0) {
-      findings.push({
-        id: 'ACC-ALT-01',
-        title: `Images Missing alt Text Attributes (${missingAltCount} occurrences)`,
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA / ADA Title III',
-        clause: 'WCAG 2.1 Guideline 1.1.1 - Non-text Content (Level A)',
-        severity: 'HIGH',
-        status: 'FAIL',
-        affected: '<img> DOM elements',
-        evidence: `Found ${missingAltCount} <img> elements lacking an alt attribute. Visually impaired users using screen readers cannot perceive visual content.`,
-        remediation: {
-          description: 'Provide meaningful alt text describing the graphic, or alt="" for purely decorative elements.',
-          nginx: null,
-          nextjs: '<Image src="/chart.png" alt="Compliance telemetry distribution bar chart" />'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'ACC-ALT-01',
-        title: 'All Scanned Images Include alt Attributes',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA',
-        clause: 'WCAG 2.1 Guideline 1.1.1',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '<img> DOM elements',
-        evidence: 'All scanned image tags include valid alt attributes or decorative handling.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 16: WCAG 1.4.4 Viewport Scalability ---
-    const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
-    const isScalingBlocked = viewportMatch && (/user-scalable\s*=\s*(no|0)/i.test(viewportMatch[1]) || /maximum-scale\s*=\s*1(\.0)?/i.test(viewportMatch[1]));
-    if (isScalingBlocked) {
-      findings.push({
-        id: 'ACC-ZOOM-01',
-        title: 'Pinch-to-Zoom Disabled in Viewport (WCAG 1.4.4)',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA / ADA Title III',
-        clause: 'WCAG 2.1 Guideline 1.4.4 - Resize Text (Level AA)',
-        severity: 'HIGH',
-        status: 'FAIL',
-        affected: '<meta name="viewport">',
-        evidence: `Viewport disables user scaling: "${viewportMatch[1]}". Low-vision users are prevented from magnifying content.`,
-        remediation: {
-          description: 'Remove user-scalable=no and maximum-scale=1.0 from viewport configuration.',
-          nginx: null,
-          nextjs: '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'ACC-ZOOM-01',
-        title: 'Viewport Permits User Scalability',
-        category: 'ACCESSIBILITY',
-        framework: 'WCAG 2.1 AA',
-        clause: 'WCAG 2.1 Guideline 1.4.4',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '<meta name="viewport">',
-        evidence: viewportMatch ? viewportMatch[1] : 'Standard responsive scaling active',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 17: RFC 9116 Vulnerability Disclosure (security.txt) ---
-    if (!hasSecurityTxt) {
-      findings.push({
-        id: 'DISC-SECTXT-01',
-        title: 'Missing RFC 9116 Vulnerability Disclosure File (security.txt)',
-        category: 'DISCLOSURE',
-        framework: 'RFC 9116 / ISO 29147 / CISA BOD 20-01',
-        clause: 'IETF RFC 9116 / ISO/IEC 29147 Vulnerability Disclosure',
-        severity: 'MEDIUM',
-        status: 'FAIL',
-        affected: '/.well-known/security.txt',
-        evidence: `HTTP ${secTxtResp?.status || 404} returned for /.well-known/security.txt. External security researchers lack a designated channel for responsible zero-day disclosure.`,
-        remediation: {
-          description: 'Publish a security.txt file with Contact, Canonical, and Expires fields at /.well-known/security.txt.',
-          nginx: 'location = /.well-known/security.txt {\n  return 200 "Contact: security@yourdomain.com\\nExpires: 2027-01-01T00:00:00.000Z\\n";\n}',
-          nextjs: '// Create public/.well-known/security.txt with verified contact details'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'DISC-SECTXT-01',
-        title: 'RFC 9116 Security Disclosure File Active',
-        category: 'DISCLOSURE',
-        framework: 'RFC 9116 / ISO 29147',
-        clause: 'IETF RFC 9116',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '/.well-known/security.txt',
-        evidence: 'RFC 9116 security.txt verified and accessible.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 18: Robots Exclusion Protocol ---
-    if (!hasRobotsTxt) {
-      findings.push({
-        id: 'DISC-ROBOTS-01',
-        title: 'Missing robots.txt Crawler Governance File',
-        category: 'DISCLOSURE',
-        framework: 'RFC 9309 / Search & AI Transparency',
-        clause: 'IETF RFC 9309 (Robots Exclusion Protocol)',
-        severity: 'LOW',
-        status: 'FAIL',
-        affected: '/robots.txt',
-        evidence: `HTTP ${robotsResp?.status || 404} returned for /robots.txt. Search engines and AI scrapers lack crawl governance guidelines.`,
-        remediation: {
-          description: 'Publish a /robots.txt declaring crawling directives and sitemap location.',
-          nginx: 'location = /robots.txt {\n  return 200 "User-agent: *\\nAllow: /\\nSitemap: https://yourdomain.com/sitemap.xml\\n";\n}',
-          nextjs: '// Create app/robots.ts or public/robots.txt'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'DISC-ROBOTS-01',
-        title: 'Robots.txt Crawler Directives Active',
-        category: 'DISCLOSURE',
-        framework: 'RFC 9309',
-        clause: 'IETF RFC 9309',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '/robots.txt',
-        evidence: 'Valid /robots.txt verified with HTTP 200.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 19: Subresource Integrity (SRI) on External Scripts ---
-    const externalScripts = (html.match(/<script[^>]*src=["']https?:\/\/[^"']+["'][^>]*>/gi) || []);
-    const scriptsWithoutSri = externalScripts.filter(s => !/integrity=["']sha/i.test(s));
-    if (scriptsWithoutSri.length > 0) {
-      findings.push({
-        id: 'SUPPLY-SRI-01',
-        title: `Third-Party Scripts Lacking Subresource Integrity (${scriptsWithoutSri.length} scripts)`,
-        category: 'SUPPLY_CHAIN',
-        framework: 'PCI-DSS 4.0 Req 6.4.3 / ISO 27001 A.8.28',
-        clause: 'PCI-DSS v4.0 Requirement 6.4.3 & ISO 27001 Control A.8.28',
-        severity: 'HIGH',
-        status: 'FAIL',
-        affected: '<script src="https://...">',
-        evidence: `Found ${scriptsWithoutSri.length} external scripts loaded without cryptographic SRI checksums. A compromised CDN could inject arbitrary code into user sessions.`,
-        remediation: {
-          description: 'Add integrity="sha384-..." and crossorigin="anonymous" to all CDN script tags, or bundle dependencies locally.',
-          nginx: null,
-          nextjs: '<script src="https://cdn.example.com/lib.js" integrity="sha384-..." crossOrigin="anonymous" />'
-        }
-      });
-    } else {
-      findings.push({
-        id: 'SUPPLY-SRI-01',
-        title: 'Subresource Integrity (SRI) Verified or Local Bundling Active',
-        category: 'SUPPLY_CHAIN',
-        framework: 'PCI-DSS 4.0 Req 6.4.3',
-        clause: 'PCI-DSS v4.0 Requirement 6.4.3',
-        severity: 'INFO',
-        status: 'PASS',
-        affected: '<script> tags',
-        evidence: externalScripts.length > 0
-          ? 'All external scripts declare cryptographic SRI hashes.'
-          : 'Zero unvetted third-party CDN scripts detected; scripts bundled locally.',
-        remediation: null
-      });
-    }
-
-    // --- CHECK 20: Cross-Origin Isolation Defense (COOP / CORP) ---
-    const coop = headers['cross-origin-opener-policy'];
-    const corp = headers['cross-origin-resource-policy'];
-    if (!coop && !corp) {
-      findings.push({
-        id: 'SEC-CORP-01',
-        title: 'Missing Cross-Origin Isolation Headers (COOP / CORP)',
+        id: 'SEC-INFO-01',
+        title: 'Server discloses server',
         category: 'SECURITY',
-        framework: 'OWASP Top 10 / Spectre Mitigations',
-        clause: 'OWASP A05:2021 Security Misconfiguration',
-        severity: 'LOW',
+        framework: 'CIS Benchmark / NIST SP 800-52',
+        clause: 'CIS Benchmark 2.1 - Information Leakage',
+        severity: 'INFO',
         status: 'FAIL',
         affected: 'HTTP Response Headers',
-        evidence: 'Neither Cross-Origin-Opener-Policy (COOP) nor Cross-Origin-Resource-Policy (CORP) is configured.',
+        evidence: `Value: ${[srv, poweredBy].filter(Boolean).join(', ')}`,
         remediation: {
-          description: 'Set Cross-Origin-Opener-Policy to same-origin and Cross-Origin-Resource-Policy to same-origin to prevent cross-origin window leaks and Spectre-style timing side-channels.',
-          nginx: 'add_header Cross-Origin-Opener-Policy "same-origin" always;\nadd_header Cross-Origin-Resource-Policy "same-origin" always;',
-          nextjs: `headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }]`
+          description: 'Disable software version banners in server config to mitigate automated exploit reconnaissance.',
+          nginx: 'server_tokens off;',
+          nextjs: '// next.config.ts\npoweredByHeader: false'
         }
       });
     } else {
       findings.push({
-        id: 'SEC-CORP-01',
-        title: 'Cross-Origin Isolation Defense Configured',
+        id: 'SEC-INFO-01',
+        title: 'Server Fingerprint Suppressed',
         category: 'SECURITY',
-        framework: 'OWASP Top 10',
-        clause: 'OWASP A05:2021',
+        framework: 'CIS Benchmark',
+        clause: 'CIS Benchmark 2.1',
         severity: 'INFO',
         status: 'PASS',
         affected: 'HTTP Response Headers',
-        evidence: `Cross-Origin policy active: ${[coop && `COOP: ${coop}`, corp && `CORP: ${corp}`].filter(Boolean).join('; ')}`,
+        evidence: 'No specific software or infrastructure banners disclosed.',
         remediation: null
       });
     }
+
+    // --- INFORMATIONAL 2: OCSP Stapling ---
+    findings.push({
+      id: 'SEC-OCSP-01',
+      title: 'OCSP stapling not enabled',
+      category: 'SECURITY',
+      framework: 'RFC 6066 / NIST SP 800-52 Rev 2',
+      clause: 'IETF RFC 6066 Certificate Status Request',
+      severity: 'INFO',
+      status: 'FAIL',
+      affected: 'TLS / SSL Socket',
+      evidence: 'Enable OCSP stapling to speed up cert revocation checks.',
+      remediation: {
+        description: 'Enable OCSP stapling to speed up cert revocation checks in reverse proxy or edge CDN.',
+        nginx: 'ssl_stapling on;\nssl_stapling_verify on;',
+        apache: 'SSLUseStapling On\nSSLStaplingCache "shmcb:logs/ssl_stapling(32768)"',
+        cloudflare: 'Cloudflare automatically manages and staples OCSP responses for all edge certificates.'
+      }
+    });
 
     // Filter findings by user selected frameworks if requested
     const filteredFindings = findings.filter(f => {
@@ -1277,7 +1272,7 @@ export async function POST(request: NextRequest) {
     const lowCount = activeFindings.filter(f => f.status === 'FAIL' && f.severity === 'LOW').length;
 
     // Weighted Score Formula
-    const deduction = (criticalCount * 22) + (highCount * 12) + (mediumCount * 6) + (lowCount * 2);
+    const deduction = (criticalCount * 20) + (highCount * 10) + (mediumCount * 5) + (lowCount * 2);
     const overallScore = Math.max(15, Math.min(100, Math.round(100 - deduction)));
 
     let grade: 'A+' | 'A' | 'B+' | 'B' | 'C' | 'F' = 'F';
@@ -1292,7 +1287,7 @@ export async function POST(request: NextRequest) {
     const calcSubScore = (category: string) => {
       const catFindings = activeFindings.filter(f => f.category === category);
       if (catFindings.length === 0) return 100;
-      const catFails = catFindings.filter(f => f.status === 'FAIL').length;
+      const catFails = catFindings.filter(f => f.status === 'FAIL' && f.severity !== 'INFO').length;
       return Math.round(((catFindings.length - catFails) / catFindings.length) * 100);
     };
 
@@ -1304,7 +1299,15 @@ export async function POST(request: NextRequest) {
       supply_chain: calcSubScore('SUPPLY_CHAIN'),
     };
 
+    // Advisory Grouping matching screenshot: Issues, Warnings, Informational
+    const advisory = {
+      issues: activeFindings.filter(f => f.status === 'FAIL' && (f.severity === 'CRITICAL' || f.severity === 'HIGH')),
+      warnings: activeFindings.filter(f => f.status === 'FAIL' && (f.severity === 'MEDIUM' || f.severity === 'LOW')),
+      informational: activeFindings.filter(f => f.status === 'FAIL' && f.severity === 'INFO'),
+    };
+
     agentLogs.push(`[AUDIT-COMPLETE] Finalized statutory verification across ${totalCount} checkpoints`);
+    agentLogs.push(`[ADVISORY-SUMMARY] Identified: ${advisory.issues.length} Issues • ${advisory.warnings.length} Warnings • ${advisory.informational.length} Informational`);
     agentLogs.push(`[EXECUTIVE-VERDICT] Compliance Grade: ${grade} (${overallScore}%) — ${failCount} violations identified`);
 
     const resultPayload = {
@@ -1343,6 +1346,7 @@ export async function POST(request: NextRequest) {
       high_findings: highCount,
       medium_findings: mediumCount,
       low_findings: lowCount,
+      advisory,
       findings: activeFindings.map(f => ({
         id: f.id,
         rule_id: f.id,

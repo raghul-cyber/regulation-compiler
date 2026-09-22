@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.regcompiler.app"),
   title: "RegCompiler | Regulation as Code",
   description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
   icons: {
@@ -28,6 +29,28 @@ export const metadata: Metadata = {
     apple: [
       { url: "/apple-touch-icon.png" }
     ],
+  },
+  openGraph: {
+    title: "RegCompiler | Regulation as Code",
+    description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
+    url: "https://www.regcompiler.app",
+    siteName: "RegCompiler",
+    images: [
+      {
+        url: "/logo-icon.png",
+        width: 800,
+        height: 600,
+        alt: "RegCompiler Autonomous Compliance Engine",
+      }
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RegCompiler | Regulation as Code",
+    description: "Autonomous Regulation-as-Code Compiler & Statutory Surveillance Engine",
+    images: ["/logo-icon.png"],
   },
 };
 

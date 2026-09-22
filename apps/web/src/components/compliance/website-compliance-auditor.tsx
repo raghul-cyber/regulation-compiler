@@ -81,6 +81,11 @@ export interface AuditResult {
     medium: number;
     low: number;
   };
+  advisory?: {
+    issues: AuditFinding[];
+    warnings: AuditFinding[];
+    informational: AuditFinding[];
+  };
   findings: AuditFinding[];
   raw_headers: { key: string; value: string }[];
   agent_logs: string[];
@@ -122,6 +127,15 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   const [expandedFinding, setExpandedFinding] = useState<string | null>(null);
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [selectedCodeTab, setSelectedCodeTab] = useState<Record<string, 'nginx' | 'nextjs' | 'apache'>>({});
+
+  // Advisory Interactive State (Matches Advisory Dossier)
+  const [advisoryOpen, setAdvisoryOpen] = useState({
+    issues: true,
+    warnings: true,
+    informational: true,
+  });
+  const [expandedAdvisoryId, setExpandedAdvisoryId] = useState<string | null>(null);
+  const [advisoryCodeTab, setAdvisoryCodeTab] = useState<Record<string, 'nginx' | 'nextjs' | 'apache' | 'cloudflare'>>({});
 
   // Billing Entitlement & 3 Free Uses State
   const [billingStatus, setBillingStatus] = useState<any>(null);
@@ -332,6 +346,42 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       return true;
     });
   }, [auditResult, severityFilter, frameworkFilter, searchQuery]);
+
+  // Advisory Groupings matching compliance advisory specification
+  const advisoryItems = useMemo(() => {
+    if (auditResult?.advisory) {
+      return auditResult.advisory;
+    }
+    if (!auditResult?.findings) {
+      return { issues: [], warnings: [], informational: [] };
+    }
+    return {
+      issues: auditResult.findings.filter(f => f.status === 'FAIL' && (f.severity === 'CRITICAL' || f.severity === 'HIGH')),
+      warnings: auditResult.findings.filter(f => f.status === 'FAIL' && (f.severity === 'MEDIUM' || f.severity === 'LOW')),
+      informational: auditResult.findings.filter(f => (f.status === 'FAIL' && f.severity === 'INFO') || f.id === 'SEC-INFO-01' || f.id === 'SEC-OCSP-01'),
+    };
+  }, [auditResult]);
+
+  const getAdvisorySubtitle = (item: AuditFinding) => {
+    if (item.id === 'SEC-CSP-01') return 'Set the Content-Security-Policy response header';
+    if (item.id === 'DNS-SPF-01') return 'Publish v=spf1 to authorise legitimate mail senders';
+    if (item.id === 'DNS-DMARC-01') return 'Publish v=DMARC1 on _dmarc subdomain to prevent spoofing';
+    if (item.id === 'SEC-COOP-01') return 'Consider adding the Cross-Origin-Opener-Policy response header';
+    if (item.id === 'SEC-CORP-01') return 'Consider adding the Cross-Origin-Resource-Policy response header';
+    if (item.id === 'SEC-COEP-01') return 'Consider adding the Cross-Origin-Embedder-Policy response header';
+    if (item.id === 'DISC-SECTXT-01') return 'Add /.well-known/security.txt with disclosure contact info';
+    if (item.id === 'SEC-WAF-01') return 'Consider Cloudflare, AWS WAF or similar to filter malicious traffic';
+    if (item.id === 'DNS-DKIM-01') return 'Publish a DKIM key so receivers can verify message signatures';
+    if (item.id === 'META-SOCIAL-01') return 'Add OpenGraph title, OpenGraph description, OpenGraph image, Twitter card type for cleaner share previews';
+    if (item.id === 'SEC-INFO-01') return item.evidence || 'Value: Vercel';
+    if (item.id === 'SEC-OCSP-01') return 'Enable OCSP stapling to speed up cert revocation checks';
+
+    if (item.evidence) {
+      const firstSentence = item.evidence.split(/\. |\.\n/)[0];
+      return firstSentence ? `${firstSentence.replace(/\.$/, '')}` : item.evidence;
+    }
+    return item.remediation?.description || item.clause;
+  };
 
   const getGradeColor = (grade: string) => {
     switch (grade) {
@@ -780,6 +830,332 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                   Medium: <span className="font-bold">{auditResult.summary.medium}</span>
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Statutory Advisory Dossier (Visual match to Advisory specification) */}
+          <div className="rounded-2xl border border-zinc-800/80 bg-[#0c1015] p-5 sm:p-7 shadow-2xl font-mono text-zinc-300 space-y-6">
+            {/* Advisory Title Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl sm:text-2xl font-black text-[#bef264] tracking-tight">
+                  Advisory
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#bef264]/10 text-[#bef264] border border-[#bef264]/30">
+                  {advisoryItems.issues.length + advisoryItems.warnings.length + advisoryItems.informational.length} Advisories Active
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <button
+                  onClick={() => setAdvisoryOpen(prev => {
+                    const allOpen = prev.issues && prev.warnings && prev.informational;
+                    return { issues: !allOpen, warnings: !allOpen, informational: !allOpen };
+                  })}
+                  className="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors text-[11px]"
+                >
+                  {advisoryOpen.issues && advisoryOpen.warnings && advisoryOpen.informational ? 'Collapse All' : 'Expand All'}
+                </button>
+              </div>
+            </div>
+
+            {/* Section 1: Issues (e.g. Issues (3)) */}
+            <div className="space-y-3">
+              <button
+                onClick={() => setAdvisoryOpen(prev => ({ ...prev, issues: !prev.issues }))}
+                className="flex items-center gap-2 text-[#fb923c] font-bold text-sm hover:text-[#f97316] transition-colors group select-none"
+              >
+                <span className={`transform transition-transform text-xs ${advisoryOpen.issues ? 'rotate-0' : '-rotate-90'}`}>
+                  ▼
+                </span>
+                <span className="tracking-wide">Issues ({advisoryItems.issues.length})</span>
+              </button>
+
+              {advisoryOpen.issues && (
+                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#fb923c]/20">
+                  {advisoryItems.issues.length === 0 ? (
+                    <div className="text-xs text-zinc-500 italic pl-3">
+                      ✓ No critical or high statutory issues detected.
+                    </div>
+                  ) : (
+                    advisoryItems.issues.map(item => {
+                      const isExpanded = expandedAdvisoryId === item.id;
+                      const activeTab = advisoryCodeTab[item.id] || (item.remediation?.nginx ? 'nginx' : item.remediation?.nextjs ? 'nextjs' : item.remediation?.cloudflare ? 'cloudflare' : 'apache');
+
+                      return (
+                        <div key={item.id} className="space-y-2 group">
+                          <div 
+                            onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
+                            className="flex items-start gap-2.5 cursor-pointer select-none"
+                          >
+                            <span className="text-[#fb923c] font-black text-sm shrink-0 leading-5">!</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                                {item.title}
+                              </div>
+                              <div className="text-zinc-400 text-xs font-mono leading-relaxed mt-0.5">
+                                {getAdvisorySubtitle(item)}
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300">
+                              {isExpanded ? '[-]' : '[+]'}
+                            </span>
+                          </div>
+
+                          {/* Expandable AST Remediation */}
+                          {isExpanded && (
+                            <div className="ml-5 p-3.5 rounded-xl bg-zinc-950/90 border border-zinc-800 space-y-3 text-xs">
+                              <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                                <span>Affected: <span className="text-zinc-200">{item.affected}</span></span>
+                                <span className="text-zinc-500">[{item.framework}]</span>
+                              </div>
+                              <div className="p-2.5 rounded bg-black/60 border border-zinc-800/80 text-zinc-300 text-[11px]">
+                                {item.evidence}
+                              </div>
+                              {item.remediation && (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-emerald-400 font-bold text-[10px] uppercase">Remediation Directive:</span>
+                                    <div className="flex items-center gap-1 font-mono text-[10px]">
+                                      {item.remediation.nginx && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nginx' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Nginx
+                                        </button>
+                                      )}
+                                      {item.remediation.nextjs && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nextjs' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Next.js
+                                        </button>
+                                      )}
+                                      {item.remediation.cloudflare && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'cloudflare' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Cloudflare / DNS
+                                        </button>
+                                      )}
+                                      {item.remediation.apache && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'apache' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Apache
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {item.remediation[activeTab] && (
+                                    <div className="relative rounded-lg bg-black border border-zinc-800 p-2.5 font-mono text-[11px] text-emerald-300 overflow-x-auto">
+                                      <pre className="select-all">{item.remediation[activeTab]}</pre>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleCopyCode(item.id, item.remediation?.[activeTab] || ''); }}
+                                        className="absolute right-2 top-2 p-1.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white"
+                                      >
+                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Section 2: Warnings (e.g. Warnings (7)) */}
+            <div className="space-y-3">
+              <button
+                onClick={() => setAdvisoryOpen(prev => ({ ...prev, warnings: !prev.warnings }))}
+                className="flex items-center gap-2 text-[#facc15] font-bold text-sm hover:text-[#fde047] transition-colors group select-none"
+              >
+                <span className={`transform transition-transform text-xs ${advisoryOpen.warnings ? 'rotate-0' : '-rotate-90'}`}>
+                  ▼
+                </span>
+                <span className="tracking-wide">Warnings ({advisoryItems.warnings.length})</span>
+              </button>
+
+              {advisoryOpen.warnings && (
+                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#facc15]/20">
+                  {advisoryItems.warnings.length === 0 ? (
+                    <div className="text-xs text-zinc-500 italic pl-3">
+                      ✓ Zero warnings flagged across tested vectors.
+                    </div>
+                  ) : (
+                    advisoryItems.warnings.map(item => {
+                      const isExpanded = expandedAdvisoryId === item.id;
+                      const activeTab = advisoryCodeTab[item.id] || (item.remediation?.nginx ? 'nginx' : item.remediation?.nextjs ? 'nextjs' : item.remediation?.cloudflare ? 'cloudflare' : 'apache');
+
+                      return (
+                        <div key={item.id} className="space-y-2 group">
+                          <div 
+                            onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
+                            className="flex items-start gap-2.5 cursor-pointer select-none"
+                          >
+                            <span className="text-[#facc15] font-bold text-xs shrink-0 leading-5">▲</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                                {item.title}
+                              </div>
+                              <div className="text-zinc-400 text-xs font-mono leading-relaxed mt-0.5">
+                                {getAdvisorySubtitle(item)}
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300">
+                              {isExpanded ? '[-]' : '[+]'}
+                            </span>
+                          </div>
+
+                          {/* Expandable AST Remediation */}
+                          {isExpanded && (
+                            <div className="ml-5 p-3.5 rounded-xl bg-zinc-950/90 border border-zinc-800 space-y-3 text-xs">
+                              <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                                <span>Affected: <span className="text-zinc-200">{item.affected}</span></span>
+                                <span className="text-zinc-500">[{item.framework}]</span>
+                              </div>
+                              <div className="p-2.5 rounded bg-black/60 border border-zinc-800/80 text-zinc-300 text-[11px]">
+                                {item.evidence}
+                              </div>
+                              {item.remediation && (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-emerald-400 font-bold text-[10px] uppercase">Remediation Directive:</span>
+                                    <div className="flex items-center gap-1 font-mono text-[10px]">
+                                      {item.remediation.nginx && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nginx' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Nginx
+                                        </button>
+                                      )}
+                                      {item.remediation.nextjs && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nextjs' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Next.js
+                                        </button>
+                                      )}
+                                      {item.remediation.cloudflare && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'cloudflare' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Cloudflare / DNS
+                                        </button>
+                                      )}
+                                      {item.remediation.apache && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'apache' })); }}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                          Apache
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {item.remediation[activeTab] && (
+                                    <div className="relative rounded-lg bg-black border border-zinc-800 p-2.5 font-mono text-[11px] text-emerald-300 overflow-x-auto">
+                                      <pre className="select-all">{item.remediation[activeTab]}</pre>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleCopyCode(item.id, item.remediation?.[activeTab] || ''); }}
+                                        className="absolute right-2 top-2 p-1.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white"
+                                      >
+                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Section 3: Informational (e.g. Informational (2)) Styled in cyan bordered box */}
+            <div className="rounded-xl border border-[#0ea5e9]/70 bg-[#032130]/40 p-4 transition-all shadow-inner">
+              <button
+                onClick={() => setAdvisoryOpen(prev => ({ ...prev, informational: !prev.informational }))}
+                className="flex items-center gap-2 text-[#38bdf8] font-bold text-sm hover:text-[#7dd3fc] transition-colors group select-none w-full text-left"
+              >
+                <span className={`transform transition-transform text-xs ${advisoryOpen.informational ? 'rotate-0' : '-rotate-90'}`}>
+                  ▼
+                </span>
+                <span className="tracking-wide">Informational ({advisoryItems.informational.length})</span>
+              </button>
+
+              {advisoryOpen.informational && (
+                <div className="space-y-3.5 mt-3 pl-2 sm:pl-3">
+                  {advisoryItems.informational.length === 0 ? (
+                    <div className="text-xs text-sky-300/70 italic pl-3">
+                      ✓ No informational disclosures discovered.
+                    </div>
+                  ) : (
+                    advisoryItems.informational.map(item => {
+                      const isExpanded = expandedAdvisoryId === item.id;
+                      const activeTab = advisoryCodeTab[item.id] || (item.remediation?.nginx ? 'nginx' : item.remediation?.nextjs ? 'nextjs' : item.remediation?.cloudflare ? 'cloudflare' : 'apache');
+
+                      return (
+                        <div key={item.id} className="space-y-2 group">
+                          <div 
+                            onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
+                            className="flex items-start gap-2.5 cursor-pointer select-none"
+                          >
+                            <span className="text-[#38bdf8] font-bold text-xs shrink-0 leading-5">ⓘ</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                                {item.title}
+                              </div>
+                              <div className="text-sky-200/70 text-xs font-mono leading-relaxed mt-0.5">
+                                {getAdvisorySubtitle(item)}
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-sky-400/60 font-mono shrink-0 group-hover:text-sky-200">
+                              {isExpanded ? '[-]' : '[+]'}
+                            </span>
+                          </div>
+
+                          {/* Expandable Details */}
+                          {isExpanded && (
+                            <div className="ml-5 p-3 rounded-lg bg-black/60 border border-sky-500/30 space-y-2.5 text-xs">
+                              <div className="text-[11px] text-sky-300/80">
+                                {item.evidence}
+                              </div>
+                              {item.remediation && (
+                                <div className="space-y-1.5 pt-1 border-t border-sky-500/20">
+                                  <span className="text-emerald-400 font-bold text-[10px] uppercase block">Suggested Configuration:</span>
+                                  <p className="text-zinc-300 text-[11px]">{item.remediation.description}</p>
+                                  {item.remediation[activeTab] && (
+                                    <div className="relative rounded bg-zinc-950 border border-zinc-800 p-2 font-mono text-[10px] text-emerald-300 overflow-x-auto mt-1">
+                                      <pre className="select-all">{item.remediation[activeTab]}</pre>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
