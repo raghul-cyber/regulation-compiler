@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -21,6 +22,11 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  const pathname = request.nextUrl.pathname;
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname.startsWith('/.well-known')) {
+    return NextResponse.next();
+  }
+
   if (!isPublicRoute(request)) {
     await auth.protect();
   }

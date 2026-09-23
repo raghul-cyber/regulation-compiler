@@ -1,10 +1,12 @@
 import type { MetadataRoute } from 'next';
 import canonicalRegulations from '@/lib/canonical-regulations.json';
 
+// Cache on Vercel Edge for fast Googlebot retrieval
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 86400; // 24 hours
 
-const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.regcompiler.app').replace(/\/+$/, '');
+// Canonical domain matching Google Search Console property exactly (https://www.regcompiler.app)
+const BASE_URL = 'https://www.regcompiler.app';
 
 interface RawRegulation {
   id: string;
@@ -14,27 +16,30 @@ interface RawRegulation {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 1. Fetch live regulations if API is accessible, else use verified canonical database snapshot
+  // Use verified canonical statutory regulations (154 real frameworks from Supabase)
   let regulations: RawRegulation[] = canonicalRegulations as RawRegulation[];
 
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-    const res = await fetch(`${apiUrl}/regulations`, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(2000),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const items = Array.isArray(data) ? data : data?.data || data?.items || [];
-      if (Array.isArray(items) && items.length > 0) {
-        regulations = items;
+  // Optional: only fetch remote production API if explicitly configured with HTTPS
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (apiUrl && apiUrl.startsWith('https://')) {
+    try {
+      const res = await fetch(`${apiUrl}/regulations`, {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(1000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : data?.data || data?.items || [];
+        if (Array.isArray(items) && items.length > 0) {
+          regulations = items;
+        }
       }
+    } catch {
+      // Fall back seamlessly to canonicalRegulations
     }
-  } catch {
-    // Seamless fallback to canonical database snapshot
   }
 
-  // 2. Strict Filter: Nomocks - zero test/dummy/mock items
+  // Strict Filter: Nomocks - zero test/dummy/mock items
   const cleanRegulations = regulations.filter((reg) => {
     if (!reg?.id || !reg?.name) return false;
     const lowerName = reg.name.toLowerCase();
@@ -43,10 +48,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const now = new Date().toISOString();
 
-  // 3. Core Static Product Pages with Calibrated Google Search Priority
+  // 1. Core Static Product Pages with Calibrated Google Search Priority
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${BASE_URL}`,
+      url: `${BASE_URL}/`,
       lastModified: now,
       changeFrequency: 'daily',
       priority: 1.0,
@@ -95,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 4. Dynamic Canonical Regulation Pages with Priority Tiering
+  // 2. Canonical Statutory Regulation Detail Pages (Zero Mocks, 100% Matching GSC Domain)
   const regulationRoutes: MetadataRoute.Sitemap = cleanRegulations.flatMap((reg) => {
     const regDate = reg.created_at ? new Date(reg.created_at).toISOString() : now;
     return [

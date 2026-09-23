@@ -17,7 +17,7 @@ PUBLIC_DIR = os.path.join(WEB_DIR, "public")
 DATA_FILE = os.path.join(WEB_DIR, "src", "lib", "canonical-regulations.json")
 API_DIR = os.path.join(REPO_ROOT, "apps", "api")
 
-BASE_URL = os.environ.get("NEXT_PUBLIC_APP_URL", "https://www.regcompiler.app").rstrip("/")
+BASE_URL = "https://www.regcompiler.app"
 
 def fetch_regulations_from_db():
     try:
