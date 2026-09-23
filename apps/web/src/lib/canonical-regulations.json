@@ -1,0 +1,926 @@
+[
+  {
+    "id": "a6491f18-4e2d-40f4-9344-479e7c7055a0",
+    "name": "General Data Protection Regulation (GDPR)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-09T15:06:37.042313"
+  },
+  {
+    "id": "4e95164f-d37b-4f73-9e26-230e1d0d9475",
+    "name": "Digital Operational Resilience Act (DORA)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-09T15:06:41.280625"
+  },
+  {
+    "id": "1d618bb3-78e2-418b-992c-562096645973",
+    "name": "Health Insurance Portability and Accountability Act (HIPAA)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-09T15:06:44.801464"
+  },
+  {
+    "id": "062db9fb-0ddf-4499-bda5-4b61f8c8c2f0",
+    "name": "California Consumer Privacy Act (CCPA / CPRA)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-09T15:06:48.299747"
+  },
+  {
+    "id": "74874484-ad20-4f04-80ef-897e055ba1fa",
+    "name": "Personal Information Protection and Electronic Documents Act (PIPEDA)",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-09T15:06:51.361713"
+  },
+  {
+    "id": "53369dc8-ac7e-4739-a592-13110238c37c",
+    "name": "ISO/IEC 27001:2022",
+    "jurisdiction": "GLOBAL",
+    "created_at": "2026-09-09T15:06:54.392670"
+  },
+  {
+    "id": "fe26d044-52f7-4c87-b954-1003445639fc",
+    "name": "Payment Card Industry Data Security Standard (PCI DSS 4.0)",
+    "jurisdiction": "GLOBAL",
+    "created_at": "2026-09-09T15:06:57.474556"
+  },
+  {
+    "id": "f879a9f7-4f8f-42e8-811b-4b0f0eae8f90",
+    "name": "Digital Operational Resilience Act",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-09T15:49:46.292770"
+  },
+  {
+    "id": "6dd9a705-c0ac-4117-bb38-8c3a1c607874",
+    "name": "European Union Artificial Intelligence Act (EU AI Act)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-10T04:46:57.779014"
+  },
+  {
+    "id": "977f12c9-468c-4d0b-8084-f8944203fb61",
+    "name": "European Union Artificial Intelligence Act (EU AI Act)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-10T04:22:19.961156"
+  },
+  {
+    "id": "095e22e6-05db-4127-9f64-9af327475323",
+    "name": "Man pleads guilty to fraud and forgery offences relating to fake takeover approach",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T12:41:31.302966"
+  },
+  {
+    "id": "3ba9e820-f2a2-461f-82db-87fba75e5b03",
+    "name": "Promoting Fair and Open Competitive Bidding in the E-Rate Program; Schools and Libraries Universal Service Support Mechanism",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:42:36.919934"
+  },
+  {
+    "id": "06feb500-b450-4214-8f31-5fac9ab6a4cc",
+    "name": "Review of the Commission's Assessment and Collection of Regulatory Fees for Fiscal Year 2026",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:43:46.426570"
+  },
+  {
+    "id": "f9af9d2d-0441-4e01-b5bd-c7e1d269c34d",
+    "name": "Use of Certain Restricted Category Aircraft for the Transport of Firefighters for Wildfire Suppression",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:31:41.279300"
+  },
+  {
+    "id": "74cf6e81-6121-4b08-a95f-ab4c35776fd9",
+    "name": "Airworthiness Directives; Airbus SAS Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:33:46.443241"
+  },
+  {
+    "id": "1f9d8d35-97fe-4cf4-9abf-b62fa50c4d2e",
+    "name": "Sport Pilot Practical Test Standards Alignment",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:45:21.585818"
+  },
+  {
+    "id": "bcd8f192-8989-4004-b5c8-57b128f883bf",
+    "name": "PCI DSS v4.0.1 Global Payment Card Data Security Standard",
+    "jurisdiction": "GLOBAL",
+    "created_at": "2026-09-13T12:46:13.447834"
+  },
+  {
+    "id": "43b5325a-1353-4cea-b3cc-402b02ec84fa",
+    "name": "Expanded Examination Cycle for Certain Small Insured Depository Institutions and U.S. Branches and Agencies of Foreign Banks",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:46:54.297307"
+  },
+  {
+    "id": "3ead0dd3-d88e-4a6e-824d-c8ffc220e6f8",
+    "name": "Approval and Promulgation of State Air Quality Plans for Designated Facilities and Pollutants; District of Columbia; Negative Declaration for Existing Other Solid Waste Incinerators",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:48:27.836474"
+  },
+  {
+    "id": "f55f13cc-5f4a-44a8-9073-33aaa250dd25",
+    "name": "Clean Data Determination; 1997 8-Hour Ozone Standards; California; Sacramento Metro Area",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:50:01.499876"
+  },
+  {
+    "id": "fe26e5d3-01ba-4ac6-9265-4c7a0fcb8ef6",
+    "name": "RIN 2120-AA64",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:51:36.473628"
+  },
+  {
+    "id": "95f4341c-949a-47ab-9a33-3712e8a30ebb",
+    "name": "Approval and Promulgation of State Air Quality Plans for Designated Facilities and Pollutants; Maryland; Negative Declaration for Existing Other Solid Waste Incinerators",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:53:02.951457"
+  },
+  {
+    "id": "6f4a055d-ff96-4484-a1e7-d5da57bf014f",
+    "name": "Airworthiness Directives; Dassault Aviation Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:54:07.153163"
+  },
+  {
+    "id": "297821d5-687c-4f31-9869-123a99ae5e4b",
+    "name": "Approval and Promulgation of Implementation Plans; California; San Joaquin Valley, Revisions to Motor Vehicle Emissions Budgets for Ozone",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:55:09.822365"
+  },
+  {
+    "id": "46d49f0e-144e-4313-a97e-1ef3688d9f8d",
+    "name": "Airworthiness Directives; Bombardier, Inc., Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:56:12.081742"
+  },
+  {
+    "id": "7ef0605a-641a-4289-bd83-eb9a1cf6f433",
+    "name": "Safety Zone; Lake Erie, Oregon, OH",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T12:57:13.757818"
+  },
+  {
+    "id": "d46076dd-6fb7-4842-87ea-3a8ce4a07ed7",
+    "name": "CEO banned for false and misleading statements made in attempt to buy bank and football club",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T12:58:17.218452"
+  },
+  {
+    "id": "3193d3ff-d004-4130-8656-f7eb5f6e8aeb",
+    "name": "FCA fines and bans former SVS Securities CEO",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T12:59:23.165541"
+  },
+  {
+    "id": "498a2df7-49a4-42c6-b968-5cd47bc40f92",
+    "name": "FCA bans senior manager for lack of honesty and integrity",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:00:26.855648"
+  },
+  {
+    "id": "f43fc459-800c-4bb0-ac6f-2b710df5c3ff",
+    "name": "FCA expands global presence with new attach\u00e9s in India and UAE",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:01:19.283717"
+  },
+  {
+    "id": "fdaa18ae-3b20-4159-b9e4-730a210db0dd",
+    "name": "FCA decides to ban and fine Daniel Thomas over unauthorised pension transfer advice",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:01:51.214036"
+  },
+  {
+    "id": "7523f96e-3b51-4be8-80ae-0e5602144bf5",
+    "name": "Unregulated loan notes and mini-bonds: don't risk your savings on promises of high returns",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:02:10.074399"
+  },
+  {
+    "id": "7ab4e168-cb54-47fa-9d79-2d82b9e2b15c",
+    "name": "Young investors trust AI more than TV or celebrities",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:03:18.683875"
+  },
+  {
+    "id": "8f0fe450-3d2a-439d-98d2-64b95a8caa4f",
+    "name": "FCA urges young adults to check for unclaimed Child Trust Funds",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:04:22.280768"
+  },
+  {
+    "id": "4a9aa70b-4a00-4664-ba9b-4f2e457f8f18",
+    "name": "Consumers warned to beware of risky mini-bonds and loan notes",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:05:28.272512"
+  },
+  {
+    "id": "4a5f66be-fd69-42e1-815b-e57659abbf11",
+    "name": "FCA bans trio behind \u00a335.5m scheme designed to bypass visa rules",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:06:35.271452"
+  },
+  {
+    "id": "5964f63b-c0a3-46f0-9da7-b9e72d2149c5",
+    "name": "EGR Wealth Limited enters administration",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-13T13:07:41.229837"
+  },
+  {
+    "id": "67ec1814-6049-4a67-84c3-8f584738790d",
+    "name": "Special Local Regulations; Marine Events Within the Sector Columbia River Captain of the Port Zone, Portland, OR",
+    "jurisdiction": "US",
+    "created_at": "2026-09-13T13:08:48.432201"
+  },
+  {
+    "id": "01dfc6f3-1fbe-4a8e-9646-7f49c98893f3",
+    "name": "Canada Gazette: Regulations Amending the Export Permits Regulations ",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:09:54.256036"
+  },
+  {
+    "id": "67b147a9-fcec-4d3a-b1b8-809128f301b2",
+    "name": "Canada Gazette: Regulations Amending the Immigration and Refugee Protection Regulations ",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:10:59.424966"
+  },
+  {
+    "id": "f202bffe-1322-4eec-ac01-25dcfc5bbda5",
+    "name": "Canada Gazette: Regulations Amending the Public Service Employment Regulations",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:12:02.871739"
+  },
+  {
+    "id": "cd906d06-13ff-4481-9b57-a3a263424bd8",
+    "name": "Regulation (EU) 2024/1689 of the European Parliament and of the Council (Artificial Intelligence Act)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-13T13:13:08.101856"
+  },
+  {
+    "id": "fab50b80-3f7d-4f18-b35d-7f3faeea780d",
+    "name": "MAS Notice 655 on Cyber Hygiene & Technology Risk Management",
+    "jurisdiction": "SG",
+    "created_at": "2026-09-13T13:14:15.171924"
+  },
+  {
+    "id": "9e954fba-0e2d-4232-a538-811b3359ec77",
+    "name": "Directive (EU) 2022/2555 on measures for a high common level of cybersecurity across the Union (NIS 2 Directive)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-13T13:15:25.454008"
+  },
+  {
+    "id": "fdc71c90-bb1e-4841-aad0-bda3b37edeaf",
+    "name": "Regulation (EU) 2022/2554 on digital operational resilience for the financial sector (DORA)",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-13T13:16:32.458004"
+  },
+  {
+    "id": "456b3298-d7ef-4e2b-a54a-62c99435a251",
+    "name": "Regulating pesticides",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:18:16.630540"
+  },
+  {
+    "id": "73a693c5-7dc0-4708-8b7a-5e35d61d6c54",
+    "name": "Regulating cosmetics",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:19:36.619954"
+  },
+  {
+    "id": "65effd45-c570-4f23-98f3-71cdc2c0f572",
+    "name": "Regulating food",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-13T13:20:47.058811"
+  },
+  {
+    "id": "c0f9a72e-0546-4f9c-8781-3e00eb959195",
+    "name": "DORA Pipeline Verification Test",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-13T16:02:15.844285"
+  },
+  {
+    "id": "225c9cb6-eef3-4231-bf1c-4e1625b07703",
+    "name": "Upper Tribunal upholds Crispin Odey ban",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-14T12:48:29.495958"
+  },
+  {
+    "id": "9739898b-64eb-4941-ab0d-d2303da10f58",
+    "name": "OJ_L_202401689_EN_TXT_compressed",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-14T13:45:22.941925"
+  },
+  {
+    "id": "e33691cc-2424-4a92-bd74-dfe3725c0e04",
+    "name": "Premier Payment Solutions Ltd enters liquidation",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-14T14:10:50.930764"
+  },
+  {
+    "id": "c99b14dd-47ba-421d-8b56-77790432f82a",
+    "name": "Federal Employees Health Benefits Program: Optimizing FEHB Plan Offerings",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:07:06.360925"
+  },
+  {
+    "id": "627849ef-30b7-49a4-a6c3-26882bc04632",
+    "name": "Promoting Employee Accountability",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:10:21.285696"
+  },
+  {
+    "id": "e28aeaf5-5a7b-444a-8702-e35f96e13c96",
+    "name": "Airworthiness Directives; MD Helicopters, LLC Helicopters",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:10:48.453951"
+  },
+  {
+    "id": "2a3e1c72-5ee7-42ed-99ae-1e286a18a83b",
+    "name": "Pacific Halibut Fisheries of the West Coast; Inseason Action for the 2026 Area 2A Pacific Halibut Directed Commercial Fishery",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:11:18.229281"
+  },
+  {
+    "id": "f938d68a-c015-4609-88ba-8f98dd1650fd",
+    "name": "Amendment of Class D and Class E Airspace Over Hyannis, MA",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:11:48.495060"
+  },
+  {
+    "id": "57ef9a0a-446d-4ab2-91c9-e9af6a5dcd06",
+    "name": "Amendment of Class E Airspace Over Pittsfield, ME",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:16:05.073500"
+  },
+  {
+    "id": "59e187c0-327d-4660-a415-a7e1dfcb21e5",
+    "name": "Establishment of United States Area Navigation Route T-337 and Amendment of Very High Frequency Omnidirectional Range Federal Airways V-101 and V-484 Near Twin Falls, ID",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T06:16:46.441311"
+  },
+  {
+    "id": "8319bb6f-64df-4563-b859-747cc0e9aba2",
+    "name": "Safety Zone; Calcasieu River Channel, Lake Charles, LA",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:21:04.281920"
+  },
+  {
+    "id": "d385cb8b-9a17-428f-b4e9-dbe4f2365f3d",
+    "name": "Safety Zone; Rocket Test Site, Rio Grande River, Boca Chica, TX",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:22:06.945777"
+  },
+  {
+    "id": "d41baa60-322f-48f4-b64f-07ade7e7510a",
+    "name": "Petition for Rulemaking of Robert Michael Vanleeuwen",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:23:05.006216"
+  },
+  {
+    "id": "ce746ccd-0bfe-4b6a-8e01-e332b15338c4",
+    "name": "Airworthiness Directives; Airbus Defence and Space GmbH Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:24:04.808480"
+  },
+  {
+    "id": "a6ebc98b-6145-491e-98fd-4253c6ab6de0",
+    "name": "Pacific Island Fisheries; Catch and Retention Limits for Striped Marlin in the Western and Central Pacific Ocean North of the Equator",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:25:01.726095"
+  },
+  {
+    "id": "261ae20d-0da7-4583-9a9b-8a705b9cbd81",
+    "name": "Airworthiness Directives; Pilatus Aircraft Ltd. Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:26:18.442545"
+  },
+  {
+    "id": "a76c9b36-e91a-4a63-9262-e3751c2d4b90",
+    "name": "Bacillus amyloliquefaciens strain AT-332; Exemption From the Requirement of a Pesticide Tolerance",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:27:17.130146"
+  },
+  {
+    "id": "55949db5-680f-4884-a689-d4344b52a20a",
+    "name": "Shared Certificates and Pooled Hiring Actions",
+    "jurisdiction": "US",
+    "created_at": "2026-09-15T07:28:14.086371"
+  },
+  {
+    "id": "ebc00dba-0641-46fa-9546-c6f289ddbaf8",
+    "name": "OJ_L_202401689_EN_TXT_compressed",
+    "jurisdiction": "EU",
+    "created_at": "2026-09-15T11:09:18.274716"
+  },
+  {
+    "id": "89ae2ef8-3ed3-44c9-b6fe-afdea59947e9",
+    "name": "Financial regulator bans former law firm owner from financial services",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-15T11:13:43.033894"
+  },
+  {
+    "id": "358c23db-94d2-4bb3-a0f5-43ea0bd4473d",
+    "name": "Revised Medical Criteria for Evaluating Cardiovascular Disorders",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:07:23.472141"
+  },
+  {
+    "id": "dffc977b-e3f1-42d6-97c1-c92dbe07bef3",
+    "name": "Indiana: Approval of State Coal Combustion Residuals Permit Program",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:10:45.736569"
+  },
+  {
+    "id": "53af18ec-68aa-4616-991b-89f01c51c2c8",
+    "name": "Racial Nondiscrimination in Private Schools; Hearing",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:14:05.235324"
+  },
+  {
+    "id": "448d589b-e964-4974-999e-94d78f32e38a",
+    "name": "Whistleblower Award Determination",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:15:25.859695"
+  },
+  {
+    "id": "cfff988c-250f-44a6-a9d3-d7f3e2b2b77d",
+    "name": "Annual Fireworks Displays and Other Events in the USCG Heartland District Requiring Safety Zones",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:15:39.489814"
+  },
+  {
+    "id": "33409295-4434-4f05-8232-8f4340660c4f",
+    "name": "Federal-State Unemployment Compensation (UC) Program; Data Availability",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:15:52.754712"
+  },
+  {
+    "id": "576a1f6a-b5ec-44f0-85fc-e2e82faf416b",
+    "name": "Safety Zone; Lake St. Clair, Grosse Pointe Farms, MI",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:17:24.340917"
+  },
+  {
+    "id": "aa19c49c-c0ea-45e4-8319-96962d053d99",
+    "name": "Special Local Regulations; Recurring Marine Events, Sector St. Petersburg",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:19:28.003658"
+  },
+  {
+    "id": "27671a01-7844-4ce6-a5da-8704a728857b",
+    "name": "Airworthiness Directives; De Havilland Aircraft of Canada Limited (Type Certificate Previously Held by Bombardier, Inc.) Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:20:43.558015"
+  },
+  {
+    "id": "a00f15a6-7fc0-49aa-a529-56998cfa66e5",
+    "name": "Registration of Lawful Permanent Residence for Children Born to Foreign Government Employees in the United States; Correction",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:22:54.256326"
+  },
+  {
+    "id": "aa7b8938-2137-4992-87cb-e9663822db34",
+    "name": "International Traffic in Arms Regulations: Modification of Civil Aircraft To Incorporate Aircraft Survivability Equipment",
+    "jurisdiction": "US",
+    "created_at": "2026-09-16T06:24:02.539963"
+  },
+  {
+    "id": "de0bd419-0658-4135-bd4c-c3a08c58115f",
+    "name": "Crypto firms get guidance on how the new regime applies",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-16T09:03:12.898262"
+  },
+  {
+    "id": "6917f674-4a63-40b5-b787-4d4d94022cff",
+    "name": "Airworthiness Directives; Pratt & Whitney Engines",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T05:30:14.151883"
+  },
+  {
+    "id": "67c12c3b-bdee-4f5f-8400-b859985f9c90",
+    "name": "Airworthiness Directives; Airbus SAS Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T05:33:38.300504"
+  },
+  {
+    "id": "8f7f92f7-81ee-4035-b57d-2a8d37077dc2",
+    "name": "Airworthiness Directives; ATR-GIE Avions de Transport R\u00e9gional Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T05:36:58.139330"
+  },
+  {
+    "id": "41d030ae-4b05-4bf6-8e98-65c0a7332c60",
+    "name": "Airworthiness Directives; Airbus SAS Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T05:40:17.282217"
+  },
+  {
+    "id": "6eebc38f-08dd-466c-a263-248a3d2e7b2d",
+    "name": "Airworthiness Directives; The Boeing Company Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T05:43:36.630314"
+  },
+  {
+    "id": "c39dc2f0-3911-456d-8f2c-a29039e01e3e",
+    "name": "Airworthiness Directives; The Boeing Company Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T06:27:17.399914"
+  },
+  {
+    "id": "781b0e3b-a19a-4278-957c-86cd81003917",
+    "name": "Medical Devices; Exemption From Premarket Notification: Radiology Computer-Aided Detection and/or Diagnosis Devices and Computer-Aided Triage and Notification Devices",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T06:30:40.203617"
+  },
+  {
+    "id": "5fe1d863-1118-40c1-a7c5-57b3f56f1965",
+    "name": "Rescission of the Greenhouse Gas Findings for Fossil Fuel-Fired Power Plants and Repeal of Regulations for Power Plant Greenhouse Gas Emissions Under Clean Air Act Section 111",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T06:33:59.196366"
+  },
+  {
+    "id": "48e1e403-46c5-429c-9e86-00baa72ef34f",
+    "name": "Partial Repeal of the Carbon Pollution Standards for Fossil Fuel-Fired Electric Generating Units",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T06:37:19.181797"
+  },
+  {
+    "id": "9c369806-b98b-4218-a356-85f6704ef0b3",
+    "name": "Revocation of Obsolete Rules Regarding Infant Bouncer Seats and Stationary Activity Centers",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:33:47.169911"
+  },
+  {
+    "id": "bae33baa-14b3-48cf-9f43-30fce14b305c",
+    "name": "Safety Zone; Key West Main Ship Channel, and Fleming Key Cut, Key West, FL",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:34:59.587039"
+  },
+  {
+    "id": "6236edd1-20a8-4b4c-a6a4-410c81fef11e",
+    "name": "Drawbridge Operation Regulation; Connecticut River, East Haddam, CT",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:36:00.308896"
+  },
+  {
+    "id": "205ecd6e-cc1e-43ec-b5a4-5e12cf829c6c",
+    "name": "Drawbridge Operation Regulation; Niantic River, Between Waterford and Niantic, CT",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:36:59.779917"
+  },
+  {
+    "id": "63028f02-3c25-4f7f-bc3f-112b3baf876a",
+    "name": "Drawbridge Operation Regulation; Mystic River, Mystic, CT",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:37:59.871797"
+  },
+  {
+    "id": "891a77e3-5da8-46ff-98c9-c25aca93fec6",
+    "name": "Special Local Regulation; Maumee River, Toledo, OH",
+    "jurisdiction": "US",
+    "created_at": "2026-09-17T07:38:59.569150"
+  },
+  {
+    "id": "ef73c59b-88c1-488a-aa8b-82a1fb46a3fe",
+    "name": "OAIC Australian Privacy Principles (APP) Guidelines & Mandatory Breach Notification",
+    "jurisdiction": "AU",
+    "created_at": "2026-09-17T07:44:03.841950"
+  },
+  {
+    "id": "00da883b-e402-4a56-80c6-101dbc754c83",
+    "name": "Japan Act on the Protection of Personal Information (APPI Statutory Enforcement Rules)",
+    "jurisdiction": "JP",
+    "created_at": "2026-09-17T07:45:02.895074"
+  },
+  {
+    "id": "ad6dad02-84cc-4f61-b1a5-3e640c25ead1",
+    "name": "Better outcomes begin when payment firms understand customers\u2019 needs",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T06:39:42.260457"
+  },
+  {
+    "id": "9edddb79-2080-4e00-8fb2-a733084d9f5a",
+    "name": "MAS FEAT Principles for Artificial Intelligence and Data Analytics in Financial Services",
+    "jurisdiction": "SG",
+    "created_at": "2026-09-17T07:47:24.462318"
+  },
+  {
+    "id": "02e80211-3773-4b02-8058-cb2e919238f9",
+    "name": "APRA Prudential Standard CPS 234: Information Security Requirements",
+    "jurisdiction": "AU",
+    "created_at": "2026-09-17T07:52:53.617301"
+  },
+  {
+    "id": "be7639ec-b6a5-4d71-b445-041c3a6ea795",
+    "name": "FCA opens investigation into Euro Exchange Securities UK Ltd",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-17T08:17:04.303449"
+  },
+  {
+    "id": "d5f5238e-a6e0-4602-b6cc-9f832ef3de41",
+    "name": "FCA sets out steps to support small businesses' access to finance",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T06:39:19.226319"
+  },
+  {
+    "id": "e02c4ed7-ea10-4a7f-b00d-8d2f64f96c3d",
+    "name": "FCA and partners continues crackdown on illegal crypto trading",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T06:39:59.525962"
+  },
+  {
+    "id": "5059055f-ea69-4d54-88cd-22d1dc48cab6",
+    "name": "Financial crime: protecting the hive",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T06:40:17.170737"
+  },
+  {
+    "id": "7472fc83-d3ae-49e6-b345-b5b8ece57061",
+    "name": "SEC Release No. 33-11216: Mandatory 4-Day Material Cybersecurity Incident Disclosure (Item 1.05 Form 8-K)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:08:51.727578"
+  },
+  {
+    "id": "107373ec-1904-4d1b-b566-361b234fb310",
+    "name": "FTC Standards for Safeguarding Customer Information (16 CFR Part 314)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:09:13.060336"
+  },
+  {
+    "id": "e370259b-1fe8-41b7-936b-5a2ae36de178",
+    "name": "HHS OCR HIPAA Security Rule: Protected Health Information Technical Controls",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:09:28.281175"
+  },
+  {
+    "id": "4094c8ef-b6ba-43f5-9b87-66998f802980",
+    "name": "FCA Policy Statement PS26/4: Consumer Duty Closed Products & Digital Services Standards",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T08:09:43.871417"
+  },
+  {
+    "id": "7547fb27-7bdc-4bab-8607-2308933a7a00",
+    "name": "Bank of England PRA Supervisory Statement SS1/26: Operational Resilience & Severe Scenario Testing",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-18T08:09:59.410688"
+  },
+  {
+    "id": "eeab6811-d247-4b3e-b4a8-f97b15fadfbb",
+    "name": "Canada Gazette Part II: Artificial Intelligence and Data Act (AIDA) Mandatory Safety Controls",
+    "jurisdiction": "CA",
+    "created_at": "2026-09-18T08:10:16.504637"
+  },
+  {
+    "id": "1ad5d6f2-90b6-4c2b-9347-ebbe18259b7e",
+    "name": "Employment in the Excepted Service",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:52:55.485887"
+  },
+  {
+    "id": "c84b6e52-9f68-4afb-89da-4d46c56dba35",
+    "name": "International Traffic in Arms Regulations: Modification of U.S. Munitions List Category XX(a)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:53:13.550498"
+  },
+  {
+    "id": "d1abb81a-ae54-493d-b014-94647f46b9fe",
+    "name": "Homeland Security Acquisition Regulation, Make Personal Protective Equipment in America Act Restrictions on Foreign Acquisition (HSAR Case 2024-003)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:53:26.438678"
+  },
+  {
+    "id": "ec0dabf2-69df-41fe-81f9-c02182819b6e",
+    "name": "Coral, Coral Reefs, and Live/Hardbottom Habitats of the South Atlantic and the Shrimp Fishery of the South Atlantic Region; Amendments 11/12",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:53:39.136146"
+  },
+  {
+    "id": "1bed0ce1-4e6f-4b09-a236-91da534de647",
+    "name": "Milk in the Northeast and Other Marketing Areas; Uniform Pricing Formula Provisions",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:53:52.132569"
+  },
+  {
+    "id": "0f3bc867-d71b-4d89-a976-3ac5227b84bc",
+    "name": "Establishment of United States Area Navigation Route T-581 in the Vicinity of Missoula, Montana",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:54:05.067308"
+  },
+  {
+    "id": "af344c93-377e-49de-92de-137abbe6f0cf",
+    "name": "Airworthiness Directives; Rolls-Royce Deutschland Ltd. & Co. KG Engines",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:54:18.029896"
+  },
+  {
+    "id": "df297203-41d1-4a9c-8a7b-5c22f021216a",
+    "name": "Airworthiness Directives; Rolls-Royce Deutschland Ltd. & Co. KG Engines",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:54:31.236189"
+  },
+  {
+    "id": "b03fb66b-4795-4a8b-a164-f029979b2041",
+    "name": "Federal Acquisition Regulation: Revolutionary FAR Overhaul Parts 8, 12, 13, 15, 38, 44, and 51",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:54:44.343810"
+  },
+  {
+    "id": "ac739066-510d-41a2-9da9-02181b381f6f",
+    "name": "International Traffic in Arms Regulations: Clarifying Policies of Denial, Updating the Major Non-NATO Ally List, and Minor Corrections",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:54:57.573185"
+  },
+  {
+    "id": "12f3d46c-0214-41a4-8007-bfcb26df94a8",
+    "name": "Federal Acquisition Regulation: Revolutionary Federal Acquisition Regulation Overhaul Parts 16, 17, and 35",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:55:10.460442"
+  },
+  {
+    "id": "ed995a1b-756a-41e4-84f8-5c6c2b5890cc",
+    "name": "Federal Acquisition Regulation: Revolutionary Federal Acquisition Regulation Overhaul Parts 9, 27, and 47",
+    "jurisdiction": "US",
+    "created_at": "2026-09-18T08:55:23.338486"
+  },
+  {
+    "id": "d87d58f0-2515-465e-b686-71f9356111f5",
+    "name": "Privacy Act Regulations",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:01:04.491559"
+  },
+  {
+    "id": "7357ec57-2f5a-4450-aaa3-06f89f4c2526",
+    "name": "Safety Zone; Illinois River, Morris, IL",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:01:19.500899"
+  },
+  {
+    "id": "cadf084b-55be-41b6-86bb-a2f8a191826d",
+    "name": "Rescission of Rule 14a-8's Federal Regulation of Shareholder Proposals and Amendments to Rule 14a-4",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:01:31.574285"
+  },
+  {
+    "id": "36911d49-5899-4f4d-accc-5f9dd8f483b2",
+    "name": "Proxy Solicitation Modernization",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:01:43.682165"
+  },
+  {
+    "id": "679d5b51-a414-4a6d-9f70-12d923e9fb8c",
+    "name": "Airworthiness Directives; The Boeing Company Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:01:55.767748"
+  },
+  {
+    "id": "50ac3d59-73b5-4360-a846-d23149f35b49",
+    "name": "Great Lakes Pilotage Rates-2027 Annual Review and Revisions to Methodology",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:02:07.974868"
+  },
+  {
+    "id": "3b03dc33-c32b-4653-b032-ef94037f447a",
+    "name": "Proposed Deletion From the National Priorities List; Correction",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:02:20.270384"
+  },
+  {
+    "id": "5a4e39d2-561f-4f79-9d3b-496ea09b31f6",
+    "name": "Federal Motor Vehicle Safety Standards; Denial of a Petition for Rulemaking",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:02:32.276993"
+  },
+  {
+    "id": "2867a4b0-eaa7-430e-8a8f-1973a538158a",
+    "name": "Schedules of Controlled Substances: Placement of Diphenidine in Schedule I",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:02:44.276683"
+  },
+  {
+    "id": "b4b0b970-eacf-489a-8a54-03ec4433df80",
+    "name": "Special Conditions: Skyryse, Robinson Helicopter Company Model R66 Helicopter; Control Margin Awareness",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:02:56.264564"
+  },
+  {
+    "id": "0cb597b7-42cc-4965-a37f-14276daf8bb1",
+    "name": "Public Access to Information",
+    "jurisdiction": "US",
+    "created_at": "2026-09-20T19:03:08.395185"
+  },
+  {
+    "id": "f71c6d63-1b65-4b31-9be8-024d6f89e711",
+    "name": "FCA and partners join forces to help improve financial security for millions",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:40:10.567488"
+  },
+  {
+    "id": "29c405f9-3c1b-4046-969d-b8f8a3437520",
+    "name": "Video",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:40:36.428772"
+  },
+  {
+    "id": "b5b21765-2a63-4231-936e-b7a9789fd9a0",
+    "name": "Infographics",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:40:58.329681"
+  },
+  {
+    "id": "d6597ca9-9dec-4875-b951-f5f472635d0f",
+    "name": "Images",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:41:20.317298"
+  },
+  {
+    "id": "dde40fb2-7502-4bb1-a1ad-743c2d15c915",
+    "name": "Building a stronger UK investment culture",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:41:38.779099"
+  },
+  {
+    "id": "b4bc9cc2-a43c-423c-92c2-46e8488d0929",
+    "name": "FCA opens investigation into Euro Exchange Securities UK Ltd",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:41:57.908110"
+  },
+  {
+    "id": "776110bd-ccb0-414b-9f32-d683e60d24bc",
+    "name": "FCA takes Hunter Jones to High Court over alleged unauthorised activity",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T04:42:17.179343"
+  },
+  {
+    "id": "bbfad104-bbc9-4d37-88e5-0218693ca2b1",
+    "name": "Debt advice warning: spot the red flags",
+    "jurisdiction": "UK",
+    "created_at": "2026-09-22T08:01:33.820489"
+  },
+  {
+    "id": "ea635673-0e0f-4496-8978-48451f230855",
+    "name": "Establishment of Class E Airspace; Ottawa, IL",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:14:07.423331"
+  },
+  {
+    "id": "8e661f26-1624-44a5-9c23-a272e6e2c60a",
+    "name": "Fisheries of the Exclusive Economic Zone Off Alaska; \u201cOther Rockfish\u201d in the Aleutian Islands Subarea of the Bering Sea and Aleutian Islands Management Area",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:14:20.846086"
+  },
+  {
+    "id": "35ef76b5-c059-4cf3-a373-3ef8f68ba7fc",
+    "name": "Softwood Lumber Board Assessment Rate Clarification and Changes to Membership",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:14:26.775851"
+  },
+  {
+    "id": "d895ffff-17aa-47e0-9e52-6c20dbc58cdd",
+    "name": "Part 572; Anthropomorphic Test Devices; Test Device for Human Occupant Restraint 50th Percentile Adult Male Dummy (THOR-50M)",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:14:39.155338"
+  },
+  {
+    "id": "55c0a53b-2556-40a8-a39d-0f9d96e68776",
+    "name": "Capital Construction Fund Revision",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:14:51.335142"
+  },
+  {
+    "id": "bc282a30-1620-46cc-ba61-26328dff8b5e",
+    "name": "Periodic Reporting",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:03.748889"
+  },
+  {
+    "id": "7a42e432-4479-49e3-9da8-1313c7e7dbac",
+    "name": "Airworthiness Directives; Airbus SAS Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:09.916427"
+  },
+  {
+    "id": "1e11610f-fc94-486d-8cfb-99e8e999ae13",
+    "name": "Airworthiness Directives; Airbus SAS Airplanes",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:17.060984"
+  },
+  {
+    "id": "416bb38e-9c43-47a2-85f4-f08e036d5c7a",
+    "name": "Safety Zone; Neuse River, New Bern, NC",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:29.244926"
+  },
+  {
+    "id": "822085bf-64e9-417d-b952-7049c76178aa",
+    "name": "Nonclinical Testing Terminology",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:32.351358"
+  },
+  {
+    "id": "30a119e3-808e-4c7a-8e13-09c9f1fb8b1a",
+    "name": "Nonclinical Testing Terminology",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:42.480771"
+  },
+  {
+    "id": "b3c821ba-c7f5-4447-9c29-f09e5809ae72",
+    "name": "Magnuson-Stevens Act Provisions; Fisheries Off West Coast States; Pacific Coast Groundfish Fishery; Pacific Coast Groundfish Fishery Management Plan; Amendment 38; 2027-28 Biennial Specifications and ",
+    "jurisdiction": "US",
+    "created_at": "2026-09-22T08:15:52.409787"
+  }
+]

@@ -1,0 +1,44 @@
+# https://www.robotstxt.org/robotstxt.html
+# RegCompiler Statutory Intelligence Search Crawler Rules
+
+User-agent: *
+Allow: /
+Allow: /regulations
+Allow: /regulations/*
+Allow: /compliance-check
+Allow: /billing
+Allow: /privacy
+Allow: /terms
+Allow: /sitemap.xml
+
+# Protect internal workspace and authenticated tenant routes
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /settings
+Disallow: /settings/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /api/*
+Disallow: /_next/*
+
+# Dedicated Googlebot Directives
+User-agent: Googlebot
+Allow: /
+Allow: /regulations
+Allow: /regulations/*
+Allow: /compliance-check
+Allow: /billing
+Allow: /privacy
+Allow: /terms
+Allow: /sitemap.xml
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /settings
+Disallow: /settings/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /api/*
+Disallow: /_next/*
+
+# XML Sitemap Location
+Sitemap: https://www.regcompiler.app/sitemap.xml

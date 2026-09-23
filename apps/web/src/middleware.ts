@@ -2,6 +2,14 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isPublicRoute = createRouteMatcher([
   '/',
+  '/sitemap.xml',
+  '/sitemap(.*)',
+  '/robots.txt',
+  '/regulations(.*)',
+  '/compliance-check(.*)',
+  '/billing(.*)',
+  '/terms(.*)',
+  '/privacy(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/r3f-test(.*)',
@@ -9,8 +17,6 @@ const isPublicRoute = createRouteMatcher([
   '/api/cron(.*)',
   '/api/jobs(.*)',
   '/api/audit(.*)',
-  '/terms(.*)',
-  '/privacy(.*)',
   '/.well-known(.*)',
 ]);
 
@@ -22,7 +28,7 @@ export default clerkMiddleware(async (auth, request) => {
 
 export const config = {
   matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|txt)).*)',
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|txt|xml)).*)',
     '/(api|trpc)(.*)',
   ],
 };
