@@ -12,7 +12,6 @@ import { RelationshipGraph } from './relationship-graph';
 import { DataStreams } from './data-streams';
 import { CompilationCore } from './compilation-core';
 import { CameraController } from './camera-controller';
-import { RegulatoryGlobe } from './regulatory-globe';
 
 interface NodePos {
   x: number;
@@ -138,8 +137,6 @@ export function ComplianceField() {
             prefersReducedMotion={prefersReducedMotion}
             scrollY={scrollY}
           />
-          
-          <RegulatoryGlobe prefersReducedMotion={prefersReducedMotion} isMobile={isMobile} />
           <CameraController 
             prefersReducedMotion={prefersReducedMotion}
             scrollY={scrollY}
