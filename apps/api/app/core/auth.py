@@ -227,8 +227,18 @@ async def get_current_user(
                     logger.error(f"User auto-creation failed: {creation_err}")
                     raise creation_err
         else:
-            # Update email if user had a placeholder email and now we have their real email
+            # Always try to fetch the authoritative email from Clerk API to handle
+            # users who switch Google accounts or change their primary email.
+            # This ensures the DB stays in sync with the actual Clerk identity.
+            try:
+                authoritative_email = _fetch_user_email_from_clerk(clerk_user_id)
+                if authoritative_email and not authoritative_email.endswith('@user.clerk'):
+                    user_email = authoritative_email
+            except Exception:
+                pass
+
             if user_email and not user_email.endswith('@user.clerk') and user.email != user_email and not is_super:
+                logger.info(f"Updating user email from '{user.email}' to '{user_email}' for clerk_id={clerk_user_id}")
                 user.email = user_email
                 try:
                     db.commit()

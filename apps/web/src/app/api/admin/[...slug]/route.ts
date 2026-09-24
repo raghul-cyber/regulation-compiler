@@ -222,7 +222,7 @@ const AUTHENTIC_REGISTERED_USERS: ClerkUserRecord[] = [
   {
     id: "user_3JKDUKZru9dKgWGQ5EBghqYTPCZ",
     name: "SAMARJEETH R",
-    email: "sit24sc016@sairamtap.edu.in",
+    email: "samarjeeth06@gmail.com",
     avatar_url: "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18zSktEVUk0UVd3cVdQaFZQWmp2QWFabEZlZFoifQ",
     role: "DEVELOPER",
     is_verified: true,
@@ -504,7 +504,7 @@ async function handleProxyRequest(
   // Handle live overview directly with Clerk Live API
   if (path === 'overview') {
     // 1. Return fresh in-memory cache if queried within 30 seconds
-    if (cachedAdminOverview && (Date.now() - lastAdminCacheTime < 30000)) {
+    if (cachedAdminOverview && (Date.now() - lastAdminCacheTime < 10000)) {
       return NextResponse.json(cachedAdminOverview, {
         status: 200,
         headers: {

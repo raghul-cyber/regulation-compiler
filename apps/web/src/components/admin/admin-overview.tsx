@@ -296,7 +296,7 @@ const AUTHENTIC_REGISTERED_USERS: ClerkUserRecord[] = [
   {
     id: "user_3JKDUKZru9dKgWGQ5EBghqYTPCZ",
     name: "SAMARJEETH R",
-    email: "sit24sc016@sairamtap.edu.in",
+    email: "samarjeeth06@gmail.com",
     avatar_url: "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18zSktEVUk0UVd3cVdQaFZQWmp2QWFabEZlZFoifQ",
     role: "DEVELOPER",
     is_verified: true,
