@@ -18,18 +18,32 @@ const isPublicRoute = createRouteMatcher([
   '/api/cron(.*)',
   '/api/jobs(.*)',
   '/api/audit(.*)',
+  '/api/compliance(.*)',
+  '/api/admin(.*)',
   '/.well-known(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
   const pathname = request.nextUrl.pathname;
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname.startsWith('/.well-known')) {
+  if (
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname.startsWith('/.well-known')
+  ) {
     return NextResponse.next();
   }
 
   if (!isPublicRoute(request)) {
-    await auth.protect();
+    const session = await auth();
+    if (!session.userId) {
+      if (pathname.startsWith('/api')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      return session.redirectToSignIn({ returnBackUrl: request.url });
+    }
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
