@@ -24,10 +24,10 @@ import {
   Layers, 
   Code2, 
   ArrowUpRight, 
-  Sparkles,
   Server,
   Filter
 } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { Button } from '@/components/ui/button';
 import { getBillingStatusAction } from '@/app/actions';
 import { PaywallModal } from '@/components/billing/paywall-modal';
@@ -594,13 +594,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             <button
               onClick={() => setScanDepth('deep')}
               disabled={isAuditing || isLimitReached}
-              className={`px-3 py-1.5 rounded transition-colors flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded transition-colors flex items-center gap-1.5 ${
                 scanDepth === 'deep'
-                  ? 'bg-blue-600 text-white font-bold shadow-sm shadow-blue-500/30'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[#2563EB] text-white font-semibold shadow-sm'
+                  : 'text-[#94A3B8] hover:text-[#CBD5E1]'
               }`}
             >
-              <Sparkles className="w-3 h-3 text-cyan-300" />
+              <RCIcon name="system-probe" size={13} className="text-[#93C5FD]" />
               Deep Full-Stack
             </button>
           </div>
@@ -618,7 +618,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             <Button
               onClick={() => handleRunAudit()}
               disabled={isAuditing}
-              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-blue-900/30 transition-all shrink-0 flex items-center justify-center gap-2"
+              className="h-10 px-6 font-medium text-xs uppercase tracking-wider bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm transition-all shrink-0 flex items-center justify-center gap-2"
             >
               {isAuditing ? (
                 <>

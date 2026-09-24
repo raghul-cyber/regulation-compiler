@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShieldCheck, Sparkles, AlertCircle, ArrowUpRight, Lock } from 'lucide-react';
+import { ShieldCheck, AlertCircle, ArrowUpRight, Lock } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { getBillingStatusAction } from '@/app/actions';
 import { PaywallModal } from './paywall-modal';
 import Link from 'next/link';
@@ -63,7 +64,7 @@ export function UsageIndicator() {
         href="/billing"
         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-400 hover:bg-blue-500/20 transition-colors text-xs font-mono font-medium"
       >
-        <Sparkles className="w-3.5 h-3.5" />
+        <RCIcon name="shield" size={14} className="text-[#3B82F6]" />
         <span>Pro Plan • Active</span>
       </Link>
     );

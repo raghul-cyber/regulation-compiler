@@ -9,7 +9,8 @@ import { SwarmSimulationView } from '@/components/compliance/swarm-simulation-vi
 import { Actions247View } from '@/components/compliance/actions-247-view';
 import { WebsiteComplianceAuditor } from '@/components/compliance/website-compliance-auditor';
 import { CoverageView } from './coverage-view';
-import { ShieldAlert, Sparkles } from 'lucide-react';
+import { ShieldAlert, Globe } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 
 const SUPER_ADMIN_EMAIL = 'rcraghul12@gmail.com';
 const SUPER_ADMIN_CLERK_ID = 'user_3HpP6350OcHxY6bu77tdXEtihSE';
@@ -75,59 +76,58 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
-      {/* Tactical Header with Stitch Telemetry */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
+      {/* Tactical Header with Enterprise Telemetry */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--rc-border)]">
         <div>
-          <div className="flex items-center gap-2 mb-1.5 font-mono text-[9px] tracking-widest text-zinc-500 uppercase">
-            <span className="text-[#00F0FF]">+</span>
+          <div className="flex items-center gap-2 mb-1.5 font-mono text-[9px] tracking-widest text-[#64748B] uppercase">
+            <span className="text-[#3B82F6]">+</span>
             <span>STATUTORY MISSION CONTROL</span>
-            <span className="text-zinc-600">/</span>
+            <span className="text-[#475569]">/</span>
             <span>NODE-SURVEILLANCE-01</span>
-            <span className="text-[#00F0FF]">+</span>
+            <span className="text-[#3B82F6]">+</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <span>Compliance Hub</span>
-            <span className="stitch-badge stitch-badge-cyan text-[10px] hidden sm:inline-flex">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#2563EB]/15 text-[#93C5FD] border border-[#2563EB]/30 hidden sm:inline-flex">
               Deterministic AST
             </span>
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[#94A3B8]">
             Autonomous statutory compilation, continuous surveillance telemetry, and algorithmic gap remediation.
           </p>
         </div>
 
         <div className="flex items-center gap-2 font-mono text-xs">
-          <div className="stitch-badge stitch-badge-emerald">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="px-3 py-1.5 rounded-lg bg-[#0E1218] border border-[var(--rc-border)] flex items-center gap-2 text-[#CBD5E1]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
             <span>10 Authorities Live</span>
           </div>
         </div>
       </div>
 
-      {/* Elevated Stitch Command Tabs */}
-      <div className="flex gap-1.5 p-1.5 rounded-2xl bg-[#080D14]/85 backdrop-blur-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-x-auto scrollbar-none">
+      {/* Elevated Enterprise Command Tabs */}
+      <div className="flex gap-1.5 p-1.5 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] overflow-x-auto scrollbar-none">
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-2 text-xs font-mono rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-mono rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#00F0FF]/15 to-[#3B82F6]/15 border border-[#00F0FF]/40 text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.15)] font-semibold'
-                  : 'border border-transparent text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                  ? 'bg-[#141922] border border-[#2563EB] text-[#F1F5F9] font-medium shadow-sm'
+                  : 'border border-transparent text-[#94A3B8] hover:text-white hover:bg-[#141922]/50'
               }`}
             >
               <span>{tab.label}</span>
               {'isNew' in tab && tab.isNew && (
-                <span className="ml-1 stitch-badge stitch-badge-cyan text-[9px] py-0 px-1.5">
-                  <Sparkles className="w-2.5 h-2.5 text-[#00F0FF]" />
+                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#2563EB]/20 text-[#93C5FD] border border-[#2563EB]/30">
                   NEW
                 </span>
               )}
               {'adminOnly' in tab && tab.adminOnly && (
-                <span className="ml-1 stitch-badge stitch-badge-amber text-[9px] py-0 px-1.5">
-                  <ShieldAlert className="w-2.5 h-2.5" />
+                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#F59E0B]/20 text-[#FBBF24] border border-[#F59E0B]/30">
+                  <ShieldAlert className="w-2.5 h-2.5 inline mr-0.5" />
                   ADMIN
                 </span>
               )}

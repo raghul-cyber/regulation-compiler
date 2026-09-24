@@ -82,7 +82,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
         style={{ colorScheme: 'dark' }}
       >
-        <body className="min-h-full flex flex-col bg-[#03070C] text-gray-100 relative selection:bg-[#00F0FF]/20 selection:text-[#00F0FF]">
+        <body className="min-h-full flex flex-col bg-[#090B0E] text-[#F1F5F9] relative selection:bg-[#2563EB]/25 selection:text-[#93C5FD]">
           <AmbientBackground />
           <IntraAppToastProvider>
             <ConsoleGuard />

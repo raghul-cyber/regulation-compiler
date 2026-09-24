@@ -94,11 +94,11 @@ export function ApiKeysList({ initialKeys }: { initialKeys: any[] }) {
       </div>
 
       {/* API Keys List */}
-      <div className="bg-[#0a0a0c] border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-[#0E1218] border border-[var(--rc-border)] rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-zinc-950 border-b border-zinc-800">
+              <tr className="bg-[#090D13] border-b border-[var(--rc-border)]">
                 <th className="py-4 px-6 text-xs font-semibold uppercase text-zinc-500">Name</th>
                 <th className="py-4 px-6 text-xs font-semibold uppercase text-zinc-500">Prefix</th>
                 <th className="py-4 px-6 text-xs font-semibold uppercase text-zinc-500">Scopes</th>
@@ -107,7 +107,7 @@ export function ApiKeysList({ initialKeys }: { initialKeys: any[] }) {
                 <th className="py-4 px-6 text-right text-xs font-semibold uppercase text-zinc-500">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/50">
+            <tbody className="divide-y divide-[var(--rc-border)]">
               {initialKeys.map(key => (
                 <tr key={key.id} className="hover:bg-zinc-800/20 transition-colors">
                   <td className="py-4 px-6">

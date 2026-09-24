@@ -15,7 +15,6 @@ import {
   CheckCircle2, 
   Sliders, 
   ArrowUpRight,
-  Sparkles,
   Zap
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

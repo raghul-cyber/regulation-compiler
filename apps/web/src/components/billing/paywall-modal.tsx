@@ -9,8 +9,9 @@ import {
   AlertCircle, 
   X, 
   Lock, 
-  Sparkles 
+  ShieldCheck 
 } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { createCheckoutAction } from '@/app/actions';
 
 import { useClerk } from '@clerk/nextjs';
@@ -179,18 +180,18 @@ export function PaywallModal({
           <button
             onClick={handleCheckout}
             disabled={isLoading}
-            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-[#5CC8FF] hover:bg-[#4bb3e6] disabled:opacity-50 text-[#05070A] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 cursor-pointer"
+            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-[#05070A]" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
                 <span>Redirecting to Dodo Payments...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-[#05070A]" />
+                <RCIcon name="shield" size={16} className="text-white" />
                 <span>Unlock Continued Access</span>
-                <ArrowRight className="w-4 h-4 text-[#05070A]" />
+                <ArrowRight className="w-4 h-4 text-white" />
               </>
             )}
           </button>

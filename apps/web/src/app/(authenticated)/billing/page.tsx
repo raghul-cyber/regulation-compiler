@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
-  Sparkles, 
   CheckCircle2, 
   Lock, 
   ArrowRight, 
@@ -14,6 +13,7 @@ import {
   Layers,
   History
 } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { getBillingStatusAction, getBillingUsageAction, createCheckoutAction, getCustomerPortalAction } from '@/app/actions';
 import { PaywallModal } from '@/components/billing/paywall-modal';
 
@@ -232,26 +232,25 @@ export default function BillingPage() {
         </div>
 
         {/* Card 3: Quick Action / Upgrade */}
-        <div className="stitch-card p-6 rounded-2xl bg-gradient-to-b from-[#0F1B2B]/95 to-[#080F18]/95 border border-[#1E3B52] shadow-[0_16px_50px_rgba(0,240,255,0.08)] flex flex-col justify-between backdrop-blur-xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00F0FF] via-[#7928CA] to-[#00F0FF]" />
+        <div className="p-6 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] flex flex-col justify-between backdrop-blur-xl relative overflow-hidden">
           <div>
-            <div className="text-[10px] font-mono text-[#00F0FF] uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <div className="text-[10px] font-mono text-[#3B82F6] uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
+              <RCIcon name="shield" size={14} className="text-[#3B82F6]" />
               Executive Access
             </div>
             <div className="text-base font-extrabold text-white">
               {billing?.paid_access || billing?.is_admin ? 'Active Entitlement' : 'Unlock Unlimited Compilations'}
             </div>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed font-sans">
+            <p className="mt-2 text-xs text-[#94A3B8] leading-relaxed font-sans">
               Instant AST pipeline prioritization. Automated legislative surveillance with webhook activation in &lt; 800ms.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-[#162A3B] space-y-2.5">
+          <div className="mt-6 pt-4 border-t border-[var(--rc-border)] space-y-2.5">
             {!billing?.paid_access && !billing?.is_admin && (
               <button
                 onClick={() => setIsPaywallOpen(true)}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#00F0FF] via-[#00B4D8] to-[#0077B6] hover:brightness-110 active:scale-[0.99] text-[#020508] font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)] cursor-pointer tracking-wider uppercase"
+                className="w-full py-3 px-4 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.99] text-white font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer tracking-wider uppercase"
               >
                 <span>Upgrade to Pro ($10.02/mo)</span>
                 <ArrowRight className="w-3.5 h-3.5" />

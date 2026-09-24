@@ -7,9 +7,9 @@ import {
   BarChart3, 
   ShieldAlert, 
   X,
-  Sparkles,
   ShieldCheck
 } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { Button } from '@/components/ui/button';
 
 interface EvaluationResultModalProps {
@@ -35,16 +35,13 @@ export function EvaluationResultModal({
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-lg bg-[#0c0c11] border border-emerald-500/40 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/50 overflow-hidden text-left animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg bg-[#0E1218] border border-[var(--rc-border)] rounded-2xl p-6 sm:p-8 shadow-2xl text-left animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Subtle Ambient Radial Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-40 bg-emerald-500/15 blur-3xl pointer-events-none rounded-full" />
-
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-5 right-5 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800/60 transition-colors"
+          className="absolute top-5 right-5 text-[#94A3B8] hover:text-white p-1 rounded-lg hover:bg-[#141922] transition-colors"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -52,7 +49,7 @@ export function EvaluationResultModal({
 
         {/* Success Icon & Badge */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-sm shadow-emerald-500/20">
+          <div className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-[#10B981]/10 border border-[#10B981]/25 text-[#10B981] shadow-sm">
             <CheckCircle2 className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -60,8 +57,8 @@ export function EvaluationResultModal({
             </span>
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-1">
-              <Sparkles className="w-3 h-3" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/25 mb-1">
+              <RCIcon name="validation" size={12} className="text-[#10B981]" />
               <span>Assessment Completed</span>
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">

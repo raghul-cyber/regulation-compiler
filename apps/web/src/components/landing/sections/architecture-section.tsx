@@ -54,14 +54,14 @@ export function ArchitectureSection() {
     <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17222C]/70 border border-[#1E2C38] text-[#5CC8FF] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <Layers className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
+          <Layers className="w-3.5 h-3.5 text-[#3B82F6]" />
           Technical Stack
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F2F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
           Enterprise Architecture
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#9AA9B5] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
           Engineered as a deterministic compiler pipeline. Every statutory input traces directly to an immutable, machine-verifiable enforcement outcome.
         </p>
       </div>
@@ -73,29 +73,29 @@ export function ArchitectureSection() {
           return (
             <div
               key={layer.step}
-              className="p-5 rounded-xl bg-[#080D13]/85 border border-[#17222C] hover:border-[#1E2C38] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left"
+              className="p-5 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left"
             >
               <div className="flex items-start md:items-center gap-4">
-                <div className="p-3 rounded-xl bg-[#0C131B] border border-[#17222C] text-[#5CC8FF] shrink-0">
+                <div className="p-3 rounded-lg bg-[#141922] border border-[var(--rc-border)] text-[#3B82F6] shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[#5CC8FF] font-bold">
+                    <span className="font-mono text-xs text-[#3B82F6] font-bold">
                       LAYER {layer.step}
                     </span>
-                    <span className="text-[#62717C]">•</span>
-                    <h3 className="text-base font-bold text-[#F2F6F8]">
+                    <span className="text-[#64748B]">•</span>
+                    <h3 className="text-base font-bold text-[#F1F5F9]">
                       {layer.name}
                     </h3>
                   </div>
-                  <p className="text-xs text-[#9AA9B5] max-w-2xl leading-relaxed">
+                  <p className="text-xs text-[#94A3B8] max-w-2xl leading-relaxed">
                     {layer.desc}
                   </p>
                 </div>
               </div>
 
-              <div className="font-mono text-[11px] text-[#9AA9B5] bg-[#0C131B] px-3 py-1.5 rounded-lg border border-[#17222C] shrink-0">
+              <div className="font-mono text-[11px] text-[#CBD5E1] bg-[#141922] px-3 py-1.5 rounded-lg border border-[var(--rc-border)] shrink-0">
                 {layer.tech}
               </div>
             </div>

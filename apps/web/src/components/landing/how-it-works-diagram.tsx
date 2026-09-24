@@ -234,34 +234,31 @@ export function HowItWorksDiagram() {
             <button
               key={stage.id}
               onClick={() => handleManualSwitch(idx)}
-              className={`text-left p-4 rounded-xl border transition-all duration-300 relative group cursor-pointer overflow-hidden ${
+              className={`text-left p-4 rounded-xl border transition-all duration-200 relative group cursor-pointer overflow-hidden ${
                 isActive
-                  ? `bg-zinc-900/90 ${stage.borderColor} shadow-lg shadow-black/40 ring-1 ${stage.color.replace('text-', 'ring-')}`
-                  : 'bg-[#0b0c10]/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/40'
+                  ? 'bg-[#141922] border-[#2563EB] shadow-sm'
+                  : 'bg-[#0E1218] border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#141922]/50'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${isActive ? stage.bgGlow : 'bg-zinc-900'} ${stage.color} transition-colors`}>
+                <div className={`p-2 rounded-lg ${isActive ? 'bg-[#2563EB]/15 text-[#3B82F6]' : 'bg-[#141922] text-[#94A3B8]'} transition-colors`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="font-mono text-xs font-bold text-zinc-500 group-hover:text-zinc-400">
+                <span className="font-mono text-xs font-bold text-[#64748B] group-hover:text-[#94A3B8]">
                   {stage.step}
                 </span>
               </div>
 
-              <h4 className="text-sm font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
+              <h4 className="text-sm font-bold text-white mb-1 group-hover:text-[#93C5FD] transition-colors">
                 {stage.title}
               </h4>
-              <p className="text-xs text-zinc-400 line-clamp-1">
+              <p className="text-xs text-[#94A3B8] line-clamp-1">
                 {stage.subtitle}
               </p>
 
               {/* Auto-rotate progress bar */}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0">
-                  {!isPaused && <div key={progressKey} className="h-[2px] bg-gradient-to-r from-[#5CC8FF] to-[#67D6A0]" style={{ animation: `landing-tab-progress ${AUTO_ROTATE_MS}ms linear forwards` }} />}
-                  <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB]" />
               )}
             </button>
           );
@@ -269,20 +266,16 @@ export function HowItWorksDiagram() {
       </div>
 
       {/* Visual Workflow Diagram Box */}
-      <div className="rounded-2xl border border-zinc-800/90 bg-[#08090d] p-6 md:p-8 shadow-2xl relative overflow-hidden">
-        {/* Subtle Ambient Background Gradients */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
+      <div className="rounded-2xl border border-[var(--rc-border)] bg-[#0E1218] p-6 md:p-8 shadow-2xl relative overflow-hidden">
         {/* Top Header of Active Stage */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-zinc-800/80">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-[var(--rc-border)]">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border ${activeStage.borderColor} ${activeStage.bgGlow} ${activeStage.color}`}>
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-[#2563EB]/30 bg-[#2563EB]/10 text-[#93C5FD]">
                 Stage {activeStage.step}: {activeStage.badge}
               </span>
-              <span className="text-xs text-zinc-500 font-mono flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-400" />
+              <span className="text-xs text-[#64748B] font-mono flex items-center gap-1">
+                <Zap className="w-3 h-3 text-[#F59E0B]" />
                 Autonomous Execution
               </span>
             </div>
@@ -295,13 +288,13 @@ export function HowItWorksDiagram() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleManualSwitch((activeStageIndex > 0 ? activeStageIndex - 1 : STAGES.length - 1))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#141922] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] text-[#CBD5E1] hover:text-white transition-all cursor-pointer"
             >
               Previous
             </button>
             <button
               onClick={() => handleManualSwitch((activeStageIndex < STAGES.length - 1 ? activeStageIndex + 1 : 0))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all flex items-center gap-1 cursor-pointer shadow-sm shadow-blue-500/20"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-all flex items-center gap-1 cursor-pointer shadow-sm"
             >
               <span>Next Stage</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -313,19 +306,19 @@ export function HowItWorksDiagram() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Stage Explanation & Highlights */}
           <div className="lg:col-span-5 space-y-6">
-            <p className="text-zinc-300 text-sm md:text-base leading-relaxed">
+            <p className="text-[#CBD5E1] text-sm md:text-base leading-relaxed">
               {activeStage.description}
             </p>
 
             <div className="space-y-3 pt-2">
-              <h5 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <h5 className="text-xs font-mono uppercase tracking-wider text-[#94A3B8] font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                 Key Operational Milestones
               </h5>
               <div className="space-y-2">
                 {activeStage.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-xs text-zinc-300 bg-zinc-900/60 border border-zinc-800/80 p-2.5 rounded-lg">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#CBD5E1] bg-[#090D13] border border-[var(--rc-border)] p-2.5 rounded-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] mt-1.5 shrink-0" />
                     <span>{h}</span>
                   </div>
                 ))}
@@ -333,9 +326,9 @@ export function HowItWorksDiagram() {
             </div>
 
             {/* Pipeline Step Flow Mini-Bar */}
-            <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 font-mono">
+            <div className="pt-4 border-t border-[var(--rc-border)] flex items-center justify-between text-xs text-[#64748B] font-mono">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
                 Pipeline Health: 100% OPERATIONAL
               </span>
               <span>Stage {activeStageIndex + 1} of {STAGES.length}</span>
@@ -344,24 +337,24 @@ export function HowItWorksDiagram() {
 
           {/* Right Column: Code & AST Inspector with Syntax Highlighting */}
           <div className="lg:col-span-7">
-            <div className="rounded-xl border border-zinc-800 bg-[#050608] overflow-hidden shadow-xl">
-              <div className="px-4 py-2.5 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between">
+            <div className="rounded-xl border border-[var(--rc-border)] bg-[#05070A] overflow-hidden shadow-xl">
+              <div className="px-4 py-2.5 bg-[#090D13] border-b border-[var(--rc-border)] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
                   </div>
-                  <span className="text-[11px] font-mono text-zinc-400 ml-2 font-medium">
+                  <span className="text-[11px] font-mono text-[#94A3B8] ml-2 font-medium">
                     {activeStage.codeTitle}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-500 uppercase bg-zinc-800 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono text-[#64748B] uppercase bg-[#141922] px-2 py-0.5 rounded border border-[var(--rc-border)]">
                   SYNTACTIC AST
                 </span>
               </div>
               <div className="p-4 overflow-x-auto max-h-[340px] custom-scrollbar">
-                <pre className="text-xs font-mono text-zinc-300 leading-relaxed">
+                <pre className="text-xs font-mono text-[#CBD5E1] leading-relaxed">
                   <code>
                     <HighlightedJSON code={activeStage.codeSnippet} />
                     <span className="landing-cursor" aria-hidden="true" />

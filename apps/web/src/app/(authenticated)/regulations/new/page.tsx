@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, BrainCircuit, FileSearch, ShieldCheck, Globe, Library, Lock } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, FileSearch, ShieldCheck, Globe, Library, Lock } from 'lucide-react';
+import { RCIcon } from '@/components/ui/rc-icon';
 import { uploadRegulationServerAction, ingestFrameworkAction, getFrameworksAction, getBillingStatusAction } from '@/app/actions';
 import { PipelineProgress } from '@/components/regulations/pipeline-progress';
 import { useAuth } from '@clerk/nextjs';
@@ -444,7 +445,7 @@ export default function NewRegulationPage() {
                                         </>
                                     ) : (
                                         <>
-                                            <BrainCircuit className="h-4 w-4" />
+                                            <RCIcon name="compiler" size={16} />
                                             <span>Live Ingest & Compile</span>
                                         </>
                                     )}
@@ -598,7 +599,7 @@ export default function NewRegulationPage() {
                   </>
                 ) : (
                   <>
-                    <BrainCircuit className="h-6 w-6" />
+                    <RCIcon name="compiler" size={24} />
                     Start Ingestion Pipeline
                   </>
                 )}
@@ -621,7 +622,7 @@ export default function NewRegulationPage() {
         </div>
         <div className="flex items-start gap-3">
           <div className="p-2 bg-gray-900 rounded-lg shrink-0">
-            <BrainCircuit className="h-5 w-5 text-gray-400" />
+            <RCIcon name="traceability" size={20} className="text-gray-400" />
           </div>
           <div>
             <h4 className="text-sm font-semibold text-gray-300">Graph Linking</h4>

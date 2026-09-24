@@ -15,7 +15,6 @@ import {
   Filter,
   CheckCircle2,
   Sliders,
-  Sparkles,
   ExternalLink,
   ChevronRight,
   Server,

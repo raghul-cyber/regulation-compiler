@@ -23,29 +23,29 @@ async function RegulationsDataLoader() {
 export default function RegulationsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--rc-border)] pb-5">
         <div>
-          <div className="flex items-center gap-2 mb-1 font-mono text-[9px] tracking-widest text-zinc-500 uppercase">
-            <span className="text-[#00F0FF]">+</span>
+          <div className="flex items-center gap-2 mb-1 font-mono text-[9px] tracking-widest text-[#64748B] uppercase">
+            <span className="text-[#3B82F6]">+</span>
             <span>DIRECTORY: CANONICAL STATUTES</span>
-            <span className="text-zinc-600">/</span>
+            <span className="text-[#475569]">/</span>
             <span>ENFORCEABLE CONTROLS</span>
-            <span className="text-[#00F0FF]">+</span>
+            <span className="text-[#3B82F6]">+</span>
           </div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Canonical Regulations</h1>
-            <span className="stitch-badge stitch-badge-emerald">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
               Live & Verified
             </span>
           </div>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[#94A3B8]">
             Browse official statutory frameworks, enforceable controls, and AI-compiled requirements.
           </p>
         </div>
         <div className="flex items-center gap-2 font-mono text-xs">
           <Link href="/dashboard">
-            <Button variant="outline" size="sm" className="border-white/[0.12] bg-[#080D14]/80 text-zinc-300 hover:text-[#00F0FF] hover:border-[#00F0FF]/40 text-xs transition-all">
+            <Button variant="outline" size="sm" className="border-[var(--rc-border)] bg-[#0E1218] text-[#CBD5E1] hover:text-white hover:border-[#2563EB] text-xs transition-all">
               Return to Hub
             </Button>
           </Link>

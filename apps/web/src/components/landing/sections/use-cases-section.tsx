@@ -50,14 +50,14 @@ export function UseCasesSection() {
     <section id="use-cases" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17222C]/70 border border-[#1E2C38] text-[#5CC8FF] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <ShieldCheck className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#3B82F6]" />
           Enterprise Scope
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F2F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
           Built for High-Stakes Regulatory Environments
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#9AA9B5] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
           Engineered for institutions and platforms that cannot afford regulatory ambiguity, audit failure, or compliance drift.
         </p>
       </div>
@@ -69,36 +69,36 @@ export function UseCasesSection() {
           return (
             <div
               key={uc.id}
-              className={`${uc.colSpan} p-6 rounded-2xl bg-[#080D13]/90 border border-[#17222C] hover:border-[#1E2C38] backdrop-blur-md flex flex-col justify-between transition-all duration-200 group`}
+              className={`${uc.colSpan} p-6 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] flex flex-col justify-between transition-all duration-200 group`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-[#0C131B] border border-[#17222C] text-[#5CC8FF]">
+                    <div className="p-2 rounded-lg bg-[#141922] border border-[var(--rc-border)] text-[#3B82F6]">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-[10px] text-[#5CC8FF] font-bold uppercase tracking-wider">
+                    <span className="font-mono text-[10px] text-[#3B82F6] font-bold uppercase tracking-wider">
                       {uc.tag}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#67D6A0] bg-[#67D6A015] px-2 py-0.5 rounded border border-[#67D6A030] font-semibold">
+                  <span className="font-mono text-[10px] text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30 font-semibold">
                     {uc.metric}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-[#F2F6F8] mb-2 group-hover:text-[#5CC8FF] transition-colors">
+                <h3 className="text-lg font-bold text-[#F1F5F9] mb-2 group-hover:text-[#93C5FD] transition-colors">
                   {uc.title}
                 </h3>
-                <p className="text-xs text-[#9AA9B5] leading-relaxed">
+                <p className="text-xs text-[#94A3B8] leading-relaxed">
                   {uc.desc}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[#17222C] flex flex-wrap items-center gap-2">
+              <div className="mt-6 pt-4 border-t border-[var(--rc-border)] flex flex-wrap items-center gap-2">
                 {uc.frameworks.map((fw) => (
                   <span 
                     key={fw} 
-                    className="font-mono text-[10px] text-[#9AA9B5] bg-[#0C131B] px-2 py-0.5 rounded border border-[#17222C]"
+                    className="font-mono text-[10px] text-[#CBD5E1] bg-[#141922] px-2 py-0.5 rounded border border-[var(--rc-border)]"
                   >
                     {fw}
                   </span>
