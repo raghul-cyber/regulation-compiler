@@ -108,12 +108,12 @@ export function TopNav() {
             </Show>
 
             <Show when="signed-out">
-              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <button className="text-xs font-mono text-[#9AA9B5] hover:text-[#F2F6F8] px-3 py-1.5 transition-colors cursor-pointer hidden sm:inline-block">
                   Sign In
                 </button>
               </SignInButton>
-              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <Button
                   size="sm"
                   className="bg-[#5CC8FF] hover:bg-[#4bb3e6] text-[#05070A] rounded-xl font-semibold shadow-[0_0_20px_rgba(92,200,255,0.25)] transition-all px-4 h-9 flex items-center gap-1.5 cursor-pointer text-xs"
@@ -192,7 +192,7 @@ export function TopNav() {
                 </Link>
               </Show>
               <Show when="signed-out">
-                <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+                <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                   <button
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full py-2 text-center rounded-xl bg-[#5CC8FF] text-[#05070A] font-semibold"
@@ -271,22 +271,22 @@ export function TopNav() {
               </Link>
             </Show>
             <Show when="signed-out">
-              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+              <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
                   Dashboard
                 </button>
               </SignInButton>
-              <SignInButton mode="modal" fallbackRedirectUrl="/regulations">
+              <SignInButton mode="modal" fallbackRedirectUrl="/regulations" signUpFallbackRedirectUrl="/regulations">
                 <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
                   Regulations
                 </button>
               </SignInButton>
-              <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check">
+              <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check" signUpFallbackRedirectUrl="/compliance-check">
                 <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
                   Compliance
                 </button>
               </SignInButton>
-              <SignInButton mode="modal" fallbackRedirectUrl="/regulations/new">
+              <SignInButton mode="modal" fallbackRedirectUrl="/regulations/new" signUpFallbackRedirectUrl="/regulations/new">
                 <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4 cursor-pointer">
                   <UploadCloud className="w-4 h-4" />
                   Upload

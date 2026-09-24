@@ -18,7 +18,9 @@ export async function setRequirementStatus(reqId: string, status: string, note?:
     const { auth } = await import('@clerk/nextjs/server');
     const session = await auth();
     const token = await session.getToken();
-    if (!token) throw new Error("Unauthorized");
+    if (!token) {
+      return { success: false, error: "Authentication session expired or not ready. Please refresh or sign in." };
+    }
 
     const API_BASE = getApiBaseUrl();
     const data = await apiClient(`${API_BASE}/requirements/${reqId}/status`, {
@@ -36,85 +38,99 @@ export async function setRequirementStatus(reqId: string, status: string, note?:
     revalidatePath('/(authenticated)/regulations/[id]/requirements', 'page');
     return { success: true, data };
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || "Failed to update requirement status" };
   }
 }
 
 export async function runComplianceCheck(regulationId: string, payload: any) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  
-  if (!token) throw new Error("Unauthorized");
-
-  // 0. Enforce 3 free actions quota before spinning up developer API key
-  const reserve = await reserveUsageAction('compliance_simulation', { regulation_id: regulationId });
-  if (!reserve.success && reserve.isPaymentRequired) {
-    return {
-      success: false,
-      isPaymentRequired: true,
-      error: "Your 3 free uses have been used. Upgrade to continue.",
-      freeUsesUsed: reserve.freeUsesUsed ?? 3,
-      freeUsesLimit: reserve.freeUsesLimit ?? 3
-    };
-  }
-
-  const API_BASE = getApiBaseUrl();
-
-  // 1. Generate a temporary API key using the user's Clerk Token
-  const keyRes = await fetch(`${API_BASE}/api-keys`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name: 'Temp Compliance Check Key', scopes: ['check-compliance'] })
-  });
-
-  if (!keyRes.ok) {
-    throw new Error("Failed to generate temporary API key for Developer API access.");
-  }
-
-  const keyData = await keyRes.json();
-  const rawKey = keyData.raw_key;
-  const keyId = keyData.id;
-
   try {
-    // 2. Reshape payload to match FastAPI ComplianceCheckPayload
-    // FastAPI expects: { system_name: str, regulation_ids: uuid[], controls_implemented: {} }
-    // The UI passes arbitrary JSON in `payload`. We wrap it correctly:
-    const backendPayload = {
-      system_name: "Compliance Simulator",
-      regulation_ids: [regulationId],
-      controls_implemented: payload
-    };
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    const token = await session.getToken();
+    
+    if (!token) {
+      return {
+        success: false,
+        error: "Authentication session expired or not ready. Please refresh or sign in."
+      };
+    }
 
-    // 3. Hit the Developer API using the temporary API Key
-    const result = await apiClient(`${API_BASE}/check-compliance`, {
+    // 0. Enforce 3 free actions quota before spinning up developer API key
+    const reserve = await reserveUsageAction('compliance_simulation', { regulation_id: regulationId });
+    if (!reserve.success && reserve.isPaymentRequired) {
+      return {
+        success: false,
+        isPaymentRequired: true,
+        error: "Your 3 free uses have been used. Upgrade to continue.",
+        freeUsesUsed: reserve.freeUsesUsed ?? 3,
+        freeUsesLimit: reserve.freeUsesLimit ?? 3
+      };
+    }
+
+    const API_BASE = getApiBaseUrl();
+
+    // 1. Generate a temporary API key using the user's Clerk Token
+    const keyRes = await fetch(`${API_BASE}/api-keys`, {
       method: 'POST',
       headers: {
-        'X-API-Key': rawKey,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(backendPayload),
-      timeoutMs: 25000,
-      retries: 2
+      body: JSON.stringify({ name: 'Temp Compliance Check Key', scopes: ['check-compliance'] })
     });
 
-    return { success: true, data: result };
-
-  } catch (error: any) {
-    return { success: false, error: error.message };
-  } finally {
-    // 4. Cleanup: Revoke the temporary API key so we don't litter the DB
-    try {
-      await fetch(`${API_BASE}/api-keys/${keyId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    } catch (e) {
-      console.error("Cleanup failed:", e);
+    if (!keyRes.ok) {
+      let errMsg = "Failed to generate temporary API key for Developer API access.";
+      try {
+        const errJson = await keyRes.json();
+        errMsg = errJson.detail || errJson.message || errMsg;
+      } catch {}
+      return { success: false, error: errMsg };
     }
+
+    const keyData = await keyRes.json();
+    const rawKey = keyData.raw_key;
+    const keyId = keyData.id;
+
+    try {
+      // 2. Reshape payload to match FastAPI ComplianceCheckPayload
+      // FastAPI expects: { system_name: str, regulation_ids: uuid[], controls_implemented: {} }
+      // The UI passes arbitrary JSON in `payload`. We wrap it correctly:
+      const backendPayload = {
+        system_name: "Compliance Simulator",
+        regulation_ids: [regulationId],
+        controls_implemented: payload
+      };
+
+      // 3. Hit the Developer API using the temporary API Key
+      const result = await apiClient(`${API_BASE}/check-compliance`, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': rawKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(backendPayload),
+        timeoutMs: 25000,
+        retries: 2
+      });
+
+      return { success: true, data: result };
+
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    } finally {
+      // 4. Cleanup: Revoke the temporary API key so we don't litter the DB
+      try {
+        await fetch(`${API_BASE}/api-keys/${keyId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.warn("Failed to cleanup temp API key:", e);
+      }
+    }
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to execute compliance check" };
   }
 }
 
@@ -167,51 +183,63 @@ export async function generateReport(regulationId: string, typeOrTypes: string |
 
 
 export async function createApiKey(name: string, scopes: string[]) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  if (!token) throw new Error("Unauthorized");
-  
-  const API_BASE = getApiBaseUrl();
-  
-  const res = await fetch(`${API_BASE}/api-keys`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, scopes })
-  });
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    const token = await session.getToken();
+    if (!token) {
+      return { success: false, error: "Authentication session expired or not ready. Please refresh or sign in." };
+    }
+    
+    const API_BASE = getApiBaseUrl();
+    
+    const res = await fetch(`${API_BASE}/api-keys`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, scopes })
+    });
 
-  if (!res.ok) {
-    const text = await res.text();
-    return { success: false, error: `Failed to create API key: ${text}` };
+    if (!res.ok) {
+      const text = await res.text();
+      return { success: false, error: `Failed to create API key: ${text}` };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to create API key" };
   }
-  const data = await res.json();
-  return { success: true, data };
 }
 
 export async function revokeApiKey(keyId: string) {
-  const { auth } = await import('@clerk/nextjs/server');
-  const session = await auth();
-  const token = await session.getToken();
-  if (!token) throw new Error("Unauthorized");
-  
-  const API_BASE = getApiBaseUrl();
-  
-  const res = await fetch(`${API_BASE}/api-keys/${keyId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
+  try {
+    const { auth } = await import('@clerk/nextjs/server');
+    const session = await auth();
+    const token = await session.getToken();
+    if (!token) {
+      return { success: false, error: "Authentication session expired or not ready. Please refresh or sign in." };
     }
-  });
+    
+    const API_BASE = getApiBaseUrl();
+    
+    const res = await fetch(`${API_BASE}/api-keys/${keyId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
 
-  if (!res.ok) {
-    const text = await res.text();
-    return { success: false, error: `Failed to revoke API key: ${text}` };
+    if (!res.ok) {
+      const text = await res.text();
+      return { success: false, error: `Failed to revoke API key: ${text}` };
+    }
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to revoke API key" };
   }
-  const data = await res.json();
-  return { success: true, data };
 }
 
 export async function uploadRegulationServerAction(formData: FormData) {

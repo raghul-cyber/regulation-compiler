@@ -71,6 +71,10 @@ export default function RootLayout({
           unsafe_disableDevelopmentModeWarnings: true,
         },
       }}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
     >
       <html
         lang="en"

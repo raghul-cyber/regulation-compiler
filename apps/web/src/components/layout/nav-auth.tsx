@@ -23,7 +23,7 @@ export function NavAuth({ showDashboardButton = false }: { showDashboardButton?:
       {userId ? (
         <UserButton />
       ) : (
-        <SignInButton mode="modal">
+        <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
           <Button size="sm" variant="secondary">Sign In</Button>
         </SignInButton>
       )}
@@ -38,7 +38,7 @@ export function NavAuth({ showDashboardButton = false }: { showDashboardButton?:
           </Link>
         )
       ) : (
-        <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
+        <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
           <Button size="sm" className="bg-white text-black hover:bg-gray-200 rounded-full font-medium cursor-pointer">
             Launch Compiler
           </Button>

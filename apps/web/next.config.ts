@@ -49,6 +49,12 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_bm9ybWFsLXNocmV3LTExLmNsZXJrLmFjY291bnRzLmRldiQ",
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://regulation-compiler.onrender.com/api/v1",
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: "/sign-in",
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: "/sign-up",
+    NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: "/dashboard",
+    NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: "/dashboard",
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: "/dashboard",
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: "/dashboard",
   },
   async headers() {
     return [
