@@ -241,61 +241,6 @@ export function TopNav() {
           <nav className="hidden md:flex items-center gap-1 text-xs">
             <Show when="signed-in">
               <Link 
-                href="/dashboard" 
-                className={`px-3 py-1.5 rounded-[6px] font-medium transition-all ${
-                  pathname.startsWith('/dashboard')
-                    ? 'text-white bg-[#151A22] border border-white/[0.12] font-semibold'
-                    : 'text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03]'
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                href="/regulations" 
-                className={`px-3 py-1.5 rounded-[6px] font-medium transition-all ${
-                  pathname.startsWith('/regulations') && !pathname.includes('/new')
-                    ? 'text-white bg-[#151A22] border border-white/[0.12] font-semibold'
-                    : 'text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03]'
-                }`}
-              >
-                Regulations
-              </Link>
-              <Link 
-                href="/compliance-check" 
-                className={`px-3 py-1.5 rounded-[6px] font-medium transition-all ${
-                  pathname.startsWith('/compliance-check')
-                    ? 'text-white bg-[#151A22] border border-white/[0.12] font-semibold'
-                    : 'text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03]'
-                }`}
-              >
-                Simulator
-              </Link>
-              <Link 
-                href="/dashboard?tab=actions_24_7" 
-                className="px-3 py-1.5 rounded-[6px] font-medium text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03] transition-all"
-              >
-                24/7 Actions
-              </Link>
-
-              {isSuperAdmin && (
-                <Link 
-                  href="/dashboard?tab=swarm" 
-                  className="px-3 py-1.5 rounded-[6px] font-medium text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03] transition-all flex items-center gap-1.5"
-                >
-                  <span>Swarm</span>
-                  <span className="px-1 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
-                    ADMIN
-                  </span>
-                </Link>
-              )}
-
-              <Link 
-                href="/dashboard?tab=policies" 
-                className="px-3 py-1.5 rounded-[6px] font-medium text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03] transition-all"
-              >
-                Policies
-              </Link>
-              <Link 
                 href="/billing" 
                 className={`px-3 py-1.5 rounded-[6px] font-medium transition-all ${
                   pathname.startsWith('/billing')
@@ -366,27 +311,6 @@ export function TopNav() {
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-white/[0.08] bg-[#090B0E]/98 backdrop-blur-xl px-4 py-3 space-y-1.5 text-xs font-medium text-[#8B949E]">
           <Show when="signed-in">
-            <Link 
-              href="/dashboard" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F1F5F9]"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              href="/regulations" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F1F5F9]"
-            >
-              Regulations
-            </Link>
-            <Link 
-              href="/compliance-check" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F1F5F9]"
-            >
-              Simulator
-            </Link>
             <Link 
               href="/billing" 
               onClick={() => setMobileMenuOpen(false)}
