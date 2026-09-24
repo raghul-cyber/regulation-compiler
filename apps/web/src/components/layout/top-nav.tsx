@@ -305,16 +305,6 @@ export function TopNav() {
               >
                 Billing
               </Link>
-              <Link 
-                href="/settings" 
-                className={`px-3 py-1.5 rounded-[6px] font-medium transition-all ${
-                  pathname.startsWith('/settings')
-                    ? 'text-white bg-[#151A22] border border-white/[0.12] font-semibold'
-                    : 'text-[#8B949E] hover:text-[#F1F5F9] hover:bg-white/[0.03]'
-                }`}
-              >
-                Settings
-              </Link>
 
               {isSuperAdmin && (
                 <Link 
@@ -403,13 +393,6 @@ export function TopNav() {
               className="block py-2 hover:text-[#F1F5F9]"
             >
               Billing
-            </Link>
-            <Link 
-              href="/settings" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F1F5F9]"
-            >
-              Settings
             </Link>
             {isSuperAdmin && (
               <Link 
