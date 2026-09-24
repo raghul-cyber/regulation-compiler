@@ -23,11 +23,19 @@ async function RegulationsDataLoader() {
 export default function RegulationsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-1 font-mono text-[9px] tracking-widest text-zinc-500 uppercase">
+            <span className="text-[#00F0FF]">+</span>
+            <span>DIRECTORY: CANONICAL STATUTES</span>
+            <span className="text-zinc-600">/</span>
+            <span>ENFORCEABLE CONTROLS</span>
+            <span className="text-[#00F0FF]">+</span>
+          </div>
+          <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Canonical Regulations</h1>
-            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full">
+            <span className="stitch-badge stitch-badge-emerald">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Live & Verified
             </span>
           </div>
@@ -35,9 +43,9 @@ export default function RegulationsPage() {
             Browse official statutory frameworks, enforceable controls, and AI-compiled requirements.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 font-mono text-xs">
           <Link href="/dashboard">
-            <Button variant="outline" size="sm" className="border-zinc-800 text-zinc-300 hover:text-white text-xs">
+            <Button variant="outline" size="sm" className="border-white/[0.12] bg-[#080D14]/80 text-zinc-300 hover:text-[#00F0FF] hover:border-[#00F0FF]/40 text-xs transition-all">
               Return to Hub
             </Button>
           </Link>

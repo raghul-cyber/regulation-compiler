@@ -74,40 +74,66 @@ export default function DashboardPage() {
   }, [isAdmin, activeTab]);
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Compliance Hub</h1>
-        <p className="mt-1 text-zinc-500">
-          Manage policies, evaluate compliance, and track remediation.
-        </p>
+    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
+      {/* Tactical Header with Stitch Telemetry */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5 font-mono text-[9px] tracking-widest text-zinc-500 uppercase">
+            <span className="text-[#00F0FF]">+</span>
+            <span>STATUTORY MISSION CONTROL</span>
+            <span className="text-zinc-600">/</span>
+            <span>NODE-SURVEILLANCE-01</span>
+            <span className="text-[#00F0FF]">+</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <span>Compliance Hub</span>
+            <span className="stitch-badge stitch-badge-cyan text-[10px] hidden sm:inline-flex">
+              Deterministic AST
+            </span>
+          </h1>
+          <p className="mt-1 text-sm text-zinc-400">
+            Autonomous statutory compilation, continuous surveillance telemetry, and algorithmic gap remediation.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 font-mono text-xs">
+          <div className="stitch-badge stitch-badge-emerald">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>10 Authorities Live</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex gap-2 border-b border-zinc-800 pb-px overflow-x-auto">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-              activeTab === tab.id
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
-            }`}
-          >
-            {tab.label}
-            {'isNew' in tab && tab.isNew && (
-              <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                <Sparkles className="w-2.5 h-2.5 text-blue-400" />
-                New
-              </span>
-            )}
-            {'adminOnly' in tab && tab.adminOnly && (
-              <span className="ml-1 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                <ShieldAlert className="w-2.5 h-2.5" />
-                Admin
-              </span>
-            )}
-          </button>
-        ))}
+      {/* Elevated Stitch Command Tabs */}
+      <div className="flex gap-1.5 p-1.5 rounded-2xl bg-[#080D14]/85 backdrop-blur-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.4)] overflow-x-auto scrollbar-none">
+        {tabs.map(tab => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-3.5 py-2 text-xs font-mono rounded-xl whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                isActive
+                  ? 'bg-gradient-to-r from-[#00F0FF]/15 to-[#3B82F6]/15 border border-[#00F0FF]/40 text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.15)] font-semibold'
+                  : 'border border-transparent text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <span>{tab.label}</span>
+              {'isNew' in tab && tab.isNew && (
+                <span className="ml-1 stitch-badge stitch-badge-cyan text-[9px] py-0 px-1.5">
+                  <Sparkles className="w-2.5 h-2.5 text-[#00F0FF]" />
+                  NEW
+                </span>
+              )}
+              {'adminOnly' in tab && tab.adminOnly && (
+                <span className="ml-1 stitch-badge stitch-badge-amber text-[9px] py-0 px-1.5">
+                  <ShieldAlert className="w-2.5 h-2.5" />
+                  ADMIN
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div className="pt-4">

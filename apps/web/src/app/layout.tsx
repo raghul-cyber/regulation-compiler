@@ -6,6 +6,7 @@ import { TopNav } from "@/components/layout/top-nav";
 import { Footer } from "@/components/layout/footer";
 import { PageContainer } from "@/components/layout/page-container";
 import { ConsoleGuard } from "@/components/common/console-guard";
+import { AmbientBackground } from "@/components/layout/ambient-background";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,14 +82,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
         style={{ colorScheme: 'dark' }}
       >
-        <body className="min-h-full flex flex-col bg-[#0a0a0c] text-gray-100">
+        <body className="min-h-full flex flex-col bg-[#03070C] text-gray-100 relative selection:bg-[#00F0FF]/20 selection:text-[#00F0FF]">
+          <AmbientBackground />
           <IntraAppToastProvider>
             <ConsoleGuard />
             <Suspense fallback={null}>
               <EntitlementGuard />
             </Suspense>
             <TopNav />
-            <main className="flex-1 w-full py-8">
+            <main className="flex-1 w-full py-8 relative z-10">
               <PageContainer>
                 {children}
               </PageContainer>

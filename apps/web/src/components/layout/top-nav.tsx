@@ -212,50 +212,91 @@ export function TopNav() {
   // 2. STANDARD APPLICATION NAVIGATION (Dashboard, Regulations, Admin, etc.)
   // =========================================================================
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-[#0a0a0c]/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#080D14]/85 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
       <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-6 lg:px-8 flex h-16 items-center justify-between">
-        {/* Left: Logo/Wordmark */}
+        {/* Left: Logo/Wordmark & Telemetry */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center p-0.5 bg-zinc-900/90 border border-zinc-800 group-hover:border-blue-500/50 transition-colors shadow-sm shadow-blue-500/10 shrink-0">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center p-1 bg-[#0E1520] border border-white/[0.12] group-hover:border-[#00F0FF]/50 transition-all shadow-[0_0_15px_rgba(0,240,255,0.1)] shrink-0">
               <Image
                 src="/logo-icon.png"
                 alt="RegCompiler Logo"
-                width={32}
-                height={32}
+                width={28}
+                height={28}
                 className="w-full h-full object-contain"
                 priority
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors leading-tight">
+              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#00F0FF] transition-colors leading-tight">
                 RegCompiler
               </span>
-              <span className="text-[10px] text-zinc-500 font-medium tracking-wide uppercase leading-none hidden sm:inline-block">
-                Regulation as Code
+              <span className="text-[9px] text-[#9AA9B5] font-mono font-medium tracking-widest uppercase leading-none hidden sm:inline-block">
+                STATUTORY COMPILER
               </span>
             </div>
           </Link>
 
+          {/* Live Surveillance Status Telemetry */}
+          <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-mono text-[10px] tracking-wider font-semibold">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>SURVEILLANCE: ACTIVE • 10 AUTHORITIES</span>
+          </div>
+
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-1.5 text-xs font-mono">
             <Show when="signed-in">
-              <Link href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">
+              <Link 
+                href="/dashboard" 
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  pathname.startsWith('/dashboard')
+                    ? 'text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 font-semibold shadow-[0_0_12px_rgba(0,240,255,0.15)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                }`}
+              >
                 Dashboard
               </Link>
-              <Link href="/regulations" className="text-zinc-400 hover:text-white transition-colors">
+              <Link 
+                href="/regulations" 
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  pathname.startsWith('/regulations') && !pathname.includes('/new')
+                    ? 'text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 font-semibold shadow-[0_0_12px_rgba(0,240,255,0.15)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                }`}
+              >
                 Regulations
               </Link>
-              <Link href="/compliance-check" className="text-zinc-400 hover:text-white transition-colors">
-                Compliance
+              <Link 
+                href="/compliance-check" 
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  pathname.startsWith('/compliance-check')
+                    ? 'text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 font-semibold shadow-[0_0_12px_rgba(0,240,255,0.15)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                }`}
+              >
+                Simulator
               </Link>
-              <Link href="/billing" className="text-zinc-400 hover:text-white transition-colors">
-                Billing
+              <Link 
+                href="/billing" 
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  pathname.startsWith('/billing')
+                    ? 'text-[#00F0FF] bg-[#00F0FF]/10 border border-[#00F0FF]/30 font-semibold shadow-[0_0_12px_rgba(0,240,255,0.15)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                }`}
+              >
+                Entitlements
               </Link>
               {isSuperAdmin && (
                 <Link
                   href="/admin"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 hover:text-amber-300 hover:bg-amber-500/25 text-xs font-semibold tracking-wide transition-all shadow-sm shadow-amber-500/20"
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                    pathname.startsWith('/admin')
+                      ? 'bg-amber-500/25 border border-amber-500/50 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                      : 'bg-amber-500/15 border border-amber-500/30 text-amber-400 hover:text-amber-300 hover:bg-amber-500/25'
+                  }`}
                   title="Super-Admin Control Panel"
                 >
                   <ShieldAlert className="w-3.5 h-3.5" />
@@ -264,32 +305,32 @@ export function TopNav() {
               )}
               <Link
                 href="/regulations/new"
-                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-2"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#00F0FF]/15 to-[#3B82F6]/15 hover:from-[#00F0FF]/25 hover:to-[#3B82F6]/25 border border-[#00F0FF]/35 text-[#00F0FF] text-xs font-semibold rounded-lg shadow-[0_0_15px_rgba(0,240,255,0.15)] transition-all ml-2"
               >
-                <UploadCloud className="w-4 h-4" />
-                Upload
+                <UploadCloud className="w-3.5 h-3.5" />
+                <span>Upload</span>
               </Link>
             </Show>
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                <button className="px-3 py-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/[0.05]">
                   Dashboard
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/regulations" signUpFallbackRedirectUrl="/regulations">
-                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
+                <button className="px-3 py-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/[0.05]">
                   Regulations
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check" signUpFallbackRedirectUrl="/compliance-check">
-                <button className="text-zinc-400 hover:text-white transition-colors cursor-pointer">
-                  Compliance
+                <button className="px-3 py-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/[0.05]">
+                  Simulator
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/regulations/new" signUpFallbackRedirectUrl="/regulations/new">
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors ml-4 cursor-pointer">
-                  <UploadCloud className="w-4 h-4" />
-                  Upload
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#00F0FF]/15 to-[#3B82F6]/15 hover:from-[#00F0FF]/25 hover:to-[#3B82F6]/25 border border-[#00F0FF]/35 text-[#00F0FF] text-xs font-semibold rounded-lg shadow-[0_0_15px_rgba(0,240,255,0.15)] transition-all ml-4 cursor-pointer">
+                  <UploadCloud className="w-3.5 h-3.5" />
+                  <span>Upload</span>
                 </button>
               </SignInButton>
             </Show>
@@ -304,7 +345,7 @@ export function TopNav() {
           <NavAuth />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+            className="md:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -314,41 +355,41 @@ export function TopNav() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-zinc-800 bg-[#0a0a0c] px-4 py-4 space-y-3">
+        <div className="md:hidden border-t border-white/[0.08] bg-[#080D14]/95 backdrop-blur-2xl px-4 py-4 space-y-2 font-mono text-xs shadow-2xl">
           <Show when="signed-in">
             <Link
               href="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
+              className="block py-2 px-3 rounded-lg text-zinc-300 hover:text-[#00F0FF] hover:bg-white/[0.05] transition-colors"
             >
               Dashboard
             </Link>
             <Link
               href="/regulations"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
+              className="block py-2 px-3 rounded-lg text-zinc-300 hover:text-[#00F0FF] hover:bg-white/[0.05] transition-colors"
             >
               Regulations
             </Link>
             <Link
               href="/compliance-check"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
+              className="block py-2 px-3 rounded-lg text-zinc-300 hover:text-[#00F0FF] hover:bg-white/[0.05] transition-colors"
             >
-              Compliance
+              Simulator
             </Link>
             <Link
               href="/billing"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-zinc-300 hover:text-white text-sm font-medium"
+              className="block py-2 px-3 rounded-lg text-zinc-300 hover:text-[#00F0FF] hover:bg-white/[0.05] transition-colors"
             >
-              Billing
+              Entitlements
             </Link>
             {isSuperAdmin && (
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 py-2 text-amber-400 hover:text-amber-300 text-sm font-semibold"
+                className="flex items-center gap-2 py-2 px-3 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 font-semibold"
               >
                 <ShieldAlert className="w-4 h-4" />
                 <span>Super-Admin Panel</span>
@@ -357,7 +398,7 @@ export function TopNav() {
             <Link
               href="/regulations/new"
               onClick={() => setMobileMenuOpen(false)}
-              className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md w-full justify-center mt-2"
+              className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#00F0FF]/20 to-[#3B82F6]/20 border border-[#00F0FF]/40 text-[#00F0FF] font-semibold rounded-lg w-full justify-center mt-2 shadow-[0_0_15px_rgba(0,240,255,0.15)]"
             >
               <UploadCloud className="w-4 h-4" />
               Upload Regulation
@@ -367,7 +408,7 @@ export function TopNav() {
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-left py-2 text-zinc-300 hover:text-white text-sm font-medium cursor-pointer"
+                className="w-full text-left py-2 px-3 rounded-lg text-zinc-300 hover:text-white hover:bg-white/[0.05] cursor-pointer"
               >
                 Dashboard
               </button>
@@ -375,7 +416,7 @@ export function TopNav() {
             <SignInButton mode="modal" fallbackRedirectUrl="/regulations">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-left py-2 text-zinc-300 hover:text-white text-sm font-medium cursor-pointer"
+                className="w-full text-left py-2 px-3 rounded-lg text-zinc-300 hover:text-white hover:bg-white/[0.05] cursor-pointer"
               >
                 Regulations
               </button>
@@ -383,15 +424,15 @@ export function TopNav() {
             <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-left py-2 text-zinc-300 hover:text-white text-sm font-medium cursor-pointer"
+                className="w-full text-left py-2 px-3 rounded-lg text-zinc-300 hover:text-white hover:bg-white/[0.05] cursor-pointer"
               >
-                Compliance
+                Simulator
               </button>
             </SignInButton>
             <SignInButton mode="modal" fallbackRedirectUrl="/regulations/new">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md w-full justify-center mt-2 cursor-pointer"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#00F0FF]/20 to-[#3B82F6]/20 border border-[#00F0FF]/40 text-[#00F0FF] font-semibold rounded-lg w-full justify-center mt-2 cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
               >
                 <UploadCloud className="w-4 h-4" />
                 Upload Regulation
