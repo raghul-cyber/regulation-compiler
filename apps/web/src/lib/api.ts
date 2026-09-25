@@ -15,7 +15,7 @@ async function getAuthToken() {
   return null;
 }
 
-async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = await getAuthToken();
 
   const headers: Record<string, string> = {
@@ -32,7 +32,7 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
       cache: 'no-store',
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(8000),
       ...options,
       headers: {
         ...headers,
@@ -85,7 +85,23 @@ export async function getRequirements(regulationId: string, searchParams?: Recor
     });
   }
   const queryString = query.toString() ? `?${query.toString()}` : '';
-  return fetchWithAuth(`/regulations/${regulationId}/requirements${queryString}`);
+  const res = await fetchWithAuth(`/regulations/${regulationId}/requirements${queryString}`);
+  if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+    return res;
+  }
+
+  // Fallback to direct signal endpoints
+  const sigRes = await fetchWithAuth(`/signals/${regulationId}/requirements${queryString}`);
+  if (sigRes?.data && Array.isArray(sigRes.data) && sigRes.data.length > 0) {
+    return sigRes;
+  }
+
+  const compRes = await fetchWithAuth(`/compliance/signals/${regulationId}/requirements${queryString}`);
+  if (compRes?.data && Array.isArray(compRes.data) && compRes.data.length > 0) {
+    return compRes;
+  }
+
+  return res || sigRes || compRes || { data: [], next_cursor: null };
 }
 
 export async function updateRequirementStatus(requirementId: string, status: string, note?: string) {

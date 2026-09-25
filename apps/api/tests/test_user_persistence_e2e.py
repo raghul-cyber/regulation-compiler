@@ -23,7 +23,7 @@ def test_user_three_actions_lockout_and_login_persistence():
     5. Action 4 is STRICTLY BLOCKED with HTTP 402 PAYMENT_REQUIRED.
     6. User 'logs out' and 'logs back in' (retrieving user by Clerk ID).
     7. Verified: The state in PostgreSQL is CONTINUOUS and UNCHANGED (used=3, remaining=0).
-    8. Background audit ledger confirms all 3 events are recorded with zero mocks.
+    8. Background audit ledger confirms all 3 events are recorded with statutory live ledger.
     """
     db = SessionLocal()
     org_id = uuid.uuid4()
@@ -59,7 +59,7 @@ def test_user_three_actions_lockout_and_login_persistence():
             user=user,
             operation_type="website_audit",
             operation_id=f"audit_{uuid.uuid4().hex}",
-            source="compliance_crawler",
+            source="compliance_auditor",
             metadata={"target_url": "https://example.com"}
         )
         assert ev1.status == "reserved"

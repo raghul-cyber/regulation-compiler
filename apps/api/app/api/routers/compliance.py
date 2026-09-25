@@ -1,4 +1,6 @@
 import uuid
+import logging
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
@@ -13,6 +15,8 @@ from app.models.audit import AuditLog
 from app.services.compliance import evaluate_policy_compliance, remediate_violation
 from app.core.limiter import limiter
 from app.core.cache import ResponseCache
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Compliance"])
 
@@ -638,6 +642,7 @@ def get_monitoring_feed(
 
         for log in audit_logs:
             created_ts = log.created_at.isoformat() if hasattr(log, "created_at") and log.created_at else now.isoformat()
+            reg_id = str(log.entity_id) if log.entity_type == "Regulation" and log.entity_id else None
             events.append({
                 "id": f"audit-{log.id}",
                 "jurisdiction": "GLOBAL",
@@ -648,7 +653,8 @@ def get_monitoring_feed(
                 "timestamp": created_ts,
                 "authority": "Internal Security Audit Daemon",
                 "source_url": "#",
-                "is_extracted": False
+                "regulation_id": reg_id,
+                "is_extracted": bool(reg_id)
             })
     except Exception as audit_err:
         import logging
@@ -660,6 +666,13 @@ def get_monitoring_feed(
         for chk in checks:
             res = chk.result.value if hasattr(chk.result, 'value') else str(chk.result)
             chk_ts = chk.created_at.isoformat() if hasattr(chk, "created_at") and chk.created_at else now.isoformat()
+            reg_id = None
+            if chk.policy_id:
+                pol = db.query(Policy).filter(Policy.id == chk.policy_id).first()
+                if pol and pol.regulation_version_id:
+                    ver = db.query(RegulationVersion).filter(RegulationVersion.id == pol.regulation_version_id).first()
+                    if ver:
+                        reg_id = str(ver.regulation_id)
             events.append({
                 "id": f"chk-{chk.id}",
                 "jurisdiction": "EU" if "eu" in str(chk.id).lower() else "US",
@@ -670,13 +683,14 @@ def get_monitoring_feed(
                 "timestamp": chk_ts,
                 "authority": "Automated Rule Evaluator",
                 "source_url": "#",
-                "is_extracted": False
+                "regulation_id": reg_id,
+                "is_extracted": bool(reg_id)
             })
     except Exception as chk_err:
         import logging
         logging.getLogger(__name__).warning(f"ComplianceCheck query notice: {chk_err}")
 
-    # 3. Authentic 24/7 Scraped Regulatory Signals from PostgreSQL (Zero Mocks, Non-blocking)
+    # 3. Authentic 24/7 Scraped Regulatory Signals from PostgreSQL (Statutory Verification, Non-blocking)
     try:
         live_signals = db.query(LiveRegulatorySignal).order_by(desc(LiveRegulatorySignal.published_at)).limit(limit).all()
         
@@ -733,6 +747,15 @@ def get_monitoring_feed(
     }
     ResponseCache.set(cache_key, feed_response, ttl_seconds=1)
     return feed_response
+
+
+@router.get("/compliance/signals/{signal_id}/requirements")
+def get_signal_requirements(
+    signal_id: str,
+    db: Session = Depends(get_db)
+):
+    from app.api.routers.requirements import list_requirements
+    return list_requirements(regulation_id=signal_id, db=db)
 
 
 @router.get("/compliance/monitoring/stream")

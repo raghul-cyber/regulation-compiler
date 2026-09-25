@@ -1,5 +1,5 @@
 # https://www.robotstxt.org/robotstxt.html
-# RegCompiler Statutory Intelligence Search Crawler Rules
+# RegCompiler Statutory Intelligence Search Index Directives
 
 User-agent: *
 Allow: /

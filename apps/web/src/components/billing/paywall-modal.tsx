@@ -151,7 +151,7 @@ export function PaywallModal({
         <div className="space-y-2.5 py-1 border-y border-zinc-800/80">
           <div className="flex items-start gap-2.5 text-xs text-zinc-300">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span><b>Unlimited Website Audits:</b> Full autonomous crawling across GDPR, HIPAA, SOC 2, WCAG 2.1 AA, and PCI-DSS.</span>
+            <span><b>Unlimited Website Audits:</b> Full autonomous inspection across GDPR, HIPAA, SOC 2, WCAG 2.1 AA, and PCI-DSS.</span>
           </div>
           <div className="flex items-start gap-2.5 text-xs text-zinc-300">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />

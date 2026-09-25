@@ -277,11 +277,11 @@ export function Actions247View() {
                 </h2>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {daemonStatus?.daemon_status === 'ACTIVE' ? 'CONTINUOUS CRAWLER ONLINE' : 'AUTONOMOUS WORKER READY'}
+                  {daemonStatus?.daemon_status === 'ACTIVE' ? 'CONTINUOUS SURVEILLANCE ONLINE' : 'AUTONOMOUS WORKER READY'}
                 </span>
               </div>
               <p className="mt-1 text-sm text-zinc-400 max-w-2xl">
-                Real-time statutory surveillance crawler and continuous autonomous AST execution ledger. Automatically ingesting, verifying, and reconciling global gazettes without interruption.
+                Real-time statutory surveillance engine and continuous autonomous AST execution ledger. Automatically ingesting, verifying, and reconciling global gazettes without interruption.
               </p>
             </div>
           </div>
@@ -511,7 +511,7 @@ export function Actions247View() {
               Live 24/7 Actions Stream & Execution Ledger
             </h3>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Audited historical record of every continuous crawl, statutory probe, rule compilation, and policy reconciliation.
+              Audited historical record of every continuous surveillance cycle, statutory probe, rule compilation, and policy reconciliation.
             </p>
           </div>
 

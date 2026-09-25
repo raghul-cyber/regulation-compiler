@@ -100,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 2. Canonical Statutory Regulation Detail Pages (Zero Mocks, 100% Matching GSC Domain)
+  // 2. Canonical Statutory Regulation Detail Pages (100% Matching GSC Domain)
   const regulationRoutes: MetadataRoute.Sitemap = cleanRegulations.flatMap((reg) => {
     const regDate = reg.created_at ? new Date(reg.created_at).toISOString() : now;
     return [

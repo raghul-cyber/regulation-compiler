@@ -435,6 +435,9 @@ class LiveRegulatoryScraperService:
                     sig_id = f"fca-{link_hash}"
                     
                     lower = (title + " " + desc_clean).lower()
+                    if any(skip_word in lower for skip_word in ["infographics", "video", "images", "news stories", "search"]):
+                        continue
+
                     if "fine" in lower or "ban" in lower or "fraud" in lower or "enforcement" in lower:
                         sev = "critical"
                     elif "rule" in lower or "regulation" in lower or "policy" in lower:
@@ -638,16 +641,29 @@ class LiveRegulatoryScraperService:
                         "operator": "AND",
                         "rules": [{"field": f"{target_signal.jurisdiction.lower()}.statutory_compliance", "operator": "EQUALS", "value": True}]
                     })
+                    req_type_str = er.get("type", "obligation").lower()
+                    req_type_enum = (
+                        RequirementTypeEnum.prohibition if req_type_str == "prohibition" 
+                        else RequirementTypeEnum.permission if req_type_str == "permission" 
+                        else RequirementTypeEnum.obligation
+                    )
+                    sev_str = er.get("severity", target_signal.severity or "high").lower()
+                    sev_enum = (
+                        SeverityEnum.critical if sev_str == "critical" 
+                        else SeverityEnum.medium if sev_str == "medium" 
+                        else SeverityEnum.low if sev_str == "low" 
+                        else SeverityEnum.high
+                    )
                     new_req = Requirement(
                         regulation_version_id=version.id,
                         section_id=sec.id,
-                        type=RequirementTypeEnum.obligation,
+                        type=req_type_enum,
                         title=t[:255],
                         description=d,
                         conditions=ast_cond,
-                        actions={"action": "VERIFY_STATUTORY_CONTROL", "authority": target_signal.authority},
-                        severity=SeverityEnum.critical if target_signal.severity == "critical" else SeverityEnum.high,
-                        evidence_required={"type": "AUDIT_LOG_EVIDENCE", "enforced": True},
+                        actions=er.get("actions", {"action": "VERIFY_STATUTORY_CONTROL", "authority": target_signal.authority}),
+                        severity=sev_enum,
+                        evidence_required={"type": "AUDIT_LOG_EVIDENCE", "enforced": True, "tamper_evident": True},
                         references={"citation": target_signal.citation or target_signal.signal_id, "url": target_signal.source_url},
                         confidence_score=0.98,
                         validation_status=ValidationStatusEnum.approved
@@ -696,7 +712,23 @@ class LiveRegulatoryScraperService:
                 sec = None
                 if src_doc_id:
                     sec = db.query(DocumentSection).filter(DocumentSection.source_document_id == src_doc_id).first()
-                if not sec and src_doc_id:
+                if not sec:
+                    if not src_doc_id:
+                        new_doc = SourceDocument(
+                            file_type=FileTypeEnum.html,
+                            storage_path=f"live_feed/{target_signal.signal_id}.html",
+                            raw_text=target_signal.raw_content or target_signal.summary or target_signal.title,
+                            ocr_used=False,
+                            page_count=1,
+                            regulation_version_id=cur_ver.id if cur_ver else None
+                        )
+                        db.add(new_doc)
+                        db.flush()
+                        src_doc_id = new_doc.id
+                        if cur_ver:
+                            cur_ver.source_document_id = src_doc_id
+                            db.flush()
+
                     sec = DocumentSection(
                         source_document_id=src_doc_id,
                         reference_label="Article 1",
@@ -706,35 +738,47 @@ class LiveRegulatoryScraperService:
                     db.add(sec)
                     db.flush()
 
-                if sec:
-                    raw_txt = target_signal.raw_content or target_signal.summary or target_signal.title
-                    extracted_rules = SemanticEngine.extract_requirements(raw_txt)
-                    for er in extracted_rules:
-                        t = er.get("title", f"Mandatory Requirement: {target_signal.citation or target_signal.jurisdiction}")
-                        d = er.get("description", raw_txt)
-                        ast_cond = er.get("conditions", {
-                            "operator": "AND",
-                            "rules": [{"field": f"{target_signal.jurisdiction.lower()}.statutory_compliance", "operator": "EQUALS", "value": True}]
-                        })
-                        new_req = Requirement(
-                            regulation_version_id=reg.current_version_id,
-                            section_id=sec.id,
-                            type=RequirementTypeEnum.obligation,
-                            title=t[:255],
-                            description=d,
-                            conditions=ast_cond,
-                            actions={"action": "VERIFY_STATUTORY_CONTROL", "authority": target_signal.authority},
-                            severity=SeverityEnum.critical if target_signal.severity == "critical" else SeverityEnum.high,
-                            evidence_required={"type": "AUDIT_LOG_EVIDENCE", "enforced": True},
-                            references={"citation": target_signal.citation or target_signal.signal_id, "url": target_signal.source_url},
-                            confidence_score=0.98,
-                            validation_status=ValidationStatusEnum.approved
-                        )
-                        db.add(new_req)
-                    db.flush()
-                    req_count = db.query(Requirement).filter(
-                        Requirement.regulation_version_id == reg.current_version_id
-                    ).count()
+                raw_txt = target_signal.raw_content or target_signal.summary or target_signal.title
+                extracted_rules = SemanticEngine.extract_requirements(raw_txt)
+                for er in extracted_rules:
+                    t = er.get("title", f"Mandatory Requirement: {target_signal.citation or target_signal.jurisdiction}")
+                    d = er.get("description", raw_txt)
+                    ast_cond = er.get("conditions", {
+                        "operator": "AND",
+                        "rules": [{"field": f"{target_signal.jurisdiction.lower()}.statutory_compliance", "operator": "EQUALS", "value": True}]
+                    })
+                    req_type_str = er.get("type", "obligation").lower()
+                    req_type_enum = (
+                        RequirementTypeEnum.prohibition if req_type_str == "prohibition" 
+                        else RequirementTypeEnum.permission if req_type_str == "permission" 
+                        else RequirementTypeEnum.obligation
+                    )
+                    sev_str = er.get("severity", target_signal.severity or "high").lower()
+                    sev_enum = (
+                        SeverityEnum.critical if sev_str == "critical" 
+                        else SeverityEnum.medium if sev_str == "medium" 
+                        else SeverityEnum.low if sev_str == "low" 
+                        else SeverityEnum.high
+                    )
+                    new_req = Requirement(
+                        regulation_version_id=reg.current_version_id,
+                        section_id=sec.id,
+                        type=req_type_enum,
+                        title=t[:255],
+                        description=d,
+                        conditions=ast_cond,
+                        actions=er.get("actions", {"action": "VERIFY_STATUTORY_CONTROL", "authority": target_signal.authority}),
+                        severity=sev_enum,
+                        evidence_required={"type": "AUDIT_LOG_EVIDENCE", "enforced": True, "tamper_evident": True},
+                        references={"citation": target_signal.citation or target_signal.signal_id, "url": target_signal.source_url},
+                        confidence_score=0.98,
+                        validation_status=ValidationStatusEnum.approved
+                    )
+                    db.add(new_req)
+                db.flush()
+                req_count = db.query(Requirement).filter(
+                    Requirement.regulation_version_id == reg.current_version_id
+                ).count()
 
             target_signal.extracted_requirements_count = max(1, req_count)
             db.commit()
@@ -862,7 +906,13 @@ class LiveRegulatoryScraperService:
                         existing.summary = sig_data["summary"]
 
                 # Automatically extract any unextracted signals into regulations & AST rules
-                if (not target_signal.is_extracted or not target_signal.regulation_id) and extracted_count < max_extractions_per_run and target_signal.raw_content:
+                needs_extract = (
+                    not target_signal.is_extracted or 
+                    not target_signal.regulation_id or 
+                    not target_signal.extracted_requirements_count or 
+                    target_signal.extracted_requirements_count == 0
+                )
+                if needs_extract and extracted_count < max_extractions_per_run:
                     extracted_count += 1
                     if run_async_extraction:
                         threading.Thread(

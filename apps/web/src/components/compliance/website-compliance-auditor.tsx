@@ -230,7 +230,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       `[HANDSHAKE] Negotiating TLS/HTTPS transport and querying cipher suite...`,
       `[SECURITY-HEADERS] Analyzing Strict-Transport-Security, CSP, X-Frame-Options, MIME protection...`,
       `[COOKIE-PROBE] Evaluating Set-Cookie headers for Secure, HttpOnly, and SameSite flags...`,
-      `[PRIVACY-DETECT] Crawling DOM for ePrivacy cookie consent banners & GDPR Art. 13 notices...`,
+      `[PRIVACY-DETECT] Inspecting DOM for ePrivacy cookie consent banners & GDPR Art. 13 notices...`,
       `[WCAG-SCAN] Checking HTML lang, page title, viewport scalability, and image alt attributes...`,
       `[STATUTORY-CHECK] Querying RFC 9116 security.txt, robots.txt, and server fingerprint...`,
       `[SUPPLY-CHAIN] Identifying third-party CDNs and verifying Subresource Integrity (SRI)...`,
@@ -457,7 +457,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             </h2>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              LIVE PROBE AGENT • ZERO MOCKS
+              LIVE PROBE AGENT • STATUTORY AUDIT
             </span>
 
             {/* Authoritative Usage Entitlement Pill */}
@@ -623,12 +623,12 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               {isAuditing ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-cyan-200" />
-                  <span>Crawling Website...</span>
+                  <span>Auditing Your Site...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 text-cyan-300" />
-                  <span>Deploy Audit Agent</span>
+                  <span>Audit Your Site</span>
                 </>
               )}
             </Button>

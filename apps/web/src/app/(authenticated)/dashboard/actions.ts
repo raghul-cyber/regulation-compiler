@@ -253,9 +253,9 @@ function getFallbackFeed() {
       authority: "European AI Office & European Parliament",
       citation: "OJ L, 2026/894 (Art. 9, 14, 15)",
       source_url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689",
-      regulation_id: "e50c766e-9a1b-4b2c-8d3e-4f5a6b7c8d9e",
+      regulation_id: "6dd9a705-c0ac-4117-bb38-8c3a1c607874",
       is_extracted: true,
-      extracted_requirements_count: 14,
+      extracted_requirements_count: 85,
       is_live_scraped: true
     },
     {
@@ -269,9 +269,9 @@ function getFallbackFeed() {
       authority: "Securities and Exchange Commission (SEC)",
       citation: "17 CFR Parts 229, 232, 239, 240, 249",
       source_url: "https://www.sec.gov/rules/final/2023/33-11216.pdf",
-      regulation_id: "a72e988a-1c3d-6d4e-0f5a-6b7c8d9e0f1a",
+      regulation_id: "1d618bb3-78e2-418b-992c-562096645973",
       is_extracted: true,
-      extracted_requirements_count: 8,
+      extracted_requirements_count: 78,
       is_live_scraped: true
     },
     {
@@ -285,9 +285,9 @@ function getFallbackFeed() {
       authority: "Financial Conduct Authority (FCA)",
       citation: "FCA PS26/4 (PRIN 2A)",
       source_url: "https://www.fca.org.uk/publications/policy-statements/ps26-4",
-      regulation_id: "b83f099b-2d4e-7e5f-1a6b-7c8d9e0f1a2b",
+      regulation_id: "a6491f18-4e2d-40f4-9344-479e7c7055a0",
       is_extracted: true,
-      extracted_requirements_count: 12,
+      extracted_requirements_count: 99,
       is_live_scraped: true
     },
     {
@@ -301,9 +301,9 @@ function getFallbackFeed() {
       authority: "Monetary Authority of Singapore (MAS)",
       citation: "MAS Notice 655 / MAS Act Cap. 186",
       source_url: "https://www.mas.gov.sg/regulation/notices/notice-655",
-      regulation_id: "c94a100c-3e5f-8f6a-2b7c-8d9e0f1a2b3c",
+      regulation_id: "fab50b80-3f7d-4f18-b35d-7f3faeea780d",
       is_extracted: true,
-      extracted_requirements_count: 9,
+      extracted_requirements_count: 48,
       is_live_scraped: true
     },
     {
@@ -317,9 +317,9 @@ function getFallbackFeed() {
       authority: "PCI Security Standards Council (PCI SSC)",
       citation: "PCI DSS v4.0.1 (Req 6.4.3, 8.4.2)",
       source_url: "https://www.pcisecuritystandards.org/standards/pci_dss/",
-      regulation_id: "d05b211d-4f6a-9a7b-3c8d-9e0f1a2b3c4d",
+      regulation_id: "bcd8f192-8989-4004-b5c8-57b128f883bf",
       is_extracted: true,
-      extracted_requirements_count: 16,
+      extracted_requirements_count: 82,
       is_live_scraped: true
     }
   ];

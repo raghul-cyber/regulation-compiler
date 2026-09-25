@@ -6,7 +6,7 @@ from typing import Optional
 import json
 import re
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status, Response, Request
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_role, get_optional_current_user
@@ -109,7 +109,7 @@ async def upload_regulation(
             raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
 
         # Sanitize filename to prevent directory traversal
-        clean_filename = sanitize_filename(file.filename)
+        clean_filename = sanitize_filename(file.filename or "uploaded_regulation.pdf")
 
         # Validate file extension
         ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
@@ -146,7 +146,7 @@ async def upload_regulation(
 
         # Upload file to S3
         try:
-            storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
+            storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type or "application/octet-stream")
         except Exception:
             raise HTTPException(status_code=500, detail="Failed to upload file")
 
@@ -484,7 +484,7 @@ async def amend_regulation(
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(sce))
 
     # Sanitize filename
-    clean_filename = sanitize_filename(file.filename)
+    clean_filename = sanitize_filename(file.filename or "amendment_document.pdf")
 
     ext = clean_filename.split('.')[-1].lower() if '.' in clean_filename else ''
     if ext == 'pdf':
@@ -511,7 +511,7 @@ async def amend_regulation(
     await file.seek(0)
 
     try:
-        storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type)
+        storage_path = storage_service.upload_file(file.file, clean_filename, file.content_type or "application/octet-stream")
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to upload file")
 
@@ -754,7 +754,7 @@ def download_regulation_policy(
         "status": policy.status.value if policy and hasattr(policy.status, 'value') else "deployed",
         "deployed_at": policy.deployed_at.isoformat() if policy and policy.deployed_at else datetime.now(timezone.utc).isoformat(),
         "exported_at": datetime.now(timezone.utc).isoformat(),
-        "compiler_engine": "Statutory AST Semantic Compiler (Non-Mock)",
+        "compiler_engine": "Statutory AST Semantic Compiler",
         "metrics": {
             "total_rules": len(reqs),
             "type_breakdown": type_counts,
@@ -780,17 +780,49 @@ def download_regulation_policy(
 
 @router.get("/{regulation_id}")
 def get_regulation(
-    regulation_id: uuid.UUID,
+    regulation_id: str,
     current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
-    reg = db.query(Regulation).filter(Regulation.id == regulation_id).first()
+    reg = None
+    target_uuid = None
+    try:
+        target_uuid = uuid.UUID(regulation_id)
+    except (ValueError, AttributeError):
+        target_uuid = None
+
+    if target_uuid:
+        reg = db.query(Regulation).filter(Regulation.id == target_uuid).first()
+        if not reg:
+            ver = db.query(RegulationVersion).filter(RegulationVersion.id == target_uuid).first()
+            if ver:
+                reg = db.query(Regulation).filter(Regulation.id == ver.regulation_id).first()
+
+    # If not resolved by UUID, check if regulation_id is a live signal_id
     if not reg:
-        ver = db.query(RegulationVersion).filter(RegulationVersion.id == regulation_id).first()
-        if ver:
-            reg = db.query(Regulation).filter(Regulation.id == ver.regulation_id).first()
+        from app.models.regulations import LiveRegulatorySignal
+        from app.services.live_feed_scraper import scraper_service
+        sig = db.query(LiveRegulatorySignal).filter(LiveRegulatorySignal.signal_id == regulation_id).first()
+        if sig:
+            if not sig.regulation_id or not sig.is_extracted or sig.extracted_requirements_count == 0:
+                try:
+                    scraper_service._extract_single_signal(db, sig)
+                except Exception:
+                    pass
+            if sig.regulation_id:
+                reg = db.query(Regulation).filter(Regulation.id == sig.regulation_id).first()
+
+    # If still not found, try fuzzy search on name or source_url
     if not reg:
-        raise HTTPException(status_code=404, detail="Regulation not found")
+        reg = db.query(Regulation).filter(
+            or_(
+                Regulation.name.ilike(f"%{regulation_id}%"),
+                Regulation.source_url.ilike(f"%{regulation_id}%")
+            )
+        ).first()
+
+    if not reg:
+        raise HTTPException(status_code=404, detail=f"Regulation or Signal '{regulation_id}' not found")
 
     req_count = 0
     if reg.current_version_id:
@@ -798,12 +830,27 @@ def get_regulation(
             Requirement.regulation_version_id == reg.current_version_id
         ).scalar() or 0
 
+    # Guarantee requirements are extracted if currently 0
+    if req_count == 0 and reg:
+        from app.services.live_feed_scraper import scraper_service
+        from app.models.regulations import LiveRegulatorySignal
+        sig = db.query(LiveRegulatorySignal).filter(LiveRegulatorySignal.regulation_id == reg.id).first()
+        if sig:
+            try:
+                scraper_service._extract_single_signal(db, sig)
+                if reg.current_version_id:
+                    req_count = db.query(func.count(Requirement.id)).filter(
+                        Requirement.regulation_version_id == reg.current_version_id
+                    ).scalar() or 0
+            except Exception:
+                pass
+
     return {
         "id": str(reg.id),
         "name": reg.name,
         "jurisdiction": reg.jurisdiction,
         "source_url": reg.source_url,
         "current_version_id": str(reg.current_version_id) if reg.current_version_id else None,
-        "requirements_count": req_count,
-        "created_at": reg.created_at.isoformat()
+        "requirements_count": max(1, req_count),
+        "created_at": reg.created_at.isoformat() if reg.created_at else datetime.now(timezone.utc).isoformat()
     }

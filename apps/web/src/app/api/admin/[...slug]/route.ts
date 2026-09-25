@@ -533,7 +533,7 @@ async function handleProxyRequest(
       console.warn('Direct Clerk API fetch notice:', clerkErr);
     }
 
-    // 3. Resilient fallback with authentic registered users snapshot (STRICTLY ZERO MOCKS)
+    // 3. Resilient fallback with authentic registered users snapshot
     const fallbackPayload = buildAdminOverviewPayload(userEmail, AUTHENTIC_REGISTERED_USERS);
     fallbackPayload.is_resilient_fallback = true;
     return NextResponse.json(fallbackPayload, {

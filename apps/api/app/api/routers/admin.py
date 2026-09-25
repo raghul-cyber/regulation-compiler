@@ -104,7 +104,7 @@ def verify_super_admin(
 
 def fetch_live_clerk_users(force_refresh: bool = False) -> List[Dict[str, Any]]:
     """
-    Queries official Clerk REST API for all real registered users (Zero mocks).
+    Queries official Clerk REST API for all real registered users (Live statutory API).
     Employs ResponseCache with a 5-minute TTL to prevent high latency on repeat loads.
     """
     cache_key = "admin:clerk_users"

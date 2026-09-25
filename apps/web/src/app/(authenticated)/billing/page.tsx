@@ -372,7 +372,7 @@ export default function BillingPage() {
                 <td className="py-3.5 font-medium text-white">Automated Website Compliance Auditor</td>
                 <td className="py-3.5 font-mono text-zinc-400">Included in 3 uses</td>
                 <td className="py-3.5 font-mono text-[#00F0FF] font-bold">Unlimited Live Scans</td>
-                <td className="py-3.5 font-mono text-emerald-400 font-bold">Continuous Automated Crawl</td>
+                <td className="py-3.5 font-mono text-emerald-400 font-bold">Continuous Automated Surveillance</td>
               </tr>
               <tr className="hover:bg-[#00F0FF]/[0.02] transition-colors">
                 <td className="py-3.5 font-medium text-white">24/7 Global Gazette Surveillance</td>

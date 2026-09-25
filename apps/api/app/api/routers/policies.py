@@ -199,7 +199,7 @@ def download_policy(
         "status": policy.status.value if hasattr(policy.status, 'value') else "deployed",
         "deployed_at": policy.deployed_at.isoformat() if policy.deployed_at else datetime.now(timezone.utc).isoformat(),
         "exported_at": datetime.now(timezone.utc).isoformat(),
-        "compiler_engine": "Statutory AST Semantic Compiler (Non-Mock)",
+        "compiler_engine": "Statutory AST Semantic Compiler",
         "metrics": {
             "total_rules": len(reqs),
             "type_breakdown": type_counts,

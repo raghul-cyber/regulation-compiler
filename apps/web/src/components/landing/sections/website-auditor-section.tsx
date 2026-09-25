@@ -151,9 +151,9 @@ export function WebsiteAuditorSection() {
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-4xl mx-auto mb-14`}>
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-5">
           <RCIcon name="system-probe" size={14} className="text-[#3B82F6]" />
-          <span>Autonomous Regulatory Crawler</span>
+          <span>Autonomous Regulatory Auditor</span>
           <span className="text-[#475569]">•</span>
-          <span className="text-white font-bold">Zero Mocks</span>
+          <span className="text-white font-bold">Live Verification</span>
         </div>
 
         <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
@@ -161,7 +161,7 @@ export function WebsiteAuditorSection() {
         </h2>
 
         <p className="mt-5 text-base md:text-xl text-[#94A3B8] leading-relaxed max-w-3xl mx-auto">
-          Our autonomous crawler agent probes live transport protocols, defense headers, ePrivacy cookie banners, and WCAG accessibility against statutory regulations — compiling deterministic AST code fixes in real time.
+          Our autonomous auditor probes live transport protocols, defense headers, ePrivacy cookie banners, and WCAG accessibility against statutory regulations — compiling deterministic AST code fixes in real time.
         </p>
       </div>
 
@@ -232,7 +232,7 @@ export function WebsiteAuditorSection() {
                 </span>
                 <h4 className="text-xl font-bold text-white">Live Regulatory Inspection Dossier</h4>
                 <span className="px-2 py-0.5 text-[11px] font-mono font-semibold bg-[#2563EB]/15 text-[#93C5FD] border border-[#2563EB]/30 rounded">
-                  Zero Mocks Verified
+                  Statutory Verified
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-[#94A3B8] mt-1">

@@ -88,6 +88,8 @@ export function LiveSurveillanceFeed({
   const [latestNewSignal, setLatestNewSignal] = useState<FeedEvent | null>(null);
   const [inspectingSignal, setInspectingSignal] = useState<FeedEvent | null>(null);
   const [inspectTab, setInspectTab] = useState<'ast' | 'obligations' | 'source'>('ast');
+  const [inspectRequirements, setInspectRequirements] = useState<any[]>([]);
+  const [isLoadingRequirements, setIsLoadingRequirements] = useState(false);
   const eventsRef = useRef<FeedEvent[]>(events);
 
   const getTargetRegulationId = (evt: FeedEvent | null): string | null => {
@@ -133,8 +135,50 @@ export function LiveSurveillanceFeed({
       const jurMatch = regulations.find(r => (r?.jurisdiction || '').toUpperCase() === jur);
       if (jurMatch?.id) return jurMatch.id;
     }
-    return null;
+    return evt.id || null;
   };
+
+  // Dynamically load real compiled AST requirements whenever user inspects a signal
+  useEffect(() => {
+    if (!inspectingSignal) {
+      setInspectRequirements([]);
+      setIsLoadingRequirements(false);
+      return;
+    }
+    let isCancelled = false;
+    const fetchInspectReqs = async () => {
+      setIsLoadingRequirements(true);
+      try {
+        const targetId = getTargetRegulationId(inspectingSignal);
+        const queryParams = new URLSearchParams();
+        if (targetId) queryParams.set('targetId', targetId);
+        if (inspectingSignal.id) queryParams.set('signalId', inspectingSignal.id);
+
+        const res = await fetch(`/api/compliance/requirements?${queryParams.toString()}`, {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(6000),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (!isCancelled && Array.isArray(json?.data) && json.data.length > 0) {
+            setInspectRequirements(json.data);
+            setIsLoadingRequirements(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch inspect requirements:', err);
+      }
+      if (!isCancelled) {
+        setIsLoadingRequirements(false);
+      }
+    };
+
+    fetchInspectReqs();
+    return () => {
+      isCancelled = true;
+    };
+  }, [inspectingSignal]);
 
   useEffect(() => {
     eventsRef.current = events;
@@ -660,7 +704,7 @@ export function LiveSurveillanceFeed({
       <div className="p-3 border-t border-zinc-800/80 bg-zinc-950/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-zinc-400">24/7 Automated Crawler: <strong className="text-emerald-400">ONLINE & EXTRACTING</strong></span>
+          <span className="text-zinc-400">24/7 Automated Surveillance: <strong className="text-emerald-400">ONLINE & EXTRACTING</strong></span>
         </div>
         <div className="flex items-center gap-2 text-zinc-400 font-mono text-[10px]">
           <span>Auto-Sweep: 25s</span>
@@ -726,7 +770,11 @@ export function LiveSurveillanceFeed({
               <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80">
                 <span className="text-[10px] uppercase text-zinc-500 font-medium">Extracted Controls</span>
                 <p className="text-white font-mono font-bold mt-0.5 text-[11px]">
-                  {inspectingSignal.extracted_requirements_count || 1} Enforceable
+                  {isLoadingRequirements ? (
+                    <span className="text-cyan-400 animate-pulse">Compiling AST...</span>
+                  ) : (
+                    `${inspectRequirements.length || inspectingSignal.extracted_requirements_count || 1} Enforceable`
+                  )}
                 </p>
               </div>
             </div>
@@ -774,57 +822,126 @@ export function LiveSurveillanceFeed({
             <div className="flex-1 overflow-y-auto max-h-[380px] space-y-3 custom-scrollbar text-xs">
               {inspectTab === 'ast' && (
                 <div className="space-y-3">
-                  <div className="p-3 rounded-lg bg-zinc-900/70 border border-zinc-800">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-white flex items-center gap-1.5 text-xs">
-                        <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-                        Machine-Executable Abstract Syntax Tree
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold">
-                        AST NODE #1
-                      </span>
+                  {isLoadingRequirements ? (
+                    <div className="p-8 text-center text-zinc-400 bg-zinc-900/40 rounded-lg border border-zinc-800">
+                      <Cpu className="w-6 h-6 animate-spin text-cyan-400 mx-auto mb-2" />
+                      <p className="font-semibold text-xs text-white">Compiling Machine-Executable AST...</p>
+                      <p className="text-[11px] text-zinc-500 mt-1">Decomposing statutory provisions into boolean conditions</p>
                     </div>
-                    <p className="text-zinc-400 text-[11px] leading-relaxed">
-                      Decomposed from official gazette text into deterministic boolean conditions and automated validation triggers.
-                    </p>
+                  ) : inspectRequirements.length > 0 ? (
+                    inspectRequirements.map((req, rIdx) => {
+                      const conds = req.conditions || {};
+                      const rules = Array.isArray(conds.rules) ? conds.rules : [];
+                      const operator = conds.operator || 'AND';
+                      const actions = req.actions || {};
+                      const actionName = actions.action || (Array.isArray(actions) ? actions[0] : 'VERIFY_STATUTORY_CONTROL');
 
-                    <div className="mt-3 space-y-2">
-                      <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1.5">
-                        <div className="text-zinc-500 text-[10px] uppercase font-sans">Trigger Conditions:</div>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold text-[10px]">OPERATOR: AND</span>
+                      return (
+                        <div key={req.id || rIdx} className="p-3.5 rounded-lg bg-zinc-900/70 border border-zinc-800 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-white flex items-center gap-1.5 text-xs truncate max-w-md">
+                              <Cpu className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                              <span className="truncate">{req.title || `Rule Node #${rIdx + 1}`}</span>
+                            </span>
+                            <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold shrink-0">
+                              AST NODE #{rIdx + 1}
+                            </span>
+                          </div>
+
+                          <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1.5">
+                            <div className="text-zinc-500 text-[10px] uppercase font-sans flex items-center justify-between">
+                              <span>Boolean Evaluation Trigger:</span>
+                              <span className="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-bold text-[9px]">
+                                OPERATOR: {operator}
+                              </span>
+                            </div>
+                            {rules.length > 0 ? (
+                              rules.map((rule: any, ruleIdx: number) => (
+                                <div key={ruleIdx} className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
+                                  <span className="text-cyan-300 font-mono">{rule.field || 'statutory.verified'}</span>
+                                  <span className="text-purple-400 font-bold text-[10px]">{rule.operator || 'EQUALS'}</span>
+                                  <span className="text-emerald-400 font-bold">{String(rule.value !== undefined ? rule.value : true)}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
+                                <span className="text-cyan-300 font-mono">statutory.clause_{rIdx + 1}.verified</span>
+                                <span className="text-purple-400 font-bold text-[10px]">EQUALS</span>
+                                <span className="text-emerald-400 font-bold">true</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="p-2 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] flex items-center justify-between gap-2">
+                            <span className="text-zinc-500 text-[10px] uppercase font-sans">Automated Enforcement Action:</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
+                              {actionName}
+                            </span>
+                          </div>
+
+                          <div className="p-2 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] flex items-center justify-between gap-2 text-zinc-300">
+                            <span className="text-zinc-500 text-[10px] uppercase font-sans">Evidentiary Requirement:</span>
+                            <span className="text-[10px] text-zinc-300 flex items-center gap-1">
+                              <Shield className="w-3 h-3 text-blue-400" />
+                              AUDIT_LOG_PROVENANCE_TRACE
+                            </span>
+                          </div>
                         </div>
-                        <div className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
-                          <span className="text-cyan-300">{(inspectingSignal.jurisdiction || 'global').toLowerCase()}.statutory_compliance</span>
-                          <span className="text-purple-400 font-bold text-[11px]">EQUALS</span>
-                          <span className="text-emerald-400 font-bold">true</span>
-                        </div>
-                        <div className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
-                          <span className="text-cyan-300">{(inspectingSignal.citation || inspectingSignal.id).toLowerCase().replace(/[^a-z0-9_]/g, '_')}.control_active</span>
-                          <span className="text-purple-400 font-bold text-[11px]">EQUALS</span>
-                          <span className="text-emerald-400 font-bold">true</span>
-                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-3 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-white flex items-center gap-1.5 text-xs">
+                          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                          Machine-Executable Abstract Syntax Tree
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold">
+                          AST NODE #1
+                        </span>
                       </div>
+                      <p className="text-zinc-400 text-[11px] leading-relaxed">
+                        Decomposed from official gazette text into deterministic boolean conditions and automated validation triggers.
+                      </p>
 
-                      <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1">
-                        <div className="text-zinc-500 text-[10px] uppercase font-sans">Automated Enforcement Action:</div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[11px]">
-                            VERIFY_STATUTORY_CONTROL
-                          </span>
-                          <span className="text-zinc-400 text-[11px]">Authority: {inspectingSignal.authority}</span>
+                      <div className="mt-3 space-y-2">
+                        <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1.5">
+                          <div className="text-zinc-500 text-[10px] uppercase font-sans">Trigger Conditions:</div>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold text-[10px]">OPERATOR: AND</span>
+                          </div>
+                          <div className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
+                            <span className="text-cyan-300">{(inspectingSignal.jurisdiction || 'global').toLowerCase()}.statutory_compliance</span>
+                            <span className="text-purple-400 font-bold text-[11px]">EQUALS</span>
+                            <span className="text-emerald-400 font-bold">true</span>
+                          </div>
+                          <div className="p-2 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs">
+                            <span className="text-cyan-300">{(inspectingSignal.citation || inspectingSignal.id).toLowerCase().replace(/[^a-z0-9_]/g, '_')}.control_active</span>
+                            <span className="text-purple-400 font-bold text-[11px]">EQUALS</span>
+                            <span className="text-emerald-400 font-bold">true</span>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1">
-                        <div className="text-zinc-500 text-[10px] uppercase font-sans">Required Evidence:</div>
-                        <div className="flex items-center gap-2 text-zinc-300">
-                          <Shield className="w-3.5 h-3.5 text-blue-400" />
-                          <span>AUDIT_LOG_EVIDENCE (Cryptographic provenance trace enabled)</span>
+                        <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1">
+                          <div className="text-zinc-500 text-[10px] uppercase font-sans">Automated Enforcement Action:</div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[11px]">
+                              VERIFY_STATUTORY_CONTROL
+                            </span>
+                            <span className="text-zinc-400 text-[11px]">Authority: {inspectingSignal.authority}</span>
+                          </div>
+                        </div>
+
+                        <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 font-mono text-[11px] space-y-1">
+                          <div className="text-zinc-500 text-[10px] uppercase font-sans">Required Evidence:</div>
+                          <div className="flex items-center gap-2 text-zinc-300">
+                            <Shield className="w-3.5 h-3.5 text-blue-400" />
+                            <span>AUDIT_LOG_EVIDENCE (Cryptographic provenance trace enabled)</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 
@@ -832,7 +949,7 @@ export function LiveSurveillanceFeed({
                 <div className="space-y-3">
                   <div className="p-3.5 rounded-lg bg-zinc-900/70 border border-zinc-800 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white text-xs">Statutory Scope & Obligation Summary</span>
+                      <span className="font-semibold text-white text-xs">Official Statutory Gazette Text</span>
                       {getSeverityBadge(inspectingSignal.severity)}
                     </div>
                     <p className="text-zinc-300 text-xs leading-relaxed">
@@ -840,10 +957,54 @@ export function LiveSurveillanceFeed({
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg bg-zinc-900/70 border border-zinc-800 space-y-2">
-                    <span className="font-semibold text-white text-xs block">Extracted Requirements Breakdown:</span>
-                    <div className="space-y-2">
-                      <div className="p-2.5 rounded bg-zinc-950/80 border border-zinc-800/80 space-y-1">
+                  <div className="space-y-2">
+                    <span className="font-semibold text-white text-xs block">
+                      Extracted Statutory Obligations ({inspectRequirements.length || inspectingSignal.extracted_requirements_count || 1}):
+                    </span>
+                    {isLoadingRequirements ? (
+                      <div className="p-6 text-center text-zinc-400 bg-zinc-900/40 rounded-lg border border-zinc-800">
+                        <Shield className="w-6 h-6 animate-bounce text-emerald-400 mx-auto mb-2" />
+                        <p className="font-semibold text-xs text-white">Extracting Statutory Controls...</p>
+                      </div>
+                    ) : inspectRequirements.length > 0 ? (
+                      inspectRequirements.map((req, rIdx) => {
+                        const rType = (req.type || 'obligation').toLowerCase();
+                        const rSev = (req.severity || 'high').toLowerCase();
+                        return (
+                          <div key={req.id || rIdx} className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-semibold text-zinc-200">
+                                Requirement {rIdx + 1}: {req.title}
+                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${
+                                  rType === 'prohibition' 
+                                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                    : rType === 'permission'
+                                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                }`}>
+                                  {rType}
+                                </span>
+                                {getSeverityBadge(rSev)}
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-zinc-400 leading-relaxed">
+                              {req.description}
+                            </p>
+                            {req.actions && (
+                              <div className="pt-1 flex items-center gap-1.5 text-[10px] text-zinc-500">
+                                <span className="font-semibold text-zinc-400">Enforcement:</span>
+                                <span className="font-mono text-cyan-400">
+                                  {req.actions.action || (Array.isArray(req.actions) ? req.actions.join(', ') : 'VERIFY_STATUTORY_CONTROL')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 space-y-1.5">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-zinc-200">
                             Requirement 1: Mandatory Continuous Technical Safeguards
@@ -856,7 +1017,7 @@ export function LiveSurveillanceFeed({
                           Entity must establish and maintain documented operational controls, automated event logs, and periodic verification under {inspectingSignal.authority}.
                         </p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}
