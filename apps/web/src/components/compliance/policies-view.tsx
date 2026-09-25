@@ -117,23 +117,25 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-zinc-500 bg-[#0a0a0c] border border-zinc-800 rounded-xl">
-        <Loader2 className="w-8 h-8 animate-spin mb-4" />
-        <span className="text-sm font-medium">Loading mapped policies...</span>
+      <div className="flex flex-col items-center justify-center p-12 text-[#64748B] bg-[#080A0E] border border-[var(--rc-border)] rounded-2xl">
+        <Loader2 className="w-8 h-8 animate-spin mb-4 text-[#4D8FCC]" />
+        <span className="text-sm font-medium font-mono text-[#CBD5E1]">Loading mapped policies...</span>
       </div>
     );
   }
 
   if (!policies.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-[#0a0a0c] border border-zinc-800 border-dashed rounded-xl">
-        <ShieldCheck className="w-12 h-12 text-zinc-700 mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Active Policies</h3>
-        <p className="text-zinc-400 max-w-md mb-6">
+      <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-[#080A0E] border border-[var(--rc-border)] border-dashed rounded-2xl">
+        <div className="w-14 h-14 rounded-2xl bg-[#10141A] border border-[var(--rc-border)] flex items-center justify-center mb-4 text-[#64748B]">
+          <ShieldCheck className="w-7 h-7" />
+        </div>
+        <h3 className="text-xl font-bold text-[#F4F6F8] mb-2">No Active Policies</h3>
+        <p className="text-[#94A3B8] max-w-md mb-6 text-sm leading-relaxed">
           A Policy maps regulatory requirements directly to your organizational systems. 
           Upload a regulation and parse its rules to automatically generate your first active policy.
         </p>
-        <Button onClick={() => router.push('/regulations/new')} className="bg-blue-600 hover:bg-blue-500">
+        <Button onClick={() => router.push('/regulations/new')} className="bg-[#4D8FCC] hover:bg-[#3D7BBB] text-white cursor-pointer shadow-sm">
           <Plus className="w-4 h-4 mr-2" />
           Upload Regulation
         </Button>
@@ -143,10 +145,10 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-4 border-b border-[var(--rc-border)]">
         <div>
-          <h2 className="text-xl font-semibold text-white">Active Policies</h2>
-          <p className="text-sm text-zinc-400 mt-1">Policies dictate which regulations are currently enforced and monitored against your systems.</p>
+          <h2 className="text-xl font-bold text-[#F4F6F8]">Active Policies</h2>
+          <p className="text-sm text-[#94A3B8] mt-1">Policies dictate which regulations are currently enforced and monitored against your systems.</p>
         </div>
       </div>
 
@@ -159,43 +161,43 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
           const lPct = (p.severity_breakdown.low / total) * 100;
 
           return (
-            <div key={p.id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-xl border border-zinc-800 bg-[#0a0a0c] gap-6">
+            <div key={p.id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-2xl border border-[var(--rc-border)] bg-[#080A0E] hover:border-[var(--rc-border-subtle)] transition-colors gap-6">
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-medium text-white truncate">{p.regulation_name}</h3>
-                  <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium uppercase tracking-wider flex items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5" />
+                  <h3 className="text-lg font-bold text-[#F4F6F8] truncate">{p.regulation_name}</h3>
+                  <span className="px-2.5 py-0.5 bg-[#10B981]/15 border border-[#10B981]/30 text-[#10B981] rounded-full text-xs font-mono font-medium uppercase tracking-wider flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] mr-1.5" />
                     {p.status}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-zinc-500 mt-1">
-                  <Info className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 text-xs text-[#94A3B8] mt-1">
+                  <Info className="w-3.5 h-3.5 text-[#4D8FCC]" />
                   <span>Actively monitoring <strong>{p.total_requirements}</strong> extracted rules against connected environments.</span>
                 </div>
               </div>
 
               <div className="w-full md:w-64 shrink-0">
-                <div className="flex justify-between text-xs text-zinc-400 mb-1.5 font-medium">
+                <div className="flex justify-between text-xs text-[#94A3B8] mb-1.5 font-mono">
                   <span>Severity Breakdown</span>
                   <span>{p.total_requirements} Total</span>
                 </div>
-                <div className="flex h-2 w-full rounded-full overflow-hidden bg-zinc-800">
-                  <div style={{ width: `${cPct}%` }} className="bg-red-500" title={`Critical: ${p.severity_breakdown.critical}`} />
-                  <div style={{ width: `${hPct}%` }} className="bg-orange-500" title={`High: ${p.severity_breakdown.high}`} />
-                  <div style={{ width: `${mPct}%` }} className="bg-yellow-500" title={`Medium: ${p.severity_breakdown.medium}`} />
-                  <div style={{ width: `${lPct}%` }} className="bg-zinc-500" title={`Low: ${p.severity_breakdown.low}`} />
+                <div className="flex h-2 w-full rounded-full overflow-hidden bg-[#10141A]">
+                  <div style={{ width: `${cPct}%` }} className="bg-rose-500" title={`Critical: ${p.severity_breakdown.critical}`} />
+                  <div style={{ width: `${hPct}%` }} className="bg-amber-500" title={`High: ${p.severity_breakdown.high}`} />
+                  <div style={{ width: `${mPct}%` }} className="bg-[#C9B88A]" title={`Medium: ${p.severity_breakdown.medium}`} />
+                  <div style={{ width: `${lPct}%` }} className="bg-[#4D8FCC]" title={`Low: ${p.severity_breakdown.low}`} />
                 </div>
-                <div className="flex gap-3 text-[10px] text-zinc-500 mt-2 font-medium uppercase tracking-wider">
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500"/>{p.severity_breakdown.critical}</span>
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-500"/>{p.severity_breakdown.high}</span>
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500"/>{p.severity_breakdown.medium}</span>
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-zinc-500"/>{p.severity_breakdown.low}</span>
+                <div className="flex gap-3 text-[10px] text-[#64748B] mt-2 font-mono uppercase tracking-wider">
+                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-500"/>{p.severity_breakdown.critical}</span>
+                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"/>{p.severity_breakdown.high}</span>
+                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#C9B88A]"/>{p.severity_breakdown.medium}</span>
+                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]"/>{p.severity_breakdown.low}</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end w-full md:w-auto shrink-0 border-t md:border-t-0 md:border-l border-zinc-800 pt-4 md:pt-0 md:pl-6">
-                <Button variant="secondary" onClick={() => openEvalModal(p.id)} className="w-full md:w-auto">
+              <div className="flex items-center justify-end w-full md:w-auto shrink-0 border-t md:border-t-0 md:border-l border-[var(--rc-border)] pt-4 md:pt-0 md:pl-6">
+                <Button variant="secondary" onClick={() => openEvalModal(p.id)} className="w-full md:w-auto bg-[#10141A] text-[#F4F6F8] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] cursor-pointer">
                   Evaluate Policy
                 </Button>
               </div>
@@ -206,15 +208,15 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
       </div>
 
       <Dialog open={evalModalOpen} onOpenChange={setEvalModalOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-[#0f0f11] border-zinc-800 p-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-zinc-800/60 bg-[#0a0a0c]">
+        <DialogContent className="sm:max-w-[600px] bg-[#080A0E] border-[var(--rc-border)] p-0 overflow-hidden text-[#F4F6F8]">
+          <DialogHeader className="p-6 pb-4 border-b border-[var(--rc-border)] bg-[#0B0E14]">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg">
+              <div className="p-2 bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30 rounded-xl">
                 <FileJson className="w-5 h-5" />
               </div>
               <div>
-                <DialogTitle className="text-xl text-white">Evaluate System Context</DialogTitle>
-                <DialogDescription className="text-zinc-400 mt-1">
+                <DialogTitle className="text-xl font-bold text-[#F4F6F8]">Evaluate System Context</DialogTitle>
+                <DialogDescription className="text-[#94A3B8] mt-1 text-xs">
                   Provide your system's architecture or configuration payload to evaluate it against the active policy.
                 </DialogDescription>
               </div>
@@ -224,9 +226,9 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
           <div className="p-6">
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-zinc-300 mb-2 block">System State Payload (JSON)</label>
+                <label className="text-xs font-mono text-[#94A3B8] uppercase tracking-wider mb-2 block">System State Payload (JSON)</label>
                 <textarea 
-                  className="w-full h-64 bg-[#050505] border border-zinc-800 rounded-xl p-4 text-sm font-mono text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all resize-none"
+                  className="w-full h-64 bg-[#050608] border border-[var(--rc-border)] rounded-xl p-4 text-xs font-mono text-[#CBD5E1] focus:outline-none focus:border-[#4D8FCC] transition-all resize-none"
                   value={evalPayload}
                   onChange={(e) => {
                     setEvalPayload(e.target.value);
@@ -235,8 +237,8 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
                   spellCheck={false}
                 />
                 {evalError && (
-                  <p className="text-red-400 text-sm mt-2 font-medium flex items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 mr-2" />
+                  <p className="text-rose-400 text-xs mt-2 font-mono flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-2" />
                     {evalError}
                   </p>
                 )}
@@ -244,11 +246,11 @@ export function PoliciesView({ onNavigateTab }: PoliciesViewProps = {}) {
             </div>
           </div>
           
-          <DialogFooter className="p-4 px-6 border-t border-zinc-800/60 bg-[#0a0a0c]">
-            <Button variant="ghost" onClick={() => setEvalModalOpen(false)} className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+          <DialogFooter className="p-4 px-6 border-t border-[var(--rc-border)] bg-[#0B0E14]">
+            <Button variant="ghost" onClick={() => setEvalModalOpen(false)} className="text-[#94A3B8] hover:text-white hover:bg-[#10141A] cursor-pointer">
               Cancel
             </Button>
-            <Button onClick={submitEvaluation} disabled={evaluating} className="bg-blue-600 hover:bg-blue-500 text-white min-w-[120px]">
+            <Button onClick={submitEvaluation} disabled={evaluating} className="bg-[#4D8FCC] hover:bg-[#3D7BBB] text-white min-w-[120px] cursor-pointer shadow-sm font-mono text-xs">
               {evaluating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Run Evaluation
             </Button>

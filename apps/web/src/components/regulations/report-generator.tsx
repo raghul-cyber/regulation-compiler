@@ -207,30 +207,30 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="group flex items-center justify-between p-4 bg-purple-950/20 hover:bg-purple-950/40 border border-purple-900/30 hover:border-purple-500/50 rounded-xl transition-all cursor-pointer"
+        className="group flex items-center justify-between p-4 bg-[#0E1218] hover:bg-[#141922] border border-[var(--rc-border)] hover:border-[var(--rc-border-hover)] rounded-xl transition-all cursor-pointer"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-900/50 rounded-lg text-purple-400">
+          <div className="p-2 bg-[#141922] border border-[var(--rc-border)] rounded-lg text-[#93C5FD]">
             <FileText className="w-5 h-5" />
           </div>
           <div className="text-left">
-            <div className="text-sm font-medium text-purple-100">Generate Report</div>
-            <div className="text-xs text-purple-300/70">Produce a compliance manifest</div>
+            <div className="text-sm font-semibold text-white">Generate Report</div>
+            <div className="text-xs text-[#94A3B8]">Produce a statutory compliance manifest</div>
           </div>
         </div>
-        <ArrowRight className="w-5 h-5 text-purple-500/50 group-hover:text-purple-400 transform group-hover:translate-x-1 transition-all" />
+        <ArrowRight className="w-5 h-5 text-[#64748B] group-hover:text-white transform group-hover:translate-x-1 transition-all" />
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#0a0a0c] border border-zinc-800 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#0E1218] border border-[var(--rc-border)] rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             
-            <div className="flex items-center justify-between p-6 border-b border-zinc-800">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--rc-border)]">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-purple-500" />
+                <FileText className="w-5 h-5 text-[#4D8FCC]" />
                 Report Generator
               </h2>
-              <button onClick={handleClose} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={handleClose} className="text-zinc-500 hover:text-white transition-colors cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -244,7 +244,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         <span className="text-sm font-semibold text-zinc-200">
                           Select Report Sections
                         </span>
-                        <p className="text-xs text-zinc-400 mt-0.5">
+                        <p className="text-xs text-[#94A3B8] mt-0.5">
                           Select one or more modules to compile a unified, comprehensive audit report.
                         </p>
                       </div>
@@ -252,7 +252,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         <button
                           type="button"
                           onClick={selectAll}
-                          className="text-purple-400 hover:text-purple-300 font-medium px-2 py-1 rounded hover:bg-purple-950/40 transition-colors"
+                          className="text-[#93C5FD] hover:text-white font-medium px-2 py-1 rounded hover:bg-[#141922] transition-colors cursor-pointer"
                         >
                           Select All
                         </button>
@@ -260,16 +260,16 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         <button
                           type="button"
                           onClick={clearAll}
-                          className="text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded hover:bg-zinc-800/40 transition-colors"
+                          className="text-[#64748B] hover:text-zinc-300 px-2 py-1 rounded hover:bg-[#141922] transition-colors cursor-pointer"
                         >
                           Clear
                         </button>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between px-3.5 py-2 bg-zinc-900/60 border border-zinc-800/70 rounded-lg text-xs mb-3">
-                      <span className="text-zinc-400">Included Modules:</span>
-                      <span className="font-semibold text-purple-400">
+                    <div className="flex items-center justify-between px-3.5 py-2 bg-[#090D13] border border-[var(--rc-border)] rounded-lg text-xs mb-3">
+                      <span className="text-[#94A3B8]">Included Modules:</span>
+                      <span className="font-semibold text-[#93C5FD]">
                         {selectedTypes.length} of {REPORT_TYPES.length} selected
                       </span>
                     </div>
@@ -281,10 +281,10 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                           <label 
                             key={type.id}
                             htmlFor={`report-type-${type.id}`}
-                            className={`group p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                            className={`group p-3.5 rounded-[8px] border cursor-pointer transition-all flex items-center justify-between ${
                               isChecked 
-                                ? 'bg-purple-950/25 border-purple-500/50 shadow-[0_0_15px_rgba(147,51,234,0.08)]' 
-                                : 'bg-zinc-900/50 border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900/80'
+                                ? 'bg-[#0B0E14] border-[#4D8FCC]/50 shadow-sm' 
+                                : 'bg-[#050608] border-white/[0.06] hover:border-white/[0.14] hover:bg-white/[0.02]'
                             }`}
                           >
                             <input 
@@ -297,15 +297,15 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                               className="sr-only"
                             />
                             <div className="pr-4">
-                              <div className={`font-medium text-sm transition-colors ${isChecked ? 'text-purple-200' : 'text-zinc-200 group-hover:text-white'}`}>
+                              <div className={`font-semibold text-sm transition-colors ${isChecked ? 'text-[#F4F6F8]' : 'text-[#CBD5E1] group-hover:text-[#F4F6F8]'}`}>
                                 {type.title}
                               </div>
-                              <div className="text-xs text-zinc-400 mt-0.5">{type.description}</div>
+                              <div className="text-xs text-[#9CA3AF] mt-0.5">{type.description}</div>
                             </div>
-                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all ${
+                            <div className={`w-5 h-5 rounded-[4px] border flex items-center justify-center shrink-0 transition-all ${
                               isChecked 
-                                ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]' 
-                                : 'border-zinc-700 bg-zinc-900 group-hover:border-zinc-500'
+                                ? 'bg-[#4D8FCC] border-[#79B5EC]/40 text-white shadow-sm' 
+                                : 'border-white/[0.12] bg-[#080A0E] group-hover:border-white/[0.24]'
                             }`}>
                               {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                             </div>
@@ -318,10 +318,10 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                   <button 
                     onClick={handleStartGeneration}
                     disabled={selectedTypes.length === 0}
-                    className={`w-full py-3.5 font-medium rounded-xl transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full py-3 font-semibold rounded-[6px] text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                       selectedTypes.length === 0
-                        ? 'bg-zinc-800/70 text-zinc-500 cursor-not-allowed border border-zinc-800'
-                        : 'bg-purple-600 hover:bg-purple-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.25)] cursor-pointer'
+                        ? 'bg-[#0B0E14] text-[#64748B] cursor-not-allowed border border-white/[0.06]'
+                        : 'bg-[#4D8FCC] hover:bg-[#3B72A8] text-white shadow-sm cursor-pointer border border-[#79B5EC]/20 active:scale-[0.99]'
                     }`}
                   >
                     {selectedTypes.length === 0 ? (
@@ -334,7 +334,7 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                   </button>
 
                   {error && (
-                    <div className="p-4 bg-red-950/20 border border-red-900/50 rounded-lg text-sm text-red-400">
+                    <div className="p-4 bg-red-950/20 border border-red-900/40 rounded-[6px] text-xs text-red-400 font-mono">
                       Error: {error}
                     </div>
                   )}
@@ -352,21 +352,21 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                         <div key={stage.num} className="flex gap-4">
                           <div className="flex flex-col items-center mt-0.5">
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-300
-                              ${isCompleted ? 'bg-emerald-500/20 text-emerald-500' : 
-                                isActive ? 'bg-purple-500/20 text-purple-400' : 
-                                'bg-zinc-800/50 text-zinc-600'}`}
+                              ${isCompleted ? 'bg-emerald-500/20 text-emerald-400' : 
+                                isActive ? 'bg-[#4D8FCC]/20 text-[#79B5EC]' : 
+                                'bg-[#0B0E14] text-[#64748B]'}`}
                             >
                               {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : 
                                isActive ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 
                                <Circle className="w-3 h-3" />}
                             </div>
                             {stage.num !== REPORT_STAGES.length && (
-                              <div className={`w-px h-full my-1 transition-colors duration-500 ${isCompleted ? 'bg-emerald-500/50' : 'bg-zinc-800'}`} />
+                              <div className={`w-px h-full my-1 transition-colors duration-500 ${isCompleted ? 'bg-emerald-500/50' : 'bg-white/[0.08]'}`} />
                             )}
                           </div>
                           <div className="flex-1 pb-4">
                             <span className={`text-sm font-semibold transition-colors duration-300 
-                              ${isPending ? 'text-zinc-600' : 'text-zinc-200'}`}
+                              ${isPending ? 'text-[#64748B]' : 'text-[#F4F6F8]'}`}
                             >
                               {stage.num}. {stage.name}
                             </span>
@@ -377,25 +377,25 @@ export function ReportGenerator({ regulationId, getToken }: { regulationId: stri
                   </div>
 
                   {error && (
-                    <div className="p-4 bg-red-950/20 border border-red-900/50 rounded-lg text-sm text-red-400">
+                    <div className="p-4 bg-red-950/20 border border-red-900/40 rounded-[6px] text-xs text-red-400 font-mono">
                       Error: {error}
                     </div>
                   )}
 
                   {downloadUrl && (
-                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 pt-4 border-t border-zinc-800">
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 pt-4 border-t border-white/[0.08]">
                       <a 
                         href={downloadUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3.5 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-colors"
+                        className="w-full flex items-center justify-center gap-2 bg-[#4D8FCC] hover:bg-[#3B72A8] text-white font-semibold py-3 rounded-[6px] text-xs uppercase tracking-wider shadow-sm transition-colors cursor-pointer border border-[#79B5EC]/20 font-mono"
                       >
-                        <FileText className="w-5 h-5" />
+                        <FileText className="w-4 h-4" />
                         Download Unified Report ({selectedTypes.length} {selectedTypes.length === 1 ? 'Section' : 'Sections'})
                       </a>
                       <button
                         onClick={handleReset}
-                        className="w-full mt-3 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium rounded-xl border border-zinc-800 transition-colors"
+                        className="w-full mt-3 py-2 bg-[#0B0E14] hover:bg-[#11151A] text-[#9CA3AF] hover:text-[#F4F6F8] text-xs font-medium rounded-[6px] border border-white/[0.08] transition-colors cursor-pointer font-mono"
                       >
                         Generate Another Report
                       </button>

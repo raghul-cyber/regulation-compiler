@@ -100,11 +100,11 @@ export function PaywallModal({
       onClick={isBlocking ? undefined : onClose}
     >
       <div 
-        className="relative w-full max-w-lg my-auto p-6 sm:p-8 rounded-2xl bg-[#0B131D] border border-[#1E2C38] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(92,200,255,0.15)] text-white overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg my-auto p-6 sm:p-8 rounded-2xl bg-[#0E1218] border border-[var(--rc-border)] shadow-2xl text-white overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Subtle Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#4D8FCC]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close Button (Hidden if Blocking) */}
         {!isBlocking && (
@@ -119,7 +119,7 @@ export function PaywallModal({
 
         {/* Header Badge */}
         <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold uppercase tracking-wider">
             <Lock className="w-3.5 h-3.5" />
             <span>Free Tier Limit Reached</span>
           </div>
@@ -129,39 +129,39 @@ export function PaywallModal({
         <div className="space-y-2">
           <h3 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Upgrade to Pro</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-[#5CC8FF] border border-blue-500/30 font-mono font-normal">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4D8FCC]/15 text-[#A3C7E8] border border-[#4D8FCC]/30 font-mono font-normal">
               $10.02/month
             </span>
           </h3>
-          <p className="text-sm text-zinc-300 leading-relaxed">
+          <p className="text-sm text-[#94A3B8] leading-relaxed">
             {reason || "You have reached your limit of 3 complimentary website compliance audits and regulation compilations. Upgrade to Pro to unlock unlimited autonomous compliance audits, PDF compilation, and statutory monitoring."}
           </p>
         </div>
 
         {/* Usage Tracker Pill */}
-        <div className="p-3 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between text-xs font-mono">
-          <span className="text-zinc-400">Free Actions Quota:</span>
-          <span className="font-bold text-rose-400 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+        <div className="p-3 rounded-xl bg-[#090D13] border border-[var(--rc-border)] flex items-center justify-between text-xs font-mono">
+          <span className="text-[#94A3B8]">Free Actions Quota:</span>
+          <span className="font-bold text-amber-400 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             {freeUsesUsed} / {freeUsesLimit} used (0 remaining)
           </span>
         </div>
 
         {/* Pro Plan Value Pillars */}
-        <div className="space-y-2.5 py-1 border-y border-zinc-800/80">
-          <div className="flex items-start gap-2.5 text-xs text-zinc-300">
+        <div className="space-y-2.5 py-1 border-y border-[var(--rc-border)]">
+          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span><b>Unlimited Website Audits:</b> Full autonomous inspection across GDPR, HIPAA, SOC 2, WCAG 2.1 AA, and PCI-DSS.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-zinc-300">
+          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span><b>Unlimited Regulation Compilation:</b> Parse multi-hundred page PDF & HTML statutory gazettes into ASTs.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-zinc-300">
+          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span><b>24/7 Global Surveillance:</b> Real-time statutory gazette monitoring and automated drift alerts.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-zinc-300">
+          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span><b>Production Policy AST Exports:</b> Machine-executable Rego/JSON policies and cryptographic audit trails.</span>
           </div>
@@ -180,7 +180,7 @@ export function PaywallModal({
           <button
             onClick={handleCheckout}
             disabled={isLoading}
-            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-[#4D8FCC] hover:bg-[#3B72A8] disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -200,7 +200,7 @@ export function PaywallModal({
             <button
               onClick={() => signOut({ redirectUrl: '/' })}
               disabled={isLoading}
-              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-medium transition-colors cursor-pointer"
+              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#141922] hover:bg-[#1A2230] text-[#94A3B8] hover:text-white border border-[var(--rc-border)] text-xs font-medium transition-colors cursor-pointer"
             >
               Sign Out
             </button>
@@ -208,7 +208,7 @@ export function PaywallModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-medium transition-colors cursor-pointer"
+              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#141922] hover:bg-[#1A2230] text-[#94A3B8] hover:text-white border border-[var(--rc-border)] text-xs font-medium transition-colors cursor-pointer"
             >
               Maybe later
             </button>
@@ -217,7 +217,7 @@ export function PaywallModal({
 
         {/* Trust Footer */}
         <div className="text-center">
-          <span className="text-[11px] text-zinc-500 font-mono">
+          <span className="text-[11px] text-[#64748B] font-mono">
             Secured by Dodo Payments • Real-time webhook confirmation
           </span>
         </div>

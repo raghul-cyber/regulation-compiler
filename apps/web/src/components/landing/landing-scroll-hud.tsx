@@ -29,12 +29,12 @@ export function LandingScrollHUD() {
 
   return (
     <>
-      {/* 1. Ultra-thin Top Glowing Scroll Progress Laser Line */}
+      {/* 1. Ultra-thin Restrained Top Reading Indicator */}
       <div 
-        className="fixed top-0 left-0 right-0 h-[2px] z-50 pointer-events-none bg-[#080D13]/60"
+        className="fixed top-0 left-0 right-0 h-[2px] z-50 pointer-events-none bg-white/[0.04]"
       >
         <div 
-          className="h-full bg-gradient-to-r from-[#2D718F] via-[#5CC8FF] to-[#67D6A0] transition-[width] duration-75 ease-out shadow-[0_0_10px_rgba(92,200,255,0.7)]"
+          className="h-full bg-[#4D8FCC] transition-[width] duration-100 ease-out shadow-[0_0_8px_rgba(77,143,204,0.4)]"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
@@ -45,7 +45,7 @@ export function LandingScrollHUD() {
           <button
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="p-2.5 rounded-xl bg-[#080D13]/80 hover:bg-[#5CC8FF] border border-[#17222C] hover:border-[#5CC8FF] text-[#9AA9B5] hover:text-[#05070A] transition-all duration-200 backdrop-blur-md shadow-lg cursor-pointer"
+            className="p-2.5 rounded-[8px] bg-[#080A0E]/85 hover:bg-[#141922] border border-white/[0.08] hover:border-white/[0.16] text-[#9CA3AF] hover:text-[#F4F6F8] transition-all duration-200 backdrop-blur-md shadow-xl cursor-pointer"
           >
             <ArrowUp className="w-4 h-4" />
           </button>

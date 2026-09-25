@@ -102,11 +102,11 @@ export function InteractiveCompilation() {
     <section id="interactive" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <Compass className="w-3.5 h-3.5 text-[#3B82F6]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
+          <Compass className="w-3.5 h-3.5 text-[#4D8FCC]" />
           Live Interactive Field
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
           See regulation become structure.
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
@@ -115,10 +115,10 @@ export function InteractiveCompilation() {
       </div>
 
       {/* Main Interactive Field Canvas Container */}
-      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} relative w-full rounded-2xl bg-[#0E1218] border border-[var(--rc-border)] p-6 md:p-8 overflow-hidden shadow-2xl`}>
+      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} relative w-full rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] p-6 md:p-8 overflow-hidden shadow-2xl`}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           {/* Interactive Topology Graph Area (7 Cols) */}
-          <div className="lg:col-span-7 relative h-[380px] rounded-xl bg-[#090D13] border border-[var(--rc-border)] p-4 flex items-center justify-center">
+          <div className="lg:col-span-7 relative h-[380px] rounded-xl bg-[#050608] border border-[var(--rc-border)] p-4 flex items-center justify-center">
             {/* SVG Connecting Edges with animated dash flow */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               {NODES.map((n1) =>
@@ -134,7 +134,7 @@ export function InteractiveCompilation() {
                       y1={`${n1.y}%`}
                       x2={`${n2.x}%`}
                       y2={`${n2.y}%`}
-                      stroke={isEdgeActive ? '#2563EB' : 'rgba(255,255,255,0.08)'}
+                      stroke={isEdgeActive ? '#4D8FCC' : 'rgba(255,255,255,0.08)'}
                       strokeWidth={isEdgeActive ? 1.5 : 1}
                       className="transition-all duration-300"
                       strokeDasharray={isEdgeActive ? '6 6' : '4 4'}
@@ -157,14 +157,14 @@ export function InteractiveCompilation() {
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
                   className={`absolute -translate-x-1/2 -translate-y-1/2 p-2.5 rounded-xl border font-mono text-xs transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#141922] border-[#2563EB] text-[#F1F5F9] scale-105 z-20 shadow-md shadow-blue-500/10'
+                      ? 'bg-[#10141A] border-[#4D8FCC] text-[#F4F6F8] scale-105 z-20 shadow-md shadow-blue-500/10'
                       : isConnected
-                      ? 'bg-[#0E1218] border-[#2563EB]/40 text-[#93C5FD] z-10'
-                      : 'bg-[#0E1218] border-[var(--rc-border)] text-[#64748B] hover:text-[#94A3B8] hover:border-[var(--rc-border-subtle)]'
+                      ? 'bg-[#080A0E] border-[#4D8FCC]/40 text-[#93C5FD] z-10'
+                      : 'bg-[#080A0E] border-[var(--rc-border)] text-[#64748B] hover:text-[#94A3B8] hover:border-[var(--rc-border-subtle)]'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 whitespace-nowrap">
-                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#3B82F6]' : 'bg-[#475569]'} transition-all`} />
+                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#4D8FCC]' : 'bg-[#475569]'} transition-all`} />
                     <span className="font-semibold">{node.label}</span>
                   </div>
                 </button>
@@ -173,15 +173,15 @@ export function InteractiveCompilation() {
           </div>
 
           {/* Node Inspector Tooltip Card (5 Cols) */}
-          <div className="lg:col-span-5 p-6 rounded-xl bg-[#090D13] border border-[var(--rc-border)] text-left flex flex-col justify-between font-mono">
+          <div className="lg:col-span-5 p-6 rounded-xl bg-[#0B0E14] border border-[var(--rc-border)] text-left flex flex-col justify-between font-mono">
             <div>
               {/* Header */}
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--rc-border)]">
                 <div>
-                  <span className="text-[10px] text-[#3B82F6] uppercase tracking-wider block font-bold">
+                  <span className="text-[10px] text-[#4D8FCC] uppercase tracking-wider block font-bold">
                     {activeNode.framework}
                   </span>
-                  <h3 className="text-base font-bold text-[#F1F5F9] mt-0.5">
+                  <h3 className="text-base font-bold text-[#F4F6F8] mt-0.5">
                     {activeNode.label}
                   </h3>
                 </div>
@@ -197,7 +197,7 @@ export function InteractiveCompilation() {
                   <div className="text-[10px] text-[#64748B] uppercase tracking-wide">
                     CLAUSE CITATION
                   </div>
-                  <div className="text-[#F1F5F9] mt-0.5">{activeNode.clause}</div>
+                  <div className="text-[#F4F6F8] mt-0.5">{activeNode.clause}</div>
                 </div>
 
                 <div>
@@ -205,7 +205,7 @@ export function InteractiveCompilation() {
                     CROSS-FRAMEWORK DEPENDENCY
                   </div>
                   <div className="text-[#93C5FD] mt-0.5 flex items-center gap-1.5">
-                    <Link2 className="w-3 h-3 text-[#3B82F6]" />
+                    <Link2 className="w-3 h-3 text-[#4D8FCC]" />
                     {activeNode.dependency}
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export function InteractiveCompilation() {
                   <div className="text-[10px] text-[#64748B] uppercase tracking-wide">
                     DETERMINISTIC EVALUATION RULE
                   </div>
-                  <pre className="text-[11px] text-[#CBD5E1] bg-[#05070A] p-2.5 rounded-lg border border-[var(--rc-border)] mt-1 overflow-x-auto">
+                  <pre className="text-[11px] text-[#CBD5E1] bg-[#050608] p-2.5 rounded-lg border border-[var(--rc-border)] mt-1 overflow-x-auto">
                     <code>{activeNode.rule}</code>
                     <span className="landing-cursor" aria-hidden="true" />
                   </pre>
@@ -225,7 +225,7 @@ export function InteractiveCompilation() {
             {/* Bottom Status */}
             <div className="mt-5 pt-3 border-t border-[var(--rc-border)] flex items-center justify-between text-[11px] text-[#64748B]">
               <span>ACTIVE CONNECTIONS: {activeNode.connections.length}</span>
-              <span className="text-[#3B82F6] font-semibold">ZERO DRIFT</span>
+              <span className="text-[#4D8FCC] font-semibold">ZERO DRIFT</span>
             </div>
           </div>
         </div>

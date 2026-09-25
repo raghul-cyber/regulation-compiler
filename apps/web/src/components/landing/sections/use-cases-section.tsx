@@ -50,11 +50,11 @@ export function UseCasesSection() {
     <section id="use-cases" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#3B82F6]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#4D8FCC]" />
           Enterprise Scope
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
           Built for High-Stakes Regulatory Environments
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
@@ -69,15 +69,15 @@ export function UseCasesSection() {
           return (
             <div
               key={uc.id}
-              className={`${uc.colSpan} p-6 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] flex flex-col justify-between transition-all duration-200 group`}
+              className={`${uc.colSpan} p-6 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14] flex flex-col justify-between transition-all duration-200 group`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-[#141922] border border-[var(--rc-border)] text-[#3B82F6]">
+                    <div className="p-2 rounded-lg bg-[#10141A] border border-[var(--rc-border)] text-[#4D8FCC]">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-[10px] text-[#3B82F6] font-bold uppercase tracking-wider">
+                    <span className="font-mono text-[10px] text-[#4D8FCC] font-bold uppercase tracking-wider">
                       {uc.tag}
                     </span>
                   </div>
@@ -86,7 +86,7 @@ export function UseCasesSection() {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-[#F1F5F9] mb-2 group-hover:text-[#93C5FD] transition-colors">
+                <h3 className="text-lg font-bold text-[#F4F6F8] mb-2 group-hover:text-[#93C5FD] transition-colors">
                   {uc.title}
                 </h3>
                 <p className="text-xs text-[#94A3B8] leading-relaxed">
@@ -98,7 +98,7 @@ export function UseCasesSection() {
                 {uc.frameworks.map((fw) => (
                   <span 
                     key={fw} 
-                    className="font-mono text-[10px] text-[#CBD5E1] bg-[#141922] px-2 py-0.5 rounded border border-[var(--rc-border)]"
+                    className="font-mono text-[10px] text-[#CBD5E1] bg-[#10141A] px-2 py-0.5 rounded border border-[var(--rc-border)]"
                   >
                     {fw}
                   </span>

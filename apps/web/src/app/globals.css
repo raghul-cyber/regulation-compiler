@@ -49,92 +49,128 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: #090B0E;
-  --foreground: #F1F5F9;
-  --card: #0E1218;
-  --card-foreground: #F1F5F9;
-  --popover: #12161F;
-  --popover-foreground: #F1F5F9;
-  --primary: #2563EB;
+  /* ========================================================================
+     LIGHT MODE — Warm Architectural White & Frosted Surfaces
+     ======================================================================== */
+  --background: #F6F7F9;
+  --foreground: #111318;
+  --card: #FFFFFF;
+  --card-foreground: #111318;
+  --popover: #FFFFFF;
+  --popover-foreground: #111318;
+  --primary: #2B5C8F;
   --primary-foreground: #FFFFFF;
-  --secondary: #141922;
-  --secondary-foreground: #F1F5F9;
-  --muted: #151A23;
-  --muted-foreground: #8B949E;
-  --accent: #1D232F;
-  --accent-foreground: #F1F5F9;
-  --destructive: #EF4444;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.10);
-  --ring: #2563EB;
-  --chart-1: #2563EB;
+  --secondary: #EEF1F5;
+  --secondary-foreground: #111318;
+  --muted: #E5E9F0;
+  --muted-foreground: #626873;
+  --accent: #EEF1F5;
+  --accent-foreground: #111318;
+  --destructive: #DC2626;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.10);
+  --ring: #4D8FCC;
+  --radius: 0.5rem;
+  
+  --chart-1: #4D8FCC;
   --chart-2: #10B981;
   --chart-3: #F59E0B;
-  --chart-4: #8B5CF6;
-  --chart-5: #64748B;
-  --sidebar: #090B0E;
-  --sidebar-foreground: #F1F5F9;
-  --sidebar-primary: #2563EB;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #12161F;
-  --sidebar-accent-foreground: #F1F5F9;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #2563EB;
+  --chart-4: #6B8BA4;
+  --chart-5: #626873;
 
-  /* RegCompiler Enterprise Design System Tokens */
-  --rc-bg: #090B0E;
-  --rc-surface: #0E1218;
-  --rc-surface-elevated: #141922;
-  --rc-surface-highlight: #1B222E;
-  --rc-border: rgba(255, 255, 255, 0.08);
-  --rc-border-subtle: rgba(255, 255, 255, 0.04);
-  --rc-border-strong: rgba(255, 255, 255, 0.14);
-  --rc-border-accent: rgba(37, 99, 235, 0.4);
-  --rc-text: #F1F5F9;
-  --rc-text-muted: #8B949E;
-  --rc-text-dim: #64748B;
-  --rc-accent: #2563EB;
-  --rc-accent-hover: #1D4ED8;
-  --rc-accent-subtle: rgba(37, 99, 235, 0.12);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #111318;
+  --sidebar-primary: #2B5C8F;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EEF1F5;
+  --sidebar-accent-foreground: #111318;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: #4D8FCC;
+
+  /* RegCompiler Design Tokens — Light Foundation */
+  --rc-bg: #F6F7F9;
+  --rc-surface: #FFFFFF;
+  --rc-surface-elevated: #EEF1F5;
+  --rc-surface-highlight: #E5E9F0;
+  --rc-border: rgba(0, 0, 0, 0.08);
+  --rc-border-subtle: rgba(0, 0, 0, 0.04);
+  --rc-border-strong: rgba(0, 0, 0, 0.16);
+  --rc-border-accent: rgba(77, 143, 204, 0.4);
+  --rc-text: #111318;
+  --rc-text-muted: #626873;
+  --rc-text-dim: #8B949E;
+  --rc-accent: #4D8FCC;
+  --rc-accent-hover: #3B72A8;
+  --rc-accent-subtle: rgba(77, 143, 204, 0.12);
+  --rc-steel: #6B8BA4;
+  --rc-champagne: #C9B88A;
   --rc-success: #10B981;
   --rc-warning: #F59E0B;
   --rc-danger: #EF4444;
-  --rc-info: #3B82F6;
+  --rc-info: #4D8FCC;
+}
+
+.dark {
+  /* ========================================================================
+     DARK MODE — Graphite & Near-Black Foundation (Precision Minimalism)
+     ======================================================================== */
+  --background: #050608;
+  --foreground: #F4F6F8;
+  --card: #080A0E;
+  --card-foreground: #F4F6F8;
+  --popover: #0B0E14;
+  --popover-foreground: #F4F6F8;
+  --primary: #4D8FCC;
+  --primary-foreground: #FFFFFF;
+  --secondary: #10141A;
+  --secondary-foreground: #F4F6F8;
+  --muted: #0E1218;
+  --muted-foreground: #9CA3AF;
+  --accent: #141922;
+  --accent-foreground: #F4F6F8;
+  --destructive: #EF4444;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #4D8FCC;
+
+  --chart-1: #4D8FCC;
+  --chart-2: #10B981;
+  --chart-3: #F59E0B;
+  --chart-4: #6B8BA4;
+  --chart-5: #64748B;
+
+  --sidebar: #050608;
+  --sidebar-foreground: #F4F6F8;
+  --sidebar-primary: #4D8FCC;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #0B0E14;
+  --sidebar-accent-foreground: #F4F6F8;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #4D8FCC;
+
+  /* RegCompiler Enterprise Design System Tokens (Near-black Graphite) */
+  --rc-bg: #050608;
+  --rc-surface: #080A0E;
+  --rc-surface-elevated: #0B0E14;
+  --rc-surface-highlight: #10141A;
+  --rc-surface-panel: #141922;
+  --rc-border: rgba(255, 255, 255, 0.06);
+  --rc-border-subtle: rgba(255, 255, 255, 0.035);
+  --rc-border-strong: rgba(255, 255, 255, 0.12);
+  --rc-border-accent: rgba(77, 143, 204, 0.35);
+  --rc-text: #F4F6F8;
+  --rc-text-muted: #9CA3AF;
+  --rc-text-dim: #64748B;
+  --rc-accent: #4D8FCC;
+  --rc-accent-hover: #3B72A8;
+  --rc-accent-subtle: rgba(77, 143, 204, 0.10);
+  --rc-steel: #6B8BA4;
+  --rc-champagne: #C9B88A;
+  --rc-champagne-subtle: rgba(201, 184, 138, 0.12);
+  --rc-success: #10B981;
+  --rc-warning: #F59E0B;
+  --rc-danger: #EF4444;
+  --rc-info: #4D8FCC;
   --rc-radius-sm: 4px;
   --rc-radius-md: 6px;
   --rc-radius-lg: 8px;
@@ -149,7 +185,11 @@
     color-scheme: dark;
   }
   body {
-    @apply bg-[#090B0E] text-[#F1F5F9] antialiased selection:bg-blue-600/30 selection:text-blue-200;
+    background-color: var(--rc-bg);
+    color: var(--rc-text);
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
@@ -157,8 +197,7 @@
 }
 
 /* ==========================================================================
-   Clerk Development Mode Badge & Warning Suppression
-   Hides orange "Development mode" footer notices in all Clerk components
+   CLERK DEV MODE BADGE SUPPRESSION
    ========================================================================== */
 .cl-development-badge,
 .cl-footerAction__developmentMode,
@@ -180,170 +219,101 @@ p[class*="development-badge"] {
 }
 
 /* ==========================================================================
-   ULTRA-PREMIUM LANDING PAGE — Cinematic Animations System
-   All animations scoped to landing page sections via class prefixes.
-   Zero impact on dashboard or other application pages.
+   CINEMATIC AMBIENT LIGHT SYSTEM (30–60s Ultra-Slow Showroom Illumination)
    ========================================================================== */
-
-/* --- Section Entrance Reveal --- */
-@keyframes landing-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
+@keyframes rc-ambient-drift-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.08;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  50% {
+    transform: translate(30px, -20px) scale(1.06);
+    opacity: 0.13;
   }
 }
 
+@keyframes rc-ambient-drift-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.06;
+  }
+  50% {
+    transform: translate(-25px, 25px) scale(0.95);
+    opacity: 0.10;
+  }
+}
+
+.rc-ambient-glow-1 {
+  animation: rc-ambient-drift-1 45s ease-in-out infinite;
+}
+
+.rc-ambient-glow-2 {
+  animation: rc-ambient-drift-2 55s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   CINEMATIC SECTION ENTRANCE & REVEAL
+   ========================================================================== */
 .landing-reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(16px);
+  filter: blur(4px);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .landing-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
+  filter: blur(0);
 }
 
-/* Staggered children reveal */
 .landing-stagger > * {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(12px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .landing-stagger.revealed > *:nth-child(1) { transition-delay: 0ms; }
-.landing-stagger.revealed > *:nth-child(2) { transition-delay: 80ms; }
-.landing-stagger.revealed > *:nth-child(3) { transition-delay: 160ms; }
-.landing-stagger.revealed > *:nth-child(4) { transition-delay: 240ms; }
-.landing-stagger.revealed > *:nth-child(5) { transition-delay: 320ms; }
-.landing-stagger.revealed > *:nth-child(6) { transition-delay: 400ms; }
-.landing-stagger.revealed > *:nth-child(7) { transition-delay: 480ms; }
-.landing-stagger.revealed > *:nth-child(8) { transition-delay: 560ms; }
+.landing-stagger.revealed > *:nth-child(2) { transition-delay: 60ms; }
+.landing-stagger.revealed > *:nth-child(3) { transition-delay: 120ms; }
+.landing-stagger.revealed > *:nth-child(4) { transition-delay: 180ms; }
+.landing-stagger.revealed > *:nth-child(5) { transition-delay: 240ms; }
+.landing-stagger.revealed > *:nth-child(6) { transition-delay: 300ms; }
+.landing-stagger.revealed > *:nth-child(7) { transition-delay: 360ms; }
+.landing-stagger.revealed > *:nth-child(8) { transition-delay: 420ms; }
 .landing-stagger.revealed > * {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* --- CTA Button Glow Pulse --- */
-@keyframes landing-glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 25px rgba(92, 200, 255, 0.25), 0 0 50px rgba(92, 200, 255, 0.08);
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(92, 200, 255, 0.45), 0 0 70px rgba(92, 200, 255, 0.15);
-  }
-}
-.landing-cta-glow {
-  animation: landing-glow-pulse 3s ease-in-out infinite;
-}
-
-/* --- Terminal Cursor Blink --- */
-@keyframes landing-cursor-blink {
+/* Terminal Cursor */
+@keyframes rc-cursor-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
 .landing-cursor {
   display: inline-block;
-  width: 3px;
+  width: 2px;
   height: 1em;
-  background: #5CC8FF;
-  margin-left: 4px;
+  background: var(--rc-accent);
+  margin-left: 3px;
   vertical-align: text-bottom;
-  animation: landing-cursor-blink 1s step-end infinite;
+  animation: rc-cursor-blink 1.2s step-end infinite;
 }
 
-/* --- SVG Edge Dash Flow Animation --- */
-@keyframes landing-dash-flow {
-  to {
-    stroke-dashoffset: -24;
-  }
-}
-.landing-edge-active {
-  stroke-dasharray: 6 6;
-  animation: landing-dash-flow 1.5s linear infinite;
-}
-
-/* --- Subtle Scanline Overlay --- */
-.landing-scanlines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(92, 200, 255, 0.015) 2px,
-    rgba(92, 200, 255, 0.015) 4px
-  );
-  z-index: 1;
-}
-
-/* --- Floating Particle Dots (CTA background) --- */
-@keyframes landing-float-particle {
-  0%, 100% {
-    transform: translateY(0px) translateX(0px);
-    opacity: 0.3;
-  }
-  25% {
-    transform: translateY(-18px) translateX(8px);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(-10px) translateX(-6px);
-    opacity: 0.4;
-  }
-  75% {
-    transform: translateY(-22px) translateX(4px);
-    opacity: 0.5;
-  }
-}
-.landing-particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #5CC8FF;
-  opacity: 0.3;
-  pointer-events: none;
-}
-.landing-particle:nth-child(1) { top: 20%; left: 15%; animation: landing-float-particle 6s ease-in-out infinite 0s; }
-.landing-particle:nth-child(2) { top: 60%; left: 75%; animation: landing-float-particle 7s ease-in-out infinite 1s; }
-.landing-particle:nth-child(3) { top: 35%; left: 85%; animation: landing-float-particle 5s ease-in-out infinite 2s; }
-.landing-particle:nth-child(4) { top: 75%; left: 25%; animation: landing-float-particle 8s ease-in-out infinite 0.5s; }
-.landing-particle:nth-child(5) { top: 45%; left: 50%; animation: landing-float-particle 6.5s ease-in-out infinite 1.5s; }
-
-/* --- Tab Progress Bar --- */
-@keyframes landing-tab-progress {
+/* Tab Progress Line */
+@keyframes rc-tab-progress {
   from { width: 0%; }
   to { width: 100%; }
 }
 .landing-tab-progress-bar {
   height: 2px;
-  background: linear-gradient(90deg, #5CC8FF, #67D6A0);
-  animation: landing-tab-progress 8s linear forwards;
+  background: var(--rc-accent);
+  animation: rc-tab-progress 8s linear forwards;
 }
 
-/* --- Glow Border Pulse --- */
-@keyframes landing-border-glow {
-  0%, 100% {
-    border-color: rgba(92, 200, 255, 0.35);
-    box-shadow: 0 0 15px rgba(92, 200, 255, 0.08);
-  }
-  50% {
-    border-color: rgba(92, 200, 255, 0.55);
-    box-shadow: 0 0 25px rgba(92, 200, 255, 0.18);
-  }
-}
-.landing-border-glow {
-  animation: landing-border-glow 2.5s ease-in-out infinite;
-}
-
-/* --- Code Line Number Gutter --- */
+/* Line Number Gutter */
 .landing-line-numbers {
   counter-reset: line;
 }
@@ -352,218 +322,156 @@ p[class*="development-badge"] {
   content: counter(line, decimal-leading-zero);
   display: inline-block;
   width: 2.5em;
-  margin-right: 1em;
+  margin-right: 1.25em;
   text-align: right;
-  color: #2D3748;
+  color: #475569;
   font-size: 10px;
   user-select: none;
 }
 
-/* --- Reduced Motion Override --- */
+/* ==========================================================================
+   RESTRAINED LIQUID GLASS & TACTILE SOLID SURFACES
+   ========================================================================== */
+.rc-glass {
+  background: rgba(8, 10, 14, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.rc-glass-floating {
+  background: rgba(11, 14, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+}
+
+.rc-surface-solid {
+  background: #080A0E;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rc-surface-elevated {
+  background: #0B0E14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.rc-surface-interactive {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rc-surface-interactive:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Precision Micro-Texture (2-4% tactile grain overlay) */
+.rc-tactile-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Clean Architectural Grid */
+.rc-grid-background {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Subtle Technical Hairline Divider */
+.rc-hairline {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Backward compatibility for stitch-card */
+.stitch-card {
+  background: #080A0E;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+.stitch-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+}
+
+.stitch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.stitch-badge-cyan {
+  background: rgba(77, 143, 204, 0.12);
+  color: #79B5EC;
+  border: 1px solid rgba(77, 143, 204, 0.25);
+}
+
+.stitch-badge-emerald {
+  background: rgba(16, 185, 129, 0.10);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.stitch-badge-amber {
+  background: rgba(245, 158, 11, 0.10);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.stitch-badge-rose {
+  background: rgba(239, 68, 68, 0.10);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* High-Precision Restrained Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #050608;
+}
+::-webkit-scrollbar-thumb {
+  background: #141922;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1E2633;
+}
+
+/* ==========================================================================
+   REDUCED MOTION OVERRIDES (Strict Accessibility)
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .landing-reveal,
   .landing-stagger > * {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
     transition: none !important;
   }
-  .landing-cta-glow,
   .landing-cursor,
-  .landing-edge-active,
-  .landing-particle,
   .landing-tab-progress-bar,
-  .landing-border-glow {
-    animation: none !important;
-  }
-  .landing-scanlines::after {
-    display: none;
-  }
-  .stitch-radar-ping {
+  .rc-ambient-glow-1,
+  .rc-ambient-glow-2 {
     animation: none !important;
   }
   .stitch-card {
     transition: none !important;
     transform: none !important;
   }
-}
-
-/* ==========================================================================
-   GOOGLE STITCH — AETHER-STITCH BESPOKE DESIGN SYSTEM TOKENS & UTILITIES
-   ========================================================================== */
-
-:root {
-  --stitch-bg-void: #090B0E;
-  --stitch-surface-deck: #0E1218;
-  --stitch-surface-card: #12161F;
-  --stitch-surface-elevated: #151A23;
-  --stitch-border-subtle: rgba(255, 255, 255, 0.08);
-  --stitch-border-active: rgba(37, 99, 235, 0.4);
-  --stitch-cyan: #2563EB;
-  --stitch-emerald: #10b981;
-  --stitch-amber: #f59e0b;
-  --stitch-rose: #f43f5e;
-}
-
-/* --- Stitch Obsidian Card --- */
-.stitch-card {
-  background: #0E1218;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  position: relative;
-}
-
-.stitch-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.stitch-card-elevated {
-  background: rgba(14, 21, 32, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
-}
-
-/* --- Tactical Micro-Grid Mesh --- */
-.stitch-grid-mesh {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* --- Stitch Telemetry Badges --- */
-.stitch-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 9999px;
-  line-height: 1;
-}
-
-.stitch-badge-cyan {
-  background: rgba(0, 240, 255, 0.12);
-  color: #00f0ff;
-  border: 1px solid rgba(0, 240, 255, 0.3);
-}
-
-.stitch-badge-emerald {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.stitch-badge-amber {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.stitch-badge-rose {
-  background: rgba(244, 63, 94, 0.12);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.3);
-}
-
-/* --- Tactical HUD Markers & Brackets --- */
-.stitch-hud-tag {
-  font-family: var(--font-mono, monospace);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #64748b;
-}
-
-/* --- Radar Ping Keyframes & Utility --- */
-@keyframes stitch-radar-ping {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
-
-.stitch-radar-ping {
-  animation: stitch-radar-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* --- Cyan & Emerald Glow Accents --- */
-.stitch-glow-cyan {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), 0 0 45px rgba(0, 240, 255, 0.08);
-}
-
-.stitch-glow-emerald {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), 0 0 45px rgba(16, 185, 129, 0.08);
-}
-
-/* --- Bespoke High-Tech Obsidian Scrollbar --- */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #03070c;
-}
-::-webkit-scrollbar-thumb {
-  background: #17222c;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #253748;
-}
-/* ==========================================================================
-   REGCOMPILER ENTERPRISE UTILITY CLASSES
-   ========================================================================== */
-.rc-panel {
-  background: #0E1218;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-.rc-panel-elevated {
-  background: #141922;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
-
-.rc-grid-background {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-.rc-hairline {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.rc-section-title {
-  font-family: var(--font-sans, sans-serif);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #F1F5F9;
-}
-
-.rc-meta-text {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  color: #8B949E;
-  letter-spacing: 0.04em;
 }

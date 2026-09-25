@@ -362,17 +362,17 @@ export default function NewRegulationPage() {
       )}
 
       <div className="flex justify-center mb-8">
-        <div className="bg-black/50 p-1 rounded-lg border border-gray-800 flex gap-1">
+        <div className="bg-[#080A0E] p-1 rounded-[8px] border border-white/[0.08] flex gap-1 shadow-sm">
             <button 
                 onClick={() => { setTab('standard'); setError(null); }}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'standard' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                className={`px-6 py-2 rounded-[6px] text-sm font-medium transition-all flex items-center gap-2 cursor-pointer ${tab === 'standard' ? 'bg-[#4D8FCC] text-white shadow-sm border border-[#79B5EC]/20' : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.04]'}`}
             >
                 <Library className="h-4 w-4" />
                 Standard Framework
             </button>
             <button 
                 onClick={() => { setTab('custom'); setError(null); }}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'custom' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                className={`px-6 py-2 rounded-[6px] text-sm font-medium transition-all flex items-center gap-2 cursor-pointer ${tab === 'custom' ? 'bg-[#4D8FCC] text-white shadow-sm border border-[#79B5EC]/20' : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.04]'}`}
             >
                 <UploadCloud className="h-4 w-4" />
                 Custom Upload
@@ -381,39 +381,39 @@ export default function NewRegulationPage() {
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-red-900/20 border border-red-500/50 rounded-xl flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-          <div className="text-red-200">{error}</div>
+        <div className="mb-8 p-4 bg-red-950/20 border border-red-900/40 rounded-[8px] flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="text-red-200 text-sm">{error}</div>
         </div>
       )}
 
       {tab === 'standard' && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <div className="bg-[#080A0E] border border-white/[0.08] rounded-[10px] p-8 shadow-md">
             <div className="flex items-center gap-3 mb-6">
-              <Library className="h-6 w-6 text-emerald-500" />
-              <h2 className="text-xl font-semibold text-white">Supported Frameworks</h2>
+              <Library className="h-5 w-5 text-[#4D8FCC]" />
+              <h2 className="text-xl font-bold text-[#F4F6F8]">Supported Frameworks</h2>
             </div>
             
             {loadingFrameworks ? (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mb-4" />
-                    <p>Loading catalog...</p>
+                <div className="flex flex-col items-center justify-center py-12 text-[#9CA3AF]">
+                    <Loader2 className="h-7 w-7 animate-spin text-[#4D8FCC] mb-4" />
+                    <p className="font-mono text-xs">Loading statutory catalog...</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {frameworks.map(f => (
-                        <div key={f.id} className="bg-black border border-gray-800 rounded-xl p-5 hover:border-emerald-500/50 transition-colors group flex flex-col">
+                        <div key={f.id} className="bg-[#050608] border border-white/[0.06] rounded-[8px] p-5 hover:border-white/[0.14] transition-all group flex flex-col">
                             <div className="flex justify-between items-start mb-3">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{f.acronym}</h3>
-                                    <p className="text-xs text-gray-500 mt-1">{f.name}</p>
+                                    <h3 className="text-base font-bold text-[#F4F6F8] group-hover:text-[#93C5FD] transition-colors">{f.acronym}</h3>
+                                    <p className="text-xs text-[#9CA3AF] mt-1">{f.name}</p>
                                 </div>
-                                <span className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded flex items-center gap-1">
-                                    <Globe className="h-3 w-3" />
+                                <span className="bg-[#0B0E14] text-[#CBD5E1] border border-white/[0.06] text-xs px-2 py-0.5 rounded-[4px] flex items-center gap-1 font-mono">
+                                    <Globe className="h-3 w-3 text-[#4D8FCC]" />
                                     {f.jurisdiction}
                                 </span>
                             </div>
-                            <p className="text-sm text-gray-400 mb-6 flex-grow">{f.description}</p>
+                            <p className="text-xs text-[#9CA3AF] mb-6 flex-grow leading-relaxed">{f.description}</p>
                             
                             {f.is_fetchable ? (
                                 <button 
@@ -425,27 +425,27 @@ export default function NewRegulationPage() {
                                       handleIngestFramework(f.acronym);
                                     }}
                                     disabled={isUploading || isLimitReached}
-                                    className={`w-full transition-all rounded py-2 text-sm font-medium flex items-center justify-center gap-2 ${
+                                    className={`w-full transition-all rounded-[6px] py-2.5 text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
                                         isLimitReached
-                                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 cursor-pointer'
+                                            ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20'
                                             : ingesting === f.acronym
-                                            ? 'bg-emerald-600 text-white border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                                            : 'bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30'
+                                            ? 'bg-[#4D8FCC] text-white border border-[#79B5EC]/30'
+                                            : 'bg-[#4D8FCC]/15 hover:bg-[#4D8FCC] text-[#93C5FD] hover:text-white border border-[#4D8FCC]/30'
                                     }`}
                                 >
                                     {isLimitReached ? (
                                         <>
-                                            <Lock className="h-4 w-4 text-amber-400" />
+                                            <Lock className="h-3.5 w-3.5 text-amber-400" />
                                             <span>3/3 Used • Upgrade to Pro</span>
                                         </>
                                     ) : ingesting === f.acronym ? (
                                         <>
-                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                             <span>Ingesting & Compiling {f.acronym}...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <RCIcon name="compiler" size={16} />
+                                            <RCIcon name="compiler" size={14} />
                                             <span>Live Ingest & Compile</span>
                                         </>
                                     )}
@@ -454,9 +454,9 @@ export default function NewRegulationPage() {
                                 <button 
                                     onClick={() => setTab('custom')}
                                     disabled={isLimitReached}
-                                    className={`w-full transition-colors rounded py-2 text-sm font-medium flex items-center justify-center gap-2 ${isLimitReached ? 'bg-gray-900 text-gray-600 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-700 text-gray-300'}`}
+                                    className={`w-full transition-colors rounded-[6px] py-2.5 text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer ${isLimitReached ? 'bg-[#0B0E14] text-[#64748B] cursor-not-allowed' : 'bg-[#0B0E14] hover:bg-[#10141A] text-[#CBD5E1] border border-white/[0.06]'}`}
                                 >
-                                    <UploadCloud className="h-4 w-4" />
+                                    <UploadCloud className="h-3.5 w-3.5" />
                                     Requires Upload
                                 </button>
                             )}
@@ -468,46 +468,46 @@ export default function NewRegulationPage() {
       )}
 
       {tab === 'custom' && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-2xl mx-auto">
+        <div className="bg-[#080A0E] border border-white/[0.08] rounded-[10px] p-8 max-w-2xl mx-auto shadow-md">
           <div className="flex items-center gap-3 mb-6">
-            <UploadCloud className="h-6 w-6 text-emerald-500" />
-            <h2 className="text-xl font-semibold text-white">Custom Upload</h2>
+            <UploadCloud className="h-5 w-5 text-[#4D8FCC]" />
+            <h2 className="text-xl font-bold text-[#F4F6F8]">Custom Upload Studio</h2>
           </div>
 
           <div className="space-y-6">
             {/* Metadata Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Regulation Name</label>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#9CA3AF] mb-1.5 font-medium">Regulation Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. GDPR, HIPAA"
+                  placeholder="e.g. EU AI Act, HIPAA"
                   disabled={isUploading || isLimitReached}
-                  className={`w-full bg-black border rounded-lg p-3 text-white transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'}`}
+                  className={`w-full bg-[#050608] border rounded-[6px] p-3 text-sm text-[#F4F6F8] placeholder-[#475569] transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-white/[0.08] focus:border-[#4D8FCC] focus:ring-1 focus:ring-[#4D8FCC]/30'}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Jurisdiction</label>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#9CA3AF] mb-1.5 font-medium">Jurisdiction</label>
                 <input
                   type="text"
                   value={jurisdiction}
                   onChange={(e) => setJurisdiction(e.target.value)}
                   placeholder="e.g. EU, US, Global"
                   disabled={isUploading || isLimitReached}
-                  className={`w-full bg-black border rounded-lg p-3 text-white transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-transparent'}`}
+                  className={`w-full bg-[#050608] border rounded-[6px] p-3 text-sm text-[#F4F6F8] placeholder-[#475569] transition-all outline-none ${isLimitReached ? 'border-amber-500/30 opacity-50 cursor-not-allowed' : 'border-white/[0.08] focus:border-[#4D8FCC] focus:ring-1 focus:ring-[#4D8FCC]/30'}`}
                 />
               </div>
             </div>
 
             {/* Drop Zone */}
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+              className={`border-2 border-dashed rounded-[8px] p-8 text-center transition-all ${
                 isLimitReached ? 'border-amber-500/30 bg-amber-500/5 opacity-50 pointer-events-none cursor-not-allowed' :
-                isDragging ? 'border-emerald-500 bg-emerald-500/10' : 
-                file ? 'border-emerald-500/50 bg-emerald-500/5' : 
-                'border-gray-700 hover:border-gray-500 hover:bg-gray-800/50'
+                isDragging ? 'border-[#4D8FCC] bg-[#0E1524]' : 
+                file ? 'border-[#4D8FCC]/50 bg-[#080A0E]' : 
+                'border-white/[0.10] hover:border-white/[0.20] bg-[#050608]'
               }`}
               onDragOver={(e) => { e.preventDefault(); if (!isLimitReached) setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
@@ -515,27 +515,27 @@ export default function NewRegulationPage() {
             >
               {file ? (
                 <div className="flex flex-col items-center">
-                  <div className="h-16 w-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-4">
-                    <FileText className="h-8 w-8 text-emerald-500" />
+                  <div className="h-14 w-14 bg-[#4D8FCC]/15 rounded-[8px] flex items-center justify-center mb-4 border border-[#4D8FCC]/25">
+                    <FileText className="h-7 w-7 text-[#79B5EC]" />
                   </div>
-                  <div className="text-white font-medium mb-1">{file.name}</div>
-                  <div className="text-gray-400 text-sm mb-4">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                  <div className="text-[#F4F6F8] font-medium text-sm mb-1">{file.name}</div>
+                  <div className="text-[#9CA3AF] text-xs mb-4 font-mono">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
                   <button 
                     onClick={() => setFile(null)}
-                    className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                    className="text-xs text-rose-400 hover:text-rose-300 font-mono transition-colors cursor-pointer"
                   >
                     Remove file
                   </button>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <div className={`h-16 w-16 rounded-full flex items-center justify-center mb-4 ${isLimitReached ? 'bg-amber-500/10 text-amber-400' : 'bg-gray-800 text-gray-400'}`}>
-                    {isLimitReached ? <Lock className="h-8 w-8 text-amber-400" /> : <UploadCloud className="h-8 w-8 text-gray-400" />}
+                  <div className={`h-14 w-14 rounded-[8px] flex items-center justify-center mb-4 border ${isLimitReached ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-[#080A0E] text-[#9CA3AF] border-white/[0.08]'}`}>
+                    {isLimitReached ? <Lock className="h-6 w-6 text-amber-400" /> : <UploadCloud className="h-6 w-6 text-[#4D8FCC]" />}
                   </div>
-                  <p className="text-white font-medium mb-2">
-                    {isLimitReached ? "Upload Locked — Free Uses Exhausted (3/3 Used)" : "Drag and drop your regulatory document here"}
+                  <p className="text-[#F4F6F8] font-medium text-sm mb-1.5">
+                    {isLimitReached ? "Upload Locked — Free Uses Exhausted (3/3 Used)" : "Drag and drop statutory document"}
                   </p>
-                  <p className="text-gray-400 text-sm mb-6">
+                  <p className="text-[#64748B] text-xs mb-5 font-mono">
                     {isLimitReached ? "Upgrade to Pro to unlock unlimited document parsing" : "Supports PDF and HTML files up to 50MB"}
                   </p>
                   <button 
@@ -547,7 +547,7 @@ export default function NewRegulationPage() {
                       }
                     }}
                     disabled={isLimitReached}
-                    className={`px-6 py-2 font-medium rounded-lg transition-colors ${isLimitReached ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-white text-black hover:bg-gray-200'}`}
+                    className={`px-5 py-2 font-medium text-xs uppercase tracking-wider rounded-[6px] transition-colors cursor-pointer ${isLimitReached ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-[#0B0E14] text-[#F4F6F8] border border-white/[0.12] hover:border-white/[0.24] hover:bg-[#11151A]'}`}
                   >
                     {isLimitReached ? "Action Locked" : "Browse Files"}
                   </button>
@@ -567,8 +567,8 @@ export default function NewRegulationPage() {
             </div>
 
             {error && (
-              <div className="p-4 bg-red-950/30 border border-red-900/50 rounded-xl flex items-start gap-3 text-sm text-red-300">
-                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+              <div className="p-4 bg-red-950/20 border border-red-900/40 rounded-[8px] flex items-start gap-3 text-xs text-red-300">
+                <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
                 <div>{error}</div>
               </div>
             )}
@@ -577,29 +577,29 @@ export default function NewRegulationPage() {
             {isLimitReached ? (
               <button
                 onClick={() => setIsPaywallOpen(true)}
-                className="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all cursor-pointer shadow-lg shadow-amber-500/10"
+                className="w-full py-3.5 rounded-[6px] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition-all cursor-pointer shadow-sm"
               >
-                <Lock className="h-5 w-5 text-amber-400" />
+                <Lock className="h-4 w-4 text-amber-400" />
                 <span>3/3 Free Uses Consumed • Upgrade to Pro</span>
               </button>
             ) : (
               <button
                 onClick={handleUpload}
                 disabled={isUploading || !file || !name || !jurisdiction}
-                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
+                className={`w-full py-3.5 rounded-[6px] font-semibold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-sm ${
                   isUploading || !file || !name || !jurisdiction
-                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                    ? 'bg-[#0B0E14] text-[#64748B] cursor-not-allowed border border-white/[0.06]'
+                    : 'bg-[#4D8FCC] hover:bg-[#3B72A8] text-white border border-[#79B5EC]/20 active:scale-[0.99]'
                 }`}
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                     Ingesting Document...
                   </>
                 ) : (
                   <>
-                    <RCIcon name="compiler" size={24} />
+                    <RCIcon name="compiler" size={18} />
                     Start Ingestion Pipeline
                   </>
                 )}
@@ -610,32 +610,32 @@ export default function NewRegulationPage() {
       )}
 
       {/* Feature Highlights Footer */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto opacity-70">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-gray-900 rounded-lg shrink-0">
-            <FileSearch className="h-5 w-5 text-gray-400" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-4xl mx-auto">
+        <div className="flex items-start gap-3 p-4 rounded-[8px] bg-[#080A0E] border border-white/[0.06]">
+          <div className="p-2 bg-[#0B0E14] border border-white/[0.06] rounded-[6px] shrink-0 text-[#4D8FCC]">
+            <FileSearch className="h-4 w-4" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-300">Semantic Parsing</h4>
-            <p className="text-xs text-gray-500 mt-1">AI models extract obligations, definitions, and exceptions.</p>
+            <h4 className="text-xs font-bold text-[#F4F6F8]">Semantic Parsing</h4>
+            <p className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">Deterministic AST extracts obligations, definitions, and boundaries.</p>
           </div>
         </div>
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-gray-900 rounded-lg shrink-0">
-            <RCIcon name="traceability" size={20} className="text-gray-400" />
+        <div className="flex items-start gap-3 p-4 rounded-[8px] bg-[#080A0E] border border-white/[0.06]">
+          <div className="p-2 bg-[#0B0E14] border border-white/[0.06] rounded-[6px] shrink-0 text-[#4D8FCC]">
+            <RCIcon name="traceability" size={16} />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-300">Graph Linking</h4>
-            <p className="text-xs text-gray-500 mt-1">Identifies dependencies and builds a knowledge graph.</p>
+            <h4 className="text-xs font-bold text-[#F4F6F8]">Graph Harmonization</h4>
+            <p className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">Identifies cross-framework dependencies and builds a unified knowledge graph.</p>
           </div>
         </div>
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-gray-900 rounded-lg shrink-0">
-            <ShieldCheck className="h-5 w-5 text-gray-400" />
+        <div className="flex items-start gap-3 p-4 rounded-[8px] bg-[#080A0E] border border-white/[0.06]">
+          <div className="p-2 bg-[#0B0E14] border border-white/[0.06] rounded-[6px] shrink-0 text-emerald-400">
+            <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-300">Policy Generation</h4>
-            <p className="text-xs text-gray-500 mt-1">Outputs executable compliance policies automatically.</p>
+            <h4 className="text-xs font-bold text-[#F4F6F8]">Policy Generation</h4>
+            <p className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">Emits executable verification policies and cryptographic audit traces.</p>
           </div>
         </div>
       </div>

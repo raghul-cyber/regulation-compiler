@@ -80,15 +80,15 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[var(--rc-border)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5 font-mono text-[9px] tracking-widest text-[#64748B] uppercase">
-            <span className="text-[#3B82F6]">+</span>
+            <span className="text-[#4D8FCC]">+</span>
             <span>STATUTORY MISSION CONTROL</span>
             <span className="text-[#475569]">/</span>
             <span>NODE-SURVEILLANCE-01</span>
-            <span className="text-[#3B82F6]">+</span>
+            <span className="text-[#4D8FCC]">+</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F4F6F8] flex items-center gap-3">
             <span>Compliance Hub</span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#2563EB]/15 text-[#93C5FD] border border-[#2563EB]/30 hidden sm:inline-flex">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30 hidden sm:inline-flex">
               Deterministic AST
             </span>
           </h1>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2 font-mono text-xs">
-          <div className="px-3 py-1.5 rounded-lg bg-[#0E1218] border border-[var(--rc-border)] flex items-center gap-2 text-[#CBD5E1]">
+          <div className="px-3 py-1.5 rounded-lg bg-[#080A0E] border border-[var(--rc-border)] flex items-center gap-2 text-[#CBD5E1]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
             <span>10 Authorities Live</span>
           </div>
@@ -106,7 +106,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Elevated Enterprise Command Tabs */}
-      <div className="flex gap-1.5 p-1.5 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] overflow-x-auto scrollbar-none">
+      <div className="flex gap-1.5 p-1.5 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] overflow-x-auto scrollbar-none">
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
           return (
@@ -115,18 +115,18 @@ export default function DashboardPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3.5 py-2 text-xs font-mono rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 isActive
-                  ? 'bg-[#141922] border border-[#2563EB] text-[#F1F5F9] font-medium shadow-sm'
-                  : 'border border-transparent text-[#94A3B8] hover:text-white hover:bg-[#141922]/50'
+                  ? 'bg-[#10141A] border border-[#4D8FCC]/50 text-[#F4F6F8] font-medium shadow-sm'
+                  : 'border border-transparent text-[#94A3B8] hover:text-[#F4F6F8] hover:bg-[#10141A]/50'
               }`}
             >
               <span>{tab.label}</span>
               {'isNew' in tab && tab.isNew && (
-                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#2563EB]/20 text-[#93C5FD] border border-[#2563EB]/30">
+                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#4D8FCC]/20 text-[#93C5FD] border border-[#4D8FCC]/30">
                   NEW
                 </span>
               )}
               {'adminOnly' in tab && tab.adminOnly && (
-                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#F59E0B]/20 text-[#FBBF24] border border-[#F59E0B]/30">
+                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#C9B88A]/20 text-[#C9B88A] border border-[#C9B88A]/30">
                   <ShieldAlert className="w-2.5 h-2.5 inline mr-0.5" />
                   ADMIN
                 </span>

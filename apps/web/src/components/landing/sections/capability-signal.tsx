@@ -19,9 +19,9 @@ export function CapabilitySignal() {
     <section className="w-full max-w-6xl mx-auto px-4 pointer-events-auto">
       <div 
         ref={ref} 
-        className={`landing-stagger ${isRevealed ? 'revealed' : ''} py-3.5 px-5 rounded-[8px] bg-[#0E1218] border border-white/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.4)]`}
+        className={`landing-stagger ${isRevealed ? 'revealed' : ''} py-3.5 px-5 rounded-[8px] bg-[#080A0E] border border-white/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.5)]`}
       >
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 divide-y sm:divide-y-0 lg:divide-x divide-white/[0.06]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 divide-y sm:divide-y-0 lg:divide-x divide-white/[0.05]">
           {CAPABILITIES.map((cap, i) => {
             const Icon = cap.icon;
             return (
@@ -31,9 +31,9 @@ export function CapabilitySignal() {
                   i > 0 ? 'lg:pl-4' : ''
                 }`}
               >
-                <div className="flex items-center gap-1.5 mb-1 text-[#3B82F6] group-hover:text-[#60A5FA] transition-colors">
+                <div className="flex items-center gap-1.5 mb-1 text-[#4D8FCC] group-hover:text-[#79B5EC] transition-colors">
                   <Icon className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px] tracking-wider uppercase font-semibold text-[#94A3B8] group-hover:text-[#F1F5F9]">
+                  <span className="font-mono text-[10px] tracking-wider uppercase font-semibold text-[#9CA3AF] group-hover:text-[#F4F6F8]">
                     {cap.label}
                   </span>
                 </div>

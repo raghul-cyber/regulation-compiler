@@ -14,8 +14,7 @@ import {
   ArrowLeft,
   RefreshCw,
   Cpu,
-  RotateCcw,
-  Sparkles
+  RotateCcw
 } from 'lucide-react';
 
 interface RequirementsBrowserViewProps {
@@ -314,15 +313,15 @@ export function RequirementsBrowserView({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#4D8FCC]/15 text-[#A3C7E8] border border-[#4D8FCC]/30">
                 {jurisdiction} Jurisdiction
               </span>
               <span className="text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" />
                 Enforceable Ruleset
               </span>
-              <span className="text-xs font-medium text-cyan-300 bg-cyan-950/40 border border-cyan-800/60 px-2.5 py-0.5 rounded-full flex items-center gap-1 font-mono">
-                <Cpu className="w-3 h-3" />
+              <span className="text-xs font-medium text-[#A3C7E8] bg-[#0E1524] border border-[var(--rc-border)] px-2.5 py-0.5 rounded-full flex items-center gap-1 font-mono">
+                <Cpu className="w-3 h-3 text-[#4D8FCC]" />
                 {requirements.length} Active Control{requirements.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -352,8 +351,8 @@ export function RequirementsBrowserView({
 
       {/* Loading state indicator */}
       {isClientLoading && (
-        <div className="rounded-xl border border-blue-500/30 bg-blue-950/20 p-8 text-center text-zinc-300 shadow-md flex flex-col items-center justify-center gap-2">
-          <RefreshCw className="w-6 h-6 animate-spin text-blue-400" />
+        <div className="rounded-xl border border-[var(--rc-border)] bg-[var(--rc-surface)] p-8 text-center text-zinc-300 shadow-sm flex flex-col items-center justify-center gap-2">
+          <RefreshCw className="w-6 h-6 animate-spin text-[#4D8FCC]" />
           <p className="text-sm font-semibold text-white">Compiling Live Statutory Requirements...</p>
           <p className="text-xs text-zinc-400">Extracting machine-actionable AST conditions from official regulation text</p>
         </div>

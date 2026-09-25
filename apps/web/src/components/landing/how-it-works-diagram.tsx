@@ -154,27 +154,27 @@ const STAGES: Stage[] = [
 
 const AUTO_ROTATE_MS = 10000;
 
-/** Simple JSON syntax highlighter for the code snippets */
+/** Simple JSON syntax highlighter with luxury enterprise palette */
 function HighlightedJSON({ code }: { code: string }) {
   const lines = code.split('\n');
   return (
     <>
       {lines.map((line, i) => {
-        // Highlight JSON keys, string values, numbers, booleans, and comments
+        // Highlight JSON keys, string values, numbers, booleans, and comments with muted luxury tones
         const highlighted = line
           // Comments
-          .replace(/(\/\/.*)$/g, '<span style="color:#62717C">$1</span>')
+          .replace(/(\/\/.*)$/g, '<span style="color:#64748B">$1</span>')
           // JSON keys  
-          .replace(/"([^"]+)"(?=\s*:)/g, '<span style="color:#5CC8FF">"$1"</span>')
+          .replace(/"([^"]+)"(?=\s*:)/g, '<span style="color:#93C5FD">"$1"</span>')
           // String values (after colon)
-          .replace(/:\s*"([^"]+)"/g, ': <span style="color:#67D6A0">"$1"</span>')
+          .replace(/:\s*"([^"]+)"/g, ': <span style="color:#A7F3D0">"$1"</span>')
           // Array string values
-          .replace(/\[\s*"([^"]+)"/g, '[<span style="color:#67D6A0">"$1"</span>')
-          .replace(/,\s*"([^"]+)"/g, ', <span style="color:#67D6A0">"$1"</span>')
+          .replace(/\[\s*"([^"]+)"/g, '[<span style="color:#A7F3D0">"$1"</span>')
+          .replace(/,\s*"([^"]+)"/g, ', <span style="color:#A7F3D0">"$1"</span>')
           // Numbers
-          .replace(/:\s*(\d+\.?\d*)/g, ': <span style="color:#FFB86C">$1</span>')
+          .replace(/:\s*(\d+\.?\d*)/g, ': <span style="color:#E2B170">$1</span>')
           // Booleans
-          .replace(/:\s*(true|false)/g, ': <span style="color:#67D6A0">$1</span>');
+          .replace(/:\s*(true|false)/g, ': <span style="color:#A7F3D0">$1</span>');
         
         return (
           <div key={i} dangerouslySetInnerHTML={{ __html: highlighted || '&nbsp;' }} />
@@ -236,12 +236,12 @@ export function HowItWorksDiagram() {
               onClick={() => handleManualSwitch(idx)}
               className={`text-left p-4 rounded-xl border transition-all duration-200 relative group cursor-pointer overflow-hidden ${
                 isActive
-                  ? 'bg-[#141922] border-[#2563EB] shadow-sm'
-                  : 'bg-[#0E1218] border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#141922]/50'
+                  ? 'bg-[#10141A] border-[#4D8FCC]/50 shadow-sm'
+                  : 'bg-[#080A0E] border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${isActive ? 'bg-[#2563EB]/15 text-[#3B82F6]' : 'bg-[#141922] text-[#94A3B8]'} transition-colors`}>
+                <div className={`p-2 rounded-lg ${isActive ? 'bg-[#4D8FCC]/15 text-[#93C5FD]' : 'bg-[#10141A] text-[#94A3B8]'} transition-colors`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <span className="font-mono text-xs font-bold text-[#64748B] group-hover:text-[#94A3B8]">
@@ -249,7 +249,7 @@ export function HowItWorksDiagram() {
                 </span>
               </div>
 
-              <h4 className="text-sm font-bold text-white mb-1 group-hover:text-[#93C5FD] transition-colors">
+              <h4 className="text-sm font-bold text-[#F4F6F8] mb-1 group-hover:text-[#93C5FD] transition-colors">
                 {stage.title}
               </h4>
               <p className="text-xs text-[#94A3B8] line-clamp-1">
@@ -258,7 +258,7 @@ export function HowItWorksDiagram() {
 
               {/* Auto-rotate progress bar */}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB]" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4D8FCC]" />
               )}
             </button>
           );
@@ -266,20 +266,20 @@ export function HowItWorksDiagram() {
       </div>
 
       {/* Visual Workflow Diagram Box */}
-      <div className="rounded-2xl border border-[var(--rc-border)] bg-[#0E1218] p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div className="rounded-2xl border border-[var(--rc-border)] bg-[#080A0E] p-6 md:p-8 shadow-2xl relative overflow-hidden">
         {/* Top Header of Active Stage */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-[var(--rc-border)]">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-[#2563EB]/30 bg-[#2563EB]/10 text-[#93C5FD]">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-[#4D8FCC]/30 bg-[#4D8FCC]/10 text-[#93C5FD]">
                 Stage {activeStage.step}: {activeStage.badge}
               </span>
               <span className="text-xs text-[#64748B] font-mono flex items-center gap-1">
-                <Zap className="w-3 h-3 text-[#F59E0B]" />
+                <Zap className="w-3 h-3 text-[#C9B88A]" />
                 Autonomous Execution
               </span>
             </div>
-            <h3 className="text-2xl font-extrabold text-white tracking-tight">
+            <h3 className="text-2xl font-extrabold text-[#F4F6F8] tracking-tight">
               {activeStage.title} — {activeStage.subtitle}
             </h3>
           </div>
@@ -288,13 +288,13 @@ export function HowItWorksDiagram() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleManualSwitch((activeStageIndex > 0 ? activeStageIndex - 1 : STAGES.length - 1))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#141922] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] text-[#CBD5E1] hover:text-white transition-all cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#10141A] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] text-[#CBD5E1] hover:text-white transition-all cursor-pointer"
             >
               Previous
             </button>
             <button
               onClick={() => handleManualSwitch((activeStageIndex < STAGES.length - 1 ? activeStageIndex + 1 : 0))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#4D8FCC] hover:bg-[#3D7BBB] text-white transition-all flex items-center gap-1 cursor-pointer shadow-sm"
             >
               <span>Next Stage</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -317,8 +317,8 @@ export function HowItWorksDiagram() {
               </h5>
               <div className="space-y-2">
                 {activeStage.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#CBD5E1] bg-[#090D13] border border-[var(--rc-border)] p-2.5 rounded-lg">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] mt-1.5 shrink-0" />
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#CBD5E1] bg-[#050608] border border-[var(--rc-border)] p-2.5 rounded-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC] mt-1.5 shrink-0" />
                     <span>{h}</span>
                   </div>
                 ))}
@@ -337,8 +337,8 @@ export function HowItWorksDiagram() {
 
           {/* Right Column: Code & AST Inspector with Syntax Highlighting */}
           <div className="lg:col-span-7">
-            <div className="rounded-xl border border-[var(--rc-border)] bg-[#05070A] overflow-hidden shadow-xl">
-              <div className="px-4 py-2.5 bg-[#090D13] border-b border-[var(--rc-border)] flex items-center justify-between">
+            <div className="rounded-xl border border-[var(--rc-border)] bg-[#050608] overflow-hidden shadow-xl">
+              <div className="px-4 py-2.5 bg-[#0B0E14] border-b border-[var(--rc-border)] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
@@ -349,7 +349,7 @@ export function HowItWorksDiagram() {
                     {activeStage.codeTitle}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-[#64748B] uppercase bg-[#141922] px-2 py-0.5 rounded border border-[var(--rc-border)]">
+                <span className="text-[10px] font-mono text-[#64748B] uppercase bg-[#10141A] px-2 py-0.5 rounded border border-[var(--rc-border)]">
                   SYNTACTIC AST
                 </span>
               </div>

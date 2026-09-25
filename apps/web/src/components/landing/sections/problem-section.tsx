@@ -40,15 +40,15 @@ export function ProblemSection() {
     <section id="problem" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Section Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-16`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1218] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <AlertCircle className="w-3.5 h-3.5 text-[#3B82F6]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-white/[0.06] text-[#79B5EC] text-xs font-mono font-medium uppercase tracking-wider mb-4">
+          <AlertCircle className="w-3.5 h-3.5 text-[#4D8FCC]" />
           The Structural Disconnect
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F1F5F9] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
           Regulations were written for humans. <br />
-          <span className="text-[#94A3B8]">Compliance systems need structure.</span>
+          <span className="text-[#9CA3AF]">Compliance systems need structure.</span>
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#9CA3AF] leading-relaxed">
           Traditional compliance relies on manual PDF audits, subjective checklists, and static spreadsheets. As global regulatory bodies publish thousands of statutory amendments every year, manual interpretation collapses under operational ambiguity.
         </p>
       </div>
@@ -68,23 +68,23 @@ export function ProblemSection() {
                 onClick={() => setSelectedFragment(frag.id)}
                 className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer text-left ${
                   isSelected
-                    ? 'bg-[#141922] border-[#2563EB] shadow-sm'
-                    : 'bg-[#0E1218] border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#141922]/50'
+                    ? 'bg-[#0B0E14] border-[#4D8FCC]/50 shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
+                    : 'bg-[#080A0E] border-white/[0.06] hover:border-white/[0.12] hover:bg-[#0B0E14]/60'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#3B82F6]" />
-                    <span className="font-mono text-xs font-bold text-[#F1F5F9]">{frag.ref}</span>
+                    <FileText className="w-4 h-4 text-[#4D8FCC]" />
+                    <span className="font-mono text-xs font-bold text-[#F4F6F8]">{frag.ref}</span>
                   </div>
                   <span className="font-mono text-[10px] text-[#F87171] bg-[#EF4444]/10 px-2 py-0.5 rounded border border-[#EF4444]/25">
                     {frag.flag}
                   </span>
                 </div>
-                <p className="text-xs text-[#94A3B8] italic line-clamp-2">
+                <p className="text-xs text-[#9CA3AF] italic line-clamp-2">
                   &ldquo;{frag.text}&rdquo;
                 </p>
-                <div className="mt-2.5 pt-2 border-t border-[var(--rc-border)] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
+                <div className="mt-2.5 pt-2 border-t border-white/[0.05] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
                   <span>Vulnerability: {frag.state}</span>
                 </div>
               </div>
@@ -97,50 +97,39 @@ export function ProblemSection() {
           <div className="text-xs font-mono text-[#64748B] uppercase tracking-wider mb-2">
             02 // AUTOMATED PARSER TRANSFORMATION
           </div>
-          <div className="p-6 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] text-left relative overflow-hidden">
-            {/* Resolution Step Indicators */}
-            <div className="space-y-4 font-mono text-xs">
-              <div className="p-3 rounded-lg bg-[#090D13] border border-[var(--rc-border)] flex items-start gap-3">
-                <div className="p-1.5 rounded bg-[#141922] text-[#3B82F6] mt-0.5">
-                  <Split className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-[#F1F5F9] font-semibold">1. Boundary Tokenization</div>
-                  <div className="text-[#94A3B8] text-[11px] mt-0.5">
-                    Isolating discrete statutory obligations from preamble recitals and guidance notes.
-                  </div>
-                </div>
+          <div className="p-6 rounded-xl bg-[#080A0E] border border-white/[0.06] text-left relative overflow-hidden">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.05] mb-4">
+              <span className="font-mono text-xs text-[#4D8FCC] uppercase tracking-wider font-semibold">
+                Syntactic Boundary Deconstruction
+              </span>
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+                Deterministic
+              </span>
+            </div>
+
+            <div className="space-y-4 text-xs font-mono">
+              <div className="p-3.5 rounded-lg bg-[#050608] border border-white/[0.05]">
+                <div className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Normalized Legal Entity</div>
+                <div className="text-[#F4F6F8] font-bold">HIGH_RISK_AI_OPERATOR // ARTICLE_09</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#090D13] border border-[var(--rc-border)] flex items-start gap-3">
-                <div className="p-1.5 rounded bg-[#141922] text-[#3B82F6] mt-0.5">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-[#F1F5F9] font-semibold">2. Dependency Graph Resolution</div>
-                  <div className="text-[#94A3B8] text-[11px] mt-0.5">
-                    Connecting articles to specific technical security controls, data schemas, and threshold limits.
-                  </div>
-                </div>
+              <div className="p-3.5 rounded-lg bg-[#050608] border border-white/[0.05]">
+                <div className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Extracted Obligation Scope</div>
+                <div className="text-emerald-400 font-semibold">[MANDATORY] Continuous Lifecycle Risk Assessment</div>
+                <div className="text-[#9CA3AF] mt-1 text-[11px]">Enforces active systematic reviews and verified post-market logs.</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#090D13] border border-[#10B981]/30 flex items-start gap-3">
-                <div className="p-1.5 rounded bg-[#10B981]/15 text-[#10B981] mt-0.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-[#10B981] font-semibold">3. Deterministic AST Emission</div>
-                  <div className="text-[#94A3B8] text-[11px] mt-0.5">
-                    Compiling legal mandates into unambiguous, machine-evaluable boolean conditions with cryptographic proof traces.
-                  </div>
+              <div className="p-3.5 rounded-lg bg-[#050608] border border-white/[0.05]">
+                <div className="text-[10px] text-[#64748B] uppercase tracking-wider mb-1">Target Engine AST Assertion</div>
+                <div className="text-[#79B5EC] overflow-x-auto whitespace-pre">
+                  {`assert(system.lifecycle.iterative_review == true)\nassert(system.risk_framework.documented == true)`}
                 </div>
               </div>
             </div>
 
-            {/* Microstatus badge */}
-            <div className="mt-5 pt-4 border-t border-[var(--rc-border)] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
-              <span>ZERO HUMAN AMBIGUITY</span>
-              <span className="text-[#10B981] font-semibold">DETERMINISTIC COMPILATION</span>
+            <div className="mt-5 pt-3 border-t border-white/[0.05] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
+              <span>Latency: &lt;12ms</span>
+              <span className="text-emerald-400">ZERO SEMANTIC DRIFT</span>
             </div>
           </div>
         </div>

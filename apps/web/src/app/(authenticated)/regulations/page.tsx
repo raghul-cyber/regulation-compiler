@@ -26,11 +26,11 @@ export default function RegulationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--rc-border)] pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1 font-mono text-[9px] tracking-widest text-[#64748B] uppercase">
-            <span className="text-[#3B82F6]">+</span>
+            <span className="text-[#C9B88A]">+</span>
             <span>DIRECTORY: CANONICAL STATUTES</span>
             <span className="text-[#475569]">/</span>
             <span>ENFORCEABLE CONTROLS</span>
-            <span className="text-[#3B82F6]">+</span>
+            <span className="text-[#C9B88A]">+</span>
           </div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Canonical Regulations</h1>
@@ -45,7 +45,7 @@ export default function RegulationsPage() {
         </div>
         <div className="flex items-center gap-2 font-mono text-xs">
           <Link href="/dashboard">
-            <Button variant="outline" size="sm" className="border-[var(--rc-border)] bg-[#0E1218] text-[#CBD5E1] hover:text-white hover:border-[#2563EB] text-xs transition-all">
+            <Button variant="outline" size="sm" className="border-white/[0.08] bg-[#080A0E] text-[#CBD5E1] hover:text-[#F4F6F8] hover:border-[#4D8FCC]/50 text-xs transition-all cursor-pointer">
               Return to Hub
             </Button>
           </Link>

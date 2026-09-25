@@ -44,7 +44,7 @@ function PipelineLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean
         dummy.scale.set(1, 1, 1);
         dummy.updateMatrix();
         particlesRef.current!.setMatrixAt(i, dummy.matrix);
-        const color = new THREE.Color(p.phase === 0 ? "#94a3b8" : "#38bdf8");
+        const color = new THREE.Color(p.phase === 0 ? "#7C8B9E" : "#4D8FCC");
         particlesRef.current!.setColorAt(i, color);
       });
       particlesRef.current.instanceMatrix.needsUpdate = true;
@@ -78,7 +78,7 @@ function PipelineLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean
         dummy.updateMatrix();
         particlesRef.current!.setMatrixAt(i, dummy.matrix);
         
-        const color = new THREE.Color(p.phase === 0 ? "#94a3b8" : "#38bdf8");
+        const color = new THREE.Color(p.phase === 0 ? "#7C8B9E" : "#4D8FCC");
         particlesRef.current!.setColorAt(i, color);
       });
       particlesRef.current.instanceMatrix.needsUpdate = true;
@@ -90,28 +90,28 @@ function PipelineLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean
 
   return (
     <>
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[5, 10, 5]} intensity={1.5} color="#4f46e5" />
-      <directionalLight position={[-5, 5, -5]} intensity={1} color="#06b6d4" />
-      <pointLight position={[0, 0, 2]} intensity={2} color="#ffffff" distance={10} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} color="#8EA5BC" />
+      <directionalLight position={[-5, 5, -5]} intensity={0.8} color="#D8D0BF" />
+      <pointLight position={[0, 0, 2]} intensity={1.5} color="#F2F1ED" distance={10} />
 
       {/* 1. Ingestion Node */}
       <Float speed={prefersReducedMotion ? 0 : 2} floatIntensity={prefersReducedMotion ? 0 : 0.5}>
         <mesh position={[-8, 0, 0]}>
           <boxGeometry args={[2, 2, 2]} />
-          <meshPhysicalMaterial color="#1e293b" metalness={0.8} roughness={0.2} clearcoat={1.0} />
+          <meshPhysicalMaterial color="#151A21" metalness={0.85} roughness={0.25} clearcoat={0.8} />
         </mesh>
       </Float>
 
-      {/* 2. AI Extraction Engine Node (Center) */}
+      {/* 2. AST Extraction Engine Node (Center) */}
       <Float speed={prefersReducedMotion ? 0 : 1.5} floatIntensity={prefersReducedMotion ? 0 : 1} rotationIntensity={prefersReducedMotion ? 0 : 0.5}>
         <mesh position={[0, 0, 0]}>
           <icosahedronGeometry args={[1.5, 1]} />
-          <meshPhysicalMaterial color="#3b82f6" emissive="#1d4ed8" emissiveIntensity={0.5} wireframe={true} />
+          <meshPhysicalMaterial color="#4D8FCC" emissive="#2B4C6F" emissiveIntensity={0.3} wireframe={true} />
         </mesh>
         <mesh position={[0, 0, 0]}>
           <icosahedronGeometry args={[1.2, 0]} />
-          <meshPhysicalMaterial color="#60a5fa" metalness={1} roughness={0} transmission={0.9} thickness={0.5} />
+          <meshPhysicalMaterial color="#C9B88A" metalness={0.9} roughness={0.2} transmission={0.7} thickness={0.4} />
         </mesh>
       </Float>
 
@@ -119,18 +119,18 @@ function PipelineLogic({ prefersReducedMotion }: { prefersReducedMotion: boolean
       <Float speed={prefersReducedMotion ? 0 : 2.5} floatIntensity={prefersReducedMotion ? 0 : 0.5}>
         <mesh position={[8, 0, 0]}>
           <cylinderGeometry args={[1, 1, 2, 32]} />
-          <meshPhysicalMaterial color="#0f172a" metalness={0.9} roughness={0.1} clearcoat={1.0} />
+          <meshPhysicalMaterial color="#0E1218" metalness={0.9} roughness={0.15} clearcoat={0.9} />
         </mesh>
       </Float>
 
       {/* Connecting Beams */}
       <mesh position={[-4, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.02, 0.02, 8, 8]} />
-        <meshBasicMaterial color="#334155" transparent opacity={0.5} />
+        <meshBasicMaterial color="#2A3441" transparent opacity={0.4} />
       </mesh>
       <mesh position={[4, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.02, 0.02, 8, 8]} />
-        <meshBasicMaterial color="#38bdf8" transparent opacity={0.3} />
+        <meshBasicMaterial color="#4D8FCC" transparent opacity={0.25} />
       </mesh>
 
       {/* Flow Particles */}
@@ -154,14 +154,14 @@ export default function DashboardCanvas() {
   }, []);
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#0a0a0c] overflow-hidden shadow-md h-[250px] relative">
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#0a0a0c] via-transparent to-transparent opacity-80" />
+    <div className="rounded-xl border border-[var(--rc-border)] bg-[#080A0E] overflow-hidden shadow-md h-[250px] relative">
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#080A0E] via-transparent to-transparent opacity-80" />
       <div className="absolute top-4 left-4 z-20 pointer-events-none">
-        <h3 className="text-zinc-100 font-semibold flex items-center gap-2">
+        <h3 className="text-[#F2F1ED] font-semibold flex items-center gap-2">
           Data Flow
-          {prefersReducedMotion && <span className="text-[10px] uppercase font-bold text-zinc-500 border border-zinc-800 px-1.5 py-0.5 rounded">Reduced Motion</span>}
+          {prefersReducedMotion && <span className="text-[10px] uppercase font-bold text-[#858B93] border border-[var(--rc-border)] px-1.5 py-0.5 rounded">Reduced Motion</span>}
         </h3>
-        <p className="text-xs text-zinc-500">Live processing pipeline</p>
+        <p className="text-xs text-[#858B93]">Live processing pipeline</p>
       </div>
       <Canvas 
         camera={{ position: [0, 5, 15], fov: 45 }} 
@@ -171,7 +171,7 @@ export default function DashboardCanvas() {
           failIfMajorPerformanceCaveat: false,
         }}
         onCreated={({ gl }) => {
-          gl.setClearColor(new THREE.Color('#0a0a0c'), 0);
+          gl.setClearColor(new THREE.Color('#080A0E'), 0);
           gl.domElement.addEventListener("webglcontextlost", (event) => {
             event.preventDefault();
           }, false);

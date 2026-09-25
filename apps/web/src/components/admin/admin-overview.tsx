@@ -392,7 +392,7 @@ function getDefaultAdminData(adminEmail: string): AdminOverviewData {
       { date: "Today", actions: 138, evaluations: 120, probes: 89, total: 347 },
     ],
     action_breakdown: [
-      { name: "Compliance Scans", category: "EVALUATION", count: 319, color: "#3b82f6" },
+      { name: "Compliance Scans", category: "EVALUATION", count: 319, color: "#4D8FCC" },
       { name: "Statutory Signal Ingestions", category: "SURVEILLANCE", count: 184, color: "#10b981" },
       { name: "Policy AST Compilations", category: "POLICY", count: 122, color: "#8b5cf6" },
       { name: "Super-Admin Governance", category: "ADMIN", count: 64, color: "#f59e0b" },
@@ -842,8 +842,8 @@ export function AdminOverview() {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#4D8FCC" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#4D8FCC" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
@@ -853,7 +853,7 @@ export function AdminOverview() {
                   contentStyle={{ backgroundColor: '#09090b', border: '1px solid #3f3f46', borderRadius: '10px', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ color: '#fff' }}
                 />
-                <Area type="monotone" dataKey="total" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorTotal)" name="Total Events" />
+                <Area type="monotone" dataKey="total" stroke="#4D8FCC" strokeWidth={2} fillOpacity={1} fill="url(#colorTotal)" name="Total Events" />
                 <Area type="monotone" dataKey="probes" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorProbes)" name="Surveillance Probes" />
               </AreaChart>
             </ResponsiveContainer>

@@ -61,24 +61,24 @@ function GlobeWireframe() {
       {/* Outer skeletal grid */}
       <Icosahedron ref={meshRef} args={[2, 4]} rotation={[0, 0, 0]}>
         <meshBasicMaterial 
-          color="#2563eb" 
+          color="#4D8FCC" 
           wireframe={true} 
           transparent={true} 
-          opacity={0.18} 
+          opacity={0.12} 
         />
       </Icosahedron>
 
-      {/* Inner subtle glow sphere */}
+      {/* Inner subtle core sphere */}
       <mesh>
         <sphereGeometry args={[1.96, 32, 32]} />
-        <meshBasicMaterial color="#0b132b" transparent opacity={0.65} />
+        <meshBasicMaterial color="#080A0E" transparent opacity={0.80} />
       </mesh>
     </group>
   );
 }
 
 // Animated Sonar Ping Ring
-function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; color?: string }) {
+function SonarPing({ position, color = '#4D8FCC' }: { position: THREE.Vector3; color?: string }) {
   const ringRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
@@ -87,7 +87,7 @@ function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; c
       const scale = 1 + t * 1.5;
       ringRef.current.scale.set(scale, scale, scale);
       const material = ringRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = Math.max(0, 0.5 - t * 0.25);
+      material.opacity = Math.max(0, 0.4 - t * 0.2);
     }
   });
 
@@ -95,7 +95,7 @@ function SonarPing({ position, color = '#38bdf8' }: { position: THREE.Vector3; c
     <group position={position}>
       <mesh ref={ringRef} lookAt={() => position.clone().multiplyScalar(2)}>
         <ringGeometry args={[0.05, 0.07, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.45} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={color} transparent opacity={0.35} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -148,10 +148,10 @@ function JurisdictionMarker({
   });
 
   const markerColor = isSelected 
-    ? '#f59e0b' 
+    ? '#C9B88A' 
     : (isActiveSignal 
-        ? '#38bdf8' 
-        : (data.count > 0 ? '#10b981' : '#60a5fa'));
+        ? '#4D8FCC' 
+        : (data.count > 0 ? '#10B981' : '#6B8BA4'));
 
   return (
     <group position={data.position}>
@@ -159,7 +159,7 @@ function JurisdictionMarker({
       {(isSelected || hovered || data.count > 0 || isActiveSignal) && (
         <SonarPing 
           position={data.position} 
-          color={isActiveSignal ? '#38bdf8' : markerColor} 
+          color={isActiveSignal ? '#4D8FCC' : markerColor} 
         />
       )}
 
@@ -177,7 +177,7 @@ function JurisdictionMarker({
       {/* Outer Halo */}
       <mesh>
         <sphereGeometry args={[0.08, 16, 16]} />
-        <meshBasicMaterial color={markerColor} transparent opacity={isSelected ? 0.45 : 0.25} />
+        <meshBasicMaterial color={markerColor} transparent opacity={isSelected ? 0.35 : 0.18} />
       </mesh>
 
       {/* Persistent Sleek Telemetry Badge (Only visible when facing user!) */}
@@ -185,20 +185,20 @@ function JurisdictionMarker({
         <Html distanceFactor={4.8} zIndexRange={[18, 0]} center>
           <div 
             onClick={onClick}
-            className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-full text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
+            className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-[4px] text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
               isSelected
-                ? 'bg-amber-500/25 text-amber-300 border-amber-400/80 ring-2 ring-amber-400/40 scale-110 shadow-amber-500/20'
+                ? 'bg-[#080A0E]/95 text-[#C9B88A] border-[#C9B88A]/60 ring-1 ring-[#C9B88A]/40 scale-105'
                 : (isActiveSignal
-                    ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/80 ring-2 ring-cyan-400/40 animate-pulse'
+                    ? 'bg-[#080A0E]/95 text-[#93C5FD] border-[#4D8FCC]/60'
                     : (data.count > 0
-                        ? 'bg-zinc-950/90 text-emerald-300 border-emerald-500/40 hover:border-emerald-400 hover:bg-zinc-900'
-                        : 'bg-zinc-950/90 text-zinc-400 border-zinc-700/60 hover:border-zinc-500 hover:text-zinc-200'))
+                        ? 'bg-[#080A0E]/95 text-emerald-400 border-emerald-500/30 hover:border-emerald-500/60'
+                        : 'bg-[#080A0E]/95 text-[#94A3B8] border-white/[0.08] hover:border-white/[0.16] hover:text-[#F4F6F8]'))
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-400' : (data.count > 0 ? 'bg-emerald-400' : 'bg-blue-400')}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#C9B88A]' : (data.count > 0 ? 'bg-emerald-400' : 'bg-[#4D8FCC]')}`} />
             <span>{data.jurisdiction}</span>
             {data.count > 0 && (
-              <span className="ml-0.5 px-1 rounded-sm bg-emerald-500/20 text-emerald-400 text-[8px] font-bold">
+              <span className="ml-0.5 px-1 rounded-[2px] bg-emerald-500/15 text-emerald-400 text-[8px] font-bold">
                 {data.count}
               </span>
             )}
@@ -280,13 +280,13 @@ function JurisdictionMarker({
               </div>
             )}
 
-            <div className="mt-2 pt-1.5 border-t border-zinc-800/80">
+            <div className="mt-2 pt-1.5 border-t border-white/[0.08]">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onInspectRegulations(data.jurisdiction);
                 }}
-                className="w-full text-center text-[9px] font-semibold py-1 px-2 rounded bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer"
+                className="w-full text-center text-[9px] font-semibold py-1 px-2 rounded-[4px] bg-[#4D8FCC] hover:bg-[#3B72A8] text-white transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer"
               >
                 <span>Inspect {data.jurisdiction}</span>
                 <ExternalLink className="w-2.5 h-2.5" />
@@ -326,8 +326,8 @@ function StreamingArc({
     if (lineRef.current) {
       const material = lineRef.current.material as THREE.LineBasicMaterial;
       material.opacity = isHighlighted 
-        ? 0.4 + Math.sin(state.clock.elapsedTime * 3) * 0.3 
-        : 0.15 + Math.sin(state.clock.elapsedTime * 1.5) * 0.1;
+        ? 0.35 + Math.sin(state.clock.elapsedTime * 3) * 0.2 
+        : 0.12 + Math.sin(state.clock.elapsedTime * 1.5) * 0.06;
     }
 
     if (particleRef.current) {
@@ -342,9 +342,9 @@ function StreamingArc({
       {/* @ts-ignore */}
       <line ref={lineRef} geometry={geometry}>
         <lineBasicMaterial 
-          color={isHighlighted ? "#fbbf24" : "#60a5fa"} 
+          color={isHighlighted ? "#C9B88A" : "#6B8BA4"} 
           transparent 
-          opacity={0.25} 
+          opacity={0.20} 
           linewidth={isHighlighted ? 2 : 1} 
         />
       </line>
@@ -352,7 +352,7 @@ function StreamingArc({
       {/* Traveling Data Signal Particle */}
       <mesh ref={particleRef}>
         <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color={isHighlighted ? "#f59e0b" : "#93c5fd"} />
+        <meshBasicMaterial color={isHighlighted ? "#C9B88A" : "#93C5FD"} />
       </mesh>
     </group>
   );
@@ -634,7 +634,7 @@ export function CoverageGlobe({
       >
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={1.2} />
-        <pointLight position={[-10, -10, -10]} intensity={0.4} color="#1d4ed8" />
+        <pointLight position={[-10, -10, -10]} intensity={0.35} color="#3B72A8" />
         
         <GlobeScene 
           markers={markers}

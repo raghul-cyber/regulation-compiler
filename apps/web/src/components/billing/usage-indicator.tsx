@@ -62,9 +62,9 @@ export function UsageIndicator() {
     return (
       <Link 
         href="/billing"
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-400 hover:bg-blue-500/20 transition-colors text-xs font-mono font-medium"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#4D8FCC]/10 border border-[#4D8FCC]/25 text-[#A3C7E8] hover:bg-[#4D8FCC]/20 transition-colors text-xs font-mono font-medium"
       >
-        <RCIcon name="shield" size={14} className="text-[#3B82F6]" />
+        <RCIcon name="shield" size={14} className="text-[#4D8FCC]" />
         <span>Pro Plan • Active</span>
       </Link>
     );
@@ -98,7 +98,7 @@ export function UsageIndicator() {
             <div className="w-12 h-1.5 bg-zinc-800 rounded-full overflow-hidden shrink-0">
               <div 
                 className={`h-full rounded-full transition-all duration-300 ${
-                  isExhausted ? 'bg-red-500' : isApproaching ? 'bg-amber-400' : 'bg-blue-500'
+                  isExhausted ? 'bg-red-500' : isApproaching ? 'bg-amber-400' : 'bg-[#4D8FCC]'
                 }`}
                 style={{ width: `${percentage}%` }}
               />

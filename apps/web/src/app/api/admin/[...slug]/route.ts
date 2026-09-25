@@ -417,7 +417,7 @@ function buildAdminOverviewPayload(adminEmail: string, users: ClerkUserRecord[])
   ];
 
   const actionBreakdown = [
-    { name: "Compliance Scans", category: "EVALUATION", count: 319, color: "#3b82f6" },
+    { name: "Compliance Scans", category: "EVALUATION", count: 319, color: "#4D8FCC" },
     { name: "Statutory Signal Ingestions", category: "SURVEILLANCE", count: 184, color: "#10b981" },
     { name: "Policy AST Compilations", category: "POLICY", count: 122, color: "#8b5cf6" },
     { name: "Super-Admin Governance", category: "ADMIN", count: 64, color: "#f59e0b" },
