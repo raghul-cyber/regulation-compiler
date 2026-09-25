@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { 
   CheckCircle2, 
   AlertCircle, 
@@ -95,20 +95,23 @@ export function IntraAppToastProvider({ children }: { children: React.ReactNode 
       const msg = customEvent.detail?.message || '';
       if (!msg) return;
 
-      if (
-        msg.toLowerCase().includes('complete') || 
-        msg.toLowerCase().includes('success') || 
-        msg.toLowerCase().includes('copied')
-      ) {
-        success('Notice', msg);
-      } else if (
-        msg.toLowerCase().includes('fail') || 
-        msg.toLowerCase().includes('error')
-      ) {
-        error('Notice', msg);
-      } else {
-        info('Notice', msg);
-      }
+      // Defer toast creation outside of the event dispatch cycle to avoid render conflicts
+      setTimeout(() => {
+        if (
+          msg.toLowerCase().includes('complete') || 
+          msg.toLowerCase().includes('success') || 
+          msg.toLowerCase().includes('copied')
+        ) {
+          success('Notice', msg);
+        } else if (
+          msg.toLowerCase().includes('fail') || 
+          msg.toLowerCase().includes('error')
+        ) {
+          error('Notice', msg);
+        } else {
+          info('Notice', msg);
+        }
+      }, 0);
     };
 
     window.addEventListener('intra-app-alert', handleWindowAlertEvent);
@@ -126,66 +129,108 @@ export function IntraAppToastProvider({ children }: { children: React.ReactNode 
         className="fixed bottom-5 right-5 z-[9999] flex flex-col gap-3 max-w-md w-[calc(100vw-2.5rem)] sm:w-96 pointer-events-none"
       >
         {toasts.map((toast) => (
-          <ToastCard key={toast.id} toast={toast} onDismiss={() => dismissToast(toast.id)} />
+          <ToastCard 
+            key={toast.id} 
+            toast={toast} 
+            onDismiss={dismissToast} 
+          />
         ))}
       </div>
     </IntraAppToastContext.Provider>
   );
 }
 
-function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => void }) {
+interface ToastCardProps {
+  toast: ToastItem;
+  onDismiss: (id: string) => void;
+}
+
+const ToastCard = React.memo(function ToastCard({ toast, onDismiss }: ToastCardProps) {
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
-  const duration = toast.duration ?? 5000;
+  const totalDuration = toast.duration ?? 5000;
+
+  // Track remaining milliseconds accurately for pause/resume support
+  const remainingMsRef = useRef(totalDuration);
+  const lastTickRef = useRef(Date.now());
+  const hasDismissedRef = useRef(false);
+  const onDismissRef = useRef(onDismiss);
+
+  // Keep latest onDismiss ref without triggering timer recreation
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  });
+
+  // Single safe dismissal trigger: runs as a clean macrotask outside of any React render/state updater phase
+  const handleDismiss = useCallback(() => {
+    if (hasDismissedRef.current) return;
+    hasDismissedRef.current = true;
+    setTimeout(() => {
+      onDismissRef.current(toast.id);
+    }, 0);
+  }, [toast.id]);
 
   useEffect(() => {
-    if (duration <= 0 || isPaused) return;
+    if (totalDuration <= 0) return;
 
-    const interval = 50;
-    const step = (interval / duration) * 100;
+    if (isPaused) {
+      lastTickRef.current = Date.now();
+      return;
+    }
+
+    lastTickRef.current = Date.now();
+    const intervalMs = 30;
 
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= step) {
-          clearInterval(timer);
-          onDismiss();
-          return 0;
-        }
-        return prev - step;
-      });
-    }, interval);
+      const now = Date.now();
+      const elapsed = now - lastTickRef.current;
+      lastTickRef.current = now;
 
-    return () => clearInterval(timer);
-  }, [duration, isPaused, onDismiss]);
+      remainingMsRef.current = Math.max(0, remainingMsRef.current - elapsed);
+      const pct = Math.max(0, (remainingMsRef.current / totalDuration) * 100);
+
+      // Pure state update: strictly sets percentage number, zero external side effects
+      setProgress(pct);
+
+      if (remainingMsRef.current <= 0) {
+        clearInterval(timer);
+        handleDismiss();
+      }
+    }, intervalMs);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [totalDuration, isPaused, handleDismiss]);
 
   const styleConfig = {
     success: {
-      border: 'border-emerald-500/40 hover:border-emerald-500/60',
-      glow: 'shadow-emerald-500/10',
-      bgBadge: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-      progressBar: 'bg-emerald-500',
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />,
+      border: 'border-emerald-500/25 hover:border-emerald-500/40',
+      glow: 'shadow-[0_12px_40px_rgba(16,185,129,0.12)]',
+      bgBadge: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+      progressBar: 'bg-gradient-to-r from-emerald-500 to-teal-400',
+      icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
     },
     error: {
-      border: 'border-rose-500/40 hover:border-rose-500/60',
-      glow: 'shadow-rose-500/10',
-      bgBadge: 'bg-rose-500/15 text-rose-400 border border-rose-500/30',
-      progressBar: 'bg-rose-500',
-      icon: <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />,
+      border: 'border-rose-500/25 hover:border-rose-500/40',
+      glow: 'shadow-[0_12px_40px_rgba(244,63,94,0.14)]',
+      bgBadge: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+      progressBar: 'bg-gradient-to-r from-rose-500 to-pink-500',
+      icon: <AlertCircle className="w-4 h-4 text-rose-400" />,
     },
     warning: {
-      border: 'border-amber-500/40 hover:border-amber-500/60',
-      glow: 'shadow-amber-500/10',
-      bgBadge: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
-      progressBar: 'bg-amber-500',
-      icon: <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />,
+      border: 'border-amber-500/25 hover:border-amber-500/40',
+      glow: 'shadow-[0_12px_40px_rgba(245,158,11,0.12)]',
+      bgBadge: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+      progressBar: 'bg-gradient-to-r from-amber-500 to-amber-300',
+      icon: <AlertTriangle className="w-4 h-4 text-amber-400" />,
     },
     info: {
-      border: 'border-blue-500/40 hover:border-blue-500/60',
-      glow: 'shadow-blue-500/10',
-      bgBadge: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-      progressBar: 'bg-blue-500',
-      icon: <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />,
+      border: 'border-sky-500/25 hover:border-sky-500/40',
+      glow: 'shadow-[0_12px_40px_rgba(14,165,233,0.12)]',
+      bgBadge: 'bg-sky-500/10 text-sky-400 border border-sky-500/20',
+      progressBar: 'bg-gradient-to-r from-sky-500 to-indigo-400',
+      icon: <Info className="w-4 h-4 text-sky-400" />,
     },
   }[toast.type];
 
@@ -194,39 +239,39 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => vo
       role="alert"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className={`pointer-events-auto relative overflow-hidden rounded-xl border bg-[#0d0d11]/95 backdrop-blur-xl p-4 shadow-2xl transition-all duration-300 ${styleConfig.border} ${styleConfig.glow} animate-in fade-in slide-in-from-bottom-3`}
+      className={`pointer-events-auto relative overflow-hidden rounded-xl border bg-[#0B0A09]/95 backdrop-blur-2xl p-4 shadow-2xl transition-all duration-300 ${styleConfig.border} ${styleConfig.glow} animate-in fade-in slide-in-from-bottom-3`}
     >
       <div className="flex items-start gap-3">
-        <div className="p-1 rounded-lg">
+        <div className={`p-1.5 rounded-lg shrink-0 ${styleConfig.bgBadge}`}>
           {styleConfig.icon}
         </div>
         
-        <div className="flex-1 min-w-0 pr-2">
+        <div className="flex-1 min-w-0 pr-1">
           <div className="flex items-center justify-between gap-2">
-            <h4 className="text-sm font-semibold text-white tracking-tight leading-snug">
+            <h4 className="text-sm font-semibold text-[#F7F4EC] tracking-tight leading-snug">
               {toast.title}
             </h4>
           </div>
 
           {toast.message && (
-            <p className="mt-1 text-xs text-zinc-400 leading-relaxed break-words">
+            <p className="mt-1 text-xs text-[#A8A196] leading-relaxed break-words font-normal">
               {toast.message}
             </p>
           )}
 
           {(toast.action || toast.secondaryAction) && (
-            <div className="mt-3 flex items-center gap-2 pt-1 border-t border-zinc-800/60">
+            <div className="mt-3 flex items-center gap-2 pt-2 border-t border-white/[0.06]">
               {toast.action && (
                 <button
                   type="button"
                   onClick={() => {
                     toast.action?.onClick();
-                    onDismiss();
+                    handleDismiss();
                   }}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+                  className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all ${
                     toast.action.primary !== false
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-xs'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
+                      ? 'bg-[#AD956C] hover:bg-[#C2AA7F] text-[#080706] font-semibold shadow-xs'
+                      : 'bg-white/[0.06] hover:bg-white/[0.12] text-[#F1EEE7] border border-white/[0.08]'
                   }`}
                 >
                   {toast.action.label}
@@ -238,9 +283,9 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => vo
                   type="button"
                   onClick={() => {
                     toast.secondaryAction?.onClick();
-                    onDismiss();
+                    handleDismiss();
                   }}
-                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors"
+                  className="px-2.5 py-1 text-xs font-medium rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-[#A8A196] hover:text-[#F7F4EC] transition-all border border-white/[0.06]"
                 >
                   {toast.secondaryAction.label}
                 </button>
@@ -251,16 +296,16 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => vo
 
         <button
           type="button"
-          onClick={onDismiss}
+          onClick={handleDismiss}
           aria-label="Dismiss notification"
-          className="text-zinc-500 hover:text-zinc-300 p-1 rounded-md hover:bg-zinc-800/60 transition-colors shrink-0"
+          className="text-[#7D7567] hover:text-[#F1EEE7] p-1 rounded-lg hover:bg-white/[0.06] transition-colors shrink-0"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {duration > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-800/50">
+      {totalDuration > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/[0.06]">
           <div
             className={`h-full ${styleConfig.progressBar} transition-all duration-75`}
             style={{ width: `${progress}%` }}
@@ -269,7 +314,7 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => vo
       )}
     </div>
   );
-}
+});
 
 export function useToast() {
   const context = useContext(IntraAppToastContext);

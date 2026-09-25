@@ -48,7 +48,9 @@ export function ConsoleGuard() {
     window.alert = (message?: any) => {
       const msg = String(message ?? '');
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('intra-app-alert', { detail: { message: msg } }));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('intra-app-alert', { detail: { message: msg } }));
+        }, 0);
       }
     };
 
