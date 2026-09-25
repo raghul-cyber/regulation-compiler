@@ -14,14 +14,14 @@ const MONITORED_FRAMEWORKS = [
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-white/[0.06] bg-[#050608] pt-8 pb-10 transition-colors relative z-10">
+    <footer className="w-full border-t border-[rgba(201,196,186,0.08)] bg-[#080706] pt-8 pb-10 transition-colors relative z-10">
       <div className="w-full max-w-screen-2xl mx-auto px-4 md:px-6 lg:px-8 space-y-6">
         
         {/* Top: Monitored Statutory Authorities Strip */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-white/[0.05]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[rgba(201,196,186,0.06)]">
           <div className="flex items-center gap-2">
-            <Activity className="w-3.5 h-3.5 text-[#4D8FCC]" />
-            <span className="font-mono text-[10px] tracking-widest text-[#9CA3AF] uppercase">
+            <Activity className="w-3.5 h-3.5 text-[#AD956C]" />
+            <span className="font-mono text-[10px] tracking-widest text-[#8D8982] uppercase">
               Continuous Statutory Surveillance:
             </span>
           </div>
@@ -29,10 +29,10 @@ export function Footer() {
             {MONITORED_FRAMEWORKS.map((fw) => (
               <span
                 key={fw.name}
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] bg-[#080A0E] border border-white/[0.06] hover:border-white/[0.12] transition-colors font-mono text-[10px] text-[#CBD5E1]"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] bg-[#151311] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] transition-colors font-mono text-[10px] text-[#C9C4BA]"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]" />
-                <span className="font-semibold text-[#64748B]">{fw.jurisdiction}:</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C]" />
+                <span className="font-semibold text-[#8D8982]">{fw.jurisdiction}:</span>
                 <span>{fw.name}</span>
               </span>
             ))}
@@ -43,7 +43,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-[6px] bg-[#080A0E] border border-white/[0.08] p-1 flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-[6px] bg-[#151311] border border-[rgba(201,196,186,0.08)] p-1 flex items-center justify-center shrink-0">
                 <Image 
                   src="/logo-icon.png" 
                   alt="RegCompiler Logo" 
@@ -53,53 +53,53 @@ export function Footer() {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-bold tracking-tight text-[#F4F6F8]">
+                <span className="text-sm font-bold tracking-tight text-[#F7F4EC]">
                   RegCompiler
                 </span>
-                <span className="font-mono text-[9px] text-[#64748B] uppercase tracking-widest">
+                <span className="font-mono text-[9px] text-[#8D8982] uppercase tracking-widest">
                   STATUTORY KERNEL ARCHITECTURE
                 </span>
               </div>
             </div>
 
-            <div className="hidden sm:block w-px h-6 bg-white/[0.06]" />
+            <div className="hidden sm:block w-px h-6 bg-[rgba(201,196,186,0.08)]" />
 
-            <div className="flex items-center gap-2 font-mono text-xs text-[#9CA3AF]">
+            <div className="flex items-center gap-2 font-mono text-xs text-[#8D8982]">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#718A79] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#718A79]" />
               </span>
               <span>All Systems Nominal • Latency 14ms</span>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6 font-mono text-xs text-[#9CA3AF]">
-            <Link href="/dashboard" className="hover:text-[#F4F6F8] transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-6 font-mono text-xs text-[#C9C4BA]">
+            <Link href="/dashboard" className="hover:text-[#F7F4EC] transition-colors">
               Surveillance
             </Link>
-            <Link href="/regulations" className="hover:text-[#F4F6F8] transition-colors">
+            <Link href="/regulations" className="hover:text-[#F7F4EC] transition-colors">
               Directory
             </Link>
-            <Link href="/compliance-check" className="hover:text-[#F4F6F8] transition-colors">
+            <Link href="/compliance-check" className="hover:text-[#F7F4EC] transition-colors">
               Simulator
             </Link>
-            <Link href="/billing" className="hover:text-[#F4F6F8] transition-colors">
+            <Link href="/billing" className="hover:text-[#F7F4EC] transition-colors">
               Entitlements
             </Link>
-            <Link href="/terms" className="hover:text-[#F4F6F8] transition-colors">
+            <Link href="/terms" className="hover:text-[#F7F4EC] transition-colors">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-[#F4F6F8] transition-colors">
+            <Link href="/privacy" className="hover:text-[#F7F4EC] transition-colors">
               Privacy
             </Link>
           </div>
         </div>
 
         {/* Bottom Micro-Bar: Cryptographic Guarantee */}
-        <div className="pt-4 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-[#64748B] gap-2">
+        <div className="pt-4 border-t border-[rgba(201,196,186,0.06)] flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-[#625F5A] gap-2">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#718A79]" />
             <span>Deterministic AST Engine v2.4 • SHA-256 Provenance Ledger Active</span>
           </div>
           <div>

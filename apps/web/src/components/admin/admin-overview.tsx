@@ -897,18 +897,18 @@ export function AdminOverview() {
       </div>
 
       {/* Real Registered Users Directory Table (No Mocks) */}
-      <div className="p-6 rounded-2xl bg-[#0a0a0c] border border-zinc-800 shadow-xl space-y-4">
+      <div className="p-6 rounded-xl bg-[#100E0D] border border-[#211D19] shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-extrabold text-white tracking-tight">
+              <h2 className="text-xl font-semibold text-[#F7F4EC] tracking-tight">
                 Authentic User Directory &amp; Logins
               </h2>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/40">
+              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/40">
                 CLERK LIVE API
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-[#8D8982] mt-0.5 font-sans">
               Live user roster queried directly from Clerk authentication directory with verified emails, authentication method, and last sign-in dates.
             </p>
           </div>
@@ -916,26 +916,26 @@ export function AdminOverview() {
           {/* Search and Filters */}
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#625F5A]" />
               <input
                 type="text"
                 placeholder="Search user or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-3 py-1.5 rounded-lg bg-zinc-900/80 border border-zinc-700 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 transition-colors w-48 sm:w-64"
+                className="pl-9 pr-3 py-1.5 rounded-lg bg-[#151311] border border-[#211D19] text-xs text-[#F1EEE7] placeholder:text-[#625F5A] focus:outline-none focus:border-[#AD956C] transition-colors w-48 sm:w-64"
               />
             </div>
 
-            <div className="flex items-center rounded-lg bg-zinc-900 border border-zinc-800 p-0.5 text-xs">
+            <div className="flex items-center rounded-lg bg-[#151311] border border-[#211D19] p-0.5 text-xs">
               <button
                 onClick={() => setFilterRole('ALL')}
-                className={`px-2.5 py-1 rounded ${filterRole === 'ALL' ? 'bg-zinc-800 text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200'}`}
+                className={`px-2.5 py-1 rounded transition-colors ${filterRole === 'ALL' ? 'bg-[#211D19] text-[#F7F4EC] font-medium' : 'text-[#8D8982] hover:text-[#C9C4BA]'}`}
               >
                 All ({data?.users.length || 0})
               </button>
               <button
                 onClick={() => setFilterRole('ADMIN')}
-                className={`px-2.5 py-1 rounded ${filterRole === 'ADMIN' ? 'bg-zinc-800 text-amber-300 font-semibold' : 'text-zinc-400 hover:text-zinc-200'}`}
+                className={`px-2.5 py-1 rounded transition-colors ${filterRole === 'ADMIN' ? 'bg-[#211D19] text-[#AD956C] font-medium' : 'text-[#8D8982] hover:text-[#C9C4BA]'}`}
               >
                 Super-Admin
               </button>
@@ -944,22 +944,22 @@ export function AdminOverview() {
         </div>
 
         {/* Users Table */}
-        <div className="overflow-x-auto rounded-xl border border-zinc-800/80">
+        <div className="overflow-x-auto rounded-lg border border-[#211D19]">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-950/80 text-[11px] uppercase tracking-wider text-zinc-400 border-b border-zinc-800">
+            <thead className="bg-[#0B0A09] text-[11px] uppercase tracking-wider text-[#8D8982] border-b border-[#211D19] font-mono">
               <tr>
-                <th className="py-3.5 px-4">User &amp; Email ID</th>
-                <th className="py-3.5 px-4">Role &amp; Clearance</th>
-                <th className="py-3.5 px-4">Auth Method</th>
-                <th className="py-3.5 px-4">Account Created</th>
-                <th className="py-3.5 px-4">Last Login / Active</th>
-                <th className="py-3.5 px-4 text-right">Audit Traces</th>
+                <th className="py-3.5 px-4 font-medium">User &amp; Email ID</th>
+                <th className="py-3.5 px-4 font-medium">Role &amp; Clearance</th>
+                <th className="py-3.5 px-4 font-medium">Auth Method</th>
+                <th className="py-3.5 px-4 font-medium">Account Created</th>
+                <th className="py-3.5 px-4 font-medium">Last Login / Active</th>
+                <th className="py-3.5 px-4 text-right font-medium">Audit Traces</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/60 font-sans">
+            <tbody className="divide-y divide-[#211D19] font-sans">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-zinc-500 text-xs">
+                  <td colSpan={6} className="py-8 text-center text-[#8D8982] text-xs">
                     No users match the query "{searchQuery}".
                   </td>
                 </tr>
@@ -967,40 +967,40 @@ export function AdminOverview() {
                 filteredUsers.map((u, idx) => (
                   <tr 
                     key={`${u.id}-${idx}`}
-                    className={`hover:bg-zinc-900/40 transition-colors ${u.is_super_admin ? 'bg-amber-500/[0.03]' : ''}`}
+                    className={`hover:bg-[#151311]/50 transition-colors ${u.is_super_admin ? 'bg-[#AD956C]/[0.02]' : ''}`}
                   >
                     {/* User & Email */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium ${
                           u.is_super_admin 
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-sm shadow-amber-500/20' 
-                            : 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
+                            ? 'bg-[#AD956C]/20 text-[#AD956C] border border-[#AD956C]/40' 
+                            : 'bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/30'
                         }`}>
                           {u.name ? u.name.charAt(0).toUpperCase() : u.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white text-xs md:text-sm">
+                            <span className="font-medium text-[#F7F4EC] text-xs md:text-sm">
                               {u.name}
                             </span>
                             {u.is_super_admin && (
-                              <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-medium rounded bg-[#AD956C]/20 text-[#AD956C] border border-[#AD956C]/40">
                                 OWNER
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-xs font-mono text-zinc-300 select-all">
+                            <span className="text-xs font-mono text-[#C9C4BA] select-all">
                               {u.email}
                             </span>
                             {u.is_verified && (
                               <span title="Verified Email">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-[#718A79] shrink-0" />
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-zinc-500 font-mono tracking-tight">
+                          <span className="text-[10px] text-[#625F5A] font-mono tracking-tight">
                             {u.id}
                           </span>
                         </div>
@@ -1010,13 +1010,13 @@ export function AdminOverview() {
                     {/* Role & Clearance */}
                     <td className="py-3.5 px-4">
                       {u.is_super_admin ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-[#AD956C]/15 text-[#AD956C] border border-[#AD956C]/30">
                           <Lock className="w-3 h-3" />
                           Super Admin
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-800/80 text-zinc-300 border border-zinc-700/60 capitalize">
-                          <Shield className="w-3 h-3 text-blue-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#151311] text-[#C9C4BA] border border-[#211D19] capitalize">
+                          <Shield className="w-3 h-3 text-[#607D96]" />
                           {u.role.replace('_', ' ')}
                         </span>
                       )}
@@ -1024,28 +1024,28 @@ export function AdminOverview() {
 
                     {/* Auth Method */}
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-300">
-                        <Fingerprint className="w-3.5 h-3.5 text-zinc-400" />
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-[#C9C4BA]">
+                        <Fingerprint className="w-3.5 h-3.5 text-[#8D8982]" />
                         {u.auth_strategy.replace('from_oauth_', 'OAuth: ').replace('email_code', 'Email OTP')}
                       </span>
                     </td>
 
                     {/* Account Created */}
-                    <td className="py-3.5 px-4 text-xs text-zinc-400">
+                    <td className="py-3.5 px-4 text-xs text-[#8D8982] font-mono">
                       {formatTimestamp(u.created_at)}
                     </td>
 
                     {/* Last Login / Sign in */}
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col">
-                        <span className={`text-xs font-semibold ${
+                        <span className={`text-xs font-medium ${
                           u.last_sign_in_at && (Date.now() - new Date(u.last_sign_in_at).getTime()) < 86400000 
-                            ? 'text-emerald-400' 
-                            : 'text-zinc-300'
+                            ? 'text-[#718A79]' 
+                            : 'text-[#C9C4BA]'
                         }`}>
                           {formatRelativeTime(u.last_sign_in_at)}
                         </span>
-                        <span className="text-[11px] font-mono text-zinc-500">
+                        <span className="text-[11px] font-mono text-[#625F5A]">
                           {formatTimestamp(u.last_sign_in_at)}
                         </span>
                       </div>
@@ -1053,7 +1053,7 @@ export function AdminOverview() {
 
                     {/* Audit Traces */}
                     <td className="py-3.5 px-4 text-right">
-                      <span className="inline-block px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 font-mono text-xs text-zinc-300">
+                      <span className="inline-block px-2.5 py-1 rounded bg-[#0B0A09] border border-[#211D19] font-mono text-xs text-[#AD956C]">
                         {u.audit_actions_count} actions
                       </span>
                     </td>
@@ -1066,32 +1066,32 @@ export function AdminOverview() {
       </div>
 
       {/* Real PostgreSQL Audit Trail Stream */}
-      <div className="p-6 rounded-2xl bg-[#0a0a0c] border border-zinc-800 shadow-xl space-y-4">
+      <div className="p-6 rounded-xl bg-[#100E0D] border border-[#211D19] shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Activity className="w-4 h-4 text-amber-400" />
+            <h3 className="text-base font-semibold text-[#F7F4EC] flex items-center gap-2">
+              <Activity className="w-4 h-4 text-[#AD956C]" />
               Real-Time Security &amp; Audit Trail
             </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-[#8D8982] mt-0.5 font-sans">
               Cryptographic traces registered by automated engines and administrative actions
             </p>
           </div>
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#151311] border border-[#211D19] text-[#8D8982]">
             Last {data?.recent_audit_trail.length || 0} events
           </span>
         </div>
 
-        <div className="divide-y divide-zinc-800/60">
+        <div className="divide-y divide-[#211D19]">
           {(data?.recent_audit_trail || []).map((evt, idx) => (
-            <div key={`${evt.id}-${idx}`} className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+            <div key={`${evt.id}-${idx}`} className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs font-mono">
               <div className="flex items-start md:items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-blue-400 mt-1 md:mt-0 shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-[#607D96] mt-1 md:mt-0 shrink-0" />
                 <div>
-                  <span className="font-semibold text-white mr-2">{evt.action}</span>
-                  <span className="text-zinc-500 font-mono text-[11px]">[{evt.entity_type}]</span>
-                  <div className="text-[11px] text-zinc-400 mt-0.5">
-                    Actor: <span className="text-zinc-300 font-mono">{evt.actor}</span>
+                  <span className="font-medium text-[#F7F4EC] mr-2">{evt.action}</span>
+                  <span className="text-[#625F5A] text-[11px]">[{evt.entity_type}]</span>
+                  <div className="text-[11px] text-[#8D8982] mt-0.5">
+                    Actor: <span className="text-[#C9C4BA]">{evt.actor}</span>
                   </div>
                 </div>
               </div>

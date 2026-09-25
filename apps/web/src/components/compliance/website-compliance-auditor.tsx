@@ -387,22 +387,22 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
     switch (grade) {
       case 'A+':
       case 'A':
-        return 'text-[#10B981] border-[#10B981]/30 bg-[#10B981]/10';
+        return 'text-[#718A79] border-[#718A79]/30 bg-[#718A79]/10';
       case 'B+':
       case 'B':
-        return 'text-[#4D8FCC] border-[#4D8FCC]/30 bg-[#4D8FCC]/10';
+        return 'text-[#607D96] border-[#344D63]/30 bg-[#344D63]/10';
       case 'C':
-        return 'text-[#C9B88A] border-[#C9B88A]/30 bg-[#C9B88A]/10';
+        return 'text-[#AD956C] border-[#AD956C]/30 bg-[#AD956C]/10';
       default:
-        return 'text-rose-400 border-rose-500/30 bg-rose-500/10';
+        return 'text-[#9A5D62] border-[#9A5D62]/30 bg-[#9A5D62]/10';
     }
   };
 
   const getSeverityBadge = (sev: string, status: string) => {
     if (status === 'PASS') {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center gap-1 font-mono">
-          <CheckCircle2 className="w-3 h-3 text-[#10B981]" />
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 flex items-center gap-1 font-mono">
+          <CheckCircle2 className="w-3 h-3 text-[#718A79]" />
           PASSED
         </span>
       );
@@ -410,29 +410,29 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
     switch (sev) {
       case 'CRITICAL':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-500/15 text-rose-300 border border-rose-500/30 flex items-center gap-1 font-mono">
-            <AlertTriangle className="w-3 h-3 text-rose-400" />
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#9A5D62]/15 text-[#9A5D62] border border-[#9A5D62]/30 flex items-center gap-1 font-mono">
+            <AlertTriangle className="w-3 h-3 text-[#9A5D62]" />
             CRITICAL
           </span>
         );
       case 'HIGH':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-mono">
-            <AlertTriangle className="w-3 h-3 text-amber-400" />
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#A48A5C]/15 text-[#A48A5C] border border-[#A48A5C]/30 flex items-center gap-1 font-mono">
+            <AlertTriangle className="w-3 h-3 text-[#A48A5C]" />
             HIGH
           </span>
         );
       case 'MEDIUM':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#C9B88A]/15 text-[#C9B88A] border border-[#C9B88A]/30 flex items-center gap-1 font-mono">
-            <ShieldAlert className="w-3 h-3 text-[#C9B88A]" />
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#AD956C]/15 text-[#AD956C] border border-[#AD956C]/30 flex items-center gap-1 font-mono">
+            <ShieldAlert className="w-3 h-3 text-[#AD956C]" />
             MEDIUM
           </span>
         );
       default:
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30 flex items-center gap-1 font-mono">
-            <Shield className="w-3 h-3 text-[#4D8FCC]" />
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#344D63]/15 text-[#607D96] border border-[#344D63]/30 flex items-center gap-1 font-mono">
+            <Shield className="w-3 h-3 text-[#607D96]" />
             LOW
           </span>
         );
@@ -440,36 +440,36 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] shadow-2xl text-[#F4F6F8] relative overflow-hidden">
+    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-[#0B0A09] border border-[#211D19] shadow-2xl text-[#F1EEE7] relative overflow-hidden">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--rc-border)] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#211D19] pb-6">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-8 h-8 rounded-lg bg-[#10141A] border border-[var(--rc-border)] flex items-center justify-center text-[#4D8FCC] shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[#151311] border border-[#211D19] flex items-center justify-center text-[#AD956C] shadow-sm">
               <Globe className="w-4 h-4" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F4F6F8] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#F7F4EC] tracking-tight">
               Automated Website Compliance Auditor
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
               LIVE PROBE AGENT • STATUTORY AUDIT
             </span>
 
             {/* Authoritative Usage Entitlement Pill */}
             {billingStatus && !billingStatus.is_admin && !billingStatus.paid_access && (
-              <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#10141A] border border-[var(--rc-border)] flex items-center gap-1.5">
-                <span className="text-zinc-400">Free Uses:</span>
-                <span className={isLimitReached ? "text-rose-400 font-extrabold" : "text-[#4D8FCC] font-extrabold"}>
+              <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#151311] border border-[#211D19] flex items-center gap-1.5">
+                <span className="text-[#8D8982]">Free Uses:</span>
+                <span className={isLimitReached ? "text-[#9A5D62] font-extrabold" : "text-[#AD956C] font-extrabold"}>
                   {billingStatus.free_usage?.used ?? 0} / {billingStatus.free_usage?.limit ?? 3}
                 </span>
                 {isLimitReached && (
-                  <span className="text-[#C9B88A] font-bold">• LOCKED</span>
+                  <span className="text-[#AD956C] font-bold">• LOCKED</span>
                 )}
               </div>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-[#94A3B8] mt-1.5 max-w-3xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8D8982] mt-1.5 max-w-3xl leading-relaxed">
             Enter your website URL. Our autonomous auditor agent inspects live transport security, defense headers, cookie configurations, GDPR consent banners, and WCAG accessibility against statutory regulations.
           </p>
         </div>
@@ -480,9 +480,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               onClick={handleDownloadReport}
               variant="outline"
               size="sm"
-              className="text-xs font-semibold bg-[#10141A] border-[var(--rc-border)] text-[#CBD5E1] hover:text-white flex items-center gap-1.5 cursor-pointer"
+              className="text-xs font-semibold bg-[#151311] border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC] flex items-center gap-1.5 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#4D8FCC]" />
+              <Download className="w-3.5 h-3.5 text-[#AD956C]" />
               <span>Export Audit (JSON)</span>
             </Button>
             <Button
@@ -495,7 +495,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               }}
               disabled={isAuditing}
               size="sm"
-              className="text-xs font-semibold bg-[#4D8FCC] hover:bg-[#3D7BBB] text-white flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="text-xs font-semibold bg-[#3F5C74] hover:bg-[#344D63] text-[#F1EEE7] flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isAuditing ? 'animate-spin' : ''}`} />
               <span>Re-Scan</span>
@@ -506,24 +506,24 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       {/* Account Action Locked Alert Banner (when 3 free uses are exhausted) */}
       {isLimitReached && (
-        <div className="p-4 sm:p-5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-amber-200 text-sm shadow-xl shadow-amber-500/5 animate-in fade-in duration-300">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#211A16] border border-[#AD956C]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[#F1EEE7] text-sm shadow-xl shadow-black/40 animate-in fade-in duration-300">
           <div className="flex items-start sm:items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-300">
+            <div className="w-10 h-10 rounded-xl bg-[#1B1815] border border-[#AD956C]/40 flex items-center justify-center shrink-0 text-[#AD956C]">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-amber-300 flex items-center gap-2">
+              <div className="font-bold text-[#F7F4EC] flex items-center gap-2">
                 <span>Account Action Locked • 3/3 Free Uses Consumed</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">Upgrade Required</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-[#AD956C]/20 text-[#AD956C] border border-[#AD956C]/30">Upgrade Required</span>
               </div>
-              <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">
+              <p className="text-xs text-[#C9C4BA] mt-1 leading-relaxed">
                 You have reached your limit of 3 free website compliance audits and regulation compilations. All audit actions are locked until you upgrade to the Pro plan.
               </p>
             </div>
           </div>
           <Button
             onClick={() => setIsPaywallOpen(true)}
-            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-amber-500/20 cursor-pointer flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-[#AD956C] hover:bg-[#B9A47C] text-[#080706] font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-black/40 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <Lock className="w-3.5 h-3.5" />
             <span>Upgrade to Pro ($10.02/mo)</span>
@@ -532,12 +532,12 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       )}
 
       {/* Target URL Input Control Deck */}
-      <div className={`p-4 sm:p-5 rounded-xl bg-[#0B0E14] border transition-all flex flex-col gap-4 ${isLimitReached ? 'border-amber-500/30 opacity-90' : 'border-[var(--rc-border)]'}`}>
+      <div className={`p-4 sm:p-5 rounded-xl bg-[#100E0D] border transition-all flex flex-col gap-4 ${isLimitReached ? 'border-[#AD956C]/30 opacity-90' : 'border-[#211D19]'}`}>
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           {/* URL Input Bar */}
           <div className="relative flex-1">
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#64748B] font-mono select-none">
-              <Lock className={`w-3.5 h-3.5 ${isLimitReached ? 'text-amber-400' : 'text-[#64748B]'}`} />
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#625F5A] font-mono select-none">
+              <Lock className={`w-3.5 h-3.5 ${isLimitReached ? 'text-[#AD956C]' : 'text-[#625F5A]'}`} />
               <span>https://</span>
             </div>
             <input
@@ -566,23 +566,23 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               }}
               placeholder={isLimitReached ? "Account Action Locked — 3/3 Free Uses Consumed (Upgrade to Pro)" : "example.com or client-portal.org"}
               disabled={isAuditing || isLimitReached}
-              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-[#64748B] focus:outline-none transition-all ${
+              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-[#625F5A] focus:outline-none transition-all ${
                 isLimitReached 
-                  ? 'bg-zinc-900/50 border-amber-500/30 text-amber-200/60 cursor-not-allowed' 
-                  : 'bg-[#050608] border-[var(--rc-border)] text-[#F4F6F8] focus:border-[#4D8FCC]'
+                  ? 'bg-[#151311] border-[#AD956C]/30 text-[#AD956C]/60 cursor-not-allowed' 
+                  : 'bg-[#080706] border-[#211D19] text-[#F1EEE7] focus:border-[#AD956C]'
               }`}
             />
           </div>
 
           {/* Depth Selector */}
-          <div className={`flex items-center gap-1 bg-[#050608] border border-[var(--rc-border)] p-1 rounded-lg text-xs font-mono ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className={`flex items-center gap-1 bg-[#080706] border border-[#211D19] p-1 rounded-lg text-xs font-mono ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
               onClick={() => setScanDepth('surface')}
               disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors ${
                 scanDepth === 'surface'
-                  ? 'bg-[#10141A] text-white font-bold'
-                  : 'text-[#94A3B8] hover:text-white'
+                  ? 'bg-[#1B1815] text-[#F7F4EC] font-bold'
+                  : 'text-[#8D8982] hover:text-[#F1EEE7]'
               }`}
             >
               Surface
@@ -592,11 +592,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors flex items-center gap-1.5 ${
                 scanDepth === 'deep'
-                  ? 'bg-[#4D8FCC] text-white font-semibold shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#CBD5E1]'
+                  ? 'bg-[#3F5C74] text-[#F7F4EC] font-semibold shadow-sm'
+                  : 'text-[#8D8982] hover:text-[#C9C4BA]'
               }`}
             >
-              <RCIcon name="system-probe" size={13} className="text-[#93C5FD]" />
+              <RCIcon name="system-probe" size={13} className="text-[#C9C4BA]" />
               Deep Full-Stack
             </button>
           </div>
@@ -605,25 +605,25 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           {isLimitReached ? (
             <Button
               onClick={() => setIsPaywallOpen(true)}
-              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 shadow-lg shadow-amber-500/10 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-[#AD956C]/20 hover:bg-[#AD956C]/30 text-[#AD956C] border border-[#AD956C]/40 shadow-lg shadow-black/40 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Lock className="w-4 h-4 text-amber-400" />
+              <Lock className="w-4 h-4 text-[#AD956C]" />
               <span>3/3 Used • Upgrade to Pro</span>
             </Button>
           ) : (
             <Button
               onClick={() => handleRunAudit()}
               disabled={isAuditing}
-              className="h-10 px-6 font-medium text-xs uppercase tracking-wider bg-[#4D8FCC] hover:bg-[#3D7BBB] text-white shadow-sm transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              className="h-10 px-6 font-medium text-xs uppercase tracking-wider bg-[#3F5C74] hover:bg-[#344D63] text-[#F1EEE7] shadow-sm transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isAuditing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#93C5FD]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#C9C4BA]" />
                   <span>Auditing Your Site...</span>
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 text-[#C9B88A]" />
+                  <Zap className="w-4 h-4 text-[#AD956C]" />
                   <span>Audit Your Site</span>
                 </>
               )}
@@ -632,10 +632,10 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
         </div>
 
         {/* Quick Presets & Framework Chips */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#17222C]/80 text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#211D19] text-xs">
           {/* Presets */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-zinc-500 text-[11px] font-mono mr-1">Quick Presets:</span>
+            <span className="text-[#8D8982] text-[11px] font-mono mr-1">Quick Presets:</span>
             {POPULAR_TARGETS.map(target => (
               <button
                 key={target.url}
@@ -648,7 +648,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                   handleRunAudit(target.url);
                 }}
                 disabled={isAuditing || isLimitReached}
-                className={`px-2.5 py-1 rounded bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-300 hover:text-white transition-colors ${isLimitReached ? 'opacity-40 cursor-not-allowed' : ''}`}
+                className={`px-2.5 py-1 rounded bg-[#151311] hover:bg-[#1B1815] border border-[#211D19] text-[11px] font-mono text-[#C9C4BA] hover:text-[#F7F4EC] transition-colors ${isLimitReached ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
                 {target.label}
               </button>
@@ -657,22 +657,22 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
           {/* Active Framework Badges */}
           <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[#64748B] text-[11px] font-mono mr-1">Regulatory Enforcements:</span>
+            <span className="text-[#8D8982] text-[11px] font-mono mr-1">Regulatory Enforcements:</span>
             {AVAILABLE_FRAMEWORKS.slice(1, 6).map(fw => (
               <span
                 key={fw}
-                className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#10141A] text-[#93C5FD] border border-[#4D8FCC]/20"
+                className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#151311] text-[#607D96] border border-[#344D63]/30"
               >
                 {fw}
               </span>
             ))}
-            <span className="text-[10px] text-[#64748B] font-mono">+3 more</span>
+            <span className="text-[10px] text-[#625F5A] font-mono">+3 more</span>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="p-3 rounded-lg bg-[#9A5D62]/15 border border-[#9A5D62]/40 text-[#9A5D62] text-xs flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-[#9A5D62]" />
             <span>{error}</span>
           </div>
         )}
@@ -680,21 +680,21 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       {/* Real-time Agent Streaming Terminal (During Scan) */}
       {isAuditing && (
-        <div className="rounded-xl border border-[#4D8FCC]/30 bg-[#050608] overflow-hidden shadow-2xl space-y-2 p-4">
-          <div className="flex items-center justify-between border-b border-[var(--rc-border)] pb-2 text-xs">
+        <div className="rounded-xl border border-[#211D19] bg-[#080706] overflow-hidden shadow-2xl space-y-2 p-4">
+          <div className="flex items-center justify-between border-b border-[#211D19] pb-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#4D8FCC]" />
-              <span className="font-mono text-[#93C5FD] font-bold">
+              <div className="w-2 h-2 rounded-full bg-[#AD956C]" />
+              <span className="font-mono text-[#AD956C] font-bold">
                 AUTONOMOUS AGENT ACTIVE // LIVE NETWORK INSPECTION
               </span>
             </div>
-            <span className="font-mono text-[#94A3B8]">{auditProgress}%</span>
+            <span className="font-mono text-[#8D8982]">{auditProgress}%</span>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-1 bg-[#10141A] rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-[#151311] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#4D8FCC] transition-all duration-300"
+              className="h-full bg-[#3F5C74] transition-all duration-300"
               style={{ width: `${auditProgress}%` }}
             />
           </div>
@@ -702,7 +702,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           {/* Terminal stream */}
           <div 
             ref={logsContainerRef}
-            className="font-mono text-[11px] text-[#CBD5E1] space-y-1 max-h-40 overflow-y-auto pt-2 leading-relaxed"
+            className="font-mono text-[11px] text-[#C9C4BA] space-y-1 max-h-40 overflow-y-auto pt-2 leading-relaxed"
           >
             {(streamLogs || []).filter(Boolean).map((rawLog, idx) => {
               const log = typeof rawLog === 'string' ? rawLog : String(rawLog || '');
@@ -710,8 +710,8 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               const isPass = log.includes('PASS') || log.includes('FOUND');
               return (
                 <div key={idx} className="flex items-start gap-2">
-                  <span className="text-[#64748B] select-none">&gt;</span>
-                  <span className={isFail ? 'text-amber-300' : isPass ? 'text-emerald-300' : 'text-[#CBD5E1]'}>
+                  <span className="text-[#625F5A] select-none">&gt;</span>
+                  <span className={isFail ? 'text-[#A48A5C]' : isPass ? 'text-[#718A79]' : 'text-[#C9C4BA]'}>
                     {log}
                   </span>
                 </div>
@@ -747,97 +747,97 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             </div>
 
             {/* Sub-Score Categorical Gauges */}
-            <div className="md:col-span-8 p-6 rounded-2xl bg-[#0B0E14] border border-[var(--rc-border)] flex flex-col justify-between gap-4">
+            <div className="md:col-span-8 p-6 rounded-2xl bg-[#100E0D] border border-[#211D19] flex flex-col justify-between gap-4">
               <div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#4D8FCC]" />
-                    <h4 className="text-sm font-bold text-[#F4F6F8] uppercase tracking-wider">
+                    <ShieldCheck className="w-4 h-4 text-[#607D96]" />
+                    <h4 className="text-sm font-bold text-[#F7F4EC] uppercase tracking-wider">
                       Regulatory Domain Posture
                     </h4>
                   </div>
-                  <span className="text-xs font-mono text-[#94A3B8]">
-                    Host: <span className="text-white font-bold">{auditResult.domain}</span> ({auditResult.latency_ms}ms)
+                  <span className="text-xs font-mono text-[#8D8982]">
+                    Host: <span className="text-[#F7F4EC] font-bold">{auditResult.domain}</span> ({auditResult.latency_ms}ms)
                   </span>
                 </div>
-                <p className="text-xs text-[#94A3B8] mt-0.5">
+                <p className="text-xs text-[#8D8982] mt-0.5">
                   Automated full-stack verification against security headers, data privacy, and WCAG accessibility standards.
                 </p>
               </div>
 
               {/* Progress Gauges */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                  <span className="text-[11px] text-zinc-400 block font-medium">Security Transport</span>
-                  <div className="text-xl font-bold font-mono text-white mt-1">
+                <div className="p-3 rounded-xl bg-[#151311] border border-[#211D19]">
+                  <span className="text-[11px] text-[#8D8982] block font-medium">Security Transport</span>
+                  <div className="text-xl font-bold font-mono text-[#F7F4EC] mt-1">
                     {auditResult.sub_scores.security}%
                   </div>
-                  <div className="w-full h-1 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${auditResult.sub_scores.security}%` }} />
+                  <div className="w-full h-1 bg-[#211D19] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#3F5C74] rounded-full" style={{ width: `${auditResult.sub_scores.security}%` }} />
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                  <span className="text-[11px] text-zinc-400 block font-medium">Privacy &amp; GDPR</span>
-                  <div className="text-xl font-bold font-mono text-white mt-1">
+                <div className="p-3 rounded-xl bg-[#151311] border border-[#211D19]">
+                  <span className="text-[11px] text-[#8D8982] block font-medium">Privacy &amp; GDPR</span>
+                  <div className="text-xl font-bold font-mono text-[#F7F4EC] mt-1">
                     {auditResult.sub_scores.privacy}%
                   </div>
-                  <div className="w-full h-1 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${auditResult.sub_scores.privacy}%` }} />
+                  <div className="w-full h-1 bg-[#211D19] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#718A79] rounded-full" style={{ width: `${auditResult.sub_scores.privacy}%` }} />
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                  <span className="text-[11px] text-zinc-400 block font-medium">WCAG Accessibility</span>
-                  <div className="text-xl font-bold font-mono text-white mt-1">
+                <div className="p-3 rounded-xl bg-[#151311] border border-[#211D19]">
+                  <span className="text-[11px] text-[#8D8982] block font-medium">WCAG Accessibility</span>
+                  <div className="text-xl font-bold font-mono text-[#F7F4EC] mt-1">
                     {auditResult.sub_scores.accessibility}%
                   </div>
-                  <div className="w-full h-1 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${auditResult.sub_scores.accessibility}%` }} />
+                  <div className="w-full h-1 bg-[#211D19] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#607D96] rounded-full" style={{ width: `${auditResult.sub_scores.accessibility}%` }} />
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                  <span className="text-[11px] text-zinc-400 block font-medium">RFC 9116 Disclosures</span>
-                  <div className="text-xl font-bold font-mono text-white mt-1">
+                <div className="p-3 rounded-xl bg-[#151311] border border-[#211D19]">
+                  <span className="text-[11px] text-[#8D8982] block font-medium">RFC 9116 Disclosures</span>
+                  <div className="text-xl font-bold font-mono text-[#F7F4EC] mt-1">
                     {auditResult.sub_scores.disclosures}%
                   </div>
-                  <div className="w-full h-1 bg-zinc-800 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${auditResult.sub_scores.disclosures}%` }} />
+                  <div className="w-full h-1 bg-[#211D19] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#AD956C] rounded-full" style={{ width: `${auditResult.sub_scores.disclosures}%` }} />
                   </div>
                 </div>
               </div>
 
               {/* Summary Stats Strip */}
-              <div className="flex items-center justify-between flex-wrap gap-2 text-xs font-mono pt-3 border-t border-zinc-800/60">
-                <span className="text-zinc-400">
-                  Total Checkpoints: <span className="text-white font-bold">{auditResult.summary.total_checkpoints}</span>
+              <div className="flex items-center justify-between flex-wrap gap-2 text-xs font-mono pt-3 border-t border-[#211D19]">
+                <span className="text-[#8D8982]">
+                  Total Checkpoints: <span className="text-[#F7F4EC] font-bold">{auditResult.summary.total_checkpoints}</span>
                 </span>
-                <span className="text-emerald-400">
+                <span className="text-[#718A79]">
                   Passed: <span className="font-bold">{auditResult.summary.passed}</span>
                 </span>
-                <span className="text-rose-400">
+                <span className="text-[#9A5D62]">
                   Critical: <span className="font-bold">{auditResult.summary.critical}</span>
                 </span>
-                <span className="text-amber-400">
+                <span className="text-[#A48A5C]">
                   High: <span className="font-bold">{auditResult.summary.high}</span>
                 </span>
-                <span className="text-yellow-400">
+                <span className="text-[#AD956C]">
                   Medium: <span className="font-bold">{auditResult.summary.medium}</span>
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Statutory Advisory Dossier (Visual match to Advisory specification) */}
-          <div className="rounded-2xl border border-zinc-800/80 bg-[#0c1015] p-5 sm:p-7 shadow-2xl font-mono text-zinc-300 space-y-6">
+          {/* Statutory Advisory Dossier */}
+          <div className="rounded-2xl border border-[#211D19] bg-[#100E0D] p-5 sm:p-7 shadow-2xl font-mono text-[#C9C4BA] space-y-6">
             {/* Advisory Title Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#211D19] pb-4">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl sm:text-2xl font-bold text-[#C9B88A] tracking-tight">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#AD956C] tracking-tight">
                   Advisory
                 </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#C9B88A]/10 text-[#C9B88A] border border-[#C9B88A]/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#AD956C]/10 text-[#AD956C] border border-[#AD956C]/30">
                   {advisoryItems.issues.length + advisoryItems.warnings.length + advisoryItems.informational.length} Advisories Active
                 </span>
               </div>
@@ -847,7 +847,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                     const allOpen = prev.issues && prev.warnings && prev.informational;
                     return { issues: !allOpen, warnings: !allOpen, informational: !allOpen };
                   })}
-                  className="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors text-[11px]"
+                  className="px-3 py-1 rounded-lg bg-[#151311] hover:bg-[#1B1815] border border-[#211D19] text-[#8D8982] hover:text-[#F7F4EC] transition-colors text-[11px]"
                 >
                   {advisoryOpen.issues && advisoryOpen.warnings && advisoryOpen.informational ? 'Collapse All' : 'Expand All'}
                 </button>
@@ -858,7 +858,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             <div className="space-y-3">
               <button
                 onClick={() => setAdvisoryOpen(prev => ({ ...prev, issues: !prev.issues }))}
-                className="flex items-center gap-2 text-[#fb923c] font-bold text-sm hover:text-[#f97316] transition-colors group select-none"
+                className="flex items-center gap-2 text-[#A48A5C] font-bold text-sm hover:text-[#C5B38B] transition-colors group select-none"
               >
                 <span className={`transform transition-transform text-xs ${advisoryOpen.issues ? 'rotate-0' : '-rotate-90'}`}>
                   ▼
@@ -867,9 +867,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               </button>
 
               {advisoryOpen.issues && (
-                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#fb923c]/20">
+                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#A48A5C]/25">
                   {advisoryItems.issues.length === 0 ? (
-                    <div className="text-xs text-zinc-500 italic pl-3">
+                    <div className="text-xs text-[#625F5A] italic pl-3">
                       ✓ No critical or high statutory issues detected.
                     </div>
                   ) : (
@@ -883,39 +883,39 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                             onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
                             className="flex items-start gap-2.5 cursor-pointer select-none"
                           >
-                            <span className="text-[#fb923c] font-black text-sm shrink-0 leading-5">!</span>
+                            <span className="text-[#A48A5C] font-black text-sm shrink-0 leading-5">!</span>
                             <div className="flex-1 min-w-0">
-                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                              <div className="text-[#F7F4EC] font-bold text-sm tracking-tight group-hover:text-[#AD956C] transition-colors">
                                 {item.title}
                               </div>
-                              <div className="text-zinc-400 text-xs font-mono leading-relaxed mt-0.5">
+                              <div className="text-[#8D8982] text-xs font-mono leading-relaxed mt-0.5">
                                 {getAdvisorySubtitle(item)}
                               </div>
                             </div>
-                            <span className="text-[10px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300">
+                            <span className="text-[10px] text-[#625F5A] font-mono shrink-0 group-hover:text-[#C9C4BA]">
                               {isExpanded ? '[-]' : '[+]'}
                             </span>
                           </div>
 
                           {/* Expandable AST Remediation */}
                           {isExpanded && (
-                            <div className="ml-5 p-3.5 rounded-xl bg-zinc-950/90 border border-zinc-800 space-y-3 text-xs">
-                              <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                                <span>Affected: <span className="text-zinc-200">{item.affected}</span></span>
-                                <span className="text-zinc-500">[{item.framework}]</span>
+                            <div className="ml-5 p-3.5 rounded-xl bg-[#151311] border border-[#211D19] space-y-3 text-xs">
+                              <div className="flex items-center justify-between text-[11px] text-[#8D8982]">
+                                <span>Affected: <span className="text-[#C9C4BA]">{item.affected}</span></span>
+                                <span className="text-[#625F5A]">[{item.framework}]</span>
                               </div>
-                              <div className="p-2.5 rounded bg-black/60 border border-zinc-800/80 text-zinc-300 text-[11px]">
+                              <div className="p-2.5 rounded bg-[#080706] border border-[#211D19] text-[#C9C4BA] text-[11px]">
                                 {item.evidence}
                               </div>
                               {item.remediation && (
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-emerald-400 font-bold text-[10px] uppercase">Remediation Directive:</span>
+                                    <span className="text-[#718A79] font-bold text-[10px] uppercase">Remediation Directive:</span>
                                     <div className="flex items-center gap-1 font-mono text-[10px]">
                                       {item.remediation.nginx && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nginx' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Nginx
                                         </button>
@@ -923,7 +923,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.nextjs && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nextjs' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Next.js
                                         </button>
@@ -931,7 +931,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.cloudflare && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'cloudflare' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Cloudflare / DNS
                                         </button>
@@ -939,7 +939,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.apache && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'apache' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Apache
                                         </button>
@@ -947,13 +947,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                     </div>
                                   </div>
                                   {item.remediation[activeTab] && (
-                                    <div className="relative rounded-lg bg-black border border-zinc-800 p-2.5 font-mono text-[11px] text-emerald-300 overflow-x-auto">
+                                    <div className="relative rounded-lg bg-[#080706] border border-[#211D19] p-2.5 font-mono text-[11px] text-[#718A79] overflow-x-auto">
                                       <pre className="select-all">{item.remediation[activeTab]}</pre>
                                       <button
                                         onClick={(e) => { e.stopPropagation(); handleCopyCode(item.id, item.remediation?.[activeTab] || ''); }}
-                                        className="absolute right-2 top-2 p-1.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white"
+                                        className="absolute right-2 top-2 p-1.5 rounded bg-[#151311] border border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC]"
                                       >
-                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-[#718A79]" /> : <Copy className="w-3 h-3" />}
                                       </button>
                                     </div>
                                   )}
@@ -973,7 +973,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             <div className="space-y-3">
               <button
                 onClick={() => setAdvisoryOpen(prev => ({ ...prev, warnings: !prev.warnings }))}
-                className="flex items-center gap-2 text-[#facc15] font-bold text-sm hover:text-[#fde047] transition-colors group select-none"
+                className="flex items-center gap-2 text-[#AD956C] font-bold text-sm hover:text-[#C5B38B] transition-colors group select-none"
               >
                 <span className={`transform transition-transform text-xs ${advisoryOpen.warnings ? 'rotate-0' : '-rotate-90'}`}>
                   ▼
@@ -982,9 +982,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               </button>
 
               {advisoryOpen.warnings && (
-                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#facc15]/20">
+                <div className="space-y-3.5 pl-3 sm:pl-4 border-l-2 border-[#AD956C]/25">
                   {advisoryItems.warnings.length === 0 ? (
-                    <div className="text-xs text-zinc-500 italic pl-3">
+                    <div className="text-xs text-[#625F5A] italic pl-3">
                       ✓ Zero warnings flagged across tested vectors.
                     </div>
                   ) : (
@@ -998,39 +998,39 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                             onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
                             className="flex items-start gap-2.5 cursor-pointer select-none"
                           >
-                            <span className="text-[#facc15] font-bold text-xs shrink-0 leading-5">▲</span>
+                            <span className="text-[#AD956C] font-bold text-xs shrink-0 leading-5">▲</span>
                             <div className="flex-1 min-w-0">
-                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                              <div className="text-[#F7F4EC] font-bold text-sm tracking-tight group-hover:text-[#AD956C] transition-colors">
                                 {item.title}
                               </div>
-                              <div className="text-zinc-400 text-xs font-mono leading-relaxed mt-0.5">
+                              <div className="text-[#8D8982] text-xs font-mono leading-relaxed mt-0.5">
                                 {getAdvisorySubtitle(item)}
                               </div>
                             </div>
-                            <span className="text-[10px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300">
+                            <span className="text-[10px] text-[#625F5A] font-mono shrink-0 group-hover:text-[#C9C4BA]">
                               {isExpanded ? '[-]' : '[+]'}
                             </span>
                           </div>
 
                           {/* Expandable AST Remediation */}
                           {isExpanded && (
-                            <div className="ml-5 p-3.5 rounded-xl bg-zinc-950/90 border border-zinc-800 space-y-3 text-xs">
-                              <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                                <span>Affected: <span className="text-zinc-200">{item.affected}</span></span>
-                                <span className="text-zinc-500">[{item.framework}]</span>
+                            <div className="ml-5 p-3.5 rounded-xl bg-[#151311] border border-[#211D19] space-y-3 text-xs">
+                              <div className="flex items-center justify-between text-[11px] text-[#8D8982]">
+                                <span>Affected: <span className="text-[#C9C4BA]">{item.affected}</span></span>
+                                <span className="text-[#625F5A]">[{item.framework}]</span>
                               </div>
-                              <div className="p-2.5 rounded bg-black/60 border border-zinc-800/80 text-zinc-300 text-[11px]">
+                              <div className="p-2.5 rounded bg-[#080706] border border-[#211D19] text-[#C9C4BA] text-[11px]">
                                 {item.evidence}
                               </div>
                               {item.remediation && (
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-emerald-400 font-bold text-[10px] uppercase">Remediation Directive:</span>
+                                    <span className="text-[#718A79] font-bold text-[10px] uppercase">Remediation Directive:</span>
                                     <div className="flex items-center gap-1 font-mono text-[10px]">
                                       {item.remediation.nginx && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nginx' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nginx' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Nginx
                                         </button>
@@ -1038,7 +1038,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.nextjs && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'nextjs' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'nextjs' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Next.js
                                         </button>
@@ -1046,7 +1046,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.cloudflare && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'cloudflare' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'cloudflare' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Cloudflare / DNS
                                         </button>
@@ -1054,7 +1054,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       {item.remediation.apache && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setAdvisoryCodeTab(prev => ({ ...prev, [item.id]: 'apache' })); }}
-                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`px-2 py-0.5 rounded ${activeTab === 'apache' ? 'bg-[#211D19] text-[#F7F4EC] font-bold' : 'text-[#8D8982] hover:text-[#F1EEE7]'}`}
                                         >
                                           Apache
                                         </button>
@@ -1062,13 +1062,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                     </div>
                                   </div>
                                   {item.remediation[activeTab] && (
-                                    <div className="relative rounded-lg bg-black border border-zinc-800 p-2.5 font-mono text-[11px] text-emerald-300 overflow-x-auto">
+                                    <div className="relative rounded-lg bg-[#080706] border border-[#211D19] p-2.5 font-mono text-[11px] text-[#718A79] overflow-x-auto">
                                       <pre className="select-all">{item.remediation[activeTab]}</pre>
                                       <button
                                         onClick={(e) => { e.stopPropagation(); handleCopyCode(item.id, item.remediation?.[activeTab] || ''); }}
-                                        className="absolute right-2 top-2 p-1.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white"
+                                        className="absolute right-2 top-2 p-1.5 rounded bg-[#151311] border border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC]"
                                       >
-                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                        {copiedCodeId === item.id ? <Check className="w-3 h-3 text-[#718A79]" /> : <Copy className="w-3 h-3" />}
                                       </button>
                                     </div>
                                   )}
@@ -1085,10 +1085,10 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             </div>
 
             {/* Section 3: Informational (e.g. Informational (2)) Styled in restrained graphite box */}
-            <div className="rounded-xl border border-[var(--rc-border)] bg-[#050608] p-4 transition-all">
+            <div className="rounded-xl border border-[#211D19] bg-[#080706] p-4 transition-all">
               <button
                 onClick={() => setAdvisoryOpen(prev => ({ ...prev, informational: !prev.informational }))}
-                className="flex items-center gap-2 text-[#93C5FD] font-bold text-sm hover:text-white transition-colors group select-none w-full text-left cursor-pointer"
+                className="flex items-center gap-2 text-[#607D96] font-bold text-sm hover:text-[#F7F4EC] transition-colors group select-none w-full text-left cursor-pointer"
               >
                 <span className={`transform transition-transform text-xs ${advisoryOpen.informational ? 'rotate-0' : '-rotate-90'}`}>
                   ▼
@@ -1099,7 +1099,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               {advisoryOpen.informational && (
                 <div className="space-y-3.5 mt-3 pl-2 sm:pl-3">
                   {advisoryItems.informational.length === 0 ? (
-                    <div className="text-xs text-[#64748B] italic pl-3">
+                    <div className="text-xs text-[#625F5A] italic pl-3">
                       ✓ No informational disclosures discovered.
                     </div>
                   ) : (
@@ -1113,32 +1113,32 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                             onClick={() => setExpandedAdvisoryId(isExpanded ? null : item.id)}
                             className="flex items-start gap-2.5 cursor-pointer select-none"
                           >
-                            <span className="text-[#93C5FD] font-bold text-xs shrink-0 leading-5">ⓘ</span>
+                            <span className="text-[#607D96] font-bold text-xs shrink-0 leading-5">ⓘ</span>
                             <div className="flex-1 min-w-0">
-                              <div className="text-zinc-100 font-bold text-sm tracking-tight group-hover:text-white transition-colors">
+                              <div className="text-[#F7F4EC] font-bold text-sm tracking-tight group-hover:text-[#AD956C] transition-colors">
                                 {item.title}
                               </div>
-                              <div className="text-[#94A3B8] text-xs font-mono leading-relaxed mt-0.5">
+                              <div className="text-[#8D8982] text-xs font-mono leading-relaxed mt-0.5">
                                 {getAdvisorySubtitle(item)}
                               </div>
                             </div>
-                            <span className="text-[10px] text-[#64748B] font-mono shrink-0 group-hover:text-zinc-300">
+                            <span className="text-[10px] text-[#625F5A] font-mono shrink-0 group-hover:text-[#C9C4BA]">
                               {isExpanded ? '[-]' : '[+]'}
                             </span>
                           </div>
 
                           {/* Expandable Details */}
                           {isExpanded && (
-                            <div className="ml-5 p-3 rounded-lg bg-[#0B0E14] border border-[var(--rc-border)] space-y-2.5 text-xs">
-                              <div className="text-[11px] text-[#93C5FD]">
+                            <div className="ml-5 p-3 rounded-lg bg-[#151311] border border-[#211D19] space-y-2.5 text-xs">
+                              <div className="text-[11px] text-[#607D96]">
                                 {item.evidence}
                               </div>
                               {item.remediation && (
-                                <div className="space-y-1.5 pt-1 border-t border-sky-500/20">
-                                  <span className="text-emerald-400 font-bold text-[10px] uppercase block">Suggested Configuration:</span>
-                                  <p className="text-zinc-300 text-[11px]">{item.remediation.description}</p>
+                                <div className="space-y-1.5 pt-1 border-t border-[#211D19]">
+                                  <span className="text-[#718A79] font-bold text-[10px] uppercase block">Suggested Configuration:</span>
+                                  <p className="text-[#C9C4BA] text-[11px]">{item.remediation.description}</p>
                                   {item.remediation[activeTab] && (
-                                    <div className="relative rounded bg-zinc-950 border border-zinc-800 p-2 font-mono text-[10px] text-emerald-300 overflow-x-auto mt-1">
+                                    <div className="relative rounded bg-[#080706] border border-[#211D19] p-2 font-mono text-[10px] text-[#718A79] overflow-x-auto mt-1">
                                       <pre className="select-all">{item.remediation[activeTab]}</pre>
                                     </div>
                                   )}
@@ -1159,11 +1159,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-400" />
+                <h3 className="text-base font-semibold text-[#F7F4EC] flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-[#607D96]" />
                   Detailed Compliance Findings &amp; Statutory AST Remediations
                 </h3>
-                <p className="text-xs text-zinc-400 mt-0.5">
+                <p className="text-xs text-[#8D8982] mt-0.5 font-sans">
                   Showing {displayedFindings.length} evaluated checkpoints matching current filters
                 </p>
               </div>
@@ -1172,26 +1172,26 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#625F5A]" />
                   <input
                     type="text"
                     placeholder="Search findings, clauses..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 pr-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-blue-500 w-44 sm:w-56"
+                    className="pl-9 pr-3 py-1.5 rounded-lg bg-[#151311] border border-[#211D19] text-xs text-[#F1EEE7] placeholder:text-[#625F5A] focus:outline-none focus:border-[#AD956C] w-44 sm:w-56 transition-colors"
                   />
                 </div>
 
                 {/* Severity Filter Pills */}
-                <div className="flex items-center rounded-lg bg-zinc-900 border border-zinc-800 p-0.5 text-xs">
+                <div className="flex items-center rounded-lg bg-[#151311] border border-[#211D19] p-0.5 text-xs">
                   {['ALL', 'CRITICAL', 'HIGH', 'PASSED'].map(sev => (
                     <button
                       key={sev}
                       onClick={() => setSeverityFilter(sev)}
-                      className={`px-2.5 py-1 rounded transition-colors text-[11px] font-semibold ${
+                      className={`px-2.5 py-1 rounded transition-colors text-[11px] font-medium ${
                         severityFilter === sev 
-                          ? 'bg-zinc-800 text-white' 
-                          : 'text-zinc-400 hover:text-zinc-200'
+                          ? 'bg-[#211D19] text-[#F7F4EC]' 
+                          : 'text-[#8D8982] hover:text-[#C9C4BA]'
                       }`}
                     >
                       {sev}
@@ -1204,7 +1204,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             {/* Findings Accordion Deck */}
             <div className="space-y-3">
               {displayedFindings.length === 0 ? (
-                <div className="p-8 rounded-xl bg-zinc-900/30 border border-zinc-800 text-center text-zinc-500 text-xs">
+                <div className="p-8 rounded-xl bg-[#100E0D] border border-[#211D19] text-center text-[#8D8982] text-xs">
                   No findings match the active search or severity filter.
                 </div>
               ) : (
@@ -1218,11 +1218,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                       className={`rounded-xl border transition-all overflow-hidden ${
                         finding.status === 'FAIL'
                           ? (finding.severity === 'CRITICAL'
-                              ? 'bg-rose-950/10 border-rose-500/30 hover:border-rose-500/50'
+                              ? 'bg-[#181215] border-[#9A5D62]/40 hover:border-[#9A5D62]/60'
                               : finding.severity === 'HIGH'
-                              ? 'bg-amber-950/10 border-amber-500/30 hover:border-amber-500/50'
-                              : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700')
-                          : 'bg-emerald-950/[0.04] border-emerald-500/20 hover:border-emerald-500/40'
+                              ? 'bg-[#1A1512] border-[#A48A5C]/40 hover:border-[#A48A5C]/60'
+                              : 'bg-[#100E0D] border-[#211D19] hover:border-[#2A241F]')
+                          : 'bg-[#100E0D] border-[#718A79]/20 hover:border-[#718A79]/40'
                       }`}
                     >
                       {/* Summary Row */}
@@ -1236,26 +1236,26 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="text-sm font-bold text-white truncate">
+                              <h4 className="text-sm font-semibold text-[#F7F4EC] truncate">
                                 {finding.title}
                               </h4>
-                              <span className="text-[10px] font-mono text-zinc-500">
+                              <span className="text-[10px] font-mono text-[#8D8982]">
                                 [{finding.clause}]
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-zinc-400 mt-0.5">
-                              <span className="text-zinc-500 font-mono text-[11px]">{finding.affected}</span>
+                            <div className="flex items-center gap-2 text-xs text-[#8D8982] mt-0.5">
+                              <span className="text-[#625F5A] font-mono text-[11px]">{finding.affected}</span>
                               <span>•</span>
-                              <span className="text-zinc-400 text-[11px]">{finding.framework}</span>
+                              <span className="text-[#8D8982] text-[11px]">{finding.framework}</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs text-blue-400 font-medium hidden sm:inline">
+                          <span className="text-xs text-[#AD956C] font-medium hidden sm:inline">
                             {isExpanded ? 'Hide Details' : 'Inspect Evidence'}
                           </span>
-                          <span className={`transform transition-transform text-zinc-400 text-xs ${isExpanded ? 'rotate-180' : ''}`}>
+                          <span className={`transform transition-transform text-[#8D8982] text-xs ${isExpanded ? 'rotate-180' : ''}`}>
                             ▼
                           </span>
                         </div>
@@ -1263,13 +1263,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
                       {/* Expanded Details & Remediation AST */}
                       {isExpanded && (
-                        <div className="p-4 pt-0 border-t border-zinc-800/60 bg-black/30 space-y-4 text-xs">
+                        <div className="p-4 pt-0 border-t border-[#211D19] bg-[#0B0A09]/60 space-y-4 text-xs">
                           {/* Evidence Block */}
                           <div className="space-y-1">
-                            <span className="text-zinc-400 font-bold uppercase text-[10px] tracking-wider block">
+                            <span className="text-[#8D8982] font-semibold uppercase text-[10px] tracking-wider block">
                               Cryptographic / Telemetry Evidence:
                             </span>
-                            <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800/80 font-mono text-[11px] text-zinc-300 break-all select-all">
+                            <div className="p-3 rounded-lg bg-[#080706] border border-[#211D19] font-mono text-[11px] text-[#C9C4BA] break-all select-all">
                               {finding.evidence}
                             </div>
                           </div>
@@ -1278,14 +1278,14 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                           {finding.remediation && (
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
-                                <span className="text-emerald-400 font-bold uppercase text-[10px] tracking-wider block">
+                                <span className="text-[#718A79] font-semibold uppercase text-[10px] tracking-wider block">
                                   Recommended AST Remediation:
                                 </span>
                                 <div className="flex items-center gap-1 font-mono text-[11px]">
                                   {finding.remediation.nginx && (
                                     <button
                                       onClick={() => setSelectedCodeTab(prev => ({ ...prev, [finding.id]: 'nginx' }))}
-                                      className={`px-2 py-0.5 rounded ${currentCodeTab === 'nginx' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                      className={`px-2 py-0.5 rounded transition-colors ${currentCodeTab === 'nginx' ? 'bg-[#211D19] text-[#F7F4EC] font-semibold' : 'text-[#8D8982] hover:text-[#C9C4BA]'}`}
                                     >
                                       Nginx
                                     </button>
@@ -1293,7 +1293,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                   {finding.remediation.nextjs && (
                                     <button
                                       onClick={() => setSelectedCodeTab(prev => ({ ...prev, [finding.id]: 'nextjs' }))}
-                                      className={`px-2 py-0.5 rounded ${currentCodeTab === 'nextjs' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                      className={`px-2 py-0.5 rounded transition-colors ${currentCodeTab === 'nextjs' ? 'bg-[#211D19] text-[#F7F4EC] font-semibold' : 'text-[#8D8982] hover:text-[#C9C4BA]'}`}
                                     >
                                       Next.js / Node
                                     </button>
@@ -1301,14 +1301,14 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                 </div>
                               </div>
 
-                              <p className="text-zinc-300 leading-relaxed">
+                              <p className="text-[#C9C4BA] leading-relaxed">
                                 {finding.remediation.description}
                               </p>
 
                               {/* Copyable Code Block */}
                               {((currentCodeTab === 'nginx' && finding.remediation.nginx) ||
                                 (currentCodeTab === 'nextjs' && finding.remediation.nextjs)) && (
-                                <div className="relative rounded-lg bg-zinc-950 border border-zinc-800 p-3 font-mono text-[11px] text-emerald-300 overflow-x-auto">
+                                <div className="relative rounded-lg bg-[#080706] border border-[#211D19] p-3 font-mono text-[11px] text-[#718A79] overflow-x-auto">
                                   <pre className="select-all">
                                     {currentCodeTab === 'nginx' ? finding.remediation.nginx : finding.remediation.nextjs}
                                   </pre>
@@ -1317,17 +1317,17 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                                       finding.id, 
                                       (currentCodeTab === 'nginx' ? finding.remediation?.nginx : finding.remediation?.nextjs) || ''
                                     )}
-                                    className="absolute right-2 top-2 p-1.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors flex items-center gap-1"
+                                    className="absolute right-2 top-2 p-1.5 rounded bg-[#151311] border border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815] transition-colors flex items-center gap-1"
                                     title="Copy Code Snippet"
                                   >
                                     {copiedCodeId === finding.id ? (
                                       <>
-                                        <Check className="w-3 h-3 text-emerald-400" />
-                                        <span className="text-[10px] text-emerald-400">Copied</span>
+                                        <Check className="w-3 h-3 text-[#718A79]" />
+                                        <span className="text-[10px] text-[#718A79]">Copied</span>
                                       </>
                                     ) : (
                                       <>
-                                        <Copy className="w-3 h-3" />
+                                        <Copy className="w-3 h-3 text-[#8D8982]" />
                                         <span className="text-[10px]">Copy Fix</span>
                                       </>
                                     )}

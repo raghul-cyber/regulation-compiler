@@ -20,14 +20,14 @@ export function HowItWorksSection() {
     <section id="how-it-works" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Header */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <Cpu className="w-3.5 h-3.5 text-[#4D8FCC]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          <Cpu className="w-3.5 h-3.5 text-[#AD956C]" />
           Compiler Architecture
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
           How RegCompiler Works
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           The end-to-end statutory compilation lifecycle. From raw governmental gazettes to real-time machine policy enforcement.
         </p>
       </div>
@@ -37,15 +37,15 @@ export function HowItWorksSection() {
         {STAGES.map((s) => (
           <div 
             key={s.step} 
-            className="p-3.5 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] text-left hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14] transition-colors"
+            className="p-3.5 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] text-left hover:border-[rgba(201,196,186,0.22)] hover:bg-[#1B1815] transition-all shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
           >
-            <div className="font-mono text-[10px] text-[#4D8FCC] font-bold mb-1">
+            <div className="font-mono text-[10px] text-[#AD956C] font-bold mb-1">
               STAGE {s.step}
             </div>
-            <div className="font-mono text-xs font-bold text-[#F4F6F8] mb-1">
+            <div className="font-mono text-xs font-bold text-[#F7F4EC] mb-1">
               {s.label}
             </div>
-            <div className="text-[11px] text-[#94A3B8] leading-relaxed">
+            <div className="text-[11px] text-[#C9C4BA] leading-relaxed">
               {s.desc}
             </div>
           </div>

@@ -50,14 +50,14 @@ export function UseCasesSection() {
     <section id="use-cases" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#4D8FCC]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#AD956C]" />
           Enterprise Scope
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
           Built for High-Stakes Regulatory Environments
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           Engineered for institutions and platforms that cannot afford regulatory ambiguity, audit failure, or compliance drift.
         </p>
       </div>
@@ -69,36 +69,36 @@ export function UseCasesSection() {
           return (
             <div
               key={uc.id}
-              className={`${uc.colSpan} p-6 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14] flex flex-col justify-between transition-all duration-200 group`}
+              className={`${uc.colSpan} p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#1B1815] flex flex-col justify-between transition-all duration-200 group shadow-[0_4px_16px_rgba(0,0,0,0.5)]`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-[#10141A] border border-[var(--rc-border)] text-[#4D8FCC]">
+                    <div className="p-2 rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.08)] text-[#AD956C]">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-[10px] text-[#4D8FCC] font-bold uppercase tracking-wider">
+                    <span className="font-mono text-[10px] text-[#AD956C] font-bold uppercase tracking-wider">
                       {uc.tag}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30 font-semibold">
+                  <span className="font-mono text-[10px] text-[#718A79] bg-[#718A79]/15 px-2 py-0.5 rounded border border-[#718A79]/30 font-semibold">
                     {uc.metric}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-[#F4F6F8] mb-2 group-hover:text-[#93C5FD] transition-colors">
+                <h3 className="text-lg font-bold text-[#F7F4EC] mb-2 group-hover:text-[#C5B38B] transition-colors">
                   {uc.title}
                 </h3>
-                <p className="text-xs text-[#94A3B8] leading-relaxed">
+                <p className="text-xs text-[#C9C4BA] leading-relaxed">
                   {uc.desc}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[var(--rc-border)] flex flex-wrap items-center gap-2">
+              <div className="mt-6 pt-4 border-t border-[rgba(201,196,186,0.08)] flex flex-wrap items-center gap-2">
                 {uc.frameworks.map((fw) => (
                   <span 
                     key={fw} 
-                    className="font-mono text-[10px] text-[#CBD5E1] bg-[#10141A] px-2 py-0.5 rounded border border-[var(--rc-border)]"
+                    className="font-mono text-[10px] text-[#8D8982] bg-[#100E0D] px-2 py-0.5 rounded border border-[rgba(201,196,186,0.08)]"
                   >
                     {fw}
                   </span>

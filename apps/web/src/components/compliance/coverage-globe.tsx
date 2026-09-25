@@ -58,27 +58,27 @@ function GlobeWireframe() {
 
   return (
     <group>
-      {/* Outer skeletal grid */}
+      {/* Outer skeletal grid in muted dusky sapphire */}
       <Icosahedron ref={meshRef} args={[2, 4]} rotation={[0, 0, 0]}>
         <meshBasicMaterial 
-          color="#4D8FCC" 
+          color="#344D63" 
           wireframe={true} 
           transparent={true} 
-          opacity={0.12} 
+          opacity={0.16} 
         />
       </Icosahedron>
 
-      {/* Inner subtle core sphere */}
+      {/* Inner subtle core sphere in deep obsidian */}
       <mesh>
         <sphereGeometry args={[1.96, 32, 32]} />
-        <meshBasicMaterial color="#080A0E" transparent opacity={0.80} />
+        <meshBasicMaterial color="#080706" transparent opacity={0.88} />
       </mesh>
     </group>
   );
 }
 
 // Animated Sonar Ping Ring
-function SonarPing({ position, color = '#4D8FCC' }: { position: THREE.Vector3; color?: string }) {
+function SonarPing({ position, color = '#AD956C' }: { position: THREE.Vector3; color?: string }) {
   const ringRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
@@ -87,7 +87,7 @@ function SonarPing({ position, color = '#4D8FCC' }: { position: THREE.Vector3; c
       const scale = 1 + t * 1.5;
       ringRef.current.scale.set(scale, scale, scale);
       const material = ringRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = Math.max(0, 0.4 - t * 0.2);
+      material.opacity = Math.max(0, 0.35 - t * 0.18);
     }
   });
 
@@ -95,7 +95,7 @@ function SonarPing({ position, color = '#4D8FCC' }: { position: THREE.Vector3; c
     <group position={position}>
       <mesh ref={ringRef} lookAt={() => position.clone().multiplyScalar(2)}>
         <ringGeometry args={[0.05, 0.07, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.35} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -148,10 +148,10 @@ function JurisdictionMarker({
   });
 
   const markerColor = isSelected 
-    ? '#C9B88A' 
+    ? '#AD956C' 
     : (isActiveSignal 
-        ? '#4D8FCC' 
-        : (data.count > 0 ? '#10B981' : '#6B8BA4'));
+        ? '#607D96' 
+        : (data.count > 0 ? '#718A79' : '#58758C'));
 
   return (
     <group position={data.position}>
@@ -159,7 +159,7 @@ function JurisdictionMarker({
       {(isSelected || hovered || data.count > 0 || isActiveSignal) && (
         <SonarPing 
           position={data.position} 
-          color={isActiveSignal ? '#4D8FCC' : markerColor} 
+          color={isActiveSignal ? '#607D96' : markerColor} 
         />
       )}
 
@@ -187,18 +187,18 @@ function JurisdictionMarker({
             onClick={onClick}
             className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-[4px] text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
               isSelected
-                ? 'bg-[#080A0E]/95 text-[#C9B88A] border-[#C9B88A]/60 ring-1 ring-[#C9B88A]/40 scale-105'
+                ? 'bg-[#151311]/95 text-[#AD956C] border-[#AD956C]/60 ring-1 ring-[#AD956C]/40 scale-105'
                 : (isActiveSignal
-                    ? 'bg-[#080A0E]/95 text-[#93C5FD] border-[#4D8FCC]/60'
+                    ? 'bg-[#151311]/95 text-[#607D96] border-[#344D63]/60'
                     : (data.count > 0
-                        ? 'bg-[#080A0E]/95 text-emerald-400 border-emerald-500/30 hover:border-emerald-500/60'
-                        : 'bg-[#080A0E]/95 text-[#94A3B8] border-white/[0.08] hover:border-white/[0.16] hover:text-[#F4F6F8]'))
+                        ? 'bg-[#151311]/95 text-[#718A79] border-[#718A79]/30 hover:border-[#718A79]/60'
+                        : 'bg-[#151311]/95 text-[#8D8982] border-[#211D19] hover:border-[#351E24] hover:text-[#F1EEE7]'))
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#C9B88A]' : (data.count > 0 ? 'bg-emerald-400' : 'bg-[#4D8FCC]')}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#AD956C]' : (data.count > 0 ? 'bg-[#718A79]' : 'bg-[#607D96]')}`} />
             <span>{data.jurisdiction}</span>
             {data.count > 0 && (
-              <span className="ml-0.5 px-1 rounded-[2px] bg-emerald-500/15 text-emerald-400 text-[8px] font-bold">
+              <span className="ml-0.5 px-1 rounded-[2px] bg-[#718A79]/15 text-[#718A79] text-[8px] font-bold">
                 {data.count}
               </span>
             )}
@@ -210,25 +210,25 @@ function JurisdictionMarker({
       {(hovered || isSelected) && isFrontFacing && (
         <Html distanceFactor={4.5} zIndexRange={[45, 0]} center>
           <div 
-            className={`font-sans bg-[#08090E]/98 border border-zinc-700/90 p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-48 pointer-events-auto select-none transition-all duration-200 ${
+            className={`font-sans bg-[#151311]/98 border border-[#211D19] p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-48 pointer-events-auto select-none transition-all duration-200 ${
               data.position.y > 0.25 
                 ? 'transform translate-y-5' 
                 : (data.position.y < -0.25 ? 'transform -translate-y-16' : 'transform -translate-y-10')
             }`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-zinc-800 pb-1">
+            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-[#211D19] pb-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-sm shrink-0">{data.flag || '🌐'}</span>
                 <div className="truncate">
-                  <h4 className="text-[11px] font-bold text-white leading-tight truncate">{data.name}</h4>
-                  <span className="text-[9px] text-zinc-400 font-mono">[{data.jurisdiction}]</span>
+                  <h4 className="text-[11px] font-bold text-[#F7F4EC] leading-tight truncate">{data.name}</h4>
+                  <span className="text-[9px] text-[#8D8982] font-mono">[{data.jurisdiction}]</span>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
                   data.count > 0 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    ? 'bg-[#718A79]/20 text-[#718A79] border border-[#718A79]/30' 
+                    : 'bg-[#607D96]/20 text-[#607D96] border border-[#607D96]/30'
                 }`}>
                   {data.count > 0 ? `${data.count} RULES` : 'ACTIVE'}
                 </span>
@@ -238,7 +238,7 @@ function JurisdictionMarker({
                       e.stopPropagation();
                       onClose();
                     }}
-                    className="p-0.5 rounded hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                    className="p-0.5 rounded hover:bg-[#1B1815] text-[#8D8982] hover:text-[#F1EEE7] transition-colors cursor-pointer"
                     title="Close Details"
                   >
                     <X className="w-3 h-3" />
@@ -247,32 +247,32 @@ function JurisdictionMarker({
               </div>
             </div>
 
-            <div className="space-y-1 text-[10px] text-zinc-300">
+            <div className="space-y-1 text-[10px] text-[#C9C4BA]">
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 text-[9px]">Authority:</span>
-                <span className="text-zinc-300 font-medium truncate max-w-[100px] text-right" title={data.authority}>
+                <span className="text-[#8D8982] text-[9px]">Authority:</span>
+                <span className="text-[#C9C4BA] font-medium truncate max-w-[100px] text-right" title={data.authority}>
                   {data.authority}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 text-[9px]">Rulesets:</span>
-                <span className="text-white font-bold">{data.count} Framework{data.count !== 1 ? 's' : ''}</span>
+                <span className="text-[#8D8982] text-[9px]">Rulesets:</span>
+                <span className="text-[#F7F4EC] font-bold">{data.count} Framework{data.count !== 1 ? 's' : ''}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 text-[9px]">Health:</span>
-                <span className="text-emerald-400 font-bold">{data.complianceScore.toFixed(0)}%</span>
+                <span className="text-[#8D8982] text-[9px]">Health:</span>
+                <span className="text-[#718A79] font-bold">{data.complianceScore.toFixed(0)}%</span>
               </div>
             </div>
 
             {data.regulations && data.regulations.length > 0 && (
-              <div className="mt-1.5 pt-1.5 border-t border-zinc-800/80">
-                <div className="text-[9px] text-zinc-500 uppercase font-semibold mb-0.5">Monitored:</div>
+              <div className="mt-1.5 pt-1.5 border-t border-[#211D19]">
+                <div className="text-[9px] text-[#8D8982] uppercase font-semibold mb-0.5">Monitored:</div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[8px] px-1.5 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded text-zinc-300 truncate" title={data.regulations[0]}>
+                  <span className="text-[8px] px-1.5 py-0.5 bg-[#100E0D] border border-[#211D19] rounded text-[#C9C4BA] truncate" title={data.regulations[0]}>
                     {data.regulations[0]}
                   </span>
                   {data.regulations.length > 1 && (
-                    <span className="text-[8px] text-zinc-500">
+                    <span className="text-[8px] text-[#8D8982]">
                       +{data.regulations.length - 1} more regulation{data.regulations.length > 2 ? 's' : ''}
                     </span>
                   )}
@@ -280,13 +280,13 @@ function JurisdictionMarker({
               </div>
             )}
 
-            <div className="mt-2 pt-1.5 border-t border-white/[0.08]">
+            <div className="mt-2 pt-1.5 border-t border-[#211D19]">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onInspectRegulations(data.jurisdiction);
                 }}
-                className="w-full text-center text-[9px] font-semibold py-1 px-2 rounded-[4px] bg-[#4D8FCC] hover:bg-[#3B72A8] text-white transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer"
+                className="w-full text-center text-[9px] font-semibold py-1 px-2 rounded-[4px] bg-[#3F5C74] hover:bg-[#344D63] text-[#F1EEE7] transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer"
               >
                 <span>Inspect {data.jurisdiction}</span>
                 <ExternalLink className="w-2.5 h-2.5" />
@@ -342,9 +342,9 @@ function StreamingArc({
       {/* @ts-ignore */}
       <line ref={lineRef} geometry={geometry}>
         <lineBasicMaterial 
-          color={isHighlighted ? "#C9B88A" : "#6B8BA4"} 
+          color={isHighlighted ? "#AD956C" : "#344D63"} 
           transparent 
-          opacity={0.20} 
+          opacity={isHighlighted ? 0.45 : 0.18} 
           linewidth={isHighlighted ? 2 : 1} 
         />
       </line>
@@ -352,7 +352,7 @@ function StreamingArc({
       {/* Traveling Data Signal Particle */}
       <mesh ref={particleRef}>
         <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color={isHighlighted ? "#C9B88A" : "#93C5FD"} />
+        <meshBasicMaterial color={isHighlighted ? "#AD956C" : "#607D96"} />
       </mesh>
     </group>
   );
@@ -417,16 +417,16 @@ function GlobeScene({
       <group ref={hqRef} position={homePosition}>
         <mesh>
           <sphereGeometry args={[0.045, 16, 16]} />
-          <meshBasicMaterial color="#10b981" />
+          <meshBasicMaterial color="#718A79" />
         </mesh>
         <mesh>
           <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color="#10b981" transparent opacity={0.25} />
+          <meshBasicMaterial color="#718A79" transparent opacity={0.25} />
         </mesh>
         {isHqFrontFacing && (
           <Html distanceFactor={7} zIndexRange={[15, 0]} center>
-            <div className="font-sans whitespace-nowrap bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full text-[8px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-emerald-950/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="font-sans whitespace-nowrap bg-[#151311]/90 text-[#718A79] border border-[#718A79]/30 px-1.5 py-0.5 rounded-full text-[8px] font-semibold tracking-wider backdrop-blur-md pointer-events-none transform -translate-y-4 flex items-center gap-1 shadow-md shadow-black/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] animate-pulse" />
               <span>SF · HQ</span>
             </div>
           </Html>
@@ -534,31 +534,31 @@ export function CoverageGlobe({
   };
 
   return (
-    <div className="w-full h-full min-h-[580px] relative rounded-xl border border-zinc-800 bg-[#070709] overflow-hidden shadow-2xl">
-      {/* Dynamic Background Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950/80 to-[#070709] pointer-events-none" />
+    <div className="w-full h-full min-h-[580px] relative rounded-xl border border-[#211D19] bg-[#0B0A09] overflow-hidden shadow-2xl">
+      {/* Dynamic Background Glow - Subtle Dusky Atmosphere */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1A1512]/40 via-[#100E0D]/80 to-[#080706] pointer-events-none" />
       
       {/* Top Header Overlay: Title, Status, and Controls */}
       <div className="absolute top-4 left-4 right-4 sm:top-5 sm:left-6 sm:right-6 z-30 flex flex-col md:flex-row md:items-start justify-between gap-3 pointer-events-none">
         {/* Left: Title & Live Surveillance Status */}
         <div className="pointer-events-none max-w-md">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#F7F4EC] tracking-tight flex items-center gap-2">
               Global Jurisdiction Monitoring
             </h3>
-            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+            <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] animate-ping inline-block" />
               LIVE SURVEILLANCE
             </span>
           </div>
-          <p className="text-zinc-400 text-xs leading-relaxed hidden sm:block">
+          <p className="text-[#8D8982] text-xs leading-relaxed hidden sm:block">
             Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking.
           </p>
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-blue-400 shadow-sm">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#151311] border border-[#211D19] text-[#607D96] shadow-sm">
               {markers.length} Global Nodes Active
             </span>
-            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-800 text-emerald-400 shadow-sm">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#151311] border border-[#211D19] text-[#718A79] shadow-sm">
               {activeRegionsCount} Active Jurisdictions ({totalActiveRulesets} Rulesets)
             </span>
           </div>
@@ -570,8 +570,8 @@ export function CoverageGlobe({
             onClick={() => setAutoRotate(!autoRotate)}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm ${
               autoRotate
-                ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 hover:bg-blue-600/30'
-                : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white'
+                ? 'bg-[#3F5C74]/20 border-[#3F5C74]/40 text-[#C9C4BA] hover:bg-[#3F5C74]/30'
+                : 'bg-[#151311]/80 border-[#211D19] text-[#8D8982] hover:text-[#F1EEE7]'
             }`}
             title="Toggle Auto Rotation"
           >
@@ -581,38 +581,38 @@ export function CoverageGlobe({
 
           <button
             onClick={() => router.push('/regulations')}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#151311]/80 hover:bg-[#1B1815] border border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC] backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
           >
-            <Layers className="w-3.5 h-3.5 text-zinc-400" />
+            <Layers className="w-3.5 h-3.5 text-[#8D8982]" />
             <span>All Regulations</span>
           </button>
         </div>
       </div>
 
-      {/* Bottom Overlay: Node Legend & Arcs Note (Both in single line separately without overlapping) */}
+      {/* Bottom Overlay: Node Legend & Arcs Note */}
       <div className="absolute bottom-3 left-4 right-4 sm:bottom-4 sm:left-5 sm:right-5 z-30 flex items-center justify-between gap-3 pointer-events-none">
-        {/* Node Legend HUD (Single line, strictly no wrapping) */}
-        <div className="px-3 py-1.5 rounded-lg bg-zinc-950/90 border border-zinc-800/80 backdrop-blur-md text-[10px] text-zinc-400 flex items-center flex-nowrap whitespace-nowrap gap-3 shadow-md shrink-0">
+        {/* Node Legend HUD */}
+        <div className="px-3 py-1.5 rounded-lg bg-[#151311]/90 border border-[#211D19] backdrop-blur-md text-[10px] text-[#8D8982] flex items-center flex-nowrap whitespace-nowrap gap-3 shadow-md shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#718A79] shadow-sm shadow-[#718A79]/50 shrink-0" />
             <span>HQ Base (SF)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#718A79] shrink-0" />
             <span>Active Rules</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#607D96] shrink-0" />
             <span>Surveillance Node</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#AD956C] shrink-0" />
             <span>Selected</span>
           </div>
         </div>
 
-        {/* Arcs Note (Single line, strictly no wrapping) */}
-        <div className="text-[10px] text-zinc-500 whitespace-nowrap text-right shrink-0 drop-shadow">
+        {/* Arcs Note */}
+        <div className="text-[10px] text-[#625F5A] whitespace-nowrap text-right shrink-0 drop-shadow">
           *Streaming arcs indicate encrypted continuous telemetry reach from HQ
         </div>
       </div>

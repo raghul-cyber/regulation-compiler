@@ -113,14 +113,14 @@ export function TransformationSection() {
     >
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-white/[0.06] text-[#79B5EC] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <Binary className="w-3.5 h-3.5 text-[#4D8FCC]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          <Binary className="w-3.5 h-3.5 text-[#AD956C]" />
           The Translation Pipeline
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
-          Regulation <span className="text-[#4D8FCC]">→</span> Structured Logic.
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
+          Regulation <span className="text-[#AD956C]">→</span> Structured Logic.
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#9CA3AF] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           Observe how the compiler dismantles complex legal prose, isolates statutory obligations, and generates deterministic boolean verification logic.
         </p>
       </div>
@@ -136,15 +136,15 @@ export function TransformationSection() {
                 onClick={() => handleManualSwitch(idx)}
                 className={`relative p-3 rounded-xl border text-left font-mono text-xs transition-all duration-200 cursor-pointer overflow-hidden ${
                   isActive
-                    ? 'bg-[#0B0E14] border-[#4D8FCC]/50 text-[#F4F6F8] shadow-sm'
-                    : 'bg-[#080A0E] border-white/[0.06] text-[#64748B] hover:text-[#9CA3AF] hover:border-white/[0.12]'
+                    ? 'bg-[#1B1815] border-[#AD956C]/50 text-[#F7F4EC] shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                    : 'bg-[#151311] border-[rgba(201,196,186,0.08)] text-[#8D8982] hover:text-[#C9C4BA] hover:border-[rgba(201,196,186,0.18)]'
                 }`}
               >
-                <div className="text-[10px] text-[#4D8FCC] mb-1 font-bold">STAGE 0{s.id}</div>
+                <div className="text-[10px] text-[#AD956C] mb-1 font-bold">STAGE 0{s.id}</div>
                 <div className="font-semibold truncate">{s.title}</div>
                 {/* Auto-advance progress indicator */}
                 {isActive && !isPaused && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4D8FCC]" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#AD956C]" />
                 )}
               </button>
             );
@@ -152,60 +152,60 @@ export function TransformationSection() {
         </div>
 
         {/* 3-Column Visual Transformation Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch p-6 rounded-xl bg-[#080A0E] border border-white/[0.06] shadow-[0_16px_40px_rgba(0,0,0,0.6)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.12)] shadow-[0_24px_64px_rgba(0,0,0,0.8)]">
           {/* Left Column: Statutory Input */}
-          <div className="lg:col-span-5 p-5 rounded-lg bg-[#050608] border border-white/[0.05] text-left flex flex-col justify-between">
+          <div className="lg:col-span-5 p-5 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)] text-left flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="font-mono text-[10px] text-[#4D8FCC] uppercase tracking-wider font-bold">
+                <span className="font-mono text-[10px] text-[#AD956C] uppercase tracking-wider font-bold">
                   INPUT // STATUTE
                 </span>
-                <span className="font-mono text-[10px] text-[#9CA3AF] bg-[#0B0E14] border border-white/[0.06] px-2 py-0.5 rounded">
+                <span className="font-mono text-[10px] text-[#C9C4BA] bg-[#151311] border border-[rgba(201,196,186,0.08)] px-2 py-0.5 rounded">
                   {stage.leftContent.source}
                 </span>
               </div>
-              <div className="font-mono text-xs text-[#9CA3AF] leading-relaxed whitespace-pre-line">
+              <div className="font-mono text-xs text-[#C9C4BA] leading-relaxed whitespace-pre-line">
                 {stage.leftContent.text}
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/[0.05] text-[11px] font-mono text-[#64748B]">
-              Target Span: <span className="text-[#4D8FCC] font-semibold">{stage.leftContent.highlight}</span>
+            <div className="mt-4 pt-3 border-t border-[rgba(201,196,186,0.08)] text-[11px] font-mono text-[#8D8982]">
+              Target Span: <span className="text-[#AD956C] font-semibold">{stage.leftContent.highlight}</span>
             </div>
           </div>
 
           {/* Center Column: Transformation Engine */}
           <div className="lg:col-span-2 flex flex-col items-center justify-center p-3 text-center">
-            <div className="w-10 h-10 rounded-lg bg-[#0B0E14] border border-white/[0.06] flex items-center justify-center text-[#4D8FCC] mb-2 shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.10)] flex items-center justify-center text-[#AD956C] mb-2 shadow-sm">
               <Cpu className="w-5 h-5" />
             </div>
-            <div className="text-[10px] font-mono text-[#64748B] uppercase tracking-wider mb-1 font-semibold">
+            <div className="text-[10px] font-mono text-[#8D8982] uppercase tracking-wider mb-1 font-semibold">
               COMPILER PASS
             </div>
-            <div className="text-[11px] font-mono text-[#CBD5E1] max-w-[140px] leading-tight">
+            <div className="text-[11px] font-mono text-[#C9C4BA] max-w-[140px] leading-tight">
               {stage.centerAction}
             </div>
-            <ArrowRight className="w-4 h-4 text-[#4D8FCC] mt-2 hidden lg:block" />
+            <ArrowRight className="w-4 h-4 text-[#AD956C] mt-2 hidden lg:block" />
           </div>
 
           {/* Right Column: AST Output */}
-          <div className="lg:col-span-5 p-5 rounded-lg bg-[#050608] border border-white/[0.05] text-left flex flex-col justify-between">
+          <div className="lg:col-span-5 p-5 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)] text-left flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="font-mono text-[10px] text-emerald-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
-                  <CheckCircle className="w-3 h-3 text-emerald-400" />
+                <span className="font-mono text-[10px] text-[#718A79] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                  <CheckCircle className="w-3 h-3 text-[#718A79]" />
                   OUTPUT // {stage.rightOutput.type}
                 </span>
-                <span className="font-mono text-[9px] text-[#64748B] bg-[#0B0E14] px-1.5 py-0.5 rounded border border-white/[0.06]">
+                <span className="font-mono text-[9px] text-[#8D8982] bg-[#151311] px-1.5 py-0.5 rounded border border-[rgba(201,196,186,0.08)]">
                   DETERMINISTIC
                 </span>
               </div>
-              <pre className="font-mono text-xs text-[#79B5EC] overflow-x-auto leading-relaxed bg-[#050608] p-3 rounded border border-white/[0.04]">
+              <pre className="font-mono text-xs text-[#F1EEE7] overflow-x-auto leading-relaxed bg-[#151311] p-3 rounded border border-[rgba(201,196,186,0.06)]">
                 <code>{stage.rightOutput.code}</code>
               </pre>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/[0.05] text-[11px] font-mono text-[#64748B] flex items-center justify-between">
-              <span>AST VALIDATION: PASS</span>
-              <span className="text-[#C9B88A]">ZERO DRIFT</span>
+            <div className="mt-4 pt-3 border-t border-[rgba(201,196,186,0.08)] text-[11px] font-mono text-[#8D8982] flex items-center justify-between">
+              <span>AST VALIDATION: <b className="text-[#718A79]">PASS</b></span>
+              <span className="text-[#AD956C]">ZERO DRIFT</span>
             </div>
           </div>
         </div>

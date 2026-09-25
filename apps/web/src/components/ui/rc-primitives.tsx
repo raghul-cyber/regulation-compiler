@@ -32,7 +32,7 @@ export const RCButton = forwardRef<HTMLButtonElement, RCButtonProps>(function RC
   ref
 ) {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium select-none transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4D8FCC]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050608] disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-medium select-none transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3F5C74]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080706] disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed';
 
   const sizeClasses = {
     sm: 'text-xs px-3 py-1.5 rounded-[5px] gap-1.5 h-8',
@@ -43,17 +43,17 @@ export const RCButton = forwardRef<HTMLButtonElement, RCButtonProps>(function RC
 
   const variantClasses = {
     primary:
-      'bg-[#4D8FCC] hover:bg-[#3B72A8] text-white shadow-[0_1px_2px_rgba(0,0,0,0.4)] border border-[#79B5EC]/30 active:scale-[0.98]',
+      'bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] shadow-[0_1px_3px_rgba(0,0,0,0.5)] border border-[#4B6982]/30 active:scale-[0.98]',
     secondary:
-      'bg-[#0B0E14] hover:bg-[#141922] text-[#F4F6F8] border border-white/[0.06] hover:border-white/[0.12] active:scale-[0.98]',
+      'bg-[#1B1815] hover:bg-[#211D19] text-[#F1EEE7] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] active:scale-[0.98]',
     outline:
-      'bg-transparent hover:bg-white/[0.03] text-[#F4F6F8] border border-white/[0.08] hover:border-white/[0.16] active:scale-[0.98]',
+      'bg-transparent hover:bg-[#1B1815]/50 text-[#F1EEE7] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] active:scale-[0.98]',
     ghost:
-      'bg-transparent hover:bg-white/[0.04] text-[#9CA3AF] hover:text-[#F4F6F8] active:scale-[0.98]',
+      'bg-transparent hover:bg-[#1B1815]/50 text-[#C9C4BA] hover:text-[#F7F4EC] active:scale-[0.98]',
     danger:
-      'bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#F87171] border border-[#EF4444]/30 hover:border-[#EF4444]/50 active:scale-[0.98]',
+      'bg-[#9A5D62]/15 hover:bg-[#9A5D62]/25 text-[#D18E93] border border-[#9A5D62]/35 active:scale-[0.98]',
     champagne:
-      'bg-[#C9B88A]/15 hover:bg-[#C9B88A]/25 text-[#E6DCBF] border border-[#C9B88A]/35 active:scale-[0.98]',
+      'bg-[#AD956C]/15 hover:bg-[#AD956C]/25 text-[#E6DCBF] border border-[#AD956C]/35 active:scale-[0.98]',
   }[variant];
 
   const content = (
@@ -134,13 +134,13 @@ export const RCInput = forwardRef<HTMLInputElement, RCInputProps>(function RCInp
         <input
           ref={ref}
           id={id}
-          className={`w-full bg-[#080A0E] text-[#F4F6F8] placeholder:text-[#475569] text-xs sm:text-sm rounded-[6px] border border-white/[0.06] hover:border-white/[0.12] focus:border-[#4D8FCC] focus:ring-1 focus:ring-[#4D8FCC] transition-all outline-none h-9 sm:h-10 ${
+          className={`w-full bg-[#151311] text-[#F1EEE7] placeholder:text-[#625F5A] text-xs sm:text-sm rounded-[6px] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] focus:border-[#3F5C74] focus:ring-1 focus:ring-[#3F5C74] transition-all outline-none h-9 sm:h-10 ${
             icon ? 'pl-9 pr-3' : 'px-3'
-          } ${error ? 'border-[#EF4444]/60 focus:border-[#EF4444]' : ''} ${className}`}
+          } ${error ? 'border-[#9A5D62]/60 focus:border-[#9A5D62]' : ''} ${className}`}
           {...props}
         />
       </div>
-      {error && <span className="text-[11px] text-[#F87171]">{error}</span>}
+      {error && <span className="text-[11px] text-[#D18E93]">{error}</span>}
     </div>
   );
 });
@@ -157,19 +157,19 @@ export const RCTextarea = forwardRef<HTMLTextAreaElement, RCTextareaProps>(funct
   return (
     <div className="w-full flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-[#9CA3AF] text-xs font-medium tracking-wide">
+        <label htmlFor={id} className="text-[#C9C4BA] text-xs font-medium tracking-wide">
           {label}
         </label>
       )}
       <textarea
         ref={ref}
         id={id}
-        className={`w-full bg-[#080A0E] text-[#F4F6F8] placeholder:text-[#475569] text-xs sm:text-sm rounded-[6px] border border-white/[0.06] hover:border-white/[0.12] focus:border-[#4D8FCC] focus:ring-1 focus:ring-[#4D8FCC] p-3 transition-all outline-none resize-y min-h-[90px] ${
-          error ? 'border-[#EF4444]/60 focus:border-[#EF4444]' : ''
+        className={`w-full bg-[#151311] text-[#F1EEE7] placeholder:text-[#625F5A] text-xs sm:text-sm rounded-[6px] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] focus:border-[#3F5C74] focus:ring-1 focus:ring-[#3F5C74] p-3 transition-all outline-none resize-y min-h-[90px] ${
+          error ? 'border-[#9A5D62]/60 focus:border-[#9A5D62]' : ''
         } ${className}`}
         {...props}
       />
-      {error && <span className="text-[11px] text-[#F87171]">{error}</span>}
+      {error && <span className="text-[11px] text-[#D18E93]">{error}</span>}
     </div>
   );
 });
@@ -190,25 +190,25 @@ export const RCSelect = forwardRef<HTMLSelectElement, RCSelectProps>(function RC
   return (
     <div className="w-full flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-[#9CA3AF] text-xs font-medium tracking-wide">
+        <label htmlFor={id} className="text-[#C9C4BA] text-xs font-medium tracking-wide">
           {label}
         </label>
       )}
       <select
         ref={ref}
         id={id}
-        className={`w-full bg-[#080A0E] text-[#F4F6F8] text-xs sm:text-sm rounded-[6px] border border-white/[0.06] hover:border-white/[0.12] focus:border-[#4D8FCC] focus:ring-1 focus:ring-[#4D8FCC] px-3 h-9 sm:h-10 transition-all outline-none cursor-pointer ${
-          error ? 'border-[#EF4444]/60' : ''
+        className={`w-full bg-[#151311] text-[#F1EEE7] text-xs sm:text-sm rounded-[6px] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] focus:border-[#3F5C74] focus:ring-1 focus:ring-[#3F5C74] px-3 h-9 sm:h-10 transition-all outline-none cursor-pointer ${
+          error ? 'border-[#9A5D62]/60' : ''
         } ${className}`}
         {...props}
       >
         {options ? options.map(opt => (
-          <option key={opt.value} value={opt.value} className="bg-[#080A0E] text-[#F4F6F8]">
+          <option key={opt.value} value={opt.value} className="bg-[#151311] text-[#F1EEE7]">
             {opt.label}
           </option>
         )) : children}
       </select>
-      {error && <span className="text-[11px] text-[#F87171]">{error}</span>}
+      {error && <span className="text-[11px] text-[#D18E93]">{error}</span>}
     </div>
   );
 });
@@ -241,8 +241,8 @@ export function RCCheckbox({
         onClick={() => onChange(!checked)}
         className={`w-4 h-4 rounded-[4px] border transition-all mt-0.5 flex items-center justify-center cursor-pointer ${
           checked
-            ? 'bg-[#4D8FCC] border-[#4D8FCC] text-white'
-            : 'bg-[#080A0E] border-white/[0.12] hover:border-white/[0.24]'
+            ? 'bg-[#3F5C74] border-[#3F5C74] text-white'
+            : 'bg-[#151311] border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.24)]'
         }`}
       >
         {checked && (
@@ -253,8 +253,8 @@ export function RCCheckbox({
       </button>
       {(label || description) && (
         <div className="flex flex-col text-left">
-          {label && <span className="text-xs font-medium text-[#F4F6F8]">{label}</span>}
-          {description && <span className="text-[11px] text-[#9CA3AF] mt-0.5">{description}</span>}
+          {label && <span className="text-xs font-medium text-[#F1EEE7]">{label}</span>}
+          {description && <span className="text-[11px] text-[#8D8982] mt-0.5">{description}</span>}
         </div>
       )}
     </label>
@@ -283,7 +283,7 @@ export function RCSwitch({
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={`w-9 h-5 rounded-full transition-colors relative p-0.5 cursor-pointer border ${
-          checked ? 'bg-[#4D8FCC] border-[#4D8FCC]' : 'bg-[#0E1218] border-white/[0.08]'
+          checked ? 'bg-[#3F5C74] border-[#3F5C74]' : 'bg-[#1B1815] border-[rgba(201,196,186,0.08)]'
         }`}
       >
         <div
@@ -292,7 +292,7 @@ export function RCSwitch({
           }`}
         />
       </button>
-      {label && <span className="text-xs font-medium text-[#F4F6F8]">{label}</span>}
+      {label && <span className="text-xs font-medium text-[#F1EEE7]">{label}</span>}
     </label>
   );
 }
@@ -317,10 +317,10 @@ export function RCCard({
   ...props
 }: RCCardProps) {
   const variantClasses = {
-    default: 'bg-[#080A0E] border border-white/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.4)]',
-    elevated: 'bg-[#0B0E14] border border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.6)]',
-    subtle: 'bg-[#050608] border border-white/[0.04]',
-    glass: 'bg-[#080A0E]/80 backdrop-blur-md border border-white/[0.07] shadow-xl',
+    default: 'bg-[#151311] border border-[rgba(201,196,186,0.08)] shadow-[0_2px_8px_rgba(0,0,0,0.5)]',
+    elevated: 'bg-[#1B1815] border border-[rgba(201,196,186,0.10)] shadow-[0_4px_20px_rgba(0,0,0,0.65)]',
+    subtle: 'bg-[#080706] border border-[rgba(201,196,186,0.05)]',
+    glass: 'bg-[#151311]/85 backdrop-blur-md border border-[rgba(201,196,186,0.08)] shadow-xl',
   }[variant];
 
   const paddingClasses = {
@@ -336,13 +336,13 @@ export function RCCard({
       {...props}
     >
       {header && (
-        <div className="px-5 py-3.5 border-b border-white/[0.05] bg-white/[0.01]">
+        <div className="px-5 py-3.5 border-b border-[rgba(201,196,186,0.06)] bg-white/[0.01]">
           {header}
         </div>
       )}
       <div className={paddingClasses}>{children}</div>
       {footer && (
-        <div className="px-5 py-3 border-t border-white/[0.05] bg-white/[0.01]">
+        <div className="px-5 py-3 border-t border-[rgba(201,196,186,0.06)] bg-white/[0.01]">
           {footer}
         </div>
       )}
@@ -358,7 +358,7 @@ export function RCPanel({
   className?: string;
 }) {
   return (
-    <div className={`p-5 rounded-[8px] bg-[#080A0E] border border-white/[0.06] ${className}`}>
+    <div className={`p-5 rounded-[8px] bg-[#151311] border border-[rgba(201,196,186,0.08)] ${className}`}>
       {children}
     </div>
   );
@@ -380,10 +380,10 @@ export function RCSection({
   return (
     <section className={`w-full flex flex-col gap-4 ${className}`}>
       {(title || action) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.05]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[rgba(201,196,186,0.06)]">
           <div>
-            {title && <h2 className="text-base sm:text-lg font-bold text-[#F4F6F8] tracking-tight">{title}</h2>}
-            {subtitle && <p className="text-xs text-[#9CA3AF] mt-0.5">{subtitle}</p>}
+            {title && <h2 className="text-base sm:text-lg font-bold text-[#F7F4EC] tracking-tight">{title}</h2>}
+            {subtitle && <p className="text-xs text-[#8D8982] mt-0.5">{subtitle}</p>}
           </div>
           {action && <div className="self-start sm:self-auto">{action}</div>}
         </div>
@@ -414,82 +414,82 @@ export type RCStatusType =
 export function RCStatus({ status, className = '' }: { status: RCStatusType; className?: string }) {
   const styles: Record<RCStatusType, { bg: string; text: string; border: string; dot: string }> = {
     PASS: {
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-      border: 'border-emerald-500/25',
-      dot: 'bg-emerald-400',
+      bg: 'bg-[#718A79]/15',
+      text: 'text-[#8BA894]',
+      border: 'border-[#718A79]/30',
+      dot: 'bg-[#718A79]',
     },
     COMPLETED: {
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-      border: 'border-emerald-500/25',
-      dot: 'bg-emerald-400',
+      bg: 'bg-[#718A79]/15',
+      text: 'text-[#8BA894]',
+      border: 'border-[#718A79]/30',
+      dot: 'bg-[#718A79]',
     },
     FAIL: {
-      bg: 'bg-rose-500/10',
-      text: 'text-rose-400',
-      border: 'border-rose-500/25',
-      dot: 'bg-rose-400',
+      bg: 'bg-[#9A5D62]/15',
+      text: 'text-[#D18E93]',
+      border: 'border-[#9A5D62]/30',
+      dot: 'bg-[#9A5D62]',
     },
     ERROR: {
-      bg: 'bg-rose-500/10',
-      text: 'text-rose-400',
-      border: 'border-rose-500/25',
-      dot: 'bg-rose-400',
+      bg: 'bg-[#9A5D62]/15',
+      text: 'text-[#D18E93]',
+      border: 'border-[#9A5D62]/30',
+      dot: 'bg-[#9A5D62]',
     },
     WARNING: {
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-400',
-      border: 'border-amber-500/25',
-      dot: 'bg-amber-400',
+      bg: 'bg-[#A48A5C]/15',
+      text: 'text-[#C5B38B]',
+      border: 'border-[#A48A5C]/30',
+      dot: 'bg-[#A48A5C]',
     },
     INFO: {
-      bg: 'bg-[#4D8FCC]/10',
-      text: 'text-[#79B5EC]',
-      border: 'border-[#4D8FCC]/25',
-      dot: 'bg-[#4D8FCC]',
+      bg: 'bg-[#3F5C74]/15',
+      text: 'text-[#7A9FBE]',
+      border: 'border-[#3F5C74]/30',
+      dot: 'bg-[#3F5C74]',
     },
     RUNNING: {
-      bg: 'bg-[#4D8FCC]/10',
-      text: 'text-[#79B5EC]',
-      border: 'border-[#4D8FCC]/25',
-      dot: 'bg-[#4D8FCC] animate-pulse',
+      bg: 'bg-[#3F5C74]/15',
+      text: 'text-[#7A9FBE]',
+      border: 'border-[#3F5C74]/30',
+      dot: 'bg-[#3F5C74] animate-pulse',
     },
     CRITICAL: {
-      bg: 'bg-rose-600/15',
-      text: 'text-rose-300 font-semibold',
-      border: 'border-rose-600/35',
-      dot: 'bg-rose-500',
+      bg: 'bg-[#9A5D62]/20',
+      text: 'text-[#E5A4A9] font-semibold',
+      border: 'border-[#9A5D62]/45',
+      dot: 'bg-[#9A5D62]',
     },
     HIGH: {
-      bg: 'bg-rose-500/10',
-      text: 'text-rose-400',
-      border: 'border-rose-500/25',
-      dot: 'bg-rose-400',
+      bg: 'bg-[#9A5D62]/15',
+      text: 'text-[#D18E93]',
+      border: 'border-[#9A5D62]/30',
+      dot: 'bg-[#9A5D62]',
     },
     MEDIUM: {
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-400',
-      border: 'border-amber-500/25',
-      dot: 'bg-amber-400',
+      bg: 'bg-[#A48A5C]/15',
+      text: 'text-[#C5B38B]',
+      border: 'border-[#A48A5C]/30',
+      dot: 'bg-[#A48A5C]',
     },
     LOW: {
-      bg: 'bg-[#4D8FCC]/10',
-      text: 'text-[#79B5EC]',
-      border: 'border-[#4D8FCC]/25',
-      dot: 'bg-[#4D8FCC]',
+      bg: 'bg-[#3F5C74]/15',
+      text: 'text-[#7A9FBE]',
+      border: 'border-[#3F5C74]/30',
+      dot: 'bg-[#3F5C74]',
     },
     'NOT ASSESSED': {
-      bg: 'bg-zinc-800/40',
-      text: 'text-zinc-400',
-      border: 'border-zinc-700/30',
-      dot: 'bg-zinc-500',
+      bg: 'bg-[#151311]',
+      text: 'text-[#8D8982]',
+      border: 'border-[rgba(201,196,186,0.08)]',
+      dot: 'bg-[#77736C]',
     },
     PENDING: {
-      bg: 'bg-[#4D8FCC]/10',
-      text: 'text-[#79B5EC]',
-      border: 'border-[#4D8FCC]/20',
-      dot: 'bg-[#4D8FCC] animate-pulse',
+      bg: 'bg-[#3F5C74]/15',
+      text: 'text-[#7A9FBE]',
+      border: 'border-[#3F5C74]/25',
+      dot: 'bg-[#3F5C74] animate-pulse',
     },
   };
 
@@ -518,12 +518,12 @@ export function RCBadge({
   className?: string;
 }) {
   const variantStyles = {
-    default: 'bg-white/[0.04] text-[#9CA3AF] border-white/[0.06]',
-    accent: 'bg-[#4D8FCC]/12 text-[#79B5EC] border-[#4D8FCC]/25',
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    mono: 'bg-[#080A0E] text-[#9CA3AF] border-white/[0.06] font-mono text-[10px] uppercase tracking-wider',
-    champagne: 'bg-[#C9B88A]/12 text-[#E6DCBF] border-[#C9B88A]/25',
+    default: 'bg-white/[0.04] text-[#C9C4BA] border-[rgba(201,196,186,0.08)]',
+    accent: 'bg-[#3F5C74]/15 text-[#7A9FBE] border-[#3F5C74]/30',
+    success: 'bg-[#718A79]/15 text-[#8BA894] border-[#718A79]/30',
+    warning: 'bg-[#A48A5C]/15 text-[#C5B38B] border-[#A48A5C]/30',
+    mono: 'bg-[#151311] text-[#C9C4BA] border-[rgba(201,196,186,0.08)] font-mono text-[10px] uppercase tracking-wider',
+    champagne: 'bg-[#AD956C]/15 text-[#E6DCBF] border-[#AD956C]/30',
   }[variant];
 
   return (
@@ -556,23 +556,23 @@ export function RCMetric({
   icon?: RCIconName;
 }) {
   const deltaColor = {
-    positive: 'text-emerald-400',
-    negative: 'text-rose-400',
-    neutral: 'text-zinc-400',
+    positive: 'text-[#8BA894]',
+    negative: 'text-[#D18E93]',
+    neutral: 'text-[#8D8982]',
   }[deltaType];
 
   return (
-    <div className="flex flex-col gap-1 p-4 rounded-[8px] bg-[#080A0E] border border-white/[0.06]">
-      <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
+    <div className="flex flex-col gap-1 p-4 rounded-[8px] bg-[#151311] border border-[rgba(201,196,186,0.08)]">
+      <div className="flex items-center justify-between text-xs text-[#8D8982]">
         <span className="font-medium tracking-wide uppercase text-[10px]">{label}</span>
-        {icon && <RCIcon name={icon} size={14} className="text-[#64748B]" />}
+        {icon && <RCIcon name={icon} size={14} className="text-[#AD956C]" />}
       </div>
       <div className="flex items-baseline gap-1.5 mt-1">
-        <span className="text-2xl font-bold tracking-tight text-[#F4F6F8] font-mono">{value}</span>
-        {unit && <span className="text-xs text-[#9CA3AF] font-mono">{unit}</span>}
+        <span className="text-2xl font-bold tracking-tight text-[#F7F4EC] font-mono">{value}</span>
+        {unit && <span className="text-xs text-[#8D8982] font-mono">{unit}</span>}
         {delta && <span className={`text-[11px] font-mono ml-auto ${deltaColor}`}>{delta}</span>}
       </div>
-      {subtext && <span className="text-[11px] text-[#64748B] mt-0.5">{subtext}</span>}
+      {subtext && <span className="text-[11px] text-[#625F5A] mt-0.5">{subtext}</span>}
     </div>
   );
 }
@@ -588,11 +588,11 @@ export function RCDataBlock({
   className?: string;
 }) {
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-[6px] bg-[#050608] border border-white/[0.05] font-mono text-xs ${className}`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-[6px] bg-[#080706] border border-[rgba(201,196,186,0.06)] font-mono text-xs ${className}`}>
       {properties.map((prop, idx) => (
         <div key={idx} className="flex flex-col gap-0.5">
-          <span className="text-[10px] text-[#64748B] uppercase tracking-wider">{prop.label}</span>
-          <span className={`font-semibold ${prop.highlight ? 'text-[#4D8FCC]' : 'text-[#E2E8F0]'}`}>
+          <span className="text-[10px] text-[#625F5A] uppercase tracking-wider">{prop.label}</span>
+          <span className={`font-semibold ${prop.highlight ? 'text-[#AD956C]' : 'text-[#F1EEE7]'}`}>
             {String(prop.value)}
           </span>
         </div>
@@ -606,8 +606,8 @@ export function RCDataBlock({
    ========================================================================== */
 export function RCTable({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`w-full overflow-x-auto rounded-[8px] border border-white/[0.06] bg-[#080A0E] ${className}`}>
-      <table className="w-full text-left text-xs sm:text-sm text-[#9CA3AF] border-collapse">
+    <div className={`w-full overflow-x-auto rounded-[8px] border border-[rgba(201,196,186,0.08)] bg-[#151311] ${className}`}>
+      <table className="w-full text-left text-xs sm:text-sm text-[#C9C4BA] border-collapse">
         {children}
       </table>
     </div>
@@ -616,7 +616,7 @@ export function RCTable({ children, className = '' }: { children: React.ReactNod
 
 export function RCTableHeader({ children }: { children: React.ReactNode }) {
   return (
-    <thead className="bg-[#050608] text-[#64748B] font-mono text-[11px] uppercase tracking-wider border-b border-white/[0.06]">
+    <thead className="bg-[#0B0A09] text-[#8D8982] font-mono text-[11px] uppercase tracking-wider border-b border-[rgba(201,196,186,0.08)]">
       {children}
     </thead>
   );
@@ -634,7 +634,7 @@ export function RCTableRow({
   return (
     <tr
       onClick={onClick}
-      className={`border-b border-white/[0.035] transition-colors hover:bg-white/[0.02] ${
+      className={`border-b border-[rgba(201,196,186,0.04)] transition-colors hover:bg-[#1B1815]/60 ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
@@ -650,7 +650,7 @@ export function RCTableCell({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <td className={`px-4 py-3 align-middle text-[#F4F6F8] ${className}`}>{children}</td>;
+  return <td className={`px-4 py-3 align-middle text-[#F1EEE7] ${className}`}>{children}</td>;
 }
 
 /* ==========================================================================
@@ -668,7 +668,7 @@ export function RCTabs({
   className?: string;
 }) {
   return (
-    <div className={`flex gap-1 p-1 rounded-[8px] bg-[#050608] border border-white/[0.06] overflow-x-auto ${className}`}>
+    <div className={`flex gap-1 p-1 rounded-[8px] bg-[#0B0A09] border border-[rgba(201,196,186,0.08)] overflow-x-auto ${className}`}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -677,20 +677,20 @@ export function RCTabs({
             onClick={() => onChange(tab.id)}
             className={`px-3.5 py-1.5 text-xs font-medium rounded-[5px] whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
               isActive
-                ? 'bg-[#0B0E14] text-[#F4F6F8] border border-white/[0.08] shadow-sm font-semibold'
-                : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02] border border-transparent'
+                ? 'bg-[#1B1815] text-[#F7F4EC] border border-[rgba(201,196,186,0.12)] shadow-sm font-semibold'
+                : 'text-[#8D8982] hover:text-[#F1EEE7] hover:bg-[#1B1815]/40 border border-transparent'
             }`}
           >
             <span>{tab.label}</span>
             {tab.count !== undefined && (
               <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
-                isActive ? 'bg-[#4D8FCC]/20 text-[#79B5EC]' : 'bg-white/[0.05] text-[#64748B]'
+                isActive ? 'bg-[#3F5C74]/20 text-[#7A9FBE]' : 'bg-[#151311] text-[#625F5A]'
               }`}>
                 {tab.count}
               </span>
             )}
             {tab.badge && (
-              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#4D8FCC]/15 text-[#79B5EC] border border-[#4D8FCC]/30">
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#AD956C]/15 text-[#E6DCBF] border border-[#AD956C]/30">
                 {tab.badge}
               </span>
             )}

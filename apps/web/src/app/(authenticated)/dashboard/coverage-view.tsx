@@ -131,78 +131,78 @@ export function CoverageView() {
     <div className="flex flex-col gap-6 w-full">
       {/* Top Telemetry Metric Ribbons */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4.5 rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] relative overflow-hidden flex flex-col justify-between">
+        <div className="p-4.5 rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] shadow-[0_4px_16px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">Monitored Nodes</span>
-            <div className="p-1.5 rounded-lg bg-[#4D8FCC]/10 border border-[#4D8FCC]/25 text-[#93C5FD]">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8D8982]">Monitored Nodes</span>
+            <div className="p-1.5 rounded-lg bg-[#3F5C74]/15 border border-[#3F5C74]/30 text-[#AD956C]">
               <Globe className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-[#F4F6F8] font-mono">
+            <span className="text-2xl font-bold text-[#F7F4EC] font-mono">
               {monitoringData?.active_jurisdictions_count || 4}
             </span>
-            <span className="text-xs text-[#64748B] font-mono">
+            <span className="text-xs text-[#8D8982] font-mono">
               / {monitoringData?.total_jurisdictions_count || 9} nodes
             </span>
           </div>
-          <div className="mt-2 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="mt-2 text-[10px] font-mono text-[#718A79] flex items-center gap-1.5 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
             <span>100% Perimeter Coverage</span>
           </div>
         </div>
 
-        <div className="p-4.5 rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] relative overflow-hidden flex flex-col justify-between">
+        <div className="p-4.5 rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] shadow-[0_4px_16px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">Active Rulesets</span>
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8D8982]">Active Rulesets</span>
+            <div className="p-1.5 rounded-lg bg-[#718A79]/15 border border-[#718A79]/30 text-[#718A79]">
               <Shield className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-[#F4F6F8] font-mono">
+            <span className="text-2xl font-bold text-[#F7F4EC] font-mono">
               {regulations.length || monitoringData?.active_regulations_count || 0}
             </span>
-            <span className="text-xs text-[#64748B] font-mono">enforced</span>
+            <span className="text-xs text-[#8D8982] font-mono">enforced</span>
           </div>
-          <div className="mt-2 text-[10px] font-mono text-[#94A3B8] flex items-center gap-1">
+          <div className="mt-2 text-[10px] font-mono text-[#8D8982] flex items-center gap-1">
             <span>DORA • GDPR • HIPAA • PIPEDA</span>
           </div>
         </div>
 
-        <div className="p-4.5 rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] relative overflow-hidden flex flex-col justify-between">
+        <div className="p-4.5 rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] shadow-[0_4px_16px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">Surveillance Engine</span>
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8D8982]">Surveillance Engine</span>
+            <div className="p-1.5 rounded-lg bg-[#718A79]/15 border border-[#718A79]/30 text-[#718A79]">
               <Radio className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-emerald-400 font-mono">ONLINE</span>
-            <span className="text-xs text-[#64748B] font-mono">24/7/365</span>
+            <span className="text-2xl font-bold text-[#718A79] font-mono">ONLINE</span>
+            <span className="text-xs text-[#8D8982] font-mono">24/7/365</span>
           </div>
-          <div className="mt-2 text-[10px] font-mono text-[#94A3B8]">
+          <div className="mt-2 text-[10px] font-mono text-[#8D8982]">
             <span>Auto-poll interval: 6s SSE stream</span>
           </div>
         </div>
 
-        <div className="p-4.5 rounded-2xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] relative overflow-hidden flex flex-col justify-between">
+        <div className="p-4.5 rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] shadow-[0_4px_16px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">Statutory Gazettes</span>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8D8982]">Statutory Gazettes</span>
             <button
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="p-1.5 rounded-lg bg-[#10141A] border border-[var(--rc-border)] hover:border-[#4D8FCC]/30 text-[#94A3B8] hover:text-[#93C5FD] transition-all cursor-pointer"
+              className="p-1.5 rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.08)] hover:border-[#AD956C]/40 text-[#8D8982] hover:text-[#F7F4EC] transition-all cursor-pointer"
               title="Force sync live telemetry"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[#4D8FCC]' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[#AD956C]' : ''}`} />
             </button>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-base font-bold text-[#F4F6F8] font-mono">Eur-Lex, SEC, FCA</span>
+            <span className="text-base font-bold text-[#F7F4EC] font-mono">Eur-Lex, SEC, FCA</span>
           </div>
-          <div className="mt-2 text-[10px] font-mono text-[#94A3B8] flex items-center gap-1">
-            <span>MAS & EDPB stream linked</span>
+          <div className="mt-2 text-[10px] font-mono text-[#8D8982] flex items-center gap-1">
+            <span>MAS &amp; EDPB stream linked</span>
           </div>
         </div>
       </div>
@@ -210,10 +210,10 @@ export function CoverageView() {
       {/* Main Command Center: 3D Globe + Live Surveillance Feed */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full items-stretch">
         {/* 3D Visualizer Canvas (7 cols on XL) */}
-        <div className="xl:col-span-7 w-full h-[620px] bg-[#080A0E] rounded-2xl overflow-hidden shadow-2xl border border-[var(--rc-border)] relative group">
+        <div className="xl:col-span-7 w-full h-[620px] bg-[#151311] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(0,0,0,0.8)] border border-[rgba(201,196,186,0.12)] relative group">
           {/* Tactical HUD Header for 3D Globe */}
-          <div className="absolute top-3 left-4 z-20 pointer-events-none font-mono text-[9px] text-[#93C5FD]/80 tracking-widest uppercase flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]" />
+          <div className="absolute top-3 left-4 z-20 pointer-events-none font-mono text-[9px] text-[#AD956C] tracking-widest uppercase flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C]" />
             <span>3D GEOSPATIAL SURVEILLANCE MATRIX</span>
           </div>
           <CoverageGlobe 
@@ -226,7 +226,7 @@ export function CoverageView() {
         </div>
 
         {/* Live Surveillance Stream (5 cols on XL) */}
-        <div className="xl:col-span-5 w-full h-[620px] stitch-card rounded-2xl overflow-hidden border border-white/[0.08]">
+        <div className="xl:col-span-5 w-full h-[620px] rounded-2xl overflow-hidden border border-[rgba(201,196,186,0.12)] bg-[#151311] shadow-[0_24px_64px_rgba(0,0,0,0.8)]">
           <LiveSurveillanceFeed
             initialEvents={initialFeed}
             regulations={regulations}
@@ -253,18 +253,18 @@ export function CoverageView() {
       </div>
 
       {/* Active Monitored Jurisdictions Matrix Deck */}
-      <div className="stitch-card p-6 rounded-2xl border border-white/[0.08] shadow-2xl">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-4 border-b border-zinc-800">
+      <div className="p-6 rounded-2xl border border-[rgba(201,196,186,0.12)] bg-[#151311] shadow-[0_24px_64px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-4 border-b border-[rgba(201,196,186,0.08)]">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white tracking-wide uppercase">
-                Active Monitored Jurisdictions & Enforced Standards
+              <h3 className="text-base font-bold text-[#F7F4EC] tracking-wide uppercase">
+                Active Monitored Jurisdictions &amp; Enforced Standards
               </h3>
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#AD956C]/15 text-[#C5B38B] border border-[#AD956C]/30 font-mono">
                 {jurisdictionsList.length} Jurisdictions
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-[#8D8982] mt-0.5">
               Live status, supervisory authority oversight, and active regulatory coverage across global jurisdictions.
             </p>
           </div>
@@ -273,17 +273,17 @@ export function CoverageView() {
             {selectedJurisdiction && (
               <button
                 onClick={() => setSelectedJurisdiction(null)}
-                className="text-xs px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                className="text-xs px-2.5 py-1 rounded-md bg-[#1B1815] hover:bg-[#211D19] text-[#C9C4BA] border border-[rgba(201,196,186,0.10)] transition-colors cursor-pointer"
               >
                 Clear Focus ({selectedJurisdiction})
               </button>
             )}
             <button
               onClick={() => router.push('/regulations')}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center gap-1.5"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] transition-all flex items-center gap-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/25 cursor-pointer"
             >
               <span>Explore Regulations Catalog</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#AD956C]" />
             </button>
           </div>
         </div>
@@ -298,20 +298,20 @@ export function CoverageView() {
                 onClick={() => jur?.code && setSelectedJurisdiction(jur.code)}
                 className={`p-4.5 rounded-xl border transition-all cursor-pointer group relative ${
                   isSelected
-                    ? 'bg-[#10141A] border-[#4D8FCC] shadow-sm'
+                    ? 'bg-[#1B1815] border-[#AD956C] shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
                     : (isLiveSignal
-                        ? 'bg-[#10141A] border-[#4D8FCC]/60 shadow-sm'
-                        : 'bg-[#080A0E] border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14]')
+                        ? 'bg-[#1B1815] border-[#AD956C]/60 shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                        : 'bg-[#100E0D] border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] hover:bg-[#1B1815]/60')
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2.5">
                     <span className="text-2xl drop-shadow">{jur.flag || '🌐'}</span>
                     <div>
-                      <h4 className="text-sm font-bold text-white group-hover:text-[#93C5FD] transition-colors">
+                      <h4 className="text-sm font-bold text-[#F7F4EC] group-hover:text-[#C5B38B] transition-colors">
                         {jur.name}
                       </h4>
-                      <span className="text-[10px] font-mono text-[#64748B] uppercase tracking-wider">
+                      <span className="text-[10px] font-mono text-[#8D8982] uppercase tracking-wider">
                         [{jur.code}]
                       </span>
                     </div>
@@ -319,46 +319,46 @@ export function CoverageView() {
 
                   <div className="flex items-center gap-1.5">
                     {isLiveSignal && (
-                      <span className="text-[9px] font-mono font-bold py-0.5 px-2 rounded bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]" />
+                      <span className="text-[9px] font-mono font-bold py-0.5 px-2 rounded bg-[#AD956C]/15 text-[#C5B38B] border border-[#AD956C]/30 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C]" />
                         LIVE PING
                       </span>
                     )}
                     <span className={`text-[10px] font-mono font-semibold py-0.5 px-2 rounded border ${
                       jur.ruleset_count > 0
-                        ? 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30'
-                        : 'bg-[#4D8FCC]/15 text-[#93C5FD] border-[#4D8FCC]/30'
+                        ? 'bg-[#718A79]/15 text-[#718A79] border-[#718A79]/30'
+                        : 'bg-[#3F5C74]/15 text-[#C9C4BA] border-[#3F5C74]/30'
                     }`}>
                       {jur.ruleset_count > 0 ? `${jur.ruleset_count} Rules Enforced` : 'Surveillance Active'}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 text-xs text-[#94A3B8] my-3 font-mono">
+                <div className="space-y-1.5 text-xs text-[#C9C4BA] my-3 font-mono">
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-[#64748B]">Supervisory:</span>
-                    <span className="text-[#CBD5E1] font-medium truncate max-w-[160px]" title={jur.authority}>
+                    <span className="text-[#8D8982]">Supervisory:</span>
+                    <span className="text-[#F1EEE7] font-medium truncate max-w-[160px]" title={jur.authority}>
                       {jur.authority}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-[#64748B]">Compliance Health:</span>
-                    <span className="text-[#10B981] font-bold">
+                    <span className="text-[#8D8982]">Compliance Health:</span>
+                    <span className="text-[#718A79] font-bold">
                       {jur.compliance_score?.toFixed(1) || 94.0}%
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-[#64748B]">Scope:</span>
-                    <span className="text-[#CBD5E1] font-medium">{jur.ruleset_count || 0} Standards</span>
+                    <span className="text-[#8D8982]">Scope:</span>
+                    <span className="text-[#C9C4BA] font-medium">{jur.ruleset_count || 0} Standards</span>
                   </div>
                 </div>
 
                 {jur.regulations && jur.regulations.length > 0 && (
-                  <div className="pt-2 border-t border-[var(--rc-border)] flex flex-wrap gap-1 font-mono">
+                  <div className="pt-2 border-t border-[rgba(201,196,186,0.08)] flex flex-wrap gap-1 font-mono">
                     {jur.regulations.map((r: string, idx: number) => (
                       <span
                         key={`${jur.code || 'jur'}-${r}-${idx}`}
-                        className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#10141A] text-[#CBD5E1] border border-[var(--rc-border)]"
+                        className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#151311] text-[#C9C4BA] border border-[rgba(201,196,186,0.08)]"
                       >
                         {r}
                       </span>
@@ -366,17 +366,17 @@ export function CoverageView() {
                   </div>
                 )}
 
-                <div className="mt-3 pt-2 border-t border-[var(--rc-border)] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
+                <div className="mt-3 pt-2 border-t border-[rgba(201,196,186,0.08)] flex items-center justify-between text-[11px] font-mono text-[#8D8982]">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/regulations?jurisdiction=${encodeURIComponent(jur.code)}`);
                     }}
-                    className="text-[#4D8FCC] hover:text-[#93C5FD] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                    className="text-[#AD956C] hover:text-[#C5B38B] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     Inspect Regulations <ArrowUpRight className="w-3 h-3" />
                   </button>
-                  <span className="text-[#94A3B8] group-hover:text-white flex items-center gap-0.5 transition-colors">
+                  <span className="text-[#8D8982] group-hover:text-[#F7F4EC] flex items-center gap-0.5 transition-colors">
                     Focus 3D Globe <ArrowUpRight className="w-3 h-3" />
                   </span>
                 </div>

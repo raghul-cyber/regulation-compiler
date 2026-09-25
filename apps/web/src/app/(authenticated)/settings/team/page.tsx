@@ -156,51 +156,51 @@ export default function TeamSettingsPage() {
     <div className="max-w-4xl mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Team & RBAC Settings</h1>
-            <p className="text-[#94A3B8] text-sm">Manage organization members and their pipeline permissions.</p>
+            <h1 className="text-2xl font-semibold text-[#F7F4EC] mb-2 tracking-tight">Team &amp; RBAC Settings</h1>
+            <p className="text-[#8D8982] text-sm font-sans">Manage organization members and their pipeline permissions.</p>
         </div>
         <button 
             onClick={() => { setIsInviteModalOpen(true); setInviteSuccessLink(null); }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] text-xs font-semibold uppercase tracking-wider transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-[#3F5C74] hover:bg-[#4B6982] text-[#F7F4EC] rounded-lg text-xs font-mono font-medium uppercase tracking-wider transition-all cursor-pointer border border-[#607D96]/30"
         >
-            <MailPlus className="h-4 w-4" />
+            <MailPlus className="h-4 w-4 text-[#AD956C]" />
             Invite Member
         </button>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-950/20 border border-red-900/50 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-          <div className="text-red-200 text-sm">{error}</div>
+        <div className="mb-6 p-4 bg-[#9A5D62]/15 border border-[#9A5D62]/30 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-[#9A5D62] flex-shrink-0 mt-0.5" />
+          <div className="text-[#9A5D62] text-sm">{error}</div>
         </div>
       )}
 
       {/* ACTIVE MEMBERS */}
-      <div className="bg-[#080A0E] border border-white/[0.08] rounded-[8px] overflow-hidden mb-8 shadow-sm">
-        <div className="px-6 py-4 border-b border-white/[0.06] flex items-center gap-3">
-          <Users className="h-4 w-4 text-[#4D8FCC]" />
-          <h2 className="text-sm font-bold text-[#F4F6F8]">Active Members ({members.length})</h2>
+      <div className="bg-[#100E0D] border border-[#211D19] rounded-xl overflow-hidden mb-8 shadow-sm">
+        <div className="px-6 py-4 border-b border-[#211D19] flex items-center gap-3">
+          <Users className="h-4 w-4 text-[#AD956C]" />
+          <h2 className="text-sm font-semibold text-[#F7F4EC]">Active Members ({members.length})</h2>
         </div>
-        <div className="divide-y divide-white/[0.05]">
+        <div className="divide-y divide-[#211D19]">
           {members.map(member => (
-            <div key={member.id} className="p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+            <div key={member.id} className="p-5 flex items-center justify-between hover:bg-[#151311]/50 transition-colors">
               <div className="flex items-center gap-4">
-                <div className="h-9 w-9 rounded-full bg-[#0B0E14] border border-white/[0.08] flex items-center justify-center">
-                  <UserCheck className="h-4 w-4 text-[#4D8FCC]" />
+                <div className="h-9 w-9 rounded-full bg-[#151311] border border-[#211D19] flex items-center justify-center">
+                  <UserCheck className="h-4 w-4 text-[#607D96]" />
                 </div>
                 <div>
-                  <div className="text-[#F4F6F8] font-medium text-sm">{member.email}</div>
-                  <div className="text-xs text-[#64748B] mt-0.5 font-mono">{member.clerk_user_id}</div>
+                  <div className="text-[#F7F4EC] font-medium text-sm">{member.email}</div>
+                  <div className="text-xs text-[#625F5A] mt-0.5 font-mono">{member.clerk_user_id}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                {updating === member.id && <Loader2 className="h-4 w-4 text-[#4D8FCC] animate-spin" />}
+                {updating === member.id && <Loader2 className="h-4 w-4 text-[#AD956C] animate-spin" />}
                 <select
                   value={member.role}
                   onChange={(e) => handleUpdateRole(member.id, e.target.value)}
                   disabled={updating === member.id}
-                  className="bg-[#050608] border border-white/[0.08] text-[#F4F6F8] text-xs font-mono rounded-[6px] focus:border-[#4D8FCC] focus:outline-none block w-48 p-2 disabled:opacity-50 cursor-pointer"
+                  className="bg-[#151311] border border-[#211D19] text-[#F1EEE7] text-xs font-mono rounded-lg focus:border-[#AD956C] focus:outline-none block w-48 p-2 disabled:opacity-50 cursor-pointer transition-colors"
                 >
                   {ROLES.map(r => (
                     <option key={r.id} value={r.id}>{r.label}</option>
@@ -214,30 +214,30 @@ export default function TeamSettingsPage() {
       
       {/* PENDING INVITES */}
       {invites.length > 0 && (
-          <div className="bg-[#0E1218] border border-[var(--rc-border)] rounded-xl overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-[var(--rc-border)] flex items-center gap-3">
-              <MailPlus className="h-5 w-5 text-amber-400" />
-              <h2 className="text-base font-semibold text-white">Pending Invitations ({invites.length})</h2>
+          <div className="bg-[#100E0D] border border-[#211D19] rounded-xl overflow-hidden shadow-sm">
+            <div className="px-6 py-4 border-b border-[#211D19] flex items-center gap-3">
+              <MailPlus className="h-5 w-5 text-[#A48A5C]" />
+              <h2 className="text-base font-semibold text-[#F7F4EC]">Pending Invitations ({invites.length})</h2>
             </div>
-            <div className="divide-y divide-[var(--rc-border)]">
+            <div className="divide-y divide-[#211D19]">
               {invites.map(invite => (
-                <div key={invite.id} className="p-6 flex items-center justify-between hover:bg-[#141922]/50 transition-colors">
+                <div key={invite.id} className="p-6 flex items-center justify-between hover:bg-[#151311]/50 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                      <MailPlus className="h-5 w-5 text-amber-400" />
+                    <div className="h-10 w-10 rounded-full bg-[#A48A5C]/15 border border-[#A48A5C]/30 flex items-center justify-center">
+                      <MailPlus className="h-5 w-5 text-[#A48A5C]" />
                     </div>
                     <div>
-                      <div className="text-white font-medium text-sm">{invite.email}</div>
-                      <div className="text-xs text-[#64748B] mt-0.5">Invited as {ROLES.find(r => r.id === invite.role)?.label} on {new Date(invite.created_at).toLocaleDateString()}</div>
+                      <div className="text-[#F7F4EC] font-medium text-sm">{invite.email}</div>
+                      <div className="text-xs text-[#8D8982] mt-0.5">Invited as {ROLES.find(r => r.id === invite.role)?.label} on {new Date(invite.created_at).toLocaleDateString()}</div>
                     </div>
                   </div>
     
                   <div className="flex items-center gap-4">
-                    {updating === invite.id && <Loader2 className="h-4 w-4 text-amber-400 animate-spin" />}
+                    {updating === invite.id && <Loader2 className="h-4 w-4 text-[#AD956C] animate-spin" />}
                     <button 
                         onClick={() => handleRevokeInvite(invite.id)}
                         disabled={updating === invite.id}
-                        className="text-red-400 hover:text-red-300 text-xs font-mono font-medium flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                        className="text-[#9A5D62] hover:text-[#C57E84] text-xs font-mono font-medium flex items-center gap-1 disabled:opacity-50 cursor-pointer transition-colors"
                     >
                         <Trash2 className="h-4 w-4" />
                         Revoke
@@ -252,20 +252,20 @@ export default function TeamSettingsPage() {
       {/* INVITE MODAL */}
       {isInviteModalOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-            <div className="bg-[#0E1218] border border-[var(--rc-border)] rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-[var(--rc-border)] flex justify-between items-center">
-                    <h3 className="text-base font-bold text-white">Invite Team Member</h3>
-                    <button onClick={() => setIsInviteModalOpen(false)} className="text-zinc-500 hover:text-white cursor-pointer">&times;</button>
+            <div className="bg-[#100E0D] border border-[#211D19] rounded-xl max-w-md w-full shadow-2xl overflow-hidden text-[#F7F4EC]">
+                <div className="px-6 py-4 border-b border-[#211D19] flex justify-between items-center">
+                    <h3 className="text-base font-semibold text-[#F7F4EC]">Invite Team Member</h3>
+                    <button onClick={() => setIsInviteModalOpen(false)} className="text-[#8D8982] hover:text-[#F7F4EC] cursor-pointer">&times;</button>
                 </div>
                 <div className="p-6">
                     {inviteSuccessLink ? (
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
-                            <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                            <h4 className="text-emerald-400 font-semibold mb-2 text-sm">Invite Sent!</h4>
-                            <p className="text-xs text-[#94A3B8] mb-4">An invitation email has been dispatched to your colleague.</p>
+                        <div className="bg-[#718A79]/15 border border-[#718A79]/30 rounded-xl p-4 text-center">
+                            <CheckCircle2 className="h-8 w-8 text-[#718A79] mx-auto mb-2" />
+                            <h4 className="text-[#718A79] font-medium mb-2 text-sm">Invite Sent!</h4>
+                            <p className="text-xs text-[#8D8982] mb-4">An invitation email has been dispatched to your colleague.</p>
                             <button 
                                 onClick={() => setIsInviteModalOpen(false)}
-                                className="w-full bg-[#141922] hover:bg-[#1A2230] text-white rounded-lg py-2 text-xs font-medium border border-[var(--rc-border)] transition-colors cursor-pointer"
+                                className="w-full bg-[#151311] hover:bg-[#1B1815] text-[#F7F4EC] rounded-lg py-2 text-xs font-medium border border-[#211D19] transition-colors cursor-pointer"
                             >
                                 Close
                             </button>
@@ -273,42 +273,42 @@ export default function TeamSettingsPage() {
                     ) : (
                         <form onSubmit={handleSendInvite} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-mono uppercase tracking-wider text-[#9CA3AF] mb-1.5 font-medium">Email Address</label>
+                                <label className="block text-xs font-mono uppercase tracking-wider text-[#8D8982] mb-1.5 font-medium">Email Address</label>
                                 <input 
                                     type="email" 
                                     required 
                                     value={inviteEmail} 
                                     onChange={e => setInviteEmail(e.target.value)}
-                                    className="w-full bg-[#050608] border border-white/[0.08] rounded-[6px] p-2.5 text-[#F4F6F8] text-xs font-mono focus:border-[#4D8FCC] focus:outline-none"
+                                    className="w-full bg-[#151311] border border-[#211D19] rounded-lg p-2.5 text-[#F1EEE7] text-xs font-mono focus:border-[#AD956C] focus:outline-none transition-colors"
                                     placeholder="colleague@company.com"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-mono uppercase tracking-wider text-[#9CA3AF] mb-1.5 font-medium">Role</label>
+                                <label className="block text-xs font-mono uppercase tracking-wider text-[#8D8982] mb-1.5 font-medium">Role</label>
                                 <select 
                                     value={inviteRole} 
                                     onChange={e => setInviteRole(e.target.value)}
-                                    className="w-full bg-[#050608] border border-white/[0.08] rounded-[6px] p-2.5 text-[#F4F6F8] text-xs font-mono focus:border-[#4D8FCC] focus:outline-none cursor-pointer"
+                                    className="w-full bg-[#151311] border border-[#211D19] rounded-lg p-2.5 text-[#F1EEE7] text-xs font-mono focus:border-[#AD956C] focus:outline-none cursor-pointer transition-colors"
                                 >
                                     {ROLES.map(r => (
                                          <option key={r.id} value={r.id}>{r.label} - {r.desc}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="pt-4 flex justify-end gap-3 border-t border-white/[0.06]">
+                            <div className="pt-4 flex justify-end gap-3 border-t border-[#211D19]">
                                 <button 
                                     type="button" 
                                     onClick={() => setIsInviteModalOpen(false)}
-                                    className="px-3.5 py-2 text-[#9CA3AF] hover:text-[#F4F6F8] text-xs font-medium transition-colors cursor-pointer"
+                                    className="px-3.5 py-2 text-[#8D8982] hover:text-[#F7F4EC] text-xs font-medium transition-colors cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={updating === "invite"}
-                                    className="px-4 py-2 bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+                                    className="px-4 py-2 bg-[#3F5C74] hover:bg-[#4B6982] text-[#F7F4EC] rounded-lg text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer border border-[#607D96]/30"
                                 >
-                                    {updating === "invite" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailPlus className="h-4 w-4" />}
+                                    {updating === "invite" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailPlus className="h-4 w-4 text-[#AD956C]" />}
                                     Send Invite
                                 </button>
                             </div>

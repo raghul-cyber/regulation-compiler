@@ -50,14 +50,12 @@ const TypingHeadline = ({ delay = 150, speed = 28 }: { delay?: number; speed?: n
 
   return (
     <div className="flex flex-col items-center justify-center select-none text-center">
-      <span className="block min-h-[1.2em] tracking-tight text-[#F4F6F8]">
+      <span className="block min-h-[1.2em] tracking-tight text-[#F7F4EC]">
         {line1Text}
         {isTypingLine1 && <span className="landing-cursor" aria-hidden="true" />}
       </span>
-      <span className="block min-h-[1.2em] mt-1 sm:mt-2 tracking-tight">
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4F6F8] via-[#E2E8F0] to-[#9CA3AF]">
-          {line2Text}
-        </span>
+      <span className="block min-h-[1.2em] mt-1 sm:mt-2 tracking-tight text-[#F1EEE7]">
+        {line2Text}
         {!isTypingLine1 && <span className="landing-cursor" aria-hidden="true" />}
       </span>
     </div>
@@ -93,7 +91,7 @@ export function HeroSection() {
     >
       <div ref={heroRef} className={`landing-reveal ${heroRevealed ? 'revealed' : ''} flex flex-col items-center max-w-5xl px-4`}>
         {/* Refined Technical Designation Plate */}
-        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-[4px] bg-[#080A0E]/95 border border-white/[0.08] text-xs font-medium text-[#9CA3AF] mb-8 shadow-[0_1px_3px_rgba(0,0,0,0.5)] tracking-wide">
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-[4px] bg-[#151311]/95 border border-[rgba(201,196,186,0.12)] text-xs font-medium text-[#C9C4BA] mb-8 shadow-[0_2px_8px_rgba(0,0,0,0.6)] tracking-wide">
           <div className="w-3.5 h-3.5 rounded-[2px] overflow-hidden flex items-center justify-center shrink-0 opacity-90">
             <Image 
               src="/logo-icon.png" 
@@ -104,46 +102,46 @@ export function HeroSection() {
               priority
             />
           </div>
-          <span className="text-[#F4F6F8] font-mono text-[11px] uppercase tracking-wider font-semibold">REGCOMPILER // SPEC-01</span>
-          <span className="text-[#3A424E] font-mono">|</span>
-          <span className="text-[#7EA2C4] font-mono tracking-wider text-[10px] uppercase font-medium">
+          <span className="text-[#F7F4EC] font-mono text-[11px] uppercase tracking-wider font-semibold">REGCOMPILER // SPEC-01</span>
+          <span className="text-[#625F5A] font-mono">|</span>
+          <span className="text-[#AD956C] font-mono tracking-wider text-[10px] uppercase font-medium">
             REGULATORY INTELLIGENCE &bull; FORMAL COMPILER
           </span>
-          <span className="w-1 h-1 rounded-full bg-[#C9B88A] ml-0.5" title="Statutory Precision Standard" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C] ml-0.5" title="Statutory Precision Standard" />
         </div>
 
-        {/* Main Headline with Clean Enterprise Sans-Serif Typography */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#F4F6F8] max-w-4xl mx-auto leading-[1.15]">
+        {/* Main Headline with Clean Enterprise Sans-Serif Typography in Warm Ivory */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#F7F4EC] max-w-4xl mx-auto leading-[1.15]">
           <TypingHeadline delay={150} speed={28} />
         </h1>
 
-        {/* Supporting Copy */}
-        <p className="mt-6 text-base sm:text-lg md:text-xl text-[#9CA3AF] max-w-3xl font-normal leading-relaxed">
+        {/* Supporting Copy in Warm Grey */}
+        <p className="mt-6 text-base sm:text-lg md:text-xl text-[#C9C4BA] max-w-3xl font-normal leading-relaxed">
           Transform dense, ambiguous legal text into deterministic Abstract Syntax Trees and machine-executable verification policies. Automated statutory surveillance running 24/7 across global regulatory gazettes.
         </p>
 
-        {/* Action CTAs — Clean Engineered Buttons */}
+        {/* Action CTAs — Clean Engineered Luxury Controls */}
         <div className="mt-9 flex flex-wrap justify-center gap-3.5 pointer-events-auto">
           <Show when="signed-in">
             <Link href="/dashboard">
               <button 
-                className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.4)] border border-[#79B5EC]/20 active:scale-[0.98]"
+                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.6)] border border-[#AD956C]/25 active:scale-[0.98]"
               >
                 <span>Start Compiling</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#AD956C]" />
               </button>
             </Link>
             <button 
               onClick={scrollToWebsiteAuditor}
-              className="rounded-[6px] font-medium px-5 h-11 bg-[#080A0E] text-[#F4F6F8] border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#0B0E14] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98] shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
             >
-              <Globe className="w-4 h-4 text-[#4D8FCC]" />
+              <Globe className="w-4 h-4 text-[#AD956C]" />
               <span>Instant Website Auditor</span>
-              <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono bg-[#4D8FCC]/15 text-[#79B5EC] font-semibold uppercase">New</span>
+              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#AD956C]/15 text-[#C5B38B] font-semibold uppercase">New</span>
             </button>
             <button 
               onClick={scrollToHowItWorks}
-              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#9CA3AF] hover:text-[#F4F6F8] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.02] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#8D8982] hover:text-[#F1EEE7] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.16)] hover:bg-[#151311]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
             >
               <span>Explore How It Works</span>
             </button>
@@ -152,23 +150,23 @@ export function HeroSection() {
           <Show when="signed-out">
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
               <button 
-                className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.4)] border border-[#79B5EC]/20 active:scale-[0.98]"
+                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.6)] border border-[#AD956C]/25 active:scale-[0.98]"
               >
                 <span>Start Compiling</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#AD956C]" />
               </button>
             </SignInButton>
             <button 
               onClick={scrollToWebsiteAuditor}
-              className="rounded-[6px] font-medium px-5 h-11 bg-[#080A0E] text-[#F4F6F8] border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#0B0E14] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98] shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
             >
-              <Globe className="w-4 h-4 text-[#4D8FCC]" />
+              <Globe className="w-4 h-4 text-[#AD956C]" />
               <span>Instant Website Auditor</span>
-              <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-mono bg-[#4D8FCC]/15 text-[#79B5EC] font-semibold uppercase">New</span>
+              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#AD956C]/15 text-[#C5B38B] font-semibold uppercase">New</span>
             </button>
             <button 
               onClick={scrollToHowItWorks}
-              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#9CA3AF] hover:text-[#F4F6F8] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.02] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#8D8982] hover:text-[#F1EEE7] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.16)] hover:bg-[#151311]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
             >
               <span>Explore How It Works</span>
             </button>
@@ -176,24 +174,24 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Integrated Technical Specification Rail — Monolithic Architectural Module */}
+      {/* Integrated Technical Specification Rail — High-End Product Specifications */}
       <div 
         ref={metricsRef}
         className={`landing-reveal ${metricsRevealed ? 'revealed' : ''} mt-14 w-full max-w-4xl px-4 pointer-events-auto font-sans`}
       >
-        <div className="w-full rounded-[8px] bg-[#080A0E]/90 border border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md overflow-hidden grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/[0.06] transition-colors hover:border-white/[0.12]">
+        <div className="w-full rounded-[8px] bg-[#151311]/95 border border-[rgba(201,196,186,0.12)] shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-md overflow-hidden grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[rgba(201,196,186,0.08)] transition-colors hover:border-[rgba(201,196,186,0.2)]">
           {/* Spec Item 1: Live Regulatory Signals */}
           <div ref={count1.ref} className="p-5 md:p-6 text-left flex flex-col justify-between group">
             <div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F4F6F8] tracking-tight font-mono leading-none">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F7F4EC] tracking-tight font-mono leading-none">
                 {count1.displayValue}
               </div>
-              <div className="text-xs text-[#A0A6B1] mt-2 font-medium tracking-wide">
+              <div className="text-xs text-[#8D8982] mt-2 font-medium tracking-wide">
                 Live Regulatory Signals
               </div>
             </div>
-            <div className="text-[11px] text-emerald-400/90 font-mono mt-3 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
+            <div className="text-[11px] text-[#718A79] font-mono mt-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] inline-block shrink-0" />
               <span className="truncate">Federal Register &amp; FCA</span>
             </div>
           </div>
@@ -201,15 +199,15 @@ export function HeroSection() {
           {/* Spec Item 2: Compiled Frameworks */}
           <div ref={count2.ref} className="p-5 md:p-6 text-left flex flex-col justify-between group">
             <div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F4F6F8] tracking-tight font-mono leading-none">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F7F4EC] tracking-tight font-mono leading-none">
                 {count2.displayValue}
               </div>
-              <div className="text-xs text-[#A0A6B1] mt-2 font-medium tracking-wide">
+              <div className="text-xs text-[#8D8982] mt-2 font-medium tracking-wide">
                 Compiled Frameworks
               </div>
             </div>
-            <div className="text-[11px] text-[#6B8BA4] font-mono mt-3 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC] inline-block shrink-0" />
+            <div className="text-[11px] text-[#4B6982] font-mono mt-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3F5C74] inline-block shrink-0" />
               <span className="truncate">EU AI Act, DORA, GDPR</span>
             </div>
           </div>
@@ -217,15 +215,15 @@ export function HeroSection() {
           {/* Spec Item 3: Formal AST Rules */}
           <div ref={count3.ref} className="p-5 md:p-6 text-left flex flex-col justify-between group">
             <div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F4F6F8] tracking-tight font-mono leading-none">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F7F4EC] tracking-tight font-mono leading-none">
                 {count3.displayValue}
               </div>
-              <div className="text-xs text-[#A0A6B1] mt-2 font-medium tracking-wide">
+              <div className="text-xs text-[#8D8982] mt-2 font-medium tracking-wide">
                 Formal AST Rules
               </div>
             </div>
-            <div className="text-[11px] text-[#6B8BA4] font-mono mt-3 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC] inline-block shrink-0" />
+            <div className="text-[11px] text-[#AD956C] font-mono mt-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C] inline-block shrink-0" />
               <span className="truncate">Deterministic Trees</span>
             </div>
           </div>
@@ -233,15 +231,15 @@ export function HeroSection() {
           {/* Spec Item 4: Evaluation Latency */}
           <div className="p-5 md:p-6 text-left flex flex-col justify-between group">
             <div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F4F6F8] tracking-tight font-mono leading-none">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F7F4EC] tracking-tight font-mono leading-none">
                 &lt;50ms
               </div>
-              <div className="text-xs text-[#A0A6B1] mt-2 font-medium tracking-wide">
+              <div className="text-xs text-[#8D8982] mt-2 font-medium tracking-wide">
                 Evaluation Latency
               </div>
             </div>
-            <div className="text-[11px] text-emerald-400/90 font-mono mt-3 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
+            <div className="text-[11px] text-[#718A79] font-mono mt-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] inline-block shrink-0" />
               <span className="truncate">In-Memory Zero-Lag Engine</span>
             </div>
           </div>

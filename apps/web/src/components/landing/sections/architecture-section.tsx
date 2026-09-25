@@ -54,14 +54,14 @@ export function ArchitectureSection() {
     <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <Layers className="w-3.5 h-3.5 text-[#4D8FCC]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          <Layers className="w-3.5 h-3.5 text-[#AD956C]" />
           Technical Stack
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
           Enterprise Architecture
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           Engineered as a deterministic compiler pipeline. Every statutory input traces directly to an immutable, machine-verifiable enforcement outcome.
         </p>
       </div>
@@ -73,29 +73,29 @@ export function ArchitectureSection() {
           return (
             <div
               key={layer.step}
-              className="p-5 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] hover:border-[var(--rc-border-subtle)] hover:bg-[#0B0E14] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left"
+              className="p-5 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#1B1815] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
             >
               <div className="flex items-start md:items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#10141A] border border-[var(--rc-border)] text-[#4D8FCC] shrink-0">
+                <div className="p-3 rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.08)] text-[#AD956C] shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[#4D8FCC] font-bold">
+                    <span className="font-mono text-xs text-[#AD956C] font-bold">
                       LAYER {layer.step}
                     </span>
-                    <span className="text-[#64748B]">•</span>
-                    <h3 className="text-base font-bold text-[#F4F6F8]">
+                    <span className="text-[#625F5A]">•</span>
+                    <h3 className="text-base font-bold text-[#F7F4EC]">
                       {layer.name}
                     </h3>
                   </div>
-                  <p className="text-xs text-[#94A3B8] max-w-2xl leading-relaxed">
+                  <p className="text-xs text-[#C9C4BA] max-w-2xl leading-relaxed">
                     {layer.desc}
                   </p>
                 </div>
               </div>
 
-              <div className="font-mono text-[11px] text-[#CBD5E1] bg-[#10141A] px-3 py-1.5 rounded-lg border border-[var(--rc-border)] shrink-0">
+              <div className="font-mono text-[11px] text-[#8D8982] bg-[#100E0D] px-3 py-1.5 rounded-lg border border-[rgba(201,196,186,0.08)] shrink-0">
                 {layer.tech}
               </div>
             </div>

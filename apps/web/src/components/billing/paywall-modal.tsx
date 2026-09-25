@@ -100,17 +100,17 @@ export function PaywallModal({
       onClick={isBlocking ? undefined : onClose}
     >
       <div 
-        className="relative w-full max-w-lg my-auto p-6 sm:p-8 rounded-2xl bg-[#0E1218] border border-[var(--rc-border)] shadow-2xl text-white overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg my-auto p-6 sm:p-8 rounded-xl bg-[#100E0D] border border-[#211D19] shadow-2xl text-[#F7F4EC] overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Subtle Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#4D8FCC]/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Warmth */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#AD956C]/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close Button (Hidden if Blocking) */}
         {!isBlocking && (
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-colors z-10 cursor-pointer"
+            className="absolute top-4 right-4 p-2 rounded-lg text-[#8D8982] hover:text-[#F7F4EC] hover:bg-[#151311] transition-colors z-10 cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -119,7 +119,7 @@ export function PaywallModal({
 
         {/* Header Badge */}
         <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#A48A5C]/15 border border-[#A48A5C]/30 text-[#A48A5C] text-xs font-mono font-medium uppercase tracking-wider">
             <Lock className="w-3.5 h-3.5" />
             <span>Free Tier Limit Reached</span>
           </div>
@@ -127,50 +127,50 @@ export function PaywallModal({
 
         {/* Modal Title & Subtitle */}
         <div className="space-y-2">
-          <h3 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h3 className="text-2xl font-semibold tracking-tight text-[#F7F4EC] flex items-center gap-2">
             <span>Upgrade to Pro</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4D8FCC]/15 text-[#A3C7E8] border border-[#4D8FCC]/30 font-mono font-normal">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/40 font-mono font-normal">
               $10.02/month
             </span>
           </h3>
-          <p className="text-sm text-[#94A3B8] leading-relaxed">
+          <p className="text-sm text-[#8D8982] leading-relaxed font-sans">
             {reason || "You have reached your limit of 3 complimentary website compliance audits and regulation compilations. Upgrade to Pro to unlock unlimited autonomous compliance audits, PDF compilation, and statutory monitoring."}
           </p>
         </div>
 
         {/* Usage Tracker Pill */}
-        <div className="p-3 rounded-xl bg-[#090D13] border border-[var(--rc-border)] flex items-center justify-between text-xs font-mono">
-          <span className="text-[#94A3B8]">Free Actions Quota:</span>
-          <span className="font-bold text-amber-400 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+        <div className="p-3 rounded-lg bg-[#0B0A09] border border-[#211D19] flex items-center justify-between text-xs font-mono">
+          <span className="text-[#8D8982]">Free Actions Quota:</span>
+          <span className="font-medium text-[#A48A5C] flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#A48A5C]" />
             {freeUsesUsed} / {freeUsesLimit} used (0 remaining)
           </span>
         </div>
 
         {/* Pro Plan Value Pillars */}
-        <div className="space-y-2.5 py-1 border-y border-[var(--rc-border)]">
-          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
-            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span><b>Unlimited Website Audits:</b> Full autonomous inspection across GDPR, HIPAA, SOC 2, WCAG 2.1 AA, and PCI-DSS.</span>
+        <div className="space-y-2.5 py-1 border-y border-[#211D19]">
+          <div className="flex items-start gap-2.5 text-xs text-[#C9C4BA]">
+            <Check className="w-4 h-4 text-[#718A79] shrink-0 mt-0.5" />
+            <span><b className="text-[#F7F4EC]">Unlimited Website Audits:</b> Full autonomous inspection across GDPR, HIPAA, SOC 2, WCAG 2.1 AA, and PCI-DSS.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
-            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span><b>Unlimited Regulation Compilation:</b> Parse multi-hundred page PDF & HTML statutory gazettes into ASTs.</span>
+          <div className="flex items-start gap-2.5 text-xs text-[#C9C4BA]">
+            <Check className="w-4 h-4 text-[#718A79] shrink-0 mt-0.5" />
+            <span><b className="text-[#F7F4EC]">Unlimited Regulation Compilation:</b> Parse multi-hundred page PDF & HTML statutory gazettes into ASTs.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
-            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span><b>24/7 Global Surveillance:</b> Real-time statutory gazette monitoring and automated drift alerts.</span>
+          <div className="flex items-start gap-2.5 text-xs text-[#C9C4BA]">
+            <Check className="w-4 h-4 text-[#718A79] shrink-0 mt-0.5" />
+            <span><b className="text-[#F7F4EC]">24/7 Global Surveillance:</b> Real-time statutory gazette monitoring and automated drift alerts.</span>
           </div>
-          <div className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
-            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span><b>Production Policy AST Exports:</b> Machine-executable Rego/JSON policies and cryptographic audit trails.</span>
+          <div className="flex items-start gap-2.5 text-xs text-[#C9C4BA]">
+            <Check className="w-4 h-4 text-[#718A79] shrink-0 mt-0.5" />
+            <span><b className="text-[#F7F4EC]">Production Policy AST Exports:</b> Machine-executable Rego/JSON policies and cryptographic audit trails.</span>
           </div>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-start gap-2 break-words">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+          <div className="p-3 rounded-lg bg-[#9A5D62]/15 border border-[#9A5D62]/30 text-xs text-[#9A5D62] flex items-start gap-2 break-words">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#9A5D62] mt-0.5" />
             <div className="leading-snug">{error}</div>
           </div>
         )}
@@ -180,18 +180,18 @@ export function PaywallModal({
           <button
             onClick={handleCheckout}
             disabled={isLoading}
-            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-[#4D8FCC] hover:bg-[#3B72A8] disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+            className="w-full sm:flex-1 py-3 px-5 rounded-lg bg-[#3F5C74] hover:bg-[#4B6982] disabled:opacity-50 text-[#F7F4EC] font-medium text-sm flex items-center justify-center gap-2 transition-all cursor-pointer border border-[#607D96]/30"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#F7F4EC]" />
                 <span>Redirecting to Dodo Payments...</span>
               </>
             ) : (
               <>
-                <RCIcon name="shield" size={16} className="text-white" />
+                <RCIcon name="shield" size={16} className="text-[#AD956C]" />
                 <span>Unlock Continued Access</span>
-                <ArrowRight className="w-4 h-4 text-white" />
+                <ArrowRight className="w-4 h-4 text-[#AD956C]" />
               </>
             )}
           </button>
@@ -200,7 +200,7 @@ export function PaywallModal({
             <button
               onClick={() => signOut({ redirectUrl: '/' })}
               disabled={isLoading}
-              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#141922] hover:bg-[#1A2230] text-[#94A3B8] hover:text-white border border-[var(--rc-border)] text-xs font-medium transition-colors cursor-pointer"
+              className="w-full sm:w-auto py-3 px-4 rounded-lg bg-[#151311] hover:bg-[#1B1815] text-[#8D8982] hover:text-[#F7F4EC] border border-[#211D19] text-xs font-medium transition-colors cursor-pointer"
             >
               Sign Out
             </button>
@@ -208,7 +208,7 @@ export function PaywallModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="w-full sm:w-auto py-3 px-4 rounded-xl bg-[#141922] hover:bg-[#1A2230] text-[#94A3B8] hover:text-white border border-[var(--rc-border)] text-xs font-medium transition-colors cursor-pointer"
+              className="w-full sm:w-auto py-3 px-4 rounded-lg bg-[#151311] hover:bg-[#1B1815] text-[#8D8982] hover:text-[#F7F4EC] border border-[#211D19] text-xs font-medium transition-colors cursor-pointer"
             >
               Maybe later
             </button>
@@ -217,7 +217,7 @@ export function PaywallModal({
 
         {/* Trust Footer */}
         <div className="text-center">
-          <span className="text-[11px] text-[#64748B] font-mono">
+          <span className="text-[11px] text-[#625F5A] font-mono">
             Secured by Dodo Payments • Real-time webhook confirmation
           </span>
         </div>

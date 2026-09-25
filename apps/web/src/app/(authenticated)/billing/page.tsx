@@ -111,30 +111,30 @@ export default function BillingPage() {
   return (
     <div className="w-full max-w-5xl mx-auto py-6 px-4 sm:px-6 space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-[10px] bg-[#080A0E] border border-white/[0.08] shadow-md relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-xl bg-[#151311] border border-[#211D19] relative overflow-hidden">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2 py-0.5 rounded-[4px] font-mono text-[10px] tracking-wider uppercase bg-[#4D8FCC]/15 text-[#79B5EC] border border-[#4D8FCC]/30 font-semibold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]" />
+            <span className="px-2 py-0.5 rounded font-mono text-[10px] tracking-wider uppercase bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/40 font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#607D96]" />
               Statutory Entitlements Engine
             </span>
-            <span className="px-2 py-0.5 rounded-[4px] font-mono text-[10px] tracking-wider uppercase bg-[#0B0E14] text-[#CBD5E1] border border-white/[0.06] font-medium">
+            <span className="px-2 py-0.5 rounded font-mono text-[10px] tracking-wider uppercase bg-[#100E0D] text-[#8D8982] border border-[#211D19] font-medium">
               Dodo Payments Gateway
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F4F6F8] flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#F7F4EC] flex items-center gap-3">
             <span>Billing & Metered Quotas</span>
           </h1>
-          <p className="mt-1 text-xs text-[#9CA3AF] max-w-xl">
+          <p className="mt-1 text-xs text-[#8D8982] max-w-xl font-sans">
             Autonomous compilation entitlements, executive subscription tiers, and persistent PostgreSQL usage telemetry.
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <div className="px-3.5 py-2 rounded-[6px] bg-[#050608] border border-white/[0.06] flex flex-col items-end font-mono">
-            <span className="text-[10px] text-[#64748B] uppercase tracking-wider">Gateway Protocol</span>
-            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Webhook Synced
+          <div className="px-3.5 py-2 rounded-lg bg-[#100E0D] border border-[#211D19] flex flex-col items-end font-mono">
+            <span className="text-[10px] text-[#625F5A] uppercase tracking-wider">Gateway Protocol</span>
+            <span className="text-xs font-medium text-[#718A79] flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" /> Webhook Synced
             </span>
           </div>
         </div>
@@ -143,31 +143,31 @@ export default function BillingPage() {
       {/* Plan & Usage KPI Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Active Tier */}
-        <div className="p-6 rounded-[8px] bg-[#080A0E] border border-white/[0.08] shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="p-6 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] transition-colors flex flex-col justify-between relative overflow-hidden">
           <div>
-            <div className="text-[10px] font-mono text-[#93C5FD] uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-[#4D8FCC]" />
+            <div className="text-[10px] font-mono text-[#607D96] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-[#AD956C]" />
               Current Plan Tier
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-extrabold text-[#F4F6F8] capitalize tracking-tight">
+              <span className="text-2xl font-semibold text-[#F7F4EC] capitalize tracking-tight">
                 {billing?.is_admin ? 'Enterprise Admin' : billing?.plan || 'Free'}
               </span>
               {billing?.is_admin ? (
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-[4px] uppercase">
+                <span className="px-2 py-0.5 text-[10px] font-mono font-medium bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 rounded uppercase">
                   Exempt
                 </span>
               ) : billing?.paid_access ? (
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30 rounded-[4px] uppercase">
+                <span className="px-2 py-0.5 text-[10px] font-mono font-medium bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/40 rounded uppercase">
                   Active Pro
                 </span>
               ) : (
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-[#0B0E14] text-[#9CA3AF] border border-white/[0.06] rounded-[4px] uppercase">
+                <span className="px-2 py-0.5 text-[10px] font-mono font-medium bg-[#151311] text-[#8D8982] border border-[#211D19] rounded uppercase">
                   Complimentary
                 </span>
               )}
             </div>
-            <p className="mt-3 text-xs text-[#9CA3AF] leading-relaxed font-sans">
+            <p className="mt-3 text-xs text-[#8D8982] leading-relaxed font-sans">
               {billing?.is_admin 
                 ? 'Unlimited full-stack statutory compilation and compliance auditing enabled across all nodes.'
                 : billing?.paid_access
@@ -176,45 +176,45 @@ export default function BillingPage() {
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono">
-            <span className="text-[#64748B]">Node Status:</span>
-            <span className="font-semibold text-emerald-400 capitalize flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <div className="mt-6 pt-4 border-t border-[#211D19] flex items-center justify-between text-xs font-mono">
+            <span className="text-[#625F5A]">Node Status:</span>
+            <span className="font-medium text-[#718A79] capitalize flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
               {billing?.status || 'Active'}
             </span>
           </div>
         </div>
 
         {/* Card 2: Free Quota Meter */}
-        <div className="p-6 rounded-[8px] bg-[#080A0E] border border-white/[0.08] shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="p-6 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] transition-colors flex flex-col justify-between relative overflow-hidden">
           <div>
-            <div className="text-[10px] font-mono text-[#93C5FD] uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#4D8FCC]" />
+            <div className="text-[10px] font-mono text-[#AD956C] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#AD956C]" />
               Compilation Quota Meter
             </div>
-            <div className="text-2xl font-extrabold text-[#F4F6F8] font-mono">
+            <div className="text-2xl font-semibold text-[#F7F4EC] font-mono">
               {billing?.is_admin ? (
-                <span className="text-emerald-400 font-sans">Unlimited</span>
+                <span className="text-[#718A79] font-sans">Unlimited</span>
               ) : (
-                <span>{freeUsed} / {freeLimit} <span className="text-xs text-[#64748B] font-normal">consumed</span></span>
+                <span>{freeUsed} / {freeLimit} <span className="text-xs text-[#625F5A] font-normal">consumed</span></span>
               )}
             </div>
 
             {!billing?.is_admin && (
               <div className="mt-4">
-                <div className="w-full h-2 bg-[#050608] rounded-full overflow-hidden border border-white/[0.06] p-0.5">
+                <div className="w-full h-2 bg-[#080706] rounded-full overflow-hidden border border-[#211D19] p-0.5">
                   <div 
-                    className={`h-full rounded-full transition-all duration-500 shadow-sm ${
+                    className={`h-full rounded-full transition-all duration-500 ${
                       isExhausted 
-                        ? 'bg-amber-500' 
-                        : 'bg-[#4D8FCC]'
+                        ? 'bg-[#A48A5C]' 
+                        : 'bg-[#3F5C74]'
                     }`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <div className="mt-2.5 text-[11px] text-[#9CA3AF] flex justify-between font-mono">
-                  <span className="text-[#93C5FD]">{freeRemaining} allocations left</span>
-                  <span className={isExhausted ? 'text-amber-400 font-semibold' : 'text-[#64748B]'}>
+                <div className="mt-2.5 text-[11px] text-[#8D8982] flex justify-between font-mono">
+                  <span className="text-[#607D96]">{freeRemaining} allocations left</span>
+                  <span className={isExhausted ? 'text-[#A48A5C] font-medium' : 'text-[#625F5A]'}>
                     {isExhausted ? 'Quota Exhausted' : `${freeLimit - freeUsed} available`}
                   </span>
                 </div>
@@ -222,35 +222,35 @@ export default function BillingPage() {
             )}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono">
-            <span className="text-[#64748B]">Metered Boundary:</span>
-            <span className="text-[#CBD5E1]">PDF / HTML Statutory Ingest</span>
+          <div className="mt-6 pt-4 border-t border-[#211D19] flex items-center justify-between text-xs font-mono">
+            <span className="text-[#625F5A]">Metered Boundary:</span>
+            <span className="text-[#C9C4BA]">PDF / HTML Statutory Ingest</span>
           </div>
         </div>
 
         {/* Card 3: Quick Action / Upgrade */}
-        <div className="p-6 rounded-[8px] bg-[#080A0E] border border-white/[0.08] shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="p-6 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] transition-colors flex flex-col justify-between relative overflow-hidden">
           <div>
-            <div className="text-[10px] font-mono text-[#79B5EC] uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
-              <RCIcon name="shield" size={14} className="text-[#4D8FCC]" />
+            <div className="text-[10px] font-mono text-[#607D96] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+              <RCIcon name="shield" size={14} className="text-[#AD956C]" />
               Executive Access
             </div>
-            <div className="text-base font-extrabold text-[#F4F6F8]">
+            <div className="text-base font-semibold text-[#F7F4EC]">
               {billing?.paid_access || billing?.is_admin ? 'Active Entitlement' : 'Unlock Unlimited Compilations'}
             </div>
-            <p className="mt-2 text-xs text-[#9CA3AF] leading-relaxed font-sans">
+            <p className="mt-2 text-xs text-[#8D8982] leading-relaxed font-sans">
               Instant AST pipeline prioritization. Automated legislative surveillance with webhook activation in &lt; 800ms.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.06] space-y-2.5">
+          <div className="mt-6 pt-4 border-t border-[#211D19] space-y-2.5">
             {!billing?.paid_access && !billing?.is_admin && (
               <button
                 onClick={() => setIsPaywallOpen(true)}
-                className="w-full py-2.5 px-4 rounded-[6px] bg-[#4D8FCC] hover:bg-[#3B72A8] active:scale-[0.99] text-white font-mono font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer tracking-wider uppercase border border-[#79B5EC]/20"
+                className="w-full py-2.5 px-4 rounded-lg bg-[#3F5C74] hover:bg-[#4B6982] active:scale-[0.99] text-[#F7F4EC] font-mono font-medium text-xs flex items-center justify-center gap-2 transition-all cursor-pointer tracking-wider uppercase border border-[#607D96]/30"
               >
                 <span>Upgrade to Pro ($10.02/mo)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#AD956C]" />
               </button>
             )}
 
@@ -258,79 +258,79 @@ export default function BillingPage() {
               <button
                 onClick={handleOpenPortal}
                 disabled={portalLoading}
-                className="w-full py-2.5 px-3 rounded-lg bg-[#141922] hover:bg-[#1A2230] text-zinc-300 border border-[var(--rc-border)] text-xs font-mono font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-lg bg-[#151311] hover:bg-[#1B1815] text-[#C9C4BA] hover:text-[#F7F4EC] border border-[#211D19] text-xs font-mono font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5 text-[#93C5FD]" />}
+                {portalLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5 text-[#AD956C]" />}
                 <span>Manage via Dodo Portal</span>
               </button>
             )}
 
             {portalError && (
-              <p className="text-[11px] font-mono text-amber-400">{portalError}</p>
+              <p className="text-[11px] font-mono text-[#A48A5C]">{portalError}</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Live Background Action & Audit Ledger */}
-      <div className="p-6 sm:p-8 rounded-[10px] bg-[#080A0E] border border-white/[0.08] shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+      <div className="p-6 sm:p-8 rounded-xl bg-[#100E0D] border border-[#211D19] shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-[#211D19] pb-4">
           <div>
-            <h3 className="text-base font-extrabold text-[#F4F6F8] flex items-center gap-2.5">
-              <History className="w-4 h-4 text-[#4D8FCC]" />
+            <h3 className="text-base font-semibold text-[#F7F4EC] flex items-center gap-2.5">
+              <History className="w-4 h-4 text-[#AD956C]" />
               <span>Live Statutory Action & Audit Ledger</span>
             </h3>
-            <p className="mt-1 text-xs text-[#9CA3AF]">
+            <p className="mt-1 text-xs text-[#8D8982] font-sans">
               Authoritative PostgreSQL usage ledger tracking metered user actions in real-time. Persistent across sessions.
             </p>
           </div>
           <button
             onClick={loadBilling}
-            className="px-3 py-1.5 rounded-[6px] bg-[#0B0E14] hover:bg-[#11151A] text-[#9CA3AF] hover:text-[#F4F6F8] border border-white/[0.08] text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-lg bg-[#151311] hover:bg-[#1B1815] text-[#8D8982] hover:text-[#F7F4EC] border border-[#211D19] hover:border-[#AD956C]/30 text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <span>Refresh Ledger</span>
           </button>
         </div>
 
         {usageEvents.length === 0 ? (
-          <div className="py-12 text-center text-[#64748B] font-mono text-xs border border-dashed border-white/[0.06] rounded-[8px] bg-[#050608]">
+          <div className="py-12 text-center text-[#625F5A] font-mono text-xs border border-dashed border-[#211D19] rounded-lg bg-[#0B0A09]">
             No metered background operations recorded yet. Perform a website compliance audit or regulation compilation to generate live telemetry.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-white/[0.06] text-[#64748B] font-mono">
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Timestamp (UTC)</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Operation Type</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Operation ID / Target</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Credits</th>
-                  <th className="pb-3 font-semibold text-right uppercase tracking-wider text-[11px]">Status</th>
+                <tr className="border-b border-[#211D19] text-[#8D8982] font-mono">
+                  <th className="pb-3 font-medium uppercase tracking-wider text-[11px]">Timestamp (UTC)</th>
+                  <th className="pb-3 font-medium uppercase tracking-wider text-[11px]">Operation Type</th>
+                  <th className="pb-3 font-medium uppercase tracking-wider text-[11px]">Operation ID / Target</th>
+                  <th className="pb-3 font-medium uppercase tracking-wider text-[11px]">Credits</th>
+                  <th className="pb-3 font-medium text-right uppercase tracking-wider text-[11px]">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05] text-[#CBD5E1] font-mono">
+              <tbody className="divide-y divide-[#211D19] text-[#C9C4BA] font-mono">
                 {usageEvents.map((evt) => (
-                  <tr key={evt.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3.5 text-[#9CA3AF] text-[11px]">
+                  <tr key={evt.id} className="hover:bg-[#151311]/50 transition-colors">
+                    <td className="py-3.5 text-[#8D8982] text-[11px]">
                       {evt.created_at ? new Date(evt.created_at).toLocaleString() : 'Just now'}
                     </td>
-                    <td className="py-3.5 font-semibold text-[#F4F6F8] capitalize flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#4D8FCC]" />
+                    <td className="py-3.5 font-medium text-[#F7F4EC] capitalize flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#607D96]" />
                       {evt.operation_type.replace(/_/g, ' ')}
                     </td>
-                    <td className="py-3.5 text-[#9CA3AF] truncate max-w-[220px]" title={evt.operation_id}>
+                    <td className="py-3.5 text-[#8D8982] truncate max-w-[220px]" title={evt.operation_id}>
                       {evt.metadata?.target_url || evt.metadata?.regulation_name || evt.metadata?.acronym || evt.operation_id}
                     </td>
-                    <td className="py-3.5 text-[#C9B88A] font-bold">
+                    <td className="py-3.5 text-[#AD956C] font-semibold">
                       {evt.credits_consumed > 0 ? `-${evt.credits_consumed} Action` : '0 (Exempt)'}
                     </td>
                     <td className="py-3.5 text-right">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-[10px] uppercase font-bold tracking-wider ${
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-[10px] uppercase font-medium tracking-wider ${
                         evt.status === 'completed'
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30'
                           : evt.status === 'reserved'
-                          ? 'bg-[#4D8FCC]/15 text-[#93C5FD] border border-[#4D8FCC]/30'
-                          : 'bg-[#0B0E14] text-[#9CA3AF] border border-white/[0.06]'
+                          ? 'bg-[#344D63]/20 text-[#607D96] border border-[#344D63]/40'
+                          : 'bg-[#151311] text-[#8D8982] border border-[#211D19]'
                       }`}>
                         {evt.status}
                       </span>
@@ -344,50 +344,50 @@ export default function BillingPage() {
       </div>
 
       {/* Plan Feature Comparison Table */}
-      <div className="p-6 sm:p-8 rounded-xl bg-[#0E1218] border border-[var(--rc-border)] shadow-sm">
-        <h3 className="text-base font-extrabold text-white mb-4 flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-xl bg-[#100E0D] border border-[#211D19] shadow-sm">
+        <h3 className="text-base font-semibold text-[#F7F4EC] mb-4 flex items-center gap-2">
           <span>Plan Comparison & Metering Architecture</span>
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-[var(--rc-border)] text-[#64748B] font-mono">
-                <th className="pb-3.5 font-semibold uppercase tracking-wider text-[11px]">Capability</th>
-                <th className="pb-3.5 font-semibold uppercase tracking-wider text-[11px]">Free Tier</th>
-                <th className="pb-3.5 font-semibold uppercase tracking-wider text-[11px] text-[#93C5FD]">Pro Tier ($10.02/mo)</th>
-                <th className="pb-3.5 font-semibold uppercase tracking-wider text-[11px] text-emerald-400">Enterprise</th>
+              <tr className="border-b border-[#211D19] text-[#8D8982] font-mono">
+                <th className="pb-3.5 font-medium uppercase tracking-wider text-[11px]">Capability</th>
+                <th className="pb-3.5 font-medium uppercase tracking-wider text-[11px]">Free Tier</th>
+                <th className="pb-3.5 font-medium uppercase tracking-wider text-[11px] text-[#607D96]">Pro Tier ($10.02/mo)</th>
+                <th className="pb-3.5 font-medium uppercase tracking-wider text-[11px] text-[#718A79]">Enterprise</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--rc-border)] text-[#CBD5E1] font-sans">
-              <tr className="hover:bg-[#141922]/50 transition-colors">
-                <td className="py-3.5 font-medium text-white">Statutory Regulation Compilations</td>
-                <td className="py-3.5 font-mono text-[#94A3B8]">3 complimentary uses</td>
-                <td className="py-3.5 font-mono text-[#93C5FD] font-bold">Unlimited Direct AST</td>
-                <td className="py-3.5 font-mono text-emerald-400 font-bold">Unlimited Dedicated Core</td>
+            <tbody className="divide-y divide-[#211D19] text-[#C9C4BA] font-sans">
+              <tr className="hover:bg-[#151311]/50 transition-colors">
+                <td className="py-3.5 font-medium text-[#F7F4EC]">Statutory Regulation Compilations</td>
+                <td className="py-3.5 font-mono text-[#8D8982]">3 complimentary uses</td>
+                <td className="py-3.5 font-mono text-[#607D96] font-semibold">Unlimited Direct AST</td>
+                <td className="py-3.5 font-mono text-[#718A79] font-semibold">Unlimited Dedicated Core</td>
               </tr>
-              <tr className="hover:bg-[#141922]/50 transition-colors">
-                <td className="py-3.5 font-medium text-white">Automated Website Compliance Auditor</td>
-                <td className="py-3.5 font-mono text-[#94A3B8]">Included in 3 uses</td>
-                <td className="py-3.5 font-mono text-[#93C5FD] font-bold">Unlimited Live Scans</td>
-                <td className="py-3.5 font-mono text-emerald-400 font-bold">Continuous Automated Surveillance</td>
+              <tr className="hover:bg-[#151311]/50 transition-colors">
+                <td className="py-3.5 font-medium text-[#F7F4EC]">Automated Website Compliance Auditor</td>
+                <td className="py-3.5 font-mono text-[#8D8982]">Included in 3 uses</td>
+                <td className="py-3.5 font-mono text-[#607D96] font-semibold">Unlimited Live Scans</td>
+                <td className="py-3.5 font-mono text-[#718A79] font-semibold">Continuous Automated Surveillance</td>
               </tr>
-              <tr className="hover:bg-[#141922]/50 transition-colors">
-                <td className="py-3.5 font-medium text-white">24/7 Global Gazette Surveillance</td>
-                <td className="py-3.5 text-[#64748B] font-mono">Read-only</td>
-                <td className="py-3.5 text-zinc-200">Live Signals & Drift Alerts</td>
-                <td className="py-3.5 text-emerald-300">Custom Jurisdiction Watchdogs</td>
+              <tr className="hover:bg-[#151311]/50 transition-colors">
+                <td className="py-3.5 font-medium text-[#F7F4EC]">24/7 Global Gazette Surveillance</td>
+                <td className="py-3.5 text-[#625F5A] font-mono">Read-only</td>
+                <td className="py-3.5 text-[#C9C4BA]">Live Signals & Drift Alerts</td>
+                <td className="py-3.5 text-[#718A79]">Custom Jurisdiction Watchdogs</td>
               </tr>
-              <tr className="hover:bg-[#141922]/50 transition-colors">
-                <td className="py-3.5 font-medium text-white">Export Code Formats</td>
-                <td className="py-3.5 text-[#94A3B8] font-mono">JSON Policy AST</td>
-                <td className="py-3.5 text-zinc-200 font-mono">Rego • AST • Nginx • Next.js</td>
-                <td className="py-3.5 text-emerald-300 font-mono">Full CI/CD Pipeline Integrations</td>
+              <tr className="hover:bg-[#151311]/50 transition-colors">
+                <td className="py-3.5 font-medium text-[#F7F4EC]">Export Code Formats</td>
+                <td className="py-3.5 text-[#8D8982] font-mono">JSON Policy AST</td>
+                <td className="py-3.5 text-[#C9C4BA] font-mono">Rego • AST • Nginx • Next.js</td>
+                <td className="py-3.5 text-[#718A79] font-mono">Full CI/CD Pipeline Integrations</td>
               </tr>
-              <tr className="hover:bg-[#141922]/50 transition-colors">
-                <td className="py-3.5 font-medium text-white">Billing & Invoicing SLA</td>
-                <td className="py-3.5 text-[#64748B] font-mono">—</td>
-                <td className="py-3.5 text-zinc-200">Dodo Payments Instant Webhook</td>
-                <td className="py-3.5 text-emerald-300">Custom Invoicing & SLA Guarantee</td>
+              <tr className="hover:bg-[#151311]/50 transition-colors">
+                <td className="py-3.5 font-medium text-[#F7F4EC]">Billing & Invoicing SLA</td>
+                <td className="py-3.5 text-[#625F5A] font-mono">—</td>
+                <td className="py-3.5 text-[#C9C4BA]">Dodo Payments Instant Webhook</td>
+                <td className="py-3.5 text-[#718A79]">Custom Invoicing & SLA Guarantee</td>
               </tr>
             </tbody>
           </table>

@@ -22,14 +22,14 @@ export function SecurityTraceability() {
     <section id="security" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
       {/* Title */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#080A0E] border border-[var(--rc-border-subtle)] text-[#93C5FD] text-xs font-mono font-medium uppercase tracking-wider mb-4">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#4D8FCC]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#AD956C]" />
           Traceability &amp; Integrity
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F6F8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
           Tamper-Evident Cryptographic Auditability
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#94A3B8] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           Every compliance check emits an immutable cryptographic hash, formal pass/fail outcome, and automated audit trail. Generate verifiable regulatory dossiers in milliseconds.
         </p>
       </div>
@@ -37,9 +37,9 @@ export function SecurityTraceability() {
       {/* Grid: 5-Stage System Trace Graph (Left) & Audit Trail Ledger (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Left Column: Trace Pipeline (7 cols) */}
-        <div className="lg:col-span-7 p-6 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] text-left flex flex-col justify-between">
+        <div className="lg:col-span-7 p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] text-left flex flex-col justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
           <div>
-            <div className="font-mono text-xs text-[#4D8FCC] uppercase tracking-wider mb-4 font-bold">
+            <div className="font-mono text-xs text-[#AD956C] uppercase tracking-wider mb-4 font-bold">
               SYSTEM INTEGRITY GRAPH // VERIFICATION PIPELINE
             </div>
             
@@ -47,18 +47,18 @@ export function SecurityTraceability() {
               {TRACE_PIPELINE.map((p, idx) => (
                 <div 
                   key={p.step} 
-                  className="p-3.5 rounded-lg bg-[#050608] border border-[var(--rc-border)] flex items-center justify-between"
+                  className="p-3.5 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)] flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded bg-[#10141A] text-[#4D8FCC] flex items-center justify-center text-[10px] font-bold">
+                    <span className="w-6 h-6 rounded bg-[#1B1815] text-[#AD956C] flex items-center justify-center text-[10px] font-bold">
                       0{idx + 1}
                     </span>
                     <div>
-                      <div className="text-xs font-bold text-[#F4F6F8]">{p.label}</div>
-                      <div className="text-[11px] text-[#94A3B8]">{p.desc}</div>
+                      <div className="text-xs font-bold text-[#F7F4EC]">{p.label}</div>
+                      <div className="text-[11px] text-[#C9C4BA]">{p.desc}</div>
                     </div>
                   </div>
-                  <span className="text-[10px] text-[#93C5FD] bg-[#4D8FCC]/15 px-2 py-0.5 rounded border border-[#4D8FCC]/30 shrink-0 font-bold">
+                  <span className="text-[10px] text-[#C9C4BA] bg-[#3F5C74]/20 px-2 py-0.5 rounded border border-[#3F5C74]/40 shrink-0 font-bold">
                     {p.step}
                   </span>
                 </div>
@@ -66,20 +66,20 @@ export function SecurityTraceability() {
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-[var(--rc-border)] flex items-center justify-between text-[11px] font-mono text-[#64748B]">
+          <div className="mt-5 pt-3 border-t border-[rgba(201,196,186,0.08)] flex items-center justify-between text-[11px] font-mono text-[#8D8982]">
             <span>HASH ALGORITHM: SHA-256</span>
-            <span className="text-[#10B981]">IMMUTABLE AUDIT LOGS</span>
+            <span className="text-[#718A79]">IMMUTABLE AUDIT LOGS</span>
           </div>
         </div>
 
         {/* Right Column: Live Audit Proof Ledger (5 cols) */}
-        <div className="lg:col-span-5 p-6 rounded-xl bg-[#080A0E] border border-[var(--rc-border)] text-left flex flex-col justify-between font-mono">
+        <div className="lg:col-span-5 p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] text-left flex flex-col justify-between font-mono shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
           <div>
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--rc-border)]">
-              <span className="text-xs text-[#4D8FCC] uppercase tracking-wider font-bold">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[rgba(201,196,186,0.08)]">
+              <span className="text-xs text-[#AD956C] uppercase tracking-wider font-bold">
                 CRYPTOGRAPHIC AUDIT TRAIL
               </span>
-              <span className="text-[10px] text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30 font-bold">
+              <span className="text-[10px] text-[#718A79] bg-[#718A79]/15 px-2 py-0.5 rounded border border-[#718A79]/30 font-bold">
                 PROVABLE
               </span>
             </div>
@@ -88,13 +88,13 @@ export function SecurityTraceability() {
               {AUDIT_LEDGER.map((item) => (
                 <div 
                   key={item.id} 
-                  className="p-3 rounded-lg bg-[#050608] border border-[var(--rc-border)]"
+                  className="p-3 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)]"
                 >
                   <div className="flex items-center justify-between text-[11px] mb-1">
-                    <span className="text-[#F4F6F8] font-bold">{item.citation}</span>
-                    <span className="text-[#10B981] font-semibold">{item.status}</span>
+                    <span className="text-[#F7F4EC] font-bold">{item.citation}</span>
+                    <span className="text-[#718A79] font-semibold">{item.status}</span>
                   </div>
-                  <div className="text-[10px] text-[#64748B] flex items-center justify-between">
+                  <div className="text-[10px] text-[#8D8982] flex items-center justify-between">
                     <span>DIGEST: {item.hash}</span>
                     <span>{item.latency}</span>
                   </div>
@@ -103,9 +103,9 @@ export function SecurityTraceability() {
             </div>
           </div>
 
-          <div className="mt-5 pt-3 border-t border-[var(--rc-border)] text-[11px] text-[#64748B] flex items-center justify-between">
+          <div className="mt-5 pt-3 border-t border-[rgba(201,196,186,0.08)] text-[11px] text-[#8D8982] flex items-center justify-between">
             <span>EXPORT: JSON-LD &amp; PDF</span>
-            <span className="text-[#4D8FCC]">ZERO DRIFT TOLERANCE</span>
+            <span className="text-[#AD956C]">ZERO DRIFT TOLERANCE</span>
           </div>
         </div>
       </div>

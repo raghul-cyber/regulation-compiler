@@ -121,14 +121,14 @@ export function TopNav() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-[#050608]/85 backdrop-blur-md border-b border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.6)]'
+            ? 'bg-[#080706]/90 backdrop-blur-md border-b border-[rgba(201,196,186,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.7)]'
             : 'bg-transparent border-b border-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-14 sm:h-16">
           {/* Brand Wordmark */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-[6px] bg-[#080A0E] border border-white/[0.08] flex items-center justify-center p-1 shadow-sm shrink-0">
+            <div className="w-7 h-7 rounded-[6px] bg-[#151311] border border-[rgba(201,196,186,0.08)] flex items-center justify-center p-1 shadow-sm shrink-0">
               <Image
                 src="/icon.png"
                 alt="RegCompiler Logo"
@@ -139,33 +139,33 @@ export function TopNav() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-sans font-bold text-sm tracking-tight text-[#F4F6F8]">
+              <span className="font-sans font-bold text-sm tracking-tight text-[#F7F4EC]">
                 RegCompiler
               </span>
-              <span className="font-mono text-[9px] tracking-wider text-[#64748B] uppercase leading-none">
+              <span className="font-mono text-[9px] tracking-wider text-[#8D8982] uppercase leading-none">
                 REGULATION AS CODE
               </span>
             </div>
           </Link>
 
           {/* Center: Editorial Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs text-[#9CA3AF] font-medium tracking-wide">
-            <a href="#product" className="hover:text-[#F4F6F8] transition-colors">
+          <nav className="hidden lg:flex items-center gap-6 text-xs text-[#C9C4BA] font-medium tracking-wide">
+            <a href="#product" className="hover:text-[#F7F4EC] transition-colors">
               Product
             </a>
-            <a href="#problem" className="hover:text-[#F4F6F8] transition-colors">
+            <a href="#problem" className="hover:text-[#F7F4EC] transition-colors">
               The Problem
             </a>
-            <a href="#how-it-works" className="hover:text-[#F4F6F8] transition-colors">
+            <a href="#how-it-works" className="hover:text-[#F7F4EC] transition-colors">
               How It Works
             </a>
-            <a href="#architecture" className="hover:text-[#F4F6F8] transition-colors">
+            <a href="#architecture" className="hover:text-[#F7F4EC] transition-colors">
               Architecture
             </a>
-            <a href="#security" className="hover:text-[#F4F6F8] transition-colors">
+            <a href="#security" className="hover:text-[#F7F4EC] transition-colors">
               Security
             </a>
-            <a href="#use-cases" className="hover:text-[#F4F6F8] transition-colors">
+            <a href="#use-cases" className="hover:text-[#F7F4EC] transition-colors">
               Use Cases
             </a>
           </nav>
@@ -176,11 +176,11 @@ export function TopNav() {
               <UsageIndicator />
               <Link href="/dashboard">
                 <button
-                  className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs active:scale-[0.98] shadow-sm border border-[#79B5EC]/20"
+                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs active:scale-[0.98] shadow-sm border border-[#4B6982]/30"
                 >
-                  <LayoutDashboard className="w-3.5 h-3.5 text-blue-100" />
+                  <LayoutDashboard className="w-3.5 h-3.5 text-[#AD956C]" />
                   <span>Dashboard</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#C9C4BA]" />
                 </button>
               </Link>
               <UserButton />
@@ -188,13 +188,13 @@ export function TopNav() {
 
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-                <button className="text-xs text-[#9CA3AF] hover:text-[#F4F6F8] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
+                <button className="text-xs text-[#C9C4BA] hover:text-[#F7F4EC] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
                   Sign In
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <button
-                  className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs shadow-sm border border-[#79B5EC]/20 active:scale-[0.98]"
+                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
                 >
                   <span>Start Compiling</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -205,7 +205,7 @@ export function TopNav() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-[#9CA3AF] hover:text-[#F4F6F8] rounded-[6px] hover:bg-white/[0.04] transition-colors"
+              className="lg:hidden p-1.5 text-[#C9C4BA] hover:text-[#F7F4EC] rounded-[6px] hover:bg-white/[0.04] transition-colors"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -215,58 +215,58 @@ export function TopNav() {
 
         {/* Mobile Menu Overlay for Landing */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-white/[0.06] bg-[#050608]/98 backdrop-blur-xl px-4 py-4 space-y-2 text-xs font-medium text-[#9CA3AF] shadow-2xl">
+          <div className="lg:hidden border-b border-[rgba(201,196,186,0.08)] bg-[#0B0A09]/98 backdrop-blur-xl px-4 py-4 space-y-2 text-xs font-medium text-[#C9C4BA] shadow-2xl">
             <a
               href="#product"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               Product
             </a>
             <a
               href="#problem"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               The Problem
             </a>
             <a
               href="#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               How It Works
             </a>
             <a
               href="#architecture"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               Architecture
             </a>
             <a
               href="#security"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               Security
             </a>
             <a
               href="#use-cases"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#F4F6F8]"
+              className="block py-2 hover:text-[#F7F4EC]"
             >
               Use Cases
             </a>
 
-            <div className="pt-3 border-t border-white/[0.06] flex flex-col gap-2">
+            <div className="pt-3 border-t border-[rgba(201,196,186,0.08)] flex flex-col gap-2">
               <Show when="signed-in">
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 text-center rounded-[6px] bg-[#4D8FCC] text-white font-medium text-xs flex items-center justify-center gap-1.5"
+                  className="py-2.5 text-center rounded-[6px] bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] font-medium text-xs flex items-center justify-center gap-1.5"
                 >
-                  <LayoutDashboard className="w-3.5 h-3.5 text-blue-100" />
+                  <LayoutDashboard className="w-3.5 h-3.5 text-[#AD956C]" />
                   <span>Open Dashboard</span>
                 </Link>
               </Show>
@@ -274,7 +274,7 @@ export function TopNav() {
                 <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 text-center rounded-[6px] bg-[#4D8FCC] text-white font-medium text-xs"
+                    className="w-full py-2.5 text-center rounded-[6px] bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] font-medium text-xs"
                   >
                     Start Compiling
                   </button>
@@ -291,12 +291,12 @@ export function TopNav() {
   // 2. STANDARD APPLICATION NAVIGATION (Dashboard, Regulations, Admin, etc.)
   // =========================================================================
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#050608]/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(201,196,186,0.08)] bg-[#080706]/90 backdrop-blur-md">
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex h-14 items-center justify-between">
         {/* Left: Logo/Wordmark & Telemetry */}
         <div className="flex items-center gap-5">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 rounded-[6px] overflow-hidden flex items-center justify-center p-1 bg-[#080A0E] border border-white/[0.08] shrink-0">
+            <div className="w-7 h-7 rounded-[6px] overflow-hidden flex items-center justify-center p-1 bg-[#151311] border border-[rgba(201,196,186,0.08)] shrink-0">
               <Image
                 src="/logo-icon.png"
                 alt="RegCompiler Logo"
@@ -307,18 +307,18 @@ export function TopNav() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-[#F4F6F8] leading-tight">
+              <span className="text-sm font-bold tracking-tight text-[#F7F4EC] leading-tight">
                 RegCompiler
               </span>
-              <span className="text-[9px] text-[#64748B] font-mono tracking-wider uppercase leading-none hidden sm:inline-block">
+              <span className="text-[9px] text-[#8D8982] font-mono tracking-wider uppercase leading-none hidden sm:inline-block">
                 STATUTORY COMPILER
               </span>
             </div>
           </Link>
 
           {/* Live Surveillance Status Beacon */}
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[10px] tracking-wider font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] bg-[#718A79]/15 border border-[#718A79]/30 text-[#8BA894] font-mono text-[10px] tracking-wider font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] inline-block animate-pulse" />
             <span>10 AUTHORITIES LIVE</span>
           </div>
 
@@ -344,11 +344,11 @@ export function TopNav() {
                     href="/dashboard" 
                     className={`px-3 py-1.5 rounded-l-[6px] font-medium transition-all flex items-center gap-1.5 ${
                       pathname.startsWith('/dashboard')
-                        ? 'text-white bg-[#0B0E14] border-y border-l border-white/[0.10] font-semibold shadow-sm'
-                        : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]'
+                        ? 'text-[#F7F4EC] bg-[#1B1815] border-y border-l border-[rgba(201,196,186,0.12)] font-semibold shadow-sm'
+                        : 'text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50'
                     }`}
                   >
-                    <LayoutDashboard className="w-3.5 h-3.5 text-[#79B5EC]" />
+                    <LayoutDashboard className="w-3.5 h-3.5 text-[#AD956C]" />
                     <span>Dashboard</span>
                   </Link>
                   <button
@@ -359,24 +359,24 @@ export function TopNav() {
                     }}
                     className={`px-1.5 py-1.5 rounded-r-[6px] transition-all flex items-center justify-center cursor-pointer ${
                       pathname.startsWith('/dashboard')
-                        ? 'text-white bg-[#0B0E14] border-y border-r border-white/[0.10]'
-                        : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]'
+                        ? 'text-[#F7F4EC] bg-[#1B1815] border-y border-r border-[rgba(201,196,186,0.12)]'
+                        : 'text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50'
                     }`}
                     aria-label="Toggle Dashboard navigation menu"
                     aria-expanded={dashboardDropdownOpen}
                   >
-                    <ChevronDown className={`w-3 h-3 transition-transform duration-150 ${dashboardDropdownOpen ? 'rotate-180 text-[#79B5EC]' : ''}`} />
+                    <ChevronDown className={`w-3 h-3 transition-transform duration-150 ${dashboardDropdownOpen ? 'rotate-180 text-[#AD956C]' : ''}`} />
                   </button>
                 </div>
 
                 {/* Dashboard Flyout Menu */}
                 {dashboardDropdownOpen && (
-                  <div className="absolute left-0 top-full mt-1.5 w-80 p-2 rounded-xl bg-[#080A0E]/98 backdrop-blur-2xl border border-white/[0.08] shadow-[0_16px_40px_rgba(0,0,0,0.7)] z-50">
-                    <div className="px-2.5 py-1.5 mb-1 border-b border-white/[0.05] flex items-center justify-between">
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-[#64748B] font-semibold">
+                  <div className="absolute left-0 top-full mt-1.5 w-80 p-2 rounded-xl bg-[#151311]/98 backdrop-blur-2xl border border-[rgba(201,196,186,0.08)] shadow-[0_16px_40px_rgba(0,0,0,0.85)] z-50">
+                    <div className="px-2.5 py-1.5 mb-1 border-b border-[rgba(201,196,186,0.06)] flex items-center justify-between">
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-[#8D8982] font-semibold">
                         Dashboard Navigation
                       </span>
-                      <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                      <span className="text-[9px] font-mono text-[#8BA894] bg-[#718A79]/15 px-1.5 py-0.5 rounded border border-[#718A79]/30">
                         10 Nodes Live
                       </span>
                     </div>
@@ -389,23 +389,23 @@ export function TopNav() {
                             key={item.href}
                             href={item.href}
                             onClick={() => setDashboardDropdownOpen(false)}
-                            className="group flex items-start gap-2.5 p-2 rounded-lg hover:bg-white/[0.03] transition-all text-left"
+                            className="group flex items-start gap-2.5 p-2 rounded-lg hover:bg-[#1B1815] transition-all text-left"
                           >
-                            <div className="w-7 h-7 rounded-[6px] bg-[#0B0E14] border border-white/[0.06] flex items-center justify-center text-[#79B5EC] group-hover:text-white group-hover:border-[#4D8FCC]/30 group-hover:bg-[#4D8FCC]/10 shrink-0 mt-0.5 transition-all">
+                            <div className="w-7 h-7 rounded-[6px] bg-[#1B1815] border border-[rgba(201,196,186,0.08)] flex items-center justify-center text-[#AD956C] group-hover:text-[#F7F4EC] group-hover:border-[#AD956C]/30 shrink-0 mt-0.5 transition-all">
                               <Icon className="w-3.5 h-3.5" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-medium text-[#F4F6F8] group-hover:text-white truncate">
+                                <span className="text-xs font-medium text-[#F1EEE7] group-hover:text-white truncate">
                                   {item.title}
                                 </span>
                                 {item.badge && (
-                                  <span className="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-[#4D8FCC]/15 text-[#79B5EC] border border-[#4D8FCC]/25">
+                                  <span className="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-[#3F5C74]/20 text-[#7A9FBE] border border-[#3F5C74]/30">
                                     {item.badge}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-[#64748B] group-hover:text-[#9CA3AF] leading-tight mt-0.5 truncate">
+                              <p className="text-[10px] text-[#8D8982] group-hover:text-[#C9C4BA] leading-tight mt-0.5 truncate">
                                 {item.description}
                               </p>
                             </div>
@@ -447,11 +447,11 @@ export function TopNav() {
                 href="/regulations" 
                 className={`px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 ${
                   pathname.startsWith('/regulations') && !pathname.includes('/new')
-                    ? 'text-white bg-[#0B0E14] border border-white/[0.10] font-semibold'
-                    : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]'
+                    ? 'text-[#F7F4EC] bg-[#1B1815] border border-[rgba(201,196,186,0.12)] font-semibold'
+                    : 'text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50'
                 }`}
               >
-                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                <BookOpen className="w-3.5 h-3.5 text-[#AD956C]" />
                 <span>Regulations</span>
               </Link>
 
@@ -460,20 +460,20 @@ export function TopNav() {
                 href="/compliance-check" 
                 className={`px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 ${
                   pathname.startsWith('/compliance-check')
-                    ? 'text-white bg-[#0B0E14] border border-white/[0.10] font-semibold'
-                    : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]'
+                    ? 'text-[#F7F4EC] bg-[#1B1815] border border-[rgba(201,196,186,0.12)] font-semibold'
+                    : 'text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50'
                 }`}
               >
-                <Cpu className="w-3.5 h-3.5 text-slate-400" />
+                <Cpu className="w-3.5 h-3.5 text-[#AD956C]" />
                 <span>Simulator</span>
               </Link>
 
               {/* 24/7 Actions */}
               <Link 
                 href="/dashboard?tab=actions_24_7" 
-                className="px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]"
+                className="px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50"
               >
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <Zap className="w-3.5 h-3.5 text-[#C5B38B]" />
                 <span>24/7 Actions</span>
               </Link>
 
@@ -482,11 +482,11 @@ export function TopNav() {
                 href="/billing" 
                 className={`px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 ${
                   pathname.startsWith('/billing')
-                    ? 'text-white bg-[#0B0E14] border border-white/[0.10] font-semibold'
-                    : 'text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02]'
+                    ? 'text-[#F7F4EC] bg-[#1B1815] border border-[rgba(201,196,186,0.12)] font-semibold'
+                    : 'text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50'
                 }`}
               >
-                <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                <CreditCard className="w-3.5 h-3.5 text-[#AD956C]" />
                 <span>Billing</span>
               </Link>
 
@@ -496,7 +496,7 @@ export function TopNav() {
                   href="/admin" 
                   className={`px-3 py-1.5 rounded-[6px] font-medium transition-all flex items-center gap-1.5 ${
                     pathname.startsWith('/admin')
-                      ? 'text-white bg-[#0B0E14] border border-white/[0.10] font-semibold'
+                      ? 'text-[#F7F4EC] bg-[#1B1815] border border-[rgba(201,196,186,0.12)] font-semibold'
                       : 'text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/10'
                   }`}
                 >
@@ -510,22 +510,22 @@ export function TopNav() {
             {/* Signed-out Desktop Nav */}
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02] transition-all flex items-center gap-1.5 cursor-pointer">
-                  <LayoutDashboard className="w-3.5 h-3.5 text-[#79B5EC]" />
+                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50 transition-all flex items-center gap-1.5 cursor-pointer">
+                  <LayoutDashboard className="w-3.5 h-3.5 text-[#AD956C]" />
                   <span>Dashboard</span>
                 </button>
               </SignInButton>
 
               <SignInButton mode="modal" fallbackRedirectUrl="/regulations" signUpFallbackRedirectUrl="/regulations">
-                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02] transition-all flex items-center gap-1.5 cursor-pointer">
-                  <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50 transition-all flex items-center gap-1.5 cursor-pointer">
+                  <BookOpen className="w-3.5 h-3.5 text-[#AD956C]" />
                   <span>Regulations</span>
                 </button>
               </SignInButton>
 
               <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check" signUpFallbackRedirectUrl="/compliance-check">
-                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#9CA3AF] hover:text-[#F4F6F8] hover:bg-white/[0.02] transition-all flex items-center gap-1.5 cursor-pointer">
-                  <Cpu className="w-3.5 h-3.5 text-slate-400" />
+                <button className="px-3 py-1.5 rounded-[6px] font-medium text-[#C9C4BA] hover:text-[#F7F4EC] hover:bg-[#1B1815]/50 transition-all flex items-center gap-1.5 cursor-pointer">
+                  <Cpu className="w-3.5 h-3.5 text-[#AD956C]" />
                   <span>Simulator</span>
                 </button>
               </SignInButton>
@@ -539,7 +539,7 @@ export function TopNav() {
             <UsageIndicator />
             <Link href="/regulations/new">
               <button 
-                className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium text-xs px-3 py-1.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#79B5EC]/20 active:scale-[0.98]"
+                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-xs px-3 py-1.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
               >
                 <span>Upload Regulation</span>
               </button>
@@ -549,13 +549,13 @@ export function TopNav() {
 
           <Show when="signed-out">
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-              <button className="text-xs text-[#9CA3AF] hover:text-[#F4F6F8] px-2.5 py-1.5 transition-colors cursor-pointer font-medium">
+              <button className="text-xs text-[#C9C4BA] hover:text-[#F7F4EC] px-2.5 py-1.5 transition-colors cursor-pointer font-medium">
                 Sign In
               </button>
             </SignInButton>
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
               <button
-                className="bg-[#4D8FCC] hover:bg-[#3B72A8] text-white rounded-[6px] font-medium text-xs px-3.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#79B5EC]/20 active:scale-[0.98]"
+                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-xs px-3.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
               >
                 <span>Start Free</span>
               </button>
@@ -565,7 +565,7 @@ export function TopNav() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-[#9CA3AF] hover:text-[#F4F6F8] rounded-[6px] hover:bg-white/[0.04] transition-colors"
+            className="md:hidden p-1.5 text-[#C9C4BA] hover:text-[#F7F4EC] rounded-[6px] hover:bg-[#1B1815] transition-colors"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -574,7 +574,7 @@ export function TopNav() {
 
       {/* Mobile Menu for Authenticated App */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-white/[0.06] bg-[#050608]/98 backdrop-blur-xl px-4 py-3 space-y-2 text-xs font-medium text-[#9CA3AF]">
+        <div className="md:hidden border-b border-[rgba(201,196,186,0.08)] bg-[#0B0A09]/98 backdrop-blur-xl px-4 py-3 space-y-2 text-xs font-medium text-[#C9C4BA]">
           <Show when="signed-in">
             {/* Dashboard Accordion in Mobile */}
             <div>
@@ -583,24 +583,24 @@ export function TopNav() {
                   href="/dashboard" 
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-2 transition-colors ${
-                    pathname.startsWith('/dashboard') ? 'text-white font-semibold' : 'hover:text-[#F4F6F8]'
+                    pathname.startsWith('/dashboard') ? 'text-[#F7F4EC] font-semibold' : 'hover:text-[#F7F4EC]'
                   }`}
                 >
-                  <LayoutDashboard className="w-4 h-4 text-[#79B5EC]" />
+                  <LayoutDashboard className="w-4 h-4 text-[#AD956C]" />
                   <span>Dashboard</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileDashboardExpanded(!mobileDashboardExpanded)}
-                  className="p-1 text-[#64748B] hover:text-white"
+                  className="p-1 text-[#8D8982] hover:text-[#F7F4EC]"
                   aria-label="Toggle Dashboard sub-navigation"
                 >
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${mobileDashboardExpanded ? 'rotate-180 text-[#79B5EC]' : ''}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${mobileDashboardExpanded ? 'rotate-180 text-[#AD956C]' : ''}`} />
                 </button>
               </div>
 
               {mobileDashboardExpanded && (
-                <div className="ml-3 pl-2 border-l border-white/[0.06] my-1 space-y-1">
+                <div className="ml-3 pl-2 border-l border-[rgba(201,196,186,0.08)] my-1 space-y-1">
                   {DASHBOARD_VIEWS.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -608,14 +608,14 @@ export function TopNav() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between py-1 px-2 rounded hover:bg-white/[0.03] hover:text-white transition-colors"
+                        className="flex items-center justify-between py-1 px-2 rounded hover:bg-[#1B1815] hover:text-[#F7F4EC] transition-colors"
                       >
                         <div className="flex items-center gap-2">
-                          <Icon className="w-3.5 h-3.5 text-[#79B5EC]" />
+                          <Icon className="w-3.5 h-3.5 text-[#AD956C]" />
                           <span>{item.title}</span>
                         </div>
                         {item.badge && (
-                          <span className="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-[#4D8FCC]/20 text-[#79B5EC] border border-[#4D8FCC]/30">
+                          <span className="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-[#3F5C74]/20 text-[#7A9FBE] border border-[#3F5C74]/30">
                             {item.badge}
                           </span>
                         )}
@@ -626,7 +626,7 @@ export function TopNav() {
                     <Link
                       href="/dashboard?tab=swarm"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between py-1 px-2 rounded hover:bg-white/[0.03] text-amber-400 hover:text-amber-300 transition-colors"
+                      className="flex items-center justify-between py-1 px-2 rounded hover:bg-[#1B1815] text-amber-400 hover:text-amber-300 transition-colors"
                     >
                       <div className="flex items-center gap-2">
                         <ShieldAlert className="w-3.5 h-3.5" />
@@ -644,27 +644,27 @@ export function TopNav() {
             <Link 
               href="/regulations" 
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 hover:text-[#F4F6F8]"
+              className="flex items-center gap-2 py-2 hover:text-[#F7F4EC]"
             >
-              <BookOpen className="w-4 h-4 text-slate-400" />
+              <BookOpen className="w-4 h-4 text-[#AD956C]" />
               <span>Regulations</span>
             </Link>
 
             <Link 
               href="/compliance-check" 
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 hover:text-[#F4F6F8]"
+              className="flex items-center gap-2 py-2 hover:text-[#F7F4EC]"
             >
-              <Cpu className="w-4 h-4 text-slate-400" />
+              <Cpu className="w-4 h-4 text-[#AD956C]" />
               <span>Simulator</span>
             </Link>
 
             <Link 
               href="/billing" 
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 hover:text-[#F4F6F8]"
+              className="flex items-center gap-2 py-2 hover:text-[#F7F4EC]"
             >
-              <CreditCard className="w-4 h-4 text-slate-400" />
+              <CreditCard className="w-4 h-4 text-[#AD956C]" />
               <span>Billing</span>
             </Link>
 
@@ -679,11 +679,11 @@ export function TopNav() {
               </Link>
             )}
 
-            <div className="pt-2 border-t border-white/[0.06]">
+            <div className="pt-2 border-t border-[rgba(201,196,186,0.08)]">
               <Link 
                 href="/regulations/new" 
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-2 text-center rounded-[6px] bg-[#4D8FCC] text-white font-medium"
+                className="block w-full py-2 text-center rounded-[6px] bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] font-medium"
               >
                 Upload Regulation
               </Link>
@@ -694,27 +694,27 @@ export function TopNav() {
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F4F6F8] cursor-pointer"
+                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F7F4EC] cursor-pointer"
               >
-                <LayoutDashboard className="w-4 h-4 text-[#79B5EC]" />
+                <LayoutDashboard className="w-4 h-4 text-[#AD956C]" />
                 <span>Dashboard</span>
               </button>
             </SignInButton>
             <SignInButton mode="modal" fallbackRedirectUrl="/regulations" signUpFallbackRedirectUrl="/regulations">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F4F6F8] cursor-pointer"
+                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F7F4EC] cursor-pointer"
               >
-                <BookOpen className="w-4 h-4 text-slate-400" />
+                <BookOpen className="w-4 h-4 text-[#AD956C]" />
                 <span>Regulations</span>
               </button>
             </SignInButton>
             <SignInButton mode="modal" fallbackRedirectUrl="/compliance-check" signUpFallbackRedirectUrl="/compliance-check">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F4F6F8] cursor-pointer"
+                className="flex items-center gap-2 w-full text-left py-2 hover:text-[#F7F4EC] cursor-pointer"
               >
-                <Cpu className="w-4 h-4 text-slate-400" />
+                <Cpu className="w-4 h-4 text-[#AD956C]" />
                 <span>Simulator</span>
               </button>
             </SignInButton>
