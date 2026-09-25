@@ -95,14 +95,20 @@ export default function NewRegulationPage() {
 
   const fetchFrameworks = async () => {
     try {
-      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      if (isRemote) {
+      setLoadingFrameworks(true);
+      setError(null);
+
+      // Prefer Server Action first: executes on Next.js server, completely bypassing browser CSP and CORS limitations
+      try {
         const res = await getFrameworksAction();
-        if (res.success && Array.isArray(res.data)) {
+        if (res?.success && Array.isArray(res.data)) {
           setFrameworks(res.data);
           return;
         }
+      } catch (saErr) {
+        console.warn('[Frameworks] Server action fallback to client fetch', saErr);
       }
+
       const token = await getToken();
       const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
@@ -170,22 +176,25 @@ export default function NewRegulationPage() {
       }
 
       let responseData: any = null;
-      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      
-      if (isRemote) {
-        // On remote domains (e.g. Vercel), use Server Action directly to eliminate cross-origin preflight/CORS errors
+      let uploadActionSucceeded = false;
+
+      // Prefer Server Action first: eliminates cross-origin and CSP limitations
+      try {
         const res = await uploadRegulationServerAction(formData);
-        if (!res.success) {
-          if (res.isPaymentRequired) {
-            setIsLimitReached(true);
-            setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
-            setIsPaywallOpen(true);
-            return;
-          }
-          throw new Error(res.error || "Upload failed");
+        if (res.success) {
+          responseData = res.data;
+          uploadActionSucceeded = true;
+        } else if (res.isPaymentRequired) {
+          setIsLimitReached(true);
+          setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
+          setIsPaywallOpen(true);
+          return;
         }
-        responseData = res.data;
-      } else {
+      } catch (saErr) {
+        console.warn('[Upload] Server action fallback to client fetch', saErr);
+      }
+
+      if (!uploadActionSucceeded) {
         try {
           const directRes = await fetch(`${apiUrl}/regulations/upload`, {
             method: 'POST',
@@ -262,22 +271,24 @@ export default function NewRegulationPage() {
     setError(null);
     try {
       setIngesting(acronym);
-      const isRemote = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
       let data: any = null;
-
-      if (isRemote) {
+      let serverActionSucceeded = false;
+      try {
         const res = await ingestFrameworkAction(acronym);
-        if (!res.success) {
-          if (res.isPaymentRequired) {
-            setIsLimitReached(true);
-            setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
-            setIsPaywallOpen(true);
-            return;
-          }
-          throw new Error(res.error || "Failed to ingest framework");
+        if (res.success) {
+          data = res.data;
+          serverActionSucceeded = true;
+        } else if (res.isPaymentRequired) {
+          setIsLimitReached(true);
+          setPaywallData({ used: res.freeUsesUsed || 3, limit: res.freeUsesLimit || 3 });
+          setIsPaywallOpen(true);
+          return;
         }
-        data = res.data;
-      } else {
+      } catch (saErr) {
+        console.warn('[IngestFramework] Server action fallback to client fetch', saErr);
+      }
+
+      if (!serverActionSucceeded) {
         const token = await getToken();
         const apiUrl = getApiUrl();
         const headers: Record<string, string> = {};
