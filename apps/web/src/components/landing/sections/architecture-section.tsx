@@ -52,25 +52,25 @@ export function ArchitectureSection() {
 
   return (
     <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
-      {/* Control Room Atmosphere (Deep Sapphire & Titanium Reflections) */}
+      {/* Control Room Atmosphere (Deep Sapphire & Graphite Reflections) */}
       <div 
         className="absolute top-1/2 right-10 -translate-y-1/2 w-[680px] h-[460px] rounded-full blur-[150px] pointer-events-none -z-10"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.30) 0%, rgba(20, 28, 36, 0.14) 50%, transparent 80%)',
+          background: 'radial-gradient(ellipse at center, rgba(77, 120, 160, 0.28) 0%, rgba(23, 36, 51, 0.14) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
 
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
-          <Layers className="w-3.5 h-3.5 text-[#C7AF7B]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
+          <Layers className="w-3.5 h-3.5 text-[#BCA77B]" />
           Technical Stack
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
           Enterprise Architecture
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed">
           Engineered as a deterministic compiler pipeline. Every statutory input traces directly to an immutable, machine-verifiable enforcement outcome.
         </p>
       </div>
@@ -82,29 +82,29 @@ export function ArchitectureSection() {
           return (
             <div
               key={layer.step}
-              className="p-5 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left shadow-[0_8px_24px_rgba(8,7,6,0.65)]"
+              className="p-5 rounded-xl rc-glass-smoked border border-[rgba(199,204,210,0.12)] hover:border-[rgba(188,167,123,0.35)] hover:bg-[#171C23]/90 transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left shadow-[0_8px_24px_rgba(9,11,15,0.65)]"
             >
               <div className="flex items-start md:items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.08)] text-[#C7AF7B] shrink-0">
+                <div className="p-3 rounded-lg bg-[#171C23] border border-[rgba(199,204,210,0.10)] text-[#BCA77B] shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[#C7AF7B] font-bold">
+                    <span className="font-mono text-xs text-[#BCA77B] font-bold">
                       LAYER {layer.step}
                     </span>
-                    <span className="text-[#625F5A]">•</span>
-                    <h3 className="text-base font-bold text-[#F4F0E8]">
+                    <span className="text-[#656C74]">•</span>
+                    <h3 className="text-base font-bold text-[#FAF9F5]">
                       {layer.name}
                     </h3>
                   </div>
-                  <p className="text-xs text-[#C9C4BA] max-w-2xl leading-relaxed">
+                  <p className="text-xs text-[#C7CCD2] max-w-2xl leading-relaxed">
                     {layer.desc}
                   </p>
                 </div>
               </div>
 
-              <div className="font-mono text-[11px] text-[#B7B4AC] bg-[#10100F] px-3 py-1.5 rounded-lg border border-[rgba(220,210,190,0.08)] shrink-0">
+              <div className="font-mono text-[11px] text-[#AAB1BA] bg-[#0C0F14] px-3 py-1.5 rounded-lg border border-[rgba(199,204,210,0.08)] shrink-0">
                 {layer.tech}
               </div>
             </div>

@@ -397,36 +397,36 @@ export function LiveSurveillanceFeed({
       case 'EU': return 'bg-[#344D63]/25 text-[#607D96] border-[#344D63]/50';
       case 'US': return 'bg-[#718A79]/20 text-[#718A79] border-[#718A79]/40';
       case 'UK': return 'bg-[#4B6982]/20 text-[#C9C4BA] border-[#344D63]/40';
-      case 'SG': return 'bg-[#AD956C]/20 text-[#AD956C] border-[#AD956C]/40';
-      case 'CA': return 'bg-[#9A5D62]/20 text-[#9A5D62] border-[#9A5D62]/40';
-      case 'GLOBAL': return 'bg-[#20171C] text-[#C9C4BA] border-[#351E24]';
-      default: return 'bg-[#151311] text-[#8D8982] border-[#211D19]';
+      case 'SG': return 'bg-[#BCA77B]/20 text-[#BCA77B] border-[#BCA77B]/40';
+      case 'CA': return 'bg-[#A96770]/20 text-[#A96770] border-[#A96770]/40';
+      case 'GLOBAL': return 'bg-[#30232F] text-[#C7CCD2] border-[#4A2830]';
+      default: return 'bg-[#12161C] text-[#969DA6] border-[#1D232B]';
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0B0A09] border border-[#211D19] rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full bg-[#0C0F14] border border-[#1D232B] rounded-xl overflow-hidden shadow-2xl">
       {/* Header Bar */}
-      <div className="p-4 border-b border-[#211D19] bg-[#151311]/90 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 border-b border-[#1D232B] bg-[#12161C]/90 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="relative flex items-center justify-center">
-            <Radio className={`w-4 h-4 ${isLive ? 'text-[#718A79] animate-pulse' : 'text-[#625F5A]'}`} />
+            <Radio className={`w-4 h-4 ${isLive ? 'text-[#76937F] animate-pulse' : 'text-[#656C74]'}`} />
             {isLive && (
-              <span className="absolute w-2 h-2 rounded-full bg-[#718A79] animate-ping opacity-75" />
+              <span className="absolute w-2 h-2 rounded-full bg-[#76937F] animate-ping opacity-75" />
             )}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-[#F7F4EC] tracking-wide uppercase">
+              <h3 className="text-sm font-bold text-[#FAF9F5] tracking-wide uppercase">
                 Live Regulatory Surveillance Feed
               </h3>
-              <span className={`px-2 py-0.5 text-[10px] font-extrabold rounded-full ${isLive ? 'bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30' : 'bg-[#1B1815] text-[#8D8982]'}`}>
+              <span className={`px-2 py-0.5 text-[10px] font-extrabold rounded-full ${isLive ? 'bg-[#76937F]/15 text-[#76937F] border border-[#76937F]/30' : 'bg-[#171C23] text-[#969DA6]'}`}>
                 {isLive ? '24/7 LIVE STREAM (1s)' : 'PAUSED'}
               </span>
             </div>
-            <p className="text-[11px] text-[#8D8982] flex items-center gap-1.5 mt-0.5 flex-wrap">
-              <span className="text-[#718A79] font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] animate-pulse" />
+            <p className="text-[11px] text-[#969DA6] flex items-center gap-1.5 mt-0.5 flex-wrap">
+              <span className="text-[#76937F] font-semibold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#76937F] animate-pulse" />
                 Continuous stream (1s)
               </span>
               <span>•</span>

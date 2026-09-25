@@ -440,36 +440,36 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.12)] shadow-[0_24px_64px_rgba(8,7,6,0.85)] text-[#F4F0E8] relative overflow-hidden">
+    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] shadow-[0_24px_64px_rgba(9,11,15,0.85)] text-[#FAF9F5] relative overflow-hidden">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[rgba(220,210,190,0.08)] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[rgba(199,204,210,0.08)] pb-6">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-8 h-8 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.12)] flex items-center justify-center text-[#C7AF7B] shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[#171C23] border border-[rgba(199,204,210,0.14)] flex items-center justify-center text-[#BCA77B] shadow-sm">
               <Globe className="w-4 h-4" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F4F0E8] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#FAF9F5] tracking-tight">
               Automated Website Compliance Auditor
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#718A79]/15 text-[#8BA894] border border-[#718A79]/35 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#76937F]/15 text-[#76937F] border border-[#76937F]/35 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#76937F]" />
               LIVE PROBE AGENT • STATUTORY AUDIT
             </span>
 
             {/* Authoritative Usage Entitlement Pill */}
             {billingStatus && !billingStatus.is_admin && !billingStatus.paid_access && (
-              <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#151311] border border-[#211D19] flex items-center gap-1.5">
-                <span className="text-[#8D8982]">Free Uses:</span>
-                <span className={isLimitReached ? "text-[#9A5D62] font-extrabold" : "text-[#AD956C] font-extrabold"}>
+              <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#12161C] border border-[rgba(199,204,210,0.12)] flex items-center gap-1.5">
+                <span className="text-[#969DA6]">Free Uses:</span>
+                <span className={isLimitReached ? "text-[#A96770] font-extrabold" : "text-[#BCA77B] font-extrabold"}>
                   {billingStatus.free_usage?.used ?? 0} / {billingStatus.free_usage?.limit ?? 3}
                 </span>
                 {isLimitReached && (
-                  <span className="text-[#AD956C] font-bold">• LOCKED</span>
+                  <span className="text-[#BCA77B] font-bold">• LOCKED</span>
                 )}
               </div>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-[#8D8982] mt-1.5 max-w-3xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#969DA6] mt-1.5 max-w-3xl leading-relaxed">
             Enter your website URL. Our autonomous auditor agent inspects live transport security, defense headers, cookie configurations, GDPR consent banners, and WCAG accessibility against statutory regulations.
           </p>
         </div>
@@ -480,9 +480,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               onClick={handleDownloadReport}
               variant="outline"
               size="sm"
-              className="text-xs font-semibold bg-[#151311] border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC] flex items-center gap-1.5 cursor-pointer"
+              className="text-xs font-semibold bg-[#12161C] border-[rgba(199,204,210,0.12)] text-[#C7CCD2] hover:text-[#FAF9F5] flex items-center gap-1.5 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#AD956C]" />
+              <Download className="w-3.5 h-3.5 text-[#BCA77B]" />
               <span>Export Audit (JSON)</span>
             </Button>
             <Button
@@ -495,7 +495,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               }}
               disabled={isAuditing}
               size="sm"
-              className="text-xs font-semibold bg-[#3F5C74] hover:bg-[#344D63] text-[#F1EEE7] flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="text-xs font-semibold rc-btn-sapphire-metal text-[#FAF9F5] flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isAuditing ? 'animate-spin' : ''}`} />
               <span>Re-Scan</span>
@@ -506,24 +506,24 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
       {/* Account Action Locked Alert Banner (when 3 free uses are exhausted) */}
       {isLimitReached && (
-        <div className="p-4 sm:p-5 rounded-xl bg-[#211A16] border border-[#AD956C]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[#F1EEE7] text-sm shadow-xl shadow-black/40 animate-in fade-in duration-300">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#30232F] border border-[#BCA77B]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[#F3F4F2] text-sm shadow-xl shadow-black/40 animate-in fade-in duration-300">
           <div className="flex items-start sm:items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1B1815] border border-[#AD956C]/40 flex items-center justify-center shrink-0 text-[#AD956C]">
+            <div className="w-10 h-10 rounded-xl bg-[#171C23] border border-[#BCA77B]/40 flex items-center justify-center shrink-0 text-[#BCA77B]">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-[#F7F4EC] flex items-center gap-2">
+              <div className="font-bold text-[#FAF9F5] flex items-center gap-2">
                 <span>Account Action Locked • 3/3 Free Uses Consumed</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-[#AD956C]/20 text-[#AD956C] border border-[#AD956C]/30">Upgrade Required</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-extrabold uppercase bg-[#BCA77B]/20 text-[#BCA77B] border border-[#BCA77B]/30">Upgrade Required</span>
               </div>
-              <p className="text-xs text-[#C9C4BA] mt-1 leading-relaxed">
+              <p className="text-xs text-[#C7CCD2] mt-1 leading-relaxed">
                 You have reached your limit of 3 free website compliance audits and regulation compilations. All audit actions are locked until you upgrade to the Pro plan.
               </p>
             </div>
           </div>
           <Button
             onClick={() => setIsPaywallOpen(true)}
-            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-[#AD956C] hover:bg-[#B9A47C] text-[#080706] font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-black/40 cursor-pointer flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-[#BCA77B] hover:bg-[#D0BE91] text-[#090B0F] font-bold text-xs uppercase tracking-wider shrink-0 shadow-lg shadow-black/40 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <Lock className="w-3.5 h-3.5" />
             <span>Upgrade to Pro ($10.02/mo)</span>
@@ -532,12 +532,12 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
       )}
 
       {/* Target URL Input Control Deck */}
-      <div className={`p-4 sm:p-5 rounded-xl bg-[#100E0D] border transition-all flex flex-col gap-4 ${isLimitReached ? 'border-[#AD956C]/30 opacity-90' : 'border-[#211D19]'}`}>
+      <div className={`p-4 sm:p-5 rounded-xl bg-[#0C0F14] border transition-all flex flex-col gap-4 ${isLimitReached ? 'border-[#BCA77B]/30 opacity-90' : 'border-[rgba(199,204,210,0.12)]'}`}>
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           {/* URL Input Bar */}
           <div className="relative flex-1">
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#625F5A] font-mono select-none">
-              <Lock className={`w-3.5 h-3.5 ${isLimitReached ? 'text-[#AD956C]' : 'text-[#625F5A]'}`} />
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#656C74] font-mono select-none">
+              <Lock className={`w-3.5 h-3.5 ${isLimitReached ? 'text-[#BCA77B]' : 'text-[#656C74]'}`} />
               <span>https://</span>
             </div>
             <input
@@ -566,23 +566,23 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               }}
               placeholder={isLimitReached ? "Account Action Locked — 3/3 Free Uses Consumed (Upgrade to Pro)" : "example.com or client-portal.org"}
               disabled={isAuditing || isLimitReached}
-              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-[#625F5A] focus:outline-none transition-all ${
+              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-[#656C74] focus:outline-none transition-all ${
                 isLimitReached 
-                  ? 'bg-[#151311] border-[#AD956C]/30 text-[#AD956C]/60 cursor-not-allowed' 
-                  : 'bg-[#080706] border-[#211D19] text-[#F1EEE7] focus:border-[#AD956C]'
+                  ? 'bg-[#12161C] border-[#BCA77B]/30 text-[#BCA77B]/60 cursor-not-allowed' 
+                  : 'bg-[#090B0F] border-[rgba(199,204,210,0.12)] text-[#FAF9F5] focus:border-[#BCA77B]'
               }`}
             />
           </div>
 
           {/* Depth Selector */}
-          <div className={`flex items-center gap-1 bg-[#080706] border border-[#211D19] p-1 rounded-lg text-xs font-mono ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className={`flex items-center gap-1 bg-[#090B0F] border border-[rgba(199,204,210,0.12)] p-1 rounded-lg text-xs font-mono ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
               onClick={() => setScanDepth('surface')}
               disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors ${
                 scanDepth === 'surface'
-                  ? 'bg-[#1B1815] text-[#F7F4EC] font-bold'
-                  : 'text-[#8D8982] hover:text-[#F1EEE7]'
+                  ? 'bg-[#171C23] text-[#FAF9F5] font-bold border border-[rgba(199,204,210,0.14)]'
+                  : 'text-[#969DA6] hover:text-[#FAF9F5]'
               }`}
             >
               Surface
@@ -592,11 +592,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               disabled={isAuditing || isLimitReached}
               className={`px-3 py-1.5 rounded transition-colors flex items-center gap-1.5 ${
                 scanDepth === 'deep'
-                  ? 'bg-[#3F5C74] text-[#F7F4EC] font-semibold shadow-sm'
-                  : 'text-[#8D8982] hover:text-[#C9C4BA]'
+                  ? 'bg-[#4D78A0] text-[#FAF9F5] font-semibold shadow-sm'
+                  : 'text-[#969DA6] hover:text-[#C7CCD2]'
               }`}
             >
-              <RCIcon name="system-probe" size={13} className="text-[#C9C4BA]" />
+              <RCIcon name="system-probe" size={13} className="text-[#C7CCD2]" />
               Deep Full-Stack
             </button>
           </div>
@@ -605,9 +605,9 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           {isLimitReached ? (
             <Button
               onClick={() => setIsPaywallOpen(true)}
-              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-[#C7AF7B]/20 hover:bg-[#C7AF7B]/30 text-[#C7AF7B] border border-[#C7AF7B]/40 shadow-lg shadow-black/40 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-[#BCA77B]/20 hover:bg-[#BCA77B]/30 text-[#BCA77B] border border-[#BCA77B]/40 shadow-lg shadow-black/40 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Lock className="w-4 h-4 text-[#C7AF7B]" />
+              <Lock className="w-4 h-4 text-[#BCA77B]" />
               <span>3/3 Used • Upgrade to Pro</span>
             </Button>
           ) : (
@@ -618,12 +618,12 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
             >
               {isAuditing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#C9C4BA]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#C7CCD2]" />
                   <span>Auditing Your Site...</span>
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 text-[#C7AF7B]" />
+                  <Zap className="w-4 h-4 text-[#BCA77B]" />
                   <span>Audit Your Site</span>
                 </>
               )}
@@ -1252,10 +1252,10 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs text-[#AD956C] font-medium hidden sm:inline">
+                          <span className="text-xs text-[#BCA77B] font-medium hidden sm:inline">
                             {isExpanded ? 'Hide Details' : 'Inspect Evidence'}
                           </span>
-                          <span className={`transform transition-transform text-[#8D8982] text-xs ${isExpanded ? 'rotate-180' : ''}`}>
+                          <span className={`transform transition-transform text-[#969DA6] text-xs ${isExpanded ? 'rotate-180' : ''}`}>
                             ▼
                           </span>
                         </div>
@@ -1263,13 +1263,13 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
 
                       {/* Expanded Details & Remediation AST */}
                       {isExpanded && (
-                        <div className="p-4 pt-0 border-t border-[#211D19] bg-[#0B0A09]/60 space-y-4 text-xs">
+                        <div className="p-4 pt-0 border-t border-[#1D232B] bg-[#0C0F14]/60 space-y-4 text-xs">
                           {/* Evidence Block */}
                           <div className="space-y-1">
-                            <span className="text-[#8D8982] font-semibold uppercase text-[10px] tracking-wider block">
+                            <span className="text-[#969DA6] font-semibold uppercase text-[10px] tracking-wider block">
                               Cryptographic / Telemetry Evidence:
                             </span>
-                            <div className="p-3 rounded-lg bg-[#080706] border border-[#211D19] font-mono text-[11px] text-[#C9C4BA] break-all select-all">
+                            <div className="p-3 rounded-lg bg-[#090B0F] border border-[#1D232B] font-mono text-[11px] text-[#C7CCD2] break-all select-all">
                               {finding.evidence}
                             </div>
                           </div>
@@ -1278,7 +1278,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                           {finding.remediation && (
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
-                                <span className="text-[#718A79] font-semibold uppercase text-[10px] tracking-wider block">
+                                <span className="text-[#76937F] font-semibold uppercase text-[10px] tracking-wider block">
                                   Recommended AST Remediation:
                                 </span>
                                 <div className="flex items-center gap-1 font-mono text-[11px]">

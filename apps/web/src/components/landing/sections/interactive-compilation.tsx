@@ -100,34 +100,34 @@ export function InteractiveCompilation() {
 
   return (
     <section id="interactive" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
-      {/* Topology Room Atmosphere (Sapphire & Titanium Reflection) */}
+      {/* Topology Room Atmosphere (Sapphire & Graphite Reflection) */}
       <div 
-        className="absolute top-1/3 left-10 w-[620px] h-[380px] rounded-full blur-[140px] pointer-events-none -z-10"
+        className="absolute top-1/3 left-10 w-[640px] h-[400px] rounded-full blur-[140px] pointer-events-none -z-10"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.24) 0%, rgba(23, 23, 22, 0.10) 50%, transparent 80%)',
+          background: 'radial-gradient(ellipse at center, rgba(77, 120, 160, 0.25) 0%, rgba(36, 43, 51, 0.12) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
 
       {/* Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
-          <Compass className="w-3.5 h-3.5 text-[#C7AF7B]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
+          <Compass className="w-3.5 h-3.5 text-[#BCA77B]" />
           Live Interactive Field
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
           See regulation become structure.
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed">
           Hover or select any regulatory node in the compliance field to inspect clause obligations, cross-framework dependencies, and deterministic validation outputs.
         </p>
       </div>
 
       {/* Main Interactive Field Canvas Container */}
-      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} relative w-full rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] p-6 md:p-8 overflow-hidden shadow-[0_32px_80px_rgba(8,7,6,0.85)]`}>
+      <div ref={contentRef} className={`landing-reveal ${contentRevealed ? 'revealed' : ''} relative w-full rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-6 md:p-8 overflow-hidden shadow-[0_32px_80px_rgba(9,11,15,0.85)]`}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
           {/* Interactive Topology Graph Area (7 Cols) */}
-          <div className="lg:col-span-7 relative h-[380px] rounded-xl bg-[#0B0A09] border border-[rgba(220,210,190,0.08)] p-4 flex items-center justify-center">
+          <div className="lg:col-span-7 relative h-[380px] rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.08)] p-4 flex items-center justify-center">
             {/* SVG Connecting Edges with animated dash flow */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               {NODES.map((n1) =>
@@ -143,8 +143,8 @@ export function InteractiveCompilation() {
                       y1={`${n1.y}%`}
                       x2={`${n2.x}%`}
                       y2={`${n2.y}%`}
-                      stroke={isEdgeActive ? '#C7AF7B' : 'rgba(220,210,190,0.08)'}
-                      strokeWidth={isEdgeActive ? 1.5 : 1}
+                      stroke={isEdgeActive ? '#BCA77B' : 'rgba(199,204,210,0.10)'}
+                      strokeWidth={isEdgeActive ? 1.6 : 1}
                       className="transition-all duration-300"
                       strokeDasharray={isEdgeActive ? '6 6' : '4 4'}
                     />
@@ -166,14 +166,14 @@ export function InteractiveCompilation() {
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
                   className={`absolute -translate-x-1/2 -translate-y-1/2 p-2.5 rounded-xl border font-mono text-xs transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#171716] border-[#C7AF7B] text-[#F4F0E8] scale-105 z-20 shadow-[0_4px_16px_rgba(199,175,123,0.25)]'
+                      ? 'bg-[#171C23] border-[#BCA77B] text-[#FAF9F5] scale-105 z-20 shadow-[0_4px_16px_rgba(188,167,123,0.3)]'
                       : isConnected
-                      ? 'bg-[#10100F] border-[#C7AF7B]/40 text-[#C9C4BA] z-10'
-                      : 'rc-glass-smoked border-[rgba(220,210,190,0.08)] text-[#8D8982] hover:text-[#C9C4BA] hover:border-[rgba(185,164,122,0.25)]'
+                      ? 'bg-[#12161C] border-[#BCA77B]/40 text-[#C7CCD2] z-10'
+                      : 'rc-glass-smoked border-[rgba(199,204,210,0.08)] text-[#969DA6] hover:text-[#C7CCD2] hover:border-[rgba(188,167,123,0.25)]'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 whitespace-nowrap">
-                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#C7AF7B]' : 'bg-[#625F5A]'} transition-all`} />
+                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#BCA77B]' : 'bg-[#656C74]'} transition-all`} />
                     <span className="font-semibold">{node.label}</span>
                   </div>
                 </button>
@@ -182,20 +182,20 @@ export function InteractiveCompilation() {
           </div>
 
           {/* Node Inspector Tooltip Card (5 Cols) */}
-          <div className="lg:col-span-5 p-6 rounded-xl bg-[#100E0D] border border-[rgba(201,196,186,0.08)] text-left flex flex-col justify-between font-mono">
+          <div className="lg:col-span-5 p-6 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.08)] text-left flex flex-col justify-between font-mono">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-[rgba(201,196,186,0.08)]">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-[rgba(199,204,210,0.08)]">
                 <div>
-                  <span className="text-[10px] text-[#AD956C] uppercase tracking-wider block font-bold">
+                  <span className="text-[10px] text-[#BCA77B] uppercase tracking-wider block font-bold">
                     {activeNode.framework}
                   </span>
-                  <h3 className="text-base font-bold text-[#F7F4EC] mt-0.5">
+                  <h3 className="text-base font-bold text-[#FAF9F5] mt-0.5">
                     {activeNode.label}
                   </h3>
                 </div>
-                <span className="text-[10px] text-[#718A79] bg-[#718A79]/15 px-2.5 py-1 rounded border border-[#718A79]/30 font-bold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-[#718A79]" />
+                <span className="text-[10px] text-[#76937F] bg-[#76937F]/15 px-2.5 py-1 rounded border border-[#76937F]/30 font-bold flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-[#76937F]" />
                   {activeNode.validation}
                 </span>
               </div>
@@ -203,27 +203,27 @@ export function InteractiveCompilation() {
               {/* Node Inspector Details */}
               <div className="space-y-3 text-xs">
                 <div>
-                  <div className="text-[10px] text-[#8D8982] uppercase tracking-wide">
+                  <div className="text-[10px] text-[#969DA6] uppercase tracking-wide">
                     CLAUSE CITATION
                   </div>
-                  <div className="text-[#F7F4EC] mt-0.5">{activeNode.clause}</div>
+                  <div className="text-[#FAF9F5] mt-0.5">{activeNode.clause}</div>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-[#8D8982] uppercase tracking-wide">
+                  <div className="text-[10px] text-[#969DA6] uppercase tracking-wide">
                     CROSS-FRAMEWORK DEPENDENCY
                   </div>
-                  <div className="text-[#C9C4BA] mt-0.5 flex items-center gap-1.5">
-                    <Link2 className="w-3 h-3 text-[#AD956C]" />
+                  <div className="text-[#C7CCD2] mt-0.5 flex items-center gap-1.5">
+                    <Link2 className="w-3 h-3 text-[#BCA77B]" />
                     {activeNode.dependency}
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-[10px] text-[#8D8982] uppercase tracking-wide">
+                  <div className="text-[10px] text-[#969DA6] uppercase tracking-wide">
                     DETERMINISTIC EVALUATION RULE
                   </div>
-                  <pre className="text-[11px] text-[#F1EEE7] bg-[#151311] p-2.5 rounded-lg border border-[rgba(201,196,186,0.08)] mt-1 overflow-x-auto">
+                  <pre className="text-[11px] text-[#F3F4F2] bg-[#12161C] p-2.5 rounded-lg border border-[rgba(199,204,210,0.08)] mt-1 overflow-x-auto">
                     <code>{activeNode.rule}</code>
                     <span className="landing-cursor" aria-hidden="true" />
                   </pre>
@@ -232,9 +232,9 @@ export function InteractiveCompilation() {
             </div>
 
             {/* Bottom Status */}
-            <div className="mt-5 pt-3 border-t border-[rgba(201,196,186,0.08)] flex items-center justify-between text-[11px] text-[#8D8982]">
+            <div className="mt-5 pt-3 border-t border-[rgba(199,204,210,0.08)] flex items-center justify-between text-[11px] text-[#969DA6]">
               <span>ACTIVE CONNECTIONS: {activeNode.connections.length}</span>
-              <span className="text-[#718A79] font-semibold">ZERO DRIFT</span>
+              <span className="text-[#76937F] font-semibold">ZERO DRIFT</span>
             </div>
           </div>
         </div>

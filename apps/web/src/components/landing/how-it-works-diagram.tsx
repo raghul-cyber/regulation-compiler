@@ -236,29 +236,29 @@ export function HowItWorksDiagram() {
               onClick={() => handleManualSwitch(idx)}
               className={`text-left p-4 rounded-xl border transition-all duration-200 relative group cursor-pointer overflow-hidden ${
                 isActive
-                  ? 'bg-[#1B1815] border-[#AD956C]/50 shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
-                  : 'bg-[#151311] border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] hover:bg-[#1B1815]'
+                  ? 'bg-[#171C23] border-[#BCA77B]/50 shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                  : 'bg-[#12161C] border-[rgba(200,180,135,0.10)] hover:border-[rgba(200,180,135,0.22)] hover:bg-[#171C23]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${isActive ? 'bg-[#AD956C]/15 text-[#C5B38B]' : 'bg-[#1B1815] text-[#8D8982]'} transition-colors`}>
+                <div className={`p-2 rounded-lg ${isActive ? 'bg-[#BCA77B]/15 text-[#CDB98B]' : 'bg-[#171C23] text-[#969DA6]'} transition-colors`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="font-mono text-xs font-bold text-[#8D8982] group-hover:text-[#C9C4BA]">
+                <span className="font-mono text-xs font-bold text-[#969DA6] group-hover:text-[#C7CCD2]">
                   {stage.step}
                 </span>
               </div>
 
-              <h4 className="text-sm font-bold text-[#F7F4EC] mb-1 group-hover:text-[#C5B38B] transition-colors">
+              <h4 className="text-sm font-bold text-[#FAF9F5] mb-1 group-hover:text-[#CDB98B] transition-colors">
                 {stage.title}
               </h4>
-              <p className="text-xs text-[#8D8982] line-clamp-1">
+              <p className="text-xs text-[#969DA6] line-clamp-1">
                 {stage.subtitle}
               </p>
 
               {/* Auto-rotate progress bar */}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#AD956C]" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#BCA77B]" />
               )}
             </button>
           );
@@ -266,20 +266,20 @@ export function HowItWorksDiagram() {
       </div>
 
       {/* Visual Workflow Diagram Box */}
-      <div className="rounded-2xl border border-[rgba(201,196,186,0.12)] bg-[#151311] p-6 md:p-8 shadow-[0_24px_64px_rgba(0,0,0,0.8)] relative overflow-hidden">
+      <div className="rounded-2xl border border-[rgba(200,180,135,0.14)] bg-[#12161C] p-6 md:p-8 shadow-[0_24px_64px_rgba(0,0,0,0.8)] relative overflow-hidden">
         {/* Top Header of Active Stage */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-[rgba(201,196,186,0.08)]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-[rgba(200,180,135,0.10)]">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-[#AD956C]/30 bg-[#AD956C]/10 text-[#C5B38B]">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-[#BCA77B]/30 bg-[#BCA77B]/10 text-[#CDB98B]">
                 Stage {activeStage.step}: {activeStage.badge}
               </span>
-              <span className="text-xs text-[#8D8982] font-mono flex items-center gap-1">
-                <Zap className="w-3 h-3 text-[#AD956C]" />
+              <span className="text-xs text-[#969DA6] font-mono flex items-center gap-1">
+                <Zap className="w-3 h-3 text-[#BCA77B]" />
                 Autonomous Execution
               </span>
             </div>
-            <h3 className="text-2xl font-extrabold text-[#F7F4EC] tracking-tight">
+            <h3 className="text-2xl font-extrabold text-[#FAF9F5] tracking-tight">
               {activeStage.title} — {activeStage.subtitle}
             </h3>
           </div>
@@ -288,16 +288,16 @@ export function HowItWorksDiagram() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleManualSwitch((activeStageIndex > 0 ? activeStageIndex - 1 : STAGES.length - 1))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.20)] text-[#C9C4BA] hover:text-[#F7F4EC] transition-all cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#171C23] border border-[rgba(200,180,135,0.12)] hover:border-[rgba(200,180,135,0.24)] text-[#C7CCD2] hover:text-[#FAF9F5] transition-all cursor-pointer"
             >
               Previous
             </button>
             <button
               onClick={() => handleManualSwitch((activeStageIndex < STAGES.length - 1 ? activeStageIndex + 1 : 0))}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] transition-all flex items-center gap-1 cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/25"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg rc-btn-sapphire-metal text-[#FAF9F5] transition-all flex items-center gap-1 cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#BCA77B]/25"
             >
               <span>Next Stage</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#AD956C]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#BCA77B]" />
             </button>
           </div>
         </div>
@@ -306,19 +306,19 @@ export function HowItWorksDiagram() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Stage Explanation & Highlights */}
           <div className="lg:col-span-5 space-y-6">
-            <p className="text-[#C9C4BA] text-sm md:text-base leading-relaxed">
+            <p className="text-[#C7CCD2] text-sm md:text-base leading-relaxed">
               {activeStage.description}
             </p>
 
             <div className="space-y-3 pt-2">
-              <h5 className="text-xs font-mono uppercase tracking-wider text-[#8D8982] font-bold flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#718A79]" />
+              <h5 className="text-xs font-mono uppercase tracking-wider text-[#969DA6] font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#76937F]" />
                 Key Operational Milestones
               </h5>
               <div className="space-y-2">
                 {activeStage.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#C9C4BA] bg-[#100E0D] border border-[rgba(201,196,186,0.08)] p-2.5 rounded-lg">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C] mt-1.5 shrink-0" />
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#C7CCD2] bg-[#0C0F14] border border-[rgba(200,180,135,0.10)] p-2.5 rounded-lg">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#BCA77B] mt-1.5 shrink-0" />
                     <span>{h}</span>
                   </div>
                 ))}
@@ -326,9 +326,9 @@ export function HowItWorksDiagram() {
             </div>
 
             {/* Pipeline Step Flow Mini-Bar */}
-            <div className="pt-4 border-t border-[rgba(201,196,186,0.08)] flex items-center justify-between text-xs text-[#8D8982] font-mono">
+            <div className="pt-4 border-t border-[rgba(200,180,135,0.10)] flex items-center justify-between text-xs text-[#969DA6] font-mono">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-[#718A79]" />
+                <span className="w-2 h-2 rounded-full bg-[#76937F]" />
                 Pipeline Health: 100% OPERATIONAL
               </span>
               <span>Stage {activeStageIndex + 1} of {STAGES.length}</span>
@@ -337,24 +337,24 @@ export function HowItWorksDiagram() {
 
           {/* Right Column: Code & AST Inspector with Syntax Highlighting */}
           <div className="lg:col-span-7">
-            <div className="rounded-xl border border-[rgba(201,196,186,0.08)] bg-[#100E0D] overflow-hidden shadow-xl">
-              <div className="px-4 py-2.5 bg-[#0D0B0A] border-b border-[rgba(201,196,186,0.08)] flex items-center justify-between">
+            <div className="rounded-xl border border-[rgba(200,180,135,0.10)] bg-[#0C0F14] overflow-hidden shadow-xl">
+              <div className="px-4 py-2.5 bg-[#090B0F] border-b border-[rgba(200,180,135,0.10)] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)]" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)]" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(200,180,135,0.16)]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(200,180,135,0.16)]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[rgba(200,180,135,0.16)]" />
                   </div>
-                  <span className="text-[11px] font-mono text-[#8D8982] ml-2 font-medium">
+                  <span className="text-[11px] font-mono text-[#969DA6] ml-2 font-medium">
                     {activeStage.codeTitle}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-[#8D8982] uppercase bg-[#151311] px-2 py-0.5 rounded border border-[rgba(201,196,186,0.08)]">
+                <span className="text-[10px] font-mono text-[#969DA6] uppercase bg-[#12161C] px-2 py-0.5 rounded border border-[rgba(200,180,135,0.10)]">
                   SYNTACTIC AST
                 </span>
               </div>
               <div className="p-4 overflow-x-auto max-h-[340px] custom-scrollbar">
-                <pre className="text-xs font-mono text-[#F1EEE7] leading-relaxed">
+                <pre className="text-xs font-mono text-[#FAF9F5] leading-relaxed">
                   <code>
                     <HighlightedJSON code={activeStage.codeSnippet} />
                     <span className="landing-cursor" aria-hidden="true" />

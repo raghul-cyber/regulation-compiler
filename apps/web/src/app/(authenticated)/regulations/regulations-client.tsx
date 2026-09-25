@@ -41,18 +41,18 @@ function getJurisdictionBadge(jurisdiction: string) {
   const code = (jurisdiction || '').toUpperCase();
   switch (code) {
     case 'EU':
-      return { label: 'EU • European Union', color: 'bg-[#344D63]/20 text-[#607D96] border-[#344D63]/40' };
+      return { label: 'EU • European Union', color: 'bg-[#4D78A0]/15 text-[#7299B4] border-[#4D78A0]/35' };
     case 'US':
-      return { label: 'US • United States', color: 'bg-[#718A79]/20 text-[#718A79] border-[#718A79]/40' };
+      return { label: 'US • United States', color: 'bg-[#76937F]/15 text-[#76937F] border-[#76937F]/35' };
     case 'CA':
-      return { label: 'CA • Canada', color: 'bg-[#9A5D62]/20 text-[#9A5D62] border-[#9A5D62]/40' };
+      return { label: 'CA • Canada', color: 'bg-[#A96770]/15 text-[#A96770] border-[#A96770]/35' };
     case 'UK':
-      return { label: 'UK • United Kingdom', color: 'bg-[#3F5C74]/20 text-[#8FA8BF] border-[#3F5C74]/40' };
+      return { label: 'UK • United Kingdom', color: 'bg-[#587F9F]/15 text-[#7299B4] border-[#587F9F]/35' };
     case 'SG':
-      return { label: 'SG • Singapore', color: 'bg-[#AD956C]/20 text-[#C5B38B] border-[#AD956C]/40' };
+      return { label: 'SG • Singapore', color: 'bg-[#BCA77B]/15 text-[#CDB98B] border-[#BCA77B]/35' };
     case 'GLOBAL':
     default:
-      return { label: 'GLOBAL • International', color: 'bg-[#151311] text-[#C9C4BA] border-[#211D19]' };
+      return { label: 'GLOBAL • International', color: 'bg-[#12161C] text-[#C7CCD2] border-[#1D232B]' };
   }
 }
 
@@ -158,78 +158,78 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
     <div className="space-y-8">
       {/* Top Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(200,180,135,0.12)] hover:border-[rgba(188,167,123,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Active Frameworks</span>
-            <Layers className="w-4 h-4 text-[#C7AF7B]" />
+            <span className="text-[10px] font-mono font-medium text-[#969DA6] uppercase tracking-wider">Active Frameworks</span>
+            <Layers className="w-4 h-4 text-[#BCA77B]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">{filteredRegulations.length}</span>
-            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Canonical</span>
+            <span className="text-2xl font-semibold text-[#FAF9F5] tracking-tight font-mono">{filteredRegulations.length}</span>
+            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#76937F]/15 border border-[#76937F]/30 uppercase">Canonical</span>
           </div>
-          <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">
+          <p className="mt-1.5 text-[11px] text-[#656C74] font-mono">
             {filteredRegulations.length === initialRegulations.length
               ? 'All official statutory acts'
               : `Filtered from ${initialRegulations.length} total`}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(200,180,135,0.12)] hover:border-[rgba(188,167,123,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Extracted Rules</span>
-            <FileText className="w-4 h-4 text-[#7A9FBE]" />
+            <span className="text-[10px] font-mono font-medium text-[#969DA6] uppercase tracking-wider">Extracted Rules</span>
+            <FileText className="w-4 h-4 text-[#648CAB]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">{totalRequirements}</span>
-            <span className="text-[10px] font-mono text-[#8BAAC4] font-medium px-1.5 py-0.5 rounded bg-[#263E55]/30 border border-[#486984]/40 uppercase">Enforceable</span>
+            <span className="text-2xl font-semibold text-[#FAF9F5] tracking-tight font-mono">{totalRequirements}</span>
+            <span className="text-[10px] font-mono text-[#7299B4] font-medium px-1.5 py-0.5 rounded bg-[#4D78A0]/15 border border-[#4D78A0]/35 uppercase">Enforceable</span>
           </div>
-          <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">Atomic compliance obligations</p>
+          <p className="mt-1.5 text-[11px] text-[#656C74] font-mono">Atomic compliance obligations</p>
         </div>
 
-        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(200,180,135,0.12)] hover:border-[rgba(188,167,123,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Jurisdictions</span>
-            <Globe2 className="w-4 h-4 text-[#718A79]" />
+            <span className="text-[10px] font-mono font-medium text-[#969DA6] uppercase tracking-wider">Jurisdictions</span>
+            <Globe2 className="w-4 h-4 text-[#76937F]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">
+            <span className="text-2xl font-semibold text-[#FAF9F5] tracking-tight font-mono">
               {selectedJurisdiction === 'ALL' ? availableJurisdictions.length : 1}
             </span>
-            <span className="text-[10px] font-mono text-[#C9C4BA] font-medium px-1.5 py-0.5 rounded bg-[#171716] border border-[rgba(220,210,190,0.10)] uppercase">Global</span>
+            <span className="text-[10px] font-mono text-[#C7CCD2] font-medium px-1.5 py-0.5 rounded bg-[#171C23] border border-[rgba(200,180,135,0.12)] uppercase">Global</span>
           </div>
-          <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono truncate">
+          <p className="mt-1.5 text-[11px] text-[#656C74] font-mono truncate">
             {selectedJurisdiction === 'ALL' ? availableJurisdictions.join(' • ') : selectedJurisdiction}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(200,180,135,0.12)] hover:border-[rgba(188,167,123,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Validation Health</span>
-            <CheckCircle2 className="w-4 h-4 text-[#718A79]" />
+            <span className="text-[10px] font-mono font-medium text-[#969DA6] uppercase tracking-wider">Validation Health</span>
+            <CheckCircle2 className="w-4 h-4 text-[#76937F]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">100%</span>
-            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Verified</span>
+            <span className="text-2xl font-semibold text-[#FAF9F5] tracking-tight font-mono">100%</span>
+            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#76937F]/15 border border-[#76937F]/30 uppercase">Verified</span>
           </div>
-          <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">0 Mock / Test entries</p>
+          <p className="mt-1.5 text-[11px] text-[#656C74] font-mono">0 Mock / Test entries</p>
         </div>
       </div>
 
       {/* Interactive Filter & Search Toolbar */}
-      <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
+      <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(200,180,135,0.12)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#625F5A]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#656C74]" />
           <Input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search regulations by name, topic, or keyword..."
-            className="pl-10 pr-8 bg-[#0B0A09] border-[rgba(220,210,190,0.10)] text-xs h-10 text-[#F4F0E8] placeholder:text-[#625F5A] focus-visible:ring-1 focus-visible:ring-[#C7AF7B] rounded-lg font-mono transition-colors"
+            className="pl-10 pr-8 bg-[#0C0F14] border-[rgba(200,180,135,0.12)] text-xs h-10 text-[#FAF9F5] placeholder:text-[#656C74] focus-visible:ring-1 focus-visible:ring-[#BCA77B] rounded-lg font-mono transition-colors"
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8D8982] hover:text-[#F4F0E8] cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969DA6] hover:text-[#FAF9F5] cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -238,15 +238,15 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
 
         {/* Jurisdiction Filters */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-[#8D8982] font-mono mr-1 flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-[#C7AF7B]" /> Region:
+          <span className="text-xs text-[#969DA6] font-mono mr-1 flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-[#BCA77B]" /> Region:
           </span>
           <button
             onClick={() => handleJurisdictionChange('ALL')}
             className={`px-3 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
               selectedJurisdiction === 'ALL'
                 ? 'rc-btn-sapphire-metal font-bold'
-                : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
+                : 'rc-btn-graphite-metal text-[#969DA6] hover:text-[#FAF9F5]'
             }`}
           >
             ALL ({regulations.length})
@@ -261,7 +261,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                 className={`px-3 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
                   isSelected
                     ? 'rc-btn-sapphire-metal font-bold'
-                    : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
+                    : 'rc-btn-graphite-metal text-[#969DA6] hover:text-[#FAF9F5]'
                 }`}
               >
                 {jur} ({count})
@@ -273,7 +273,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
               variant="ghost"
               size="sm"
               onClick={handleClearFilters}
-              className="text-xs font-mono text-[#8D8982] hover:text-[#9A5D62] h-9 px-2.5 cursor-pointer"
+              className="text-xs font-mono text-[#969DA6] hover:text-[#A96770] h-9 px-2.5 cursor-pointer"
             >
               Reset
             </Button>
@@ -283,30 +283,30 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
             size="sm"
             onClick={syncRegulations}
             disabled={isRefreshing}
-            className="text-xs text-[#8D8982] hover:text-[#F7F4EC] h-9 px-2.5 ml-auto border border-[#211D19] bg-[#100E0D] rounded-lg cursor-pointer"
+            className="text-xs text-[#969DA6] hover:text-[#FAF9F5] h-9 px-2.5 ml-auto border border-[#1D232B] bg-[#12161C] rounded-lg cursor-pointer"
             title="Force Synchronize Regulations"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#AD956C]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#BCA77B]' : ''}`} />
           </Button>
         </div>
       </div>
 
       {/* Regulations Grid */}
       {regulations.length === 0 ? (
-        <div className="rounded-xl border border-[#211D19] bg-[#100E0D] p-12 text-center">
+        <div className="rounded-xl border border-[#1D232B] bg-[#12161C] p-12 text-center">
           {isLoading || isRefreshing ? (
             <>
-              <Loader2 className="w-10 h-10 text-[#AD956C] animate-spin mx-auto mb-4" />
-              <h3 className="text-base font-semibold text-[#F7F4EC]">Synchronizing Canonical Regulations...</h3>
-              <p className="mt-1 text-xs text-[#8D8982] max-w-sm mx-auto font-sans">
+              <Loader2 className="w-10 h-10 text-[#BCA77B] animate-spin mx-auto mb-4" />
+              <h3 className="text-base font-semibold text-[#FAF9F5]">Synchronizing Canonical Regulations...</h3>
+              <p className="mt-1 text-xs text-[#969DA6] max-w-sm mx-auto font-sans">
                 Establishing direct connection to PostgreSQL repository and loading official statutory frameworks.
               </p>
             </>
           ) : (
             <>
-              <Shield className="w-12 h-12 text-[#625F5A] mx-auto mb-4" />
-              <h3 className="text-base font-semibold text-[#F7F4EC]">Database Synchronization Pending</h3>
-              <p className="mt-1 text-xs text-[#8D8982] max-w-sm mx-auto font-sans">
+              <Shield className="w-12 h-12 text-[#656C74] mx-auto mb-4" />
+              <h3 className="text-base font-semibold text-[#FAF9F5]">Database Synchronization Pending</h3>
+              <p className="mt-1 text-xs text-[#969DA6] max-w-sm mx-auto font-sans">
                 No statutory frameworks currently synchronized. Click below to force synchronizing canonical regulations.
               </p>
               <Button 
@@ -314,7 +314,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                 size="sm" 
                 onClick={syncRegulations}
                 disabled={isRefreshing}
-                className="mt-4 bg-[#3F5C74] hover:bg-[#4B6982] text-[#F7F4EC] font-mono font-medium text-xs cursor-pointer shadow-sm"
+                className="mt-4 rc-btn-sapphire-metal text-[#FAF9F5] font-mono font-medium text-xs cursor-pointer shadow-sm"
               >
                 <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Force Refresh Synchronization
@@ -323,17 +323,17 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
           )}
         </div>
       ) : filteredRegulations.length === 0 ? (
-        <div className="rounded-xl border border-[#211D19] bg-[#100E0D] p-12 text-center">
-          <Shield className="w-12 h-12 text-[#625F5A] mx-auto mb-4" />
-          <h3 className="text-base font-semibold text-[#F7F4EC]">No regulations match "{selectedJurisdiction}" filter</h3>
-          <p className="mt-1 text-xs text-[#8D8982] max-w-sm mx-auto font-sans">
+        <div className="rounded-xl border border-[#1D232B] bg-[#12161C] p-12 text-center">
+          <Shield className="w-12 h-12 text-[#656C74] mx-auto mb-4" />
+          <h3 className="text-base font-semibold text-[#FAF9F5]">No regulations match "{selectedJurisdiction}" filter</h3>
+          <p className="mt-1 text-xs text-[#969DA6] max-w-sm mx-auto font-sans">
             {searchQuery ? `No results matching query "${searchQuery}".` : `No active frameworks configured for ${selectedJurisdiction}.`}
           </p>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={handleClearFilters}
-            className="mt-4 border-[#211D19] text-xs text-[#C9C4BA] hover:text-[#F7F4EC] bg-[#151311] hover:bg-[#1B1815] cursor-pointer"
+            className="mt-4 border-[#1D232B] text-xs text-[#C7CCD2] hover:text-[#FAF9F5] bg-[#12161C] hover:bg-[#171C23] cursor-pointer"
           >
             View All {regulations.length} Regulations
           </Button>
@@ -345,39 +345,39 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
             return (
               <Card 
                 key={reg.id} 
-                className="rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 transition-all flex flex-col justify-between shadow-[0_8px_24px_rgba(8,7,6,0.65)] group rounded-xl overflow-hidden relative"
+                className="rc-glass-smoked border border-[rgba(200,180,135,0.12)] hover:border-[rgba(188,167,123,0.3)] hover:bg-[#171C23]/90 transition-all flex flex-col justify-between shadow-[0_8px_24px_rgba(8,7,6,0.65)] group rounded-xl overflow-hidden relative"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2 mb-2.5">
                     <span className={`text-[10px] font-mono font-medium px-2.5 py-0.5 rounded-full border ${badge.color}`}>
                       {badge.label}
                     </span>
-                    <span className="text-[10px] font-mono font-medium text-[#8BA894] bg-[#718A79]/15 border border-[#718A79]/35 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-[#718A79]" />
+                    <span className="text-[10px] font-mono font-medium text-[#8BA894] bg-[#76937F]/15 border border-[#76937F]/35 px-2 py-0.5 rounded-md flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-[#76937F]" />
                       Enforceable
                     </span>
                   </div>
-                  <CardTitle className="text-base font-semibold text-[#F4F0E8] group-hover:text-white transition-colors leading-snug">
+                  <CardTitle className="text-base font-semibold text-[#FAF9F5] group-hover:text-white transition-colors leading-snug">
                     {reg.name}
                   </CardTitle>
-                  <CardDescription className="text-[#8D8982] text-xs mt-2 line-clamp-3 leading-relaxed font-sans">
+                  <CardDescription className="text-[#969DA6] text-xs mt-2 line-clamp-3 leading-relaxed font-sans">
                     {reg.description || 'Comprehensive statutory compliance framework governing operational standards and obligations.'}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="pt-2 pb-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs py-2 px-3 bg-[#0B0A09] border border-[rgba(220,210,190,0.08)] rounded-lg font-mono">
-                    <span className="text-[#8D8982] font-medium flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-[#C7AF7B]" />
+                  <div className="flex items-center justify-between text-xs py-2 px-3 bg-[#0C0F14] border border-[rgba(200,180,135,0.10)] rounded-lg font-mono">
+                    <span className="text-[#969DA6] font-medium flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-[#BCA77B]" />
                       Extracted Controls:
                     </span>
-                    <span className="text-[#8BAAC4] font-semibold text-xs bg-[#263E55]/30 px-2 py-0.5 rounded border border-[#486984]/40">
+                    <span className="text-[#7299B4] font-semibold text-xs bg-[#4D78A0]/15 px-2 py-0.5 rounded border border-[#4D78A0]/35">
                       {reg.requirements_count || 0} Requirements
                     </span>
                   </div>
 
                   {reg.source_url && (
-                    <div className="flex items-center justify-between text-[11px] text-[#625F5A] font-mono">
+                    <div className="flex items-center justify-between text-[11px] text-[#656C74] font-mono">
                       <span className="truncate max-w-[200px]" title={reg.source_url}>
                         Source: {reg.source_url.startsWith('http') ? new URL(reg.source_url).hostname : 'Statutory Repository'}
                       </span>
@@ -386,7 +386,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                           href={reg.source_url} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className="text-[#7A9FBE] hover:text-[#C7AF7B] flex items-center gap-1 transition-colors"
+                          className="text-[#648CAB] hover:text-[#BCA77B] flex items-center gap-1 transition-colors"
                         >
                           Official Text
                           <ExternalLink className="w-3 h-3" />
@@ -396,13 +396,13 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                   )}
                 </CardContent>
 
-                <CardFooter className="pt-2 pb-4 border-t border-[rgba(220,210,190,0.08)]">
+                <CardFooter className="pt-2 pb-4 border-t border-[rgba(200,180,135,0.10)]">
                   <Link href={`/regulations/${reg.id}/requirements`} className="w-full">
                     <button 
                       className="w-full rc-btn-graphite-metal font-mono font-medium text-xs h-10 rounded-lg flex items-center justify-center gap-2 group/btn transition-all cursor-pointer"
                     >
                       <span className="uppercase tracking-wider">Inspect Requirements</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1 text-[#C7AF7B]" />
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1 text-[#BCA77B]" />
                     </button>
                   </Link>
                 </CardFooter>

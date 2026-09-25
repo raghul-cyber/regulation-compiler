@@ -147,79 +147,79 @@ export function WebsiteAuditorSection() {
 
   return (
     <section id="website-auditor" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
-      {/* Environmental Lighting for Audit Room (Sapphire & Titanium Glow) */}
+      {/* Environmental Lighting for Audit Room (Sapphire & Titanium Depth) */}
       <div 
-        className="absolute -top-12 -right-8 w-[580px] h-[380px] rounded-full blur-[140px] pointer-events-none -z-10"
+        className="absolute -top-12 -right-8 w-[600px] h-[400px] rounded-full blur-[140px] pointer-events-none -z-10"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.20) 0%, rgba(23, 23, 22, 0.10) 50%, transparent 80%)',
+          background: 'radial-gradient(ellipse at center, rgba(77, 120, 160, 0.22) 0%, rgba(48, 35, 47, 0.12) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
 
       {/* Section Eyebrow & Hero Callout */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-4xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_4px_16px_rgba(8,7,6,0.6)] backdrop-blur-md">
-          <RCIcon name="system-probe" size={14} className="text-[#C7AF7B]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_4px_16px_rgba(9,11,15,0.6)] backdrop-blur-md">
+          <RCIcon name="system-probe" size={14} className="text-[#BCA77B]" />
           <span>Autonomous Regulatory Auditor</span>
-          <span className="text-[#625F5A]">•</span>
-          <span className="text-[#F4F0E8] font-bold">Live Verification</span>
+          <span className="text-[#656C74]">•</span>
+          <span className="text-[#FAF9F5] font-bold">Live Verification</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
           Automated Website Compliance Auditor
         </h2>
 
-        <p className="mt-5 text-base md:text-xl text-[#C9C4BA] leading-relaxed max-w-3xl mx-auto">
+        <p className="mt-5 text-base md:text-xl text-[#C7CCD2] leading-relaxed max-w-3xl mx-auto">
           Our autonomous auditor probes live transport protocols, defense headers, ePrivacy cookie banners, and WCAG accessibility against statutory regulations — compiling deterministic AST code fixes in real time.
         </p>
       </div>
 
       {/* Feature Pillar Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
-        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(199,204,210,0.12)] hover:border-[rgba(188,167,123,0.35)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(9,11,15,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#263E55]/30 border border-[#486984]/40 flex items-center justify-center text-[#7A9FBE] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#4D78A0]/25 border border-[#4D78A0]/45 flex items-center justify-center text-[#7299B4] mb-4">
               <Globe className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">Live Autonomous Probe</h3>
-            <p className="text-sm text-[#C9C4BA] leading-relaxed">
+            <h3 className="text-lg font-bold text-[#FAF9F5] mb-2">Live Autonomous Probe</h3>
+            <p className="text-sm text-[#C7CCD2] leading-relaxed">
               Dispatches a headless agent that inspects transport TLS ciphers, response headers, Subresource Integrity (SRI), and rendered DOM trees with sub-500ms latency.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-[#C7AF7B]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(199,204,210,0.08)] text-xs font-mono text-[#969DA6] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#BCA77B]" />
             <span>Multi-Hop Traversal &amp; Loop Guard</span>
           </div>
         </div>
 
-        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(199,204,210,0.12)] hover:border-[rgba(188,167,123,0.35)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(9,11,15,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#C7AF7B]/15 border border-[#C7AF7B]/35 flex items-center justify-center text-[#C7AF7B] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#BCA77B]/20 border border-[#BCA77B]/45 flex items-center justify-center text-[#BCA77B] mb-4">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">8+ Statutory Frameworks</h3>
-            <p className="text-sm text-[#C9C4BA] leading-relaxed">
+            <h3 className="text-lg font-bold text-[#FAF9F5] mb-2">8+ Statutory Frameworks</h3>
+            <p className="text-sm text-[#C7CCD2] leading-relaxed">
               Simultaneously audits against GDPR, HIPAA, SOC 2, WCAG 2.1 AA, PCI-DSS 4.0, ISO 27001, DORA, and RFC 9116 — identifying non-compliant attributes and legal gaps.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-[#C7AF7B]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(199,204,210,0.08)] text-xs font-mono text-[#969DA6] flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#BCA77B]" />
             <span>Cross-Regulation Compliance Matrix</span>
           </div>
         </div>
 
-        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(199,204,210,0.12)] hover:border-[rgba(188,167,123,0.35)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(9,11,15,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#718A79]/20 border border-[#718A79]/40 flex items-center justify-center text-[#8BA894] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#76937F]/22 border border-[#76937F]/45 flex items-center justify-center text-[#76937F] mb-4">
               <FileCheck2 className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">Instant AST Code Remediations</h3>
-            <p className="text-sm text-[#C9C4BA] leading-relaxed">
+            <h3 className="text-lg font-bold text-[#FAF9F5] mb-2">Instant AST Code Remediations</h3>
+            <p className="text-sm text-[#C7CCD2] leading-relaxed">
               Every flagged violation includes an automated remediation snippet ready to copy into Next.js, Nginx, Apache, or Cloudflare edge transform rules.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <FileCode2 className="w-3.5 h-3.5 text-[#8BA894]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(199,204,210,0.08)] text-xs font-mono text-[#969DA6] flex items-center gap-1.5">
+            <FileCode2 className="w-3.5 h-3.5 text-[#76937F]" />
             <span>Syntactic Drop-In Patches</span>
           </div>
         </div>
@@ -228,23 +228,23 @@ export function WebsiteAuditorSection() {
       {/* Enterprise Compliance Inspection Showcase Container */}
       <div 
         ref={contentRef} 
-        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] p-6 sm:p-8 shadow-[0_32px_80px_rgba(8,7,6,0.85)] relative overflow-hidden`}
+        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-6 sm:p-8 shadow-[0_32px_80px_rgba(9,11,15,0.85)] relative overflow-hidden`}
       >
         <div className="relative z-10 space-y-6">
           {/* Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[rgba(220,210,190,0.08)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[rgba(199,204,210,0.08)]">
             <div>
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#718A79]"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#76937F]"></span>
                 </span>
-                <h4 className="text-xl font-bold text-[#F4F0E8]">Live Regulatory Inspection Dossier</h4>
-                <span className="px-2 py-0.5 text-[11px] font-mono font-semibold bg-[#C7AF7B]/15 text-[#C7AF7B] border border-[#C7AF7B]/30 rounded">
+                <h4 className="text-xl font-bold text-[#FAF9F5]">Live Regulatory Inspection Dossier</h4>
+                <span className="px-2 py-0.5 text-[11px] font-mono font-semibold bg-[#BCA77B]/15 text-[#BCA77B] border border-[#BCA77B]/30 rounded">
                   Statutory Verified
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-[#C9C4BA] mt-1">
-                Sample production inspection report for <code className="text-[#C7AF7B] font-mono">production.cloud-portal.io</code> evaluated against statutory mandates.
+              <p className="text-xs sm:text-sm text-[#C7CCD2] mt-1">
+                Sample production inspection report for <code className="text-[#BCA77B] font-mono">production.cloud-portal.io</code> evaluated against statutory mandates.
               </p>
             </div>
 
@@ -253,125 +253,125 @@ export function WebsiteAuditorSection() {
               className="rc-btn-sapphire-metal inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] font-medium text-xs uppercase tracking-wider whitespace-nowrap self-start sm:self-auto cursor-pointer"
             >
               <span>Launch Auditor in Studio</span>
-              <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
+              <ArrowRight className="w-4 h-4 text-[#BCA77B]" />
             </Link>
           </div>
 
           {/* Telemetry Summary & Score Deck */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             {/* Grade Card */}
-            <div className="lg:col-span-4 p-6 rounded-xl bg-[#100E0D] border border-[rgba(201,196,186,0.08)] flex flex-col items-center justify-center text-center relative overflow-hidden">
-              <span className="text-xs font-mono uppercase tracking-widest text-[#8D8982] font-bold mb-1">
+            <div className="lg:col-span-4 p-6 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] flex flex-col items-center justify-center text-center relative overflow-hidden">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#969DA6] font-bold mb-1">
                 COMPLIANCE VERDICT
               </span>
-              <div className="text-6xl sm:text-7xl font-black text-[#718A79] tracking-tight my-1">
+              <div className="text-6xl sm:text-7xl font-black text-[#76937F] tracking-tight my-1">
                 A
               </div>
-              <div className="text-lg font-mono font-bold text-[#F7F4EC] mt-1">
+              <div className="text-lg font-mono font-bold text-[#FAF9F5] mt-1">
                 94 / 100 Overall Score
               </div>
-              <p className="text-xs text-[#C9C4BA] mt-2 max-w-[220px]">
+              <p className="text-xs text-[#C7CCD2] mt-2 max-w-[220px]">
                 High statutory compliance posture. 18 Passed • 2 Remediations Required.
               </p>
-              <div className="mt-4 pt-3 border-t border-[rgba(201,196,186,0.08)] w-full flex items-center justify-around text-[11px] font-mono text-[#8D8982]">
-                <span>Latency: <b className="text-[#F7F4EC]">420ms</b></span>
+              <div className="mt-4 pt-3 border-t border-[rgba(199,204,210,0.08)] w-full flex items-center justify-around text-[11px] font-mono text-[#969DA6]">
+                <span>Latency: <b className="text-[#FAF9F5]">420ms</b></span>
                 <span>•</span>
-                <span>Checkpoints: <b className="text-[#F7F4EC]">20 Active</b></span>
+                <span>Checkpoints: <b className="text-[#FAF9F5]">20 Active</b></span>
               </div>
             </div>
 
             {/* Categorical Domain Gauges */}
-            <div className="lg:col-span-8 p-6 rounded-xl bg-[#100E0D] border border-[rgba(201,196,186,0.08)] flex flex-col justify-between gap-4">
+            <div className="lg:col-span-8 p-6 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] flex flex-col justify-between gap-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <RCIcon name="system-probe" size={16} className="text-[#AD956C]" />
-                  <span className="text-xs font-mono font-bold text-[#F7F4EC] uppercase tracking-wider">
+                  <RCIcon name="system-probe" size={16} className="text-[#BCA77B]" />
+                  <span className="text-xs font-mono font-bold text-[#FAF9F5] uppercase tracking-wider">
                     Categorical Regulatory Performance
                   </span>
                 </div>
-                <span className="text-xs font-mono text-[#8D8982]">Autonomous Probe v2.4</span>
+                <span className="text-xs font-mono text-[#969DA6]">Autonomous Probe v2.4</span>
               </div>
 
               {/* Progress Gauges Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>Transport Security</span>
-                    <span className="text-[#718A79] font-bold font-mono">100%</span>
+                    <span className="text-[#76937F] font-bold font-mono">100%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#718A79] rounded-full" style={{ width: '100%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#76937F] rounded-full" style={{ width: '100%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">TLS 1.3 / Strict HTTPS</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">TLS 1.3 / Strict HTTPS</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>Defense Headers</span>
-                    <span className="text-[#607D96] font-bold font-mono">95%</span>
+                    <span className="text-[#6689A5] font-bold font-mono">95%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#3F5C74] rounded-full" style={{ width: '95%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#4D78A0] rounded-full" style={{ width: '95%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">CSP / X-Frame DENY</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">CSP / X-Frame DENY</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>ePrivacy &amp; Cookies</span>
-                    <span className="text-[#A48A5C] font-bold font-mono">85%</span>
+                    <span className="text-[#B39863] font-bold font-mono">85%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#A48A5C] rounded-full" style={{ width: '85%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#B39863] rounded-full" style={{ width: '85%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">SameSite / HttpOnly</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">SameSite / HttpOnly</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>WCAG 2.1 AA</span>
-                    <span className="text-[#607D96] font-bold font-mono">100%</span>
+                    <span className="text-[#6689A5] font-bold font-mono">100%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#3F5C74] rounded-full" style={{ width: '100%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#4D78A0] rounded-full" style={{ width: '100%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">Lang / Alt / Viewport</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">Lang / Alt / Viewport</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>Disclosures (RFC 9116)</span>
-                    <span className="text-[#AD956C] font-bold font-mono">90%</span>
+                    <span className="text-[#BCA77B] font-bold font-mono">90%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#AD956C] rounded-full" style={{ width: '90%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#BCA77B] rounded-full" style={{ width: '90%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">security.txt / robots.txt</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">security.txt / robots.txt</span>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.06)]">
-                  <div className="flex items-center justify-between text-xs text-[#C9C4BA]">
+                <div className="p-3 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+                  <div className="flex items-center justify-between text-xs text-[#C7CCD2]">
                     <span>Supply Chain (SRI)</span>
-                    <span className="text-[#8D8982] font-bold font-mono">92%</span>
+                    <span className="text-[#969DA6] font-bold font-mono">92%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#080706] rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#625F5A] rounded-full" style={{ width: '92%' }} />
+                  <div className="w-full h-1.5 bg-[#090B0F] rounded-full mt-2 overflow-hidden">
+                    <div className="h-full bg-[#242B33] rounded-full" style={{ width: '92%' }} />
                   </div>
-                  <span className="text-[10px] text-[#8D8982] font-mono mt-1 block">Cryptographic Checksums</span>
+                  <span className="text-[10px] text-[#969DA6] font-mono mt-1 block">Cryptographic Checksums</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Interactive Findings & AST Remediation Panel */}
-          <div className="rounded-xl bg-[#100E0D] border border-[rgba(201,196,186,0.08)] p-5 sm:p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[rgba(201,196,186,0.08)]">
+          <div className="rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] p-5 sm:p-6 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[rgba(199,204,210,0.08)]">
               <div>
-                <h5 className="text-sm font-bold text-[#F7F4EC] flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-[#AD956C]" />
+                <h5 className="text-sm font-bold text-[#FAF9F5] flex items-center gap-2">
+                  <Code2 className="w-4 h-4 text-[#BCA77B]" />
                   <span>Interactive Finding Inspector &amp; AST Remediation Code Generator</span>
                 </h5>
-                <p className="text-xs text-[#8D8982] mt-0.5">
+                <p className="text-xs text-[#969DA6] mt-0.5">
                   Select an audit observation to inspect statutory citation, cryptographic evidence, and drop-in configuration patches.
                 </p>
               </div>
@@ -383,8 +383,8 @@ export function WebsiteAuditorSection() {
                     onClick={() => setActiveFindingId(f.id)}
                     className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all cursor-pointer ${
                       activeFindingId === f.id
-                        ? 'rc-btn-sapphire-metal font-bold shadow-[0_4px_16px_rgba(17,24,32,0.6)]'
-                        : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
+                        ? 'rc-btn-sapphire-metal font-bold shadow-[0_4px_16px_rgba(9,11,15,0.7)]'
+                        : 'rc-btn-graphite-metal text-[#969DA6] hover:text-[#FAF9F5]'
                     }`}
                   >
                     {f.id}
@@ -395,47 +395,47 @@ export function WebsiteAuditorSection() {
 
             {/* Selected Finding Detail Box */}
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.10)] space-y-2">
+              <div className="p-4 rounded-lg bg-[#171C23] border border-[rgba(199,204,210,0.12)] space-y-2">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      selectedFinding.severity === 'CRITICAL' ? 'bg-[#321D24] text-[#C7AF7B] border border-[#321D24]' :
-                      selectedFinding.severity === 'HIGH' ? 'bg-[#211915] text-[#C7AF7B] border border-[rgba(185,164,122,0.3)]' :
-                      'bg-[#263E55]/30 text-[#8BAAC4] border border-[#486984]/40'
+                      selectedFinding.severity === 'CRITICAL' ? 'bg-[#4A2830] text-[#BCA77B] border border-[#4A2830]' :
+                      selectedFinding.severity === 'HIGH' ? 'bg-[#30232F] text-[#BCA77B] border border-[rgba(188,167,123,0.35)]' :
+                      'bg-[#4D78A0]/25 text-[#7299B4] border border-[#4D78A0]/40'
                     }`}>
                       {selectedFinding.severity} FAIL
                     </span>
-                    <h6 className="text-sm font-bold text-[#F4F0E8]">{selectedFinding.title}</h6>
+                    <h6 className="text-sm font-bold text-[#FAF9F5]">{selectedFinding.title}</h6>
                   </div>
-                  <span className="text-xs font-mono text-[#8D8982]">{selectedFinding.framework}</span>
+                  <span className="text-xs font-mono text-[#969DA6]">{selectedFinding.framework}</span>
                 </div>
 
-                <div className="text-xs text-[#8D8982] font-mono pt-1">
-                  <b>Statutory Clause:</b> <span className="text-[#C9C4BA]">{selectedFinding.clause}</span>
+                <div className="text-xs text-[#969DA6] font-mono pt-1">
+                  <b>Statutory Clause:</b> <span className="text-[#C7CCD2]">{selectedFinding.clause}</span>
                 </div>
-                <div className="text-xs text-[#8D8982]">
-                  <b>Evidence:</b> <span className="text-[#C9C4BA] font-mono text-[11px]">{selectedFinding.evidence}</span>
+                <div className="text-xs text-[#969DA6]">
+                  <b>Evidence:</b> <span className="text-[#C7CCD2] font-mono text-[11px]">{selectedFinding.evidence}</span>
                 </div>
               </div>
 
               {/* Code Remediation Switcher */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-[#8D8982] uppercase tracking-wider flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-[#AD956C]" />
+                  <span className="font-mono text-[#969DA6] uppercase tracking-wider flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-[#BCA77B]" />
                     <span>Instant Remediation Patch</span>
                   </span>
 
                   {/* Tabs */}
-                  <div className="flex items-center gap-1 bg-[#151311] border border-[rgba(201,196,186,0.08)] p-0.5 rounded-lg text-xs font-mono">
+                  <div className="flex items-center gap-1 bg-[#12161C] border border-[rgba(199,204,210,0.10)] p-0.5 rounded-lg text-xs font-mono">
                     {(['nextjs', 'nginx', 'apache', 'cloudflare'] as const).map(tab => (
                       <button
                         key={tab}
                         onClick={() => setActiveCodeTab(tab)}
                         className={`px-2.5 py-1 rounded capitalize transition-all cursor-pointer ${
                           activeCodeTab === tab
-                            ? 'bg-[#1B1815] text-[#F7F4EC] font-medium border border-[rgba(201,196,186,0.12)]'
-                            : 'text-[#8D8982] hover:text-[#C9C4BA]'
+                            ? 'bg-[#171C23] text-[#FAF9F5] font-medium border border-[rgba(199,204,210,0.14)]'
+                            : 'text-[#969DA6] hover:text-[#C7CCD2]'
                         }`}
                       >
                         {tab === 'nextjs' ? 'Next.js' : tab === 'cloudflare' ? 'Cloudflare WAF' : tab}
@@ -445,17 +445,17 @@ export function WebsiteAuditorSection() {
                 </div>
 
                 {/* Code Box */}
-                <div className="relative rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.08)] overflow-hidden font-mono text-xs">
-                  <div className="flex items-center justify-between px-4 py-2 bg-[#0D0B0A] border-b border-[rgba(201,196,186,0.08)] text-[11px] text-[#8D8982]">
+                <div className="relative rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.10)] overflow-hidden font-mono text-xs">
+                  <div className="flex items-center justify-between px-4 py-2 bg-[#0C0F14] border-b border-[rgba(199,204,210,0.08)] text-[11px] text-[#969DA6]">
                     <span>Target Deployment: {activeCodeTab.toUpperCase()}</span>
                     <button
                       onClick={handleCopyCode}
-                      className="flex items-center gap-1 text-[#8D8982] hover:text-[#F7F4EC] transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-[#969DA6] hover:text-[#FAF9F5] transition-colors cursor-pointer"
                     >
                       {copied ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-[#718A79]" />
-                          <span className="text-[#718A79]">Copied!</span>
+                          <Check className="w-3.5 h-3.5 text-[#76937F]" />
+                          <span className="text-[#76937F]">Copied!</span>
                         </>
                       ) : (
                         <>
@@ -465,7 +465,7 @@ export function WebsiteAuditorSection() {
                       )}
                     </button>
                   </div>
-                  <pre className="p-4 text-[#F1EEE7] overflow-x-auto leading-relaxed bg-[#100E0D]">
+                  <pre className="p-4 text-[#F3F4F2] overflow-x-auto leading-relaxed bg-[#0C0F14]">
                     <code>{selectedFinding.code[activeCodeTab]}</code>
                   </pre>
                 </div>
@@ -474,15 +474,15 @@ export function WebsiteAuditorSection() {
           </div>
 
           {/* Statutory Frameworks Badge Grid */}
-          <div className="pt-4 border-t border-[rgba(201,196,186,0.08)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="pt-4 border-t border-[rgba(199,204,210,0.08)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-[#8D8982] font-mono mr-1">Evaluated Frameworks:</span>
+              <span className="text-xs text-[#969DA6] font-mono mr-1">Evaluated Frameworks:</span>
               {COMPLIANCE_FRAMEWORKS.map(fw => (
                 <div
                   key={fw.name}
-                  className="px-2.5 py-1 rounded-md bg-[#100E0D] border border-[rgba(201,196,186,0.08)] text-[#C9C4BA] text-xs font-mono flex items-center gap-1.5"
+                  className="px-2.5 py-1 rounded-md bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] text-[#C7CCD2] text-xs font-mono flex items-center gap-1.5"
                 >
-                  <CheckCircle2 className="w-3 h-3 text-[#718A79]" />
+                  <CheckCircle2 className="w-3 h-3 text-[#76937F]" />
                   <span>{fw.name}</span>
                 </div>
               ))}
@@ -490,7 +490,7 @@ export function WebsiteAuditorSection() {
 
             <Link
               href="/dashboard?tab=website_auditor"
-              className="text-xs text-[#AD956C] hover:text-[#C5B38B] font-mono font-medium flex items-center gap-1 shrink-0 self-start sm:self-auto"
+              className="text-xs text-[#BCA77B] hover:text-[#D0BE91] font-mono font-medium flex items-center gap-1 shrink-0 self-start sm:self-auto"
             >
               <span>Explore full audit capabilities</span>
               <ArrowRight className="w-3.5 h-3.5" />

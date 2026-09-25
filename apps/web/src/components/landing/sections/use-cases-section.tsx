@@ -48,25 +48,25 @@ const USE_CASES = [
 export function UseCasesSection() {
   return (
     <section id="use-cases" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
-      {/* Executive Suite Room Atmosphere (Bronze & Champagne Reflection) */}
+      {/* Executive Suite Room Atmosphere (Champagne & Graphite Reflection) */}
       <div 
         className="absolute top-1/3 right-10 w-[620px] h-[400px] rounded-full blur-[150px] pointer-events-none -z-10"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(199, 175, 123, 0.16) 0%, rgba(33, 25, 21, 0.10) 50%, transparent 80%)',
+          background: 'radial-gradient(ellipse at center, rgba(188, 167, 123, 0.18) 0%, rgba(36, 43, 51, 0.12) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
 
       {/* Title */}
       <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#C7AF7B]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#BCA77B]" />
           Enterprise Scope
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
           Built for High-Stakes Regulatory Environments
         </h2>
-        <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
+        <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed">
           Engineered for institutions and platforms that cannot afford regulatory ambiguity, audit failure, or compliance drift.
         </p>
       </div>
@@ -78,36 +78,36 @@ export function UseCasesSection() {
           return (
             <div
               key={uc.id}
-              className={`${uc.colSpan} p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 flex flex-col justify-between transition-all duration-200 group shadow-[0_8px_24px_rgba(8,7,6,0.65)]`}
+              className={`${uc.colSpan} p-6 rounded-xl rc-glass-smoked border border-[rgba(199,204,210,0.12)] hover:border-[rgba(188,167,123,0.35)] hover:bg-[#171C23]/90 flex flex-col justify-between transition-all duration-200 group shadow-[0_8px_24px_rgba(9,11,15,0.65)]`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.08)] text-[#C7AF7B]">
+                    <div className="p-2 rounded-lg bg-[#171C23] border border-[rgba(199,204,210,0.10)] text-[#BCA77B]">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-[10px] text-[#C7AF7B] font-bold uppercase tracking-wider">
+                    <span className="font-mono text-[10px] text-[#BCA77B] font-bold uppercase tracking-wider">
                       {uc.tag}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#8BA894] bg-[#718A79]/15 px-2 py-0.5 rounded border border-[#718A79]/35 font-semibold">
+                  <span className="font-mono text-[10px] text-[#76937F] bg-[#76937F]/15 px-2 py-0.5 rounded border border-[#76937F]/35 font-semibold">
                     {uc.metric}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-[#F4F0E8] mb-2 group-hover:text-[#C7AF7B] transition-colors">
+                <h3 className="text-lg font-bold text-[#FAF9F5] mb-2 group-hover:text-[#BCA77B] transition-colors">
                   {uc.title}
                 </h3>
-                <p className="text-xs text-[#C9C4BA] leading-relaxed">
+                <p className="text-xs text-[#C7CCD2] leading-relaxed">
                   {uc.desc}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[rgba(220,210,190,0.08)] flex flex-wrap items-center gap-2">
+              <div className="mt-6 pt-4 border-t border-[rgba(199,204,210,0.08)] flex flex-wrap items-center gap-2">
                 {uc.frameworks.map((fw) => (
                   <span 
                     key={fw} 
-                    className="font-mono text-[10px] text-[#B7B4AC] bg-[#10100F] px-2 py-0.5 rounded border border-[rgba(220,210,190,0.08)]"
+                    className="font-mono text-[10px] text-[#AAB1BA] bg-[#0C0F14] px-2 py-0.5 rounded border border-[rgba(199,204,210,0.08)]"
                   >
                     {fw}
                   </span>

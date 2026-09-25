@@ -187,18 +187,18 @@ function JurisdictionMarker({
             onClick={onClick}
             className={`font-sans select-none whitespace-nowrap cursor-pointer px-1.5 py-0.5 rounded-[4px] text-[9px] font-semibold tracking-wide border transition-all duration-200 transform -translate-y-4 flex items-center gap-1 shadow-lg ${
               isSelected
-                ? 'bg-[#151311]/95 text-[#AD956C] border-[#AD956C]/60 ring-1 ring-[#AD956C]/40 scale-105'
+                ? 'bg-[#12161C]/95 text-[#BCA77B] border-[#BCA77B]/60 ring-1 ring-[#BCA77B]/40 scale-105'
                 : (isActiveSignal
-                    ? 'bg-[#151311]/95 text-[#607D96] border-[#344D63]/60'
+                    ? 'bg-[#12161C]/95 text-[#7299B4] border-[#4D78A0]/60'
                     : (data.count > 0
-                        ? 'bg-[#151311]/95 text-[#718A79] border-[#718A79]/30 hover:border-[#718A79]/60'
-                        : 'bg-[#151311]/95 text-[#8D8982] border-[#211D19] hover:border-[#351E24] hover:text-[#F1EEE7]'))
+                        ? 'bg-[#12161C]/95 text-[#76937F] border-[#76937F]/30 hover:border-[#76937F]/60'
+                        : 'bg-[#12161C]/95 text-[#969DA6] border-[#1D232B] hover:border-[#4A2830] hover:text-[#FAF9F5]'))
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#AD956C]' : (data.count > 0 ? 'bg-[#718A79]' : 'bg-[#607D96]')}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#BCA77B]' : (data.count > 0 ? 'bg-[#76937F]' : 'bg-[#7299B4]')}`} />
             <span>{data.jurisdiction}</span>
             {data.count > 0 && (
-              <span className="ml-0.5 px-1 rounded-[2px] bg-[#718A79]/15 text-[#718A79] text-[8px] font-bold">
+              <span className="ml-0.5 px-1 rounded-[2px] bg-[#76937F]/15 text-[#76937F] text-[8px] font-bold">
                 {data.count}
               </span>
             )}
@@ -210,18 +210,18 @@ function JurisdictionMarker({
       {(hovered || isSelected) && isFrontFacing && (
         <Html distanceFactor={4.5} zIndexRange={[45, 0]} center>
           <div 
-            className={`font-sans bg-[#151311]/98 border border-[#211D19] p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-48 pointer-events-auto select-none transition-all duration-200 ${
+            className={`font-sans bg-[#12161C]/98 border border-[#1D232B] p-2.5 rounded-xl shadow-2xl backdrop-blur-xl text-left w-48 pointer-events-auto select-none transition-all duration-200 ${
               data.position.y > 0.25 
                 ? 'transform translate-y-5' 
                 : (data.position.y < -0.25 ? 'transform -translate-y-16' : 'transform -translate-y-10')
             }`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-[#211D19] pb-1">
+            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-[#1D232B] pb-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-sm shrink-0">{data.flag || '🌐'}</span>
                 <div className="truncate">
-                  <h4 className="text-[11px] font-bold text-[#F7F4EC] leading-tight truncate">{data.name}</h4>
-                  <span className="text-[9px] text-[#8D8982] font-mono">[{data.jurisdiction}]</span>
+                  <h4 className="text-[11px] font-bold text-[#FAF9F5] leading-tight truncate">{data.name}</h4>
+                  <span className="text-[9px] text-[#969DA6] font-mono">[{data.jurisdiction}]</span>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
@@ -547,18 +547,18 @@ export function CoverageGlobe({
               Global Jurisdiction Monitoring
             </h3>
             <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#718A79] animate-ping inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#76937F] animate-ping inline-block" />
               LIVE SURVEILLANCE
             </span>
           </div>
-          <p className="text-[#8D8982] text-xs leading-relaxed hidden sm:block">
+          <p className="text-[#969DA6] text-xs leading-relaxed hidden sm:block">
             Continuous worldwide regulatory surveillance network. Real-time telemetry, automated jurisdictional compliance tracking.
           </p>
           <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#151311] border border-[#211D19] text-[#607D96] shadow-sm">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#12161C] border border-[#1D232B] text-[#7299B4] shadow-sm">
               {markers.length} Global Nodes Active
             </span>
-            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#151311] border border-[#211D19] text-[#718A79] shadow-sm">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#12161C] border border-[#1D232B] text-[#76937F] shadow-sm">
               {activeRegionsCount} Active Jurisdictions ({totalActiveRulesets} Rulesets)
             </span>
           </div>
@@ -570,8 +570,8 @@ export function CoverageGlobe({
             onClick={() => setAutoRotate(!autoRotate)}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm ${
               autoRotate
-                ? 'bg-[#3F5C74]/20 border-[#3F5C74]/40 text-[#C9C4BA] hover:bg-[#3F5C74]/30'
-                : 'bg-[#151311]/80 border-[#211D19] text-[#8D8982] hover:text-[#F1EEE7]'
+                ? 'bg-[#4D78A0]/20 border-[#4D78A0]/40 text-[#FAF9F5] hover:bg-[#4D78A0]/30'
+                : 'bg-[#12161C]/80 border-[#1D232B] text-[#969DA6] hover:text-[#FAF9F5]'
             }`}
             title="Toggle Auto Rotation"
           >
@@ -581,9 +581,9 @@ export function CoverageGlobe({
 
           <button
             onClick={() => router.push('/regulations')}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#151311]/80 hover:bg-[#1B1815] border border-[#211D19] text-[#C9C4BA] hover:text-[#F7F4EC] backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#12161C]/80 hover:bg-[#171C23] border border-[#1D232B] text-[#C7CCD2] hover:text-[#FAF9F5] backdrop-blur-md transition-all flex items-center gap-1.5 shadow-sm"
           >
-            <Layers className="w-3.5 h-3.5 text-[#8D8982]" />
+            <Layers className="w-3.5 h-3.5 text-[#969DA6]" />
             <span>All Regulations</span>
           </button>
         </div>
@@ -592,21 +592,21 @@ export function CoverageGlobe({
       {/* Bottom Overlay: Node Legend & Arcs Note */}
       <div className="absolute bottom-3 left-4 right-4 sm:bottom-4 sm:left-5 sm:right-5 z-30 flex items-center justify-between gap-3 pointer-events-none">
         {/* Node Legend HUD */}
-        <div className="px-3 py-1.5 rounded-lg bg-[#151311]/90 border border-[#211D19] backdrop-blur-md text-[10px] text-[#8D8982] flex items-center flex-nowrap whitespace-nowrap gap-3 shadow-md shrink-0">
+        <div className="px-3 py-1.5 rounded-lg bg-[#12161C]/90 border border-[#1D232B] backdrop-blur-md text-[10px] text-[#969DA6] flex items-center flex-nowrap whitespace-nowrap gap-3 shadow-md shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#718A79] shadow-sm shadow-[#718A79]/50 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#76937F] shadow-sm shadow-[#76937F]/50 shrink-0" />
             <span>HQ Base (SF)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#718A79] shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#76937F] shrink-0" />
             <span>Active Rules</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#607D96] shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#7299B4] shrink-0" />
             <span>Surveillance Node</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#AD956C] shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#BCA77B] shrink-0" />
             <span>Selected</span>
           </div>
         </div>
