@@ -26,55 +26,55 @@ export default function LandingPage() {
         <CapabilitySignal />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 03B — Automated Website Compliance Auditor (Autonomous Statutory Agent) */}
         <WebsiteAuditorSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 04 — The Regulation Problem */}
         <ProblemSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 05 — Regulation → Structured Logic Transformation */}
         <TransformationSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 06 — How The Compiler Works (5 Stages) */}
         <HowItWorksSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 07 — Interactive Compilation Environment */}
         <InteractiveCompilation />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 08 — Enterprise Architecture Layer */}
         <ArchitectureSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 09 — Security & Cryptographic Traceability */}
         <SecurityTraceability />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 10 — High-Stakes Use Cases */}
         <UseCasesSection />
 
         {/* Architectural Section Divider */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(185,164,122,0.20)] to-transparent pointer-events-none" />
 
         {/* Section 11 — Final Calmer CTA */}
         <FinalCTASection />

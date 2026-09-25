@@ -146,17 +146,26 @@ export function WebsiteAuditorSection() {
   };
 
   return (
-    <section id="website-auditor" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
+    <section id="website-auditor" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
+      {/* Environmental Lighting for Audit Room (Sapphire & Titanium Glow) */}
+      <div 
+        className="absolute -top-12 -right-8 w-[580px] h-[380px] rounded-full blur-[140px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.20) 0%, rgba(23, 23, 22, 0.10) 50%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Section Eyebrow & Hero Callout */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-4xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          <RCIcon name="system-probe" size={14} className="text-[#AD956C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_4px_16px_rgba(8,7,6,0.6)] backdrop-blur-md">
+          <RCIcon name="system-probe" size={14} className="text-[#C7AF7B]" />
           <span>Autonomous Regulatory Auditor</span>
           <span className="text-[#625F5A]">•</span>
-          <span className="text-[#F7F4EC] font-bold">Live Verification</span>
+          <span className="text-[#F4F0E8] font-bold">Live Verification</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
           Automated Website Compliance Auditor
         </h2>
 
@@ -167,50 +176,50 @@ export function WebsiteAuditorSection() {
 
       {/* Feature Pillar Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
-        <div className="p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.2)] transition-all flex flex-col justify-between shadow-[0_4px_16px_rgba(0,0,0,0.5)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#3F5C74]/15 border border-[#3F5C74]/30 flex items-center justify-center text-[#607D96] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#263E55]/30 border border-[#486984]/40 flex items-center justify-center text-[#7A9FBE] mb-4">
               <Globe className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F7F4EC] mb-2">Live Autonomous Probe</h3>
+            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">Live Autonomous Probe</h3>
             <p className="text-sm text-[#C9C4BA] leading-relaxed">
               Dispatches a headless agent that inspects transport TLS ciphers, response headers, Subresource Integrity (SRI), and rendered DOM trees with sub-500ms latency.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(201,196,186,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-[#AD956C]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#C7AF7B]" />
             <span>Multi-Hop Traversal &amp; Loop Guard</span>
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.2)] transition-all flex flex-col justify-between shadow-[0_4px_16px_rgba(0,0,0,0.5)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#AD956C]/15 border border-[#AD956C]/30 flex items-center justify-center text-[#AD956C] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#C7AF7B]/15 border border-[#C7AF7B]/35 flex items-center justify-center text-[#C7AF7B] mb-4">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F7F4EC] mb-2">8+ Statutory Frameworks</h3>
+            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">8+ Statutory Frameworks</h3>
             <p className="text-sm text-[#C9C4BA] leading-relaxed">
               Simultaneously audits against GDPR, HIPAA, SOC 2, WCAG 2.1 AA, PCI-DSS 4.0, ISO 27001, DORA, and RFC 9116 — identifying non-compliant attributes and legal gaps.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(201,196,186,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-[#AD956C]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#C7AF7B]" />
             <span>Cross-Regulation Compliance Matrix</span>
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.2)] transition-all flex flex-col justify-between shadow-[0_4px_16px_rgba(0,0,0,0.5)]">
+        <div className="p-6 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] transition-all flex flex-col justify-between shadow-[0_8px_28px_rgba(8,7,6,0.6)]">
           <div>
-            <div className="w-10 h-10 rounded-lg bg-[#718A79]/15 border border-[#718A79]/30 flex items-center justify-center text-[#718A79] mb-4">
+            <div className="w-10 h-10 rounded-lg bg-[#718A79]/20 border border-[#718A79]/40 flex items-center justify-center text-[#8BA894] mb-4">
               <FileCheck2 className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-[#F7F4EC] mb-2">Instant AST Code Remediations</h3>
+            <h3 className="text-lg font-bold text-[#F4F0E8] mb-2">Instant AST Code Remediations</h3>
             <p className="text-sm text-[#C9C4BA] leading-relaxed">
               Every flagged violation includes an automated remediation snippet ready to copy into Next.js, Nginx, Apache, or Cloudflare edge transform rules.
             </p>
           </div>
-          <div className="mt-4 pt-4 border-t border-[rgba(201,196,186,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
-            <FileCode2 className="w-3.5 h-3.5 text-[#718A79]" />
+          <div className="mt-4 pt-4 border-t border-[rgba(220,210,190,0.08)] text-xs font-mono text-[#8D8982] flex items-center gap-1.5">
+            <FileCode2 className="w-3.5 h-3.5 text-[#8BA894]" />
             <span>Syntactic Drop-In Patches</span>
           </div>
         </div>
@@ -219,32 +228,32 @@ export function WebsiteAuditorSection() {
       {/* Enterprise Compliance Inspection Showcase Container */}
       <div 
         ref={contentRef} 
-        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.12)] p-6 sm:p-8 shadow-[0_24px_64px_rgba(0,0,0,0.8)] relative overflow-hidden`}
+        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] p-6 sm:p-8 shadow-[0_32px_80px_rgba(8,7,6,0.85)] relative overflow-hidden`}
       >
         <div className="relative z-10 space-y-6">
           {/* Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[rgba(201,196,186,0.08)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[rgba(220,210,190,0.08)]">
             <div>
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#718A79]"></span>
                 </span>
-                <h4 className="text-xl font-bold text-[#F7F4EC]">Live Regulatory Inspection Dossier</h4>
-                <span className="px-2 py-0.5 text-[11px] font-mono font-semibold bg-[#AD956C]/15 text-[#C5B38B] border border-[#AD956C]/25 rounded">
+                <h4 className="text-xl font-bold text-[#F4F0E8]">Live Regulatory Inspection Dossier</h4>
+                <span className="px-2 py-0.5 text-[11px] font-mono font-semibold bg-[#C7AF7B]/15 text-[#C7AF7B] border border-[#C7AF7B]/30 rounded">
                   Statutory Verified
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-[#C9C4BA] mt-1">
-                Sample production inspection report for <code className="text-[#C5B38B] font-mono">production.cloud-portal.io</code> evaluated against statutory mandates.
+                Sample production inspection report for <code className="text-[#C7AF7B] font-mono">production.cloud-portal.io</code> evaluated against statutory mandates.
               </p>
             </div>
 
             <Link 
               href="/dashboard?tab=website_auditor" 
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] font-medium transition-all text-xs uppercase tracking-wider whitespace-nowrap self-start sm:self-auto cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/25 active:scale-[0.98]"
+              className="rc-btn-sapphire-metal inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] font-medium text-xs uppercase tracking-wider whitespace-nowrap self-start sm:self-auto cursor-pointer"
             >
               <span>Launch Auditor in Studio</span>
-              <ArrowRight className="w-4 h-4 text-[#AD956C]" />
+              <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
             </Link>
           </div>
 
@@ -372,10 +381,10 @@ export function WebsiteAuditorSection() {
                   <button
                     key={f.id}
                     onClick={() => setActiveFindingId(f.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all cursor-pointer ${
                       activeFindingId === f.id
-                        ? 'bg-[#3F5C74] text-[#F7F4EC] font-bold shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/30'
-                        : 'bg-[#151311] hover:bg-[#1B1815] text-[#8D8982] hover:text-[#F1EEE7] border border-[rgba(201,196,186,0.08)]'
+                        ? 'rc-btn-sapphire-metal font-bold shadow-[0_4px_16px_rgba(17,24,32,0.6)]'
+                        : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
                     }`}
                   >
                     {f.id}
@@ -386,17 +395,17 @@ export function WebsiteAuditorSection() {
 
             {/* Selected Finding Detail Box */}
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-[#151311] border border-[rgba(201,196,186,0.08)] space-y-2">
+              <div className="p-4 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.10)] space-y-2">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      selectedFinding.severity === 'CRITICAL' ? 'bg-[#9A5D62]/20 text-[#C5B38B] border border-[#9A5D62]/40' :
-                      selectedFinding.severity === 'HIGH' ? 'bg-[#A48A5C]/20 text-[#C5B38B] border border-[#A48A5C]/40' :
-                      'bg-[#3F5C74]/20 text-[#C9C4BA] border border-[#3F5C74]/40'
+                      selectedFinding.severity === 'CRITICAL' ? 'bg-[#321D24] text-[#C7AF7B] border border-[#321D24]' :
+                      selectedFinding.severity === 'HIGH' ? 'bg-[#211915] text-[#C7AF7B] border border-[rgba(185,164,122,0.3)]' :
+                      'bg-[#263E55]/30 text-[#8BAAC4] border border-[#486984]/40'
                     }`}>
                       {selectedFinding.severity} FAIL
                     </span>
-                    <h6 className="text-sm font-bold text-[#F7F4EC]">{selectedFinding.title}</h6>
+                    <h6 className="text-sm font-bold text-[#F4F0E8]">{selectedFinding.title}</h6>
                   </div>
                   <span className="text-xs font-mono text-[#8D8982]">{selectedFinding.framework}</span>
                 </div>

@@ -158,14 +158,14 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
     <div className="space-y-8">
       {/* Top Metrics Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] relative overflow-hidden flex flex-col justify-between transition-colors">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Active Frameworks</span>
-            <Layers className="w-4 h-4 text-[#AD956C]" />
+            <Layers className="w-4 h-4 text-[#C7AF7B]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F7F4EC] tracking-tight font-mono">{filteredRegulations.length}</span>
-            <span className="text-[10px] font-mono text-[#718A79] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Canonical</span>
+            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">{filteredRegulations.length}</span>
+            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Canonical</span>
           </div>
           <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">
             {filteredRegulations.length === initialRegulations.length
@@ -174,49 +174,49 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] relative overflow-hidden flex flex-col justify-between transition-colors">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Extracted Rules</span>
-            <FileText className="w-4 h-4 text-[#607D96]" />
+            <FileText className="w-4 h-4 text-[#7A9FBE]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F7F4EC] tracking-tight font-mono">{totalRequirements}</span>
-            <span className="text-[10px] font-mono text-[#607D96] font-medium px-1.5 py-0.5 rounded bg-[#344D63]/20 border border-[#344D63]/40 uppercase">Enforceable</span>
+            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">{totalRequirements}</span>
+            <span className="text-[10px] font-mono text-[#8BAAC4] font-medium px-1.5 py-0.5 rounded bg-[#263E55]/30 border border-[#486984]/40 uppercase">Enforceable</span>
           </div>
           <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">Atomic compliance obligations</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] relative overflow-hidden flex flex-col justify-between transition-colors">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Jurisdictions</span>
             <Globe2 className="w-4 h-4 text-[#718A79]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F7F4EC] tracking-tight font-mono">
+            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">
               {selectedJurisdiction === 'ALL' ? availableJurisdictions.length : 1}
             </span>
-            <span className="text-[10px] font-mono text-[#C9C4BA] font-medium px-1.5 py-0.5 rounded bg-[#151311] border border-[#211D19] uppercase">Global</span>
+            <span className="text-[10px] font-mono text-[#C9C4BA] font-medium px-1.5 py-0.5 rounded bg-[#171716] border border-[rgba(220,210,190,0.10)] uppercase">Global</span>
           </div>
           <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono truncate">
             {selectedJurisdiction === 'ALL' ? availableJurisdictions.join(' • ') : selectedJurisdiction}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] relative overflow-hidden flex flex-col justify-between transition-colors">
+        <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] relative overflow-hidden flex flex-col justify-between transition-all shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono font-medium text-[#8D8982] uppercase tracking-wider">Validation Health</span>
             <CheckCircle2 className="w-4 h-4 text-[#718A79]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[#F7F4EC] tracking-tight font-mono">100%</span>
-            <span className="text-[10px] font-mono text-[#718A79] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Verified</span>
+            <span className="text-2xl font-semibold text-[#F4F0E8] tracking-tight font-mono">100%</span>
+            <span className="text-[10px] font-mono text-[#8BA894] font-medium px-1.5 py-0.5 rounded bg-[#718A79]/15 border border-[#718A79]/30 uppercase">Verified</span>
           </div>
           <p className="mt-1.5 text-[11px] text-[#625F5A] font-mono">0 Mock / Test entries</p>
         </div>
       </div>
 
       {/* Interactive Filter & Search Toolbar */}
-      <div className="p-4 rounded-xl bg-[#151311] border border-[#211D19] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="p-4 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-[0_8px_24px_rgba(8,7,6,0.6)]">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#625F5A]" />
@@ -224,12 +224,12 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search regulations by name, topic, or keyword..."
-            className="pl-10 pr-8 bg-[#0B0A09] border-[#211D19] text-xs h-10 text-[#F1EEE7] placeholder:text-[#625F5A] focus-visible:ring-1 focus-visible:ring-[#AD956C] rounded-lg font-mono transition-colors"
+            className="pl-10 pr-8 bg-[#0B0A09] border-[rgba(220,210,190,0.10)] text-xs h-10 text-[#F4F0E8] placeholder:text-[#625F5A] focus-visible:ring-1 focus-visible:ring-[#C7AF7B] rounded-lg font-mono transition-colors"
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8D8982] hover:text-[#F7F4EC] cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8D8982] hover:text-[#F4F0E8] cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -239,14 +239,14 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
         {/* Jurisdiction Filters */}
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs text-[#8D8982] font-mono mr-1 flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-[#AD956C]" /> Region:
+            <Filter className="w-3.5 h-3.5 text-[#C7AF7B]" /> Region:
           </span>
           <button
             onClick={() => handleJurisdictionChange('ALL')}
             className={`px-3 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
               selectedJurisdiction === 'ALL'
-                ? 'bg-[#3F5C74] text-[#F7F4EC]'
-                : 'bg-[#100E0D] border border-[#211D19] text-[#8D8982] hover:text-[#F7F4EC] hover:border-[#2A241F]'
+                ? 'rc-btn-sapphire-metal font-bold'
+                : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
             }`}
           >
             ALL ({regulations.length})
@@ -260,8 +260,8 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                 onClick={() => handleJurisdictionChange(jur)}
                 className={`px-3 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#3F5C74] text-[#F7F4EC]'
-                    : 'bg-[#100E0D] border border-[#211D19] text-[#8D8982] hover:text-[#F7F4EC] hover:border-[#2A241F]'
+                    ? 'rc-btn-sapphire-metal font-bold'
+                    : 'rc-btn-graphite-metal text-[#8D8982] hover:text-[#F4F0E8]'
                 }`}
               >
                 {jur} ({count})
@@ -345,19 +345,19 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
             return (
               <Card 
                 key={reg.id} 
-                className="bg-[#100E0D] border border-[#211D19] hover:border-[#2A241F] hover:bg-[#151311] transition-all flex flex-col justify-between shadow-lg group rounded-xl overflow-hidden relative"
+                className="rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 transition-all flex flex-col justify-between shadow-[0_8px_24px_rgba(8,7,6,0.65)] group rounded-xl overflow-hidden relative"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2 mb-2.5">
                     <span className={`text-[10px] font-mono font-medium px-2.5 py-0.5 rounded-full border ${badge.color}`}>
                       {badge.label}
                     </span>
-                    <span className="text-[10px] font-mono font-medium text-[#718A79] bg-[#718A79]/15 border border-[#718A79]/30 px-2 py-0.5 rounded-md flex items-center gap-1">
+                    <span className="text-[10px] font-mono font-medium text-[#8BA894] bg-[#718A79]/15 border border-[#718A79]/35 px-2 py-0.5 rounded-md flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-[#718A79]" />
                       Enforceable
                     </span>
                   </div>
-                  <CardTitle className="text-base font-semibold text-[#F7F4EC] group-hover:text-[#F7F4EC] transition-colors leading-snug">
+                  <CardTitle className="text-base font-semibold text-[#F4F0E8] group-hover:text-white transition-colors leading-snug">
                     {reg.name}
                   </CardTitle>
                   <CardDescription className="text-[#8D8982] text-xs mt-2 line-clamp-3 leading-relaxed font-sans">
@@ -366,12 +366,12 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                 </CardHeader>
 
                 <CardContent className="pt-2 pb-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs py-2 px-3 bg-[#080706] border border-[#211D19] rounded-lg font-mono">
+                  <div className="flex items-center justify-between text-xs py-2 px-3 bg-[#0B0A09] border border-[rgba(220,210,190,0.08)] rounded-lg font-mono">
                     <span className="text-[#8D8982] font-medium flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-[#AD956C]" />
+                      <BookOpen className="w-3.5 h-3.5 text-[#C7AF7B]" />
                       Extracted Controls:
                     </span>
-                    <span className="text-[#607D96] font-semibold text-xs bg-[#344D63]/20 px-2 py-0.5 rounded border border-[#344D63]/30">
+                    <span className="text-[#8BAAC4] font-semibold text-xs bg-[#263E55]/30 px-2 py-0.5 rounded border border-[#486984]/40">
                       {reg.requirements_count || 0} Requirements
                     </span>
                   </div>
@@ -386,7 +386,7 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                           href={reg.source_url} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className="text-[#607D96] hover:text-[#AD956C] flex items-center gap-1 transition-colors"
+                          className="text-[#7A9FBE] hover:text-[#C7AF7B] flex items-center gap-1 transition-colors"
                         >
                           Official Text
                           <ExternalLink className="w-3 h-3" />
@@ -396,15 +396,14 @@ export function RegulationsClient({ initialRegulations }: RegulationsClientProps
                   )}
                 </CardContent>
 
-                <CardFooter className="pt-2 pb-4 border-t border-[#211D19]">
+                <CardFooter className="pt-2 pb-4 border-t border-[rgba(220,210,190,0.08)]">
                   <Link href={`/regulations/${reg.id}/requirements`} className="w-full">
-                    <Button 
-                      variant="default" 
-                      className="w-full bg-[#151311] hover:bg-[#1B1815] text-[#C9C4BA] hover:text-[#F7F4EC] border border-[#211D19] hover:border-[#AD956C]/40 font-mono font-medium text-xs h-10 rounded-lg flex items-center justify-center gap-2 group/btn transition-all cursor-pointer"
+                    <button 
+                      className="w-full rc-btn-graphite-metal font-mono font-medium text-xs h-10 rounded-lg flex items-center justify-center gap-2 group/btn transition-all cursor-pointer"
                     >
                       <span className="uppercase tracking-wider">Inspect Requirements</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1 text-[#AD956C]" />
-                    </Button>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1 text-[#C7AF7B]" />
+                    </button>
                   </Link>
                 </CardFooter>
               </Card>

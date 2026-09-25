@@ -105,20 +105,29 @@ export function TransformationSection() {
   return (
     <section 
       id="transformation" 
-      className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24"
+      className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
+      {/* Transformation Room Atmosphere (Warm Champagne & Titanium Glow) */}
+      <div 
+        className="absolute top-1/3 right-0 w-[580px] h-[360px] rounded-full blur-[140px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(199, 175, 123, 0.16) 0%, rgba(33, 25, 21, 0.08) 50%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          <Binary className="w-3.5 h-3.5 text-[#AD956C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
+          <Binary className="w-3.5 h-3.5 text-[#C7AF7B]" />
           The Translation Pipeline
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
-          Regulation <span className="text-[#AD956C]">→</span> Structured Logic.
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
+          Regulation <span className="text-[#C7AF7B]">→</span> Structured Logic.
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
           Observe how the compiler dismantles complex legal prose, isolates statutory obligations, and generates deterministic boolean verification logic.
@@ -136,15 +145,15 @@ export function TransformationSection() {
                 onClick={() => handleManualSwitch(idx)}
                 className={`relative p-3 rounded-xl border text-left font-mono text-xs transition-all duration-200 cursor-pointer overflow-hidden ${
                   isActive
-                    ? 'bg-[#1B1815] border-[#AD956C]/50 text-[#F7F4EC] shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
-                    : 'bg-[#151311] border-[rgba(201,196,186,0.08)] text-[#8D8982] hover:text-[#C9C4BA] hover:border-[rgba(201,196,186,0.18)]'
+                    ? 'bg-[#171716] border-[#C7AF7B]/60 text-[#F4F0E8] shadow-[0_8px_24px_rgba(8,7,6,0.65)]'
+                    : 'rc-glass-smoked border-[rgba(220,210,190,0.08)] text-[#8D8982] hover:text-[#C9C4BA] hover:border-[rgba(185,164,122,0.25)]'
                 }`}
               >
-                <div className="text-[10px] text-[#AD956C] mb-1 font-bold">STAGE 0{s.id}</div>
+                <div className="text-[10px] text-[#C7AF7B] mb-1 font-bold">STAGE 0{s.id}</div>
                 <div className="font-semibold truncate">{s.title}</div>
                 {/* Auto-advance progress indicator */}
                 {isActive && !isPaused && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#AD956C]" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C7AF7B]" />
                 )}
               </button>
             );
@@ -152,9 +161,9 @@ export function TransformationSection() {
         </div>
 
         {/* 3-Column Visual Transformation Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.12)] shadow-[0_24px_64px_rgba(0,0,0,0.8)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch p-6 rounded-xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] shadow-[0_32px_80px_rgba(8,7,6,0.85)]">
           {/* Left Column: Statutory Input */}
-          <div className="lg:col-span-5 p-5 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)] text-left flex flex-col justify-between">
+          <div className="lg:col-span-5 p-5 rounded-lg bg-[#10100F] border border-[rgba(220,210,190,0.08)] text-left flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] text-[#AD956C] uppercase tracking-wider font-bold">

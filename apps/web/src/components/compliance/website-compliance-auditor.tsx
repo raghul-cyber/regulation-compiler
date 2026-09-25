@@ -440,18 +440,18 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-[#0B0A09] border border-[#211D19] shadow-2xl text-[#F1EEE7] relative overflow-hidden">
+    <div className="w-full flex flex-col gap-6 p-6 sm:p-8 rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.12)] shadow-[0_24px_64px_rgba(8,7,6,0.85)] text-[#F4F0E8] relative overflow-hidden">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#211D19] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[rgba(220,210,190,0.08)] pb-6">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-8 h-8 rounded-lg bg-[#151311] border border-[#211D19] flex items-center justify-center text-[#AD956C] shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.12)] flex items-center justify-center text-[#C7AF7B] shadow-sm">
               <Globe className="w-4 h-4" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F7F4EC] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#F4F0E8] tracking-tight">
               Automated Website Compliance Auditor
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#718A79]/15 text-[#718A79] border border-[#718A79]/30 flex items-center gap-1.5">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#718A79]/15 text-[#8BA894] border border-[#718A79]/35 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
               LIVE PROBE AGENT • STATUTORY AUDIT
             </span>
@@ -605,16 +605,16 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
           {isLimitReached ? (
             <Button
               onClick={() => setIsPaywallOpen(true)}
-              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-[#AD956C]/20 hover:bg-[#AD956C]/30 text-[#AD956C] border border-[#AD956C]/40 shadow-lg shadow-black/40 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              className="h-10 px-6 font-bold text-xs uppercase tracking-wider bg-[#C7AF7B]/20 hover:bg-[#C7AF7B]/30 text-[#C7AF7B] border border-[#C7AF7B]/40 shadow-lg shadow-black/40 transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Lock className="w-4 h-4 text-[#AD956C]" />
+              <Lock className="w-4 h-4 text-[#C7AF7B]" />
               <span>3/3 Used • Upgrade to Pro</span>
             </Button>
           ) : (
-            <Button
+            <button
               onClick={() => handleRunAudit()}
               disabled={isAuditing}
-              className="h-10 px-6 font-medium text-xs uppercase tracking-wider bg-[#3F5C74] hover:bg-[#344D63] text-[#F1EEE7] shadow-sm transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              className="h-10 px-6 font-medium text-xs uppercase tracking-wider rc-btn-sapphire-metal rounded-[6px] transition-all shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               {isAuditing ? (
                 <>
@@ -623,11 +623,11 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 text-[#AD956C]" />
+                  <Zap className="w-4 h-4 text-[#C7AF7B]" />
                   <span>Audit Your Site</span>
                 </>
               )}
-            </Button>
+            </button>
           )}
         </div>
 

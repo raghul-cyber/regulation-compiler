@@ -89,10 +89,19 @@ export function HeroSection() {
       id="product" 
       className="w-full flex flex-col items-center text-center pt-24 sm:pt-28 md:pt-32 scroll-mt-28 relative"
     >
-      <div ref={heroRef} className={`landing-reveal ${heroRevealed ? 'revealed' : ''} flex flex-col items-center max-w-5xl px-4`}>
+      {/* Central Hero Atmospheric Framing Light (Soft champagne halo above headline, sapphire depth below) */}
+      <div 
+        className="absolute top-16 left-1/2 -translate-x-1/2 w-[720px] h-[340px] rounded-full blur-[110px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(199, 175, 123, 0.12) 0%, rgba(38, 62, 85, 0.08) 50%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div ref={heroRef} className={`landing-reveal ${heroRevealed ? 'revealed' : ''} flex flex-col items-center max-w-5xl px-4 relative`}>
         {/* Refined Technical Designation Plate */}
-        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-[4px] bg-[#151311]/95 border border-[rgba(201,196,186,0.12)] text-xs font-medium text-[#C9C4BA] mb-8 shadow-[0_2px_8px_rgba(0,0,0,0.6)] tracking-wide">
-          <div className="w-3.5 h-3.5 rounded-[2px] overflow-hidden flex items-center justify-center shrink-0 opacity-90">
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-[4px] bg-[#171716]/90 border border-[rgba(220,210,190,0.12)] text-xs font-medium text-[#C9C4BA] mb-8 shadow-[0_4px_16px_rgba(8,7,6,0.6)] tracking-wide backdrop-blur-md">
+          <div className="w-3.5 h-3.5 rounded-[2px] overflow-hidden flex items-center justify-center shrink-0 opacity-95">
             <Image 
               src="/logo-icon.png" 
               alt="RegCompiler Logo" 
@@ -102,16 +111,16 @@ export function HeroSection() {
               priority
             />
           </div>
-          <span className="text-[#F7F4EC] font-mono text-[11px] uppercase tracking-wider font-semibold">REGCOMPILER // SPEC-01</span>
+          <span className="text-[#F4F0E8] font-mono text-[11px] uppercase tracking-wider font-semibold">REGCOMPILER // SPEC-01</span>
           <span className="text-[#625F5A] font-mono">|</span>
-          <span className="text-[#AD956C] font-mono tracking-wider text-[10px] uppercase font-medium">
+          <span className="text-[#C7AF7B] font-mono tracking-wider text-[10px] uppercase font-medium">
             REGULATORY INTELLIGENCE &bull; FORMAL COMPILER
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#AD956C] ml-0.5" title="Statutory Precision Standard" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C7AF7B] ml-0.5 shadow-[0_0_6px_rgba(199,175,123,0.5)]" title="Statutory Precision Standard" />
         </div>
 
         {/* Main Headline with Clean Enterprise Sans-Serif Typography in Warm Ivory */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#F7F4EC] max-w-4xl mx-auto leading-[1.15]">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#F4F0E8] max-w-4xl mx-auto leading-[1.15]">
           <TypingHeadline delay={150} speed={28} />
         </h1>
 
@@ -125,23 +134,23 @@ export function HeroSection() {
           <Show when="signed-in">
             <Link href="/dashboard">
               <button 
-                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.6)] border border-[#AD956C]/25 active:scale-[0.98]"
+                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(17,24,32,0.6)]"
               >
                 <span>Start Compiling</span>
-                <ArrowRight className="w-4 h-4 text-[#AD956C]" />
+                <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
               </button>
             </Link>
             <button 
               onClick={scrollToWebsiteAuditor}
-              className="rounded-[6px] font-medium px-5 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98] shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+              className="rc-btn-graphite-metal rounded-[6px] font-medium px-5 h-11 flex items-center gap-2 text-sm cursor-pointer"
             >
-              <Globe className="w-4 h-4 text-[#AD956C]" />
+              <Globe className="w-4 h-4 text-[#C7AF7B]" />
               <span>Instant Website Auditor</span>
-              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#AD956C]/15 text-[#C5B38B] font-semibold uppercase">New</span>
+              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#C7AF7B]/15 text-[#C7AF7B] border border-[#C7AF7B]/30 font-semibold uppercase">New</span>
             </button>
             <button 
               onClick={scrollToHowItWorks}
-              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#8D8982] hover:text-[#F1EEE7] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.16)] hover:bg-[#151311]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#B7B4AC] hover:text-[#F4F0E8] border border-[rgba(220,210,190,0.12)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
             >
               <span>Explore How It Works</span>
             </button>
@@ -150,23 +159,23 @@ export function HeroSection() {
           <Show when="signed-out">
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
               <button 
-                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-sm transition-all px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.6)] border border-[#AD956C]/25 active:scale-[0.98]"
+                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(17,24,32,0.6)]"
               >
                 <span>Start Compiling</span>
-                <ArrowRight className="w-4 h-4 text-[#AD956C]" />
+                <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
               </button>
             </SignInButton>
             <button 
               onClick={scrollToWebsiteAuditor}
-              className="rounded-[6px] font-medium px-5 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98] shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+              className="rc-btn-graphite-metal rounded-[6px] font-medium px-5 h-11 flex items-center gap-2 text-sm cursor-pointer"
             >
-              <Globe className="w-4 h-4 text-[#AD956C]" />
+              <Globe className="w-4 h-4 text-[#C7AF7B]" />
               <span>Instant Website Auditor</span>
-              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#AD956C]/15 text-[#C5B38B] font-semibold uppercase">New</span>
+              <span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#C7AF7B]/15 text-[#C7AF7B] border border-[#C7AF7B]/30 font-semibold uppercase">New</span>
             </button>
             <button 
               onClick={scrollToHowItWorks}
-              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#8D8982] hover:text-[#F1EEE7] border border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.16)] hover:bg-[#151311]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+              className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#B7B4AC] hover:text-[#F4F0E8] border border-[rgba(220,210,190,0.12)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
             >
               <span>Explore How It Works</span>
             </button>
@@ -179,7 +188,7 @@ export function HeroSection() {
         ref={metricsRef}
         className={`landing-reveal ${metricsRevealed ? 'revealed' : ''} mt-14 w-full max-w-4xl px-4 pointer-events-auto font-sans`}
       >
-        <div className="w-full rounded-[8px] bg-[#151311]/95 border border-[rgba(201,196,186,0.12)] shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-md overflow-hidden grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[rgba(201,196,186,0.08)] transition-colors hover:border-[rgba(201,196,186,0.2)]">
+        <div className="w-full rounded-[8px] rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] shadow-[0_24px_60px_rgba(8,7,6,0.85)] overflow-hidden grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[rgba(220,210,190,0.08)] transition-all hover:border-[rgba(185,164,122,0.35)]">
           {/* Spec Item 1: Live Regulatory Signals */}
           <div ref={count1.ref} className="p-5 md:p-6 text-left flex flex-col justify-between group">
             <div>

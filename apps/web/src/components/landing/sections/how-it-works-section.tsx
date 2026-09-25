@@ -17,14 +17,23 @@ export function HowItWorksSection() {
   const { ref: stagesRef, isRevealed: stagesRevealed } = useScrollReveal({ threshold: 0.1 });
 
   return (
-    <section id="how-it-works" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
+    <section id="how-it-works" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
+      {/* Engineering Laboratory Room Atmosphere (Espresso & Champagne Lighting) */}
+      <div 
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[720px] h-[400px] rounded-full blur-[150px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(33, 25, 21, 0.40) 0%, rgba(199, 175, 123, 0.12) 50%, transparent 85%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Header */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          <Cpu className="w-3.5 h-3.5 text-[#AD956C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
+          <Cpu className="w-3.5 h-3.5 text-[#C7AF7B]" />
           Compiler Architecture
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
           How RegCompiler Works
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
@@ -37,12 +46,12 @@ export function HowItWorksSection() {
         {STAGES.map((s) => (
           <div 
             key={s.step} 
-            className="p-3.5 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] text-left hover:border-[rgba(201,196,186,0.22)] hover:bg-[#1B1815] transition-all shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
+            className="p-3.5 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] text-left hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 transition-all shadow-[0_8px_24px_rgba(8,7,6,0.65)]"
           >
-            <div className="font-mono text-[10px] text-[#AD956C] font-bold mb-1">
+            <div className="font-mono text-[10px] text-[#C7AF7B] font-bold mb-1">
               STAGE {s.step}
             </div>
-            <div className="font-mono text-xs font-bold text-[#F7F4EC] mb-1">
+            <div className="font-mono text-xs font-bold text-[#F4F0E8] mb-1">
               {s.label}
             </div>
             <div className="text-[11px] text-[#C9C4BA] leading-relaxed">

@@ -7,15 +7,24 @@ import { ArrowRight, Terminal } from 'lucide-react';
 
 export function FinalCTASection() {
   return (
-    <section id="cta" className="w-full max-w-4xl mx-auto px-4 text-center pointer-events-auto pt-10">
-      <div className="p-8 sm:p-14 rounded-2xl bg-[#151311] border border-[rgba(201,196,186,0.12)] shadow-[0_24px_64px_rgba(0,0,0,0.8)] relative overflow-hidden">
+    <section id="cta" className="w-full max-w-4xl mx-auto px-4 text-center pointer-events-auto pt-10 relative">
+      {/* Quiet Corridor / Vault Exit Atmosphere (Sapphire & Champagne Halo) */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[380px] rounded-full blur-[140px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.24) 0%, rgba(199, 175, 123, 0.10) 45%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="p-8 sm:p-14 rounded-2xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] shadow-[0_32px_80px_rgba(8,7,6,0.85)] relative overflow-hidden">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#100E0D] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-            <Terminal className="w-3.5 h-3.5 text-[#AD956C]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-5 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
+            <Terminal className="w-3.5 h-3.5 text-[#C7AF7B]" />
             Operational Readiness
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight mb-4">
             Make Regulations Operational.
           </h2>
 
@@ -26,43 +35,37 @@ export function FinalCTASection() {
           <div className="flex flex-wrap justify-center gap-4">
             <Show when="signed-in">
               <Link href="/dashboard">
-                <Button 
-                  size="lg" 
-                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-lg font-medium px-8 h-11 transition-all cursor-pointer flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/25 active:scale-[0.98]"
+                <button 
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-8 h-11 transition-all cursor-pointer flex items-center gap-2 text-sm"
                 >
                   <span>Start Compiling</span>
-                  <ArrowRight className="w-4 h-4 text-[#AD956C]" />
-                </Button>
+                  <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
+                </button>
               </Link>
               <Link href="/regulations">
-                <Button 
-                  size="lg" 
-                  variant="secondary" 
-                  className="rounded-lg font-medium px-8 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                <button 
+                  className="rc-btn-graphite-metal rounded-[6px] font-medium px-8 h-11 cursor-pointer flex items-center gap-2 text-sm"
                 >
                   Launch Compiler Studio
-                </Button>
+                </button>
               </Link>
             </Show>
 
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
-                <Button 
-                  size="lg" 
-                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-lg font-medium px-8 h-11 transition-all cursor-pointer flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)] border border-[#AD956C]/25 active:scale-[0.98]"
+                <button 
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-8 h-11 transition-all cursor-pointer flex items-center gap-2 text-sm"
                 >
                   <span>Start Compiling</span>
-                  <ArrowRight className="w-4 h-4 text-[#AD956C]" />
-                </Button>
+                  <ArrowRight className="w-4 h-4 text-[#C7AF7B]" />
+                </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/regulations">
-                <Button 
-                  size="lg" 
-                  variant="secondary" 
-                  className="rounded-lg font-medium px-8 h-11 bg-[#1B1815] text-[#F1EEE7] border border-[rgba(201,196,186,0.12)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#211D19] cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                <button 
+                  className="rc-btn-graphite-metal rounded-[6px] font-medium px-8 h-11 cursor-pointer flex items-center gap-2 text-sm"
                 >
                   Launch Compiler Studio
-                </Button>
+                </button>
               </SignInButton>
             </Show>
           </div>

@@ -51,14 +51,23 @@ export function ArchitectureSection() {
   const { ref: layersRef, isRevealed: layersRevealed } = useScrollReveal({ threshold: 0.08 });
 
   return (
-    <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
+    <section id="architecture" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
+      {/* Control Room Atmosphere (Deep Sapphire & Titanium Reflections) */}
+      <div 
+        className="absolute top-1/2 right-10 -translate-y-1/2 w-[680px] h-[460px] rounded-full blur-[150px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(38, 62, 85, 0.30) 0%, rgba(20, 28, 36, 0.14) 50%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-14`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          <Layers className="w-3.5 h-3.5 text-[#AD956C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
+          <Layers className="w-3.5 h-3.5 text-[#C7AF7B]" />
           Technical Stack
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
           Enterprise Architecture
         </h2>
         <p className="mt-4 text-base md:text-lg text-[#C9C4BA] leading-relaxed">
@@ -73,19 +82,19 @@ export function ArchitectureSection() {
           return (
             <div
               key={layer.step}
-              className="p-5 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] hover:border-[rgba(201,196,186,0.22)] hover:bg-[#1B1815] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
+              className="p-5 rounded-xl rc-glass-smoked border border-[rgba(220,210,190,0.10)] hover:border-[rgba(185,164,122,0.3)] hover:bg-[#171716]/90 transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left shadow-[0_8px_24px_rgba(8,7,6,0.65)]"
             >
               <div className="flex items-start md:items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#1B1815] border border-[rgba(201,196,186,0.08)] text-[#AD956C] shrink-0">
+                <div className="p-3 rounded-lg bg-[#171716] border border-[rgba(220,210,190,0.08)] text-[#C7AF7B] shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[#AD956C] font-bold">
+                    <span className="font-mono text-xs text-[#C7AF7B] font-bold">
                       LAYER {layer.step}
                     </span>
                     <span className="text-[#625F5A]">•</span>
-                    <h3 className="text-base font-bold text-[#F7F4EC]">
+                    <h3 className="text-base font-bold text-[#F4F0E8]">
                       {layer.name}
                     </h3>
                   </div>
@@ -95,7 +104,7 @@ export function ArchitectureSection() {
                 </div>
               </div>
 
-              <div className="font-mono text-[11px] text-[#8D8982] bg-[#100E0D] px-3 py-1.5 rounded-lg border border-[rgba(201,196,186,0.08)] shrink-0">
+              <div className="font-mono text-[11px] text-[#B7B4AC] bg-[#10100F] px-3 py-1.5 rounded-lg border border-[rgba(220,210,190,0.08)] shrink-0">
                 {layer.tech}
               </div>
             </div>

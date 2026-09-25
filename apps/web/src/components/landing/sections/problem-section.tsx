@@ -37,14 +37,23 @@ export function ProblemSection() {
   const { ref: contentRef, isRevealed: contentRevealed } = useScrollReveal({ threshold: 0.1 });
 
   return (
-    <section id="problem" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24">
+    <section id="problem" className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative">
+      {/* Dark Archive Room Atmosphere (Smoked Plum & Deep Burgundy) */}
+      <div 
+        className="absolute top-1/2 left-0 -translate-y-1/2 w-[650px] h-[420px] rounded-full blur-[150px] pointer-events-none -z-10"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(36, 25, 31, 0.28) 0%, rgba(50, 29, 36, 0.14) 45%, transparent 80%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Section Eyebrow & Title */}
       <div ref={titleRef} className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-16`}>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151311] border border-[rgba(201,196,186,0.12)] text-[#AD956C] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-          <AlertCircle className="w-3.5 h-3.5 text-[#AD956C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171716] border border-[rgba(220,210,190,0.12)] text-[#C7AF7B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(8,7,6,0.5)] backdrop-blur-md">
+          <AlertCircle className="w-3.5 h-3.5 text-[#C7AF7B]" />
           The Structural Disconnect
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F7F4EC] tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F4F0E8] tracking-tight leading-tight">
           Regulations were written for humans. <br />
           <span className="text-[#8D8982]">Compliance systems need structure.</span>
         </h2>
@@ -68,23 +77,23 @@ export function ProblemSection() {
                 onClick={() => setSelectedFragment(frag.id)}
                 className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer text-left ${
                   isSelected
-                    ? 'bg-[#1B1815] border-[#AD956C]/50 shadow-[0_8px_24px_rgba(0,0,0,0.6)]'
-                    : 'bg-[#151311] border-[rgba(201,196,186,0.08)] hover:border-[rgba(201,196,186,0.18)] hover:bg-[#1B1815]/60'
+                    ? 'bg-[#24191F]/50 border-[rgba(185,164,122,0.45)] shadow-[0_12px_36px_rgba(8,7,6,0.7)] backdrop-blur-md'
+                    : 'rc-glass-smoked border-[rgba(220,210,190,0.08)] hover:border-[rgba(185,164,122,0.25)] hover:bg-[#171716]/80'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#AD956C]" />
-                    <span className="font-mono text-xs font-bold text-[#F7F4EC]">{frag.ref}</span>
+                    <FileText className="w-4 h-4 text-[#C7AF7B]" />
+                    <span className="font-mono text-xs font-bold text-[#F4F0E8]">{frag.ref}</span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#C5B38B] bg-[#9A5D62]/20 px-2 py-0.5 rounded border border-[#9A5D62]/30">
+                  <span className="font-mono text-[10px] text-[#C7AF7B] bg-[#321D24] px-2 py-0.5 rounded border border-[#321D24]">
                     {frag.flag}
                   </span>
                 </div>
                 <p className="text-xs text-[#C9C4BA] italic line-clamp-2">
                   &ldquo;{frag.text}&rdquo;
                 </p>
-                <div className="mt-2.5 pt-2 border-t border-[rgba(201,196,186,0.08)] flex items-center justify-between text-[11px] font-mono text-[#8D8982]">
+                <div className="mt-2.5 pt-2 border-t border-[rgba(220,210,190,0.08)] flex items-center justify-between text-[11px] font-mono text-[#8D8982]">
                   <span>Vulnerability: {frag.state}</span>
                 </div>
               </div>
@@ -97,18 +106,18 @@ export function ProblemSection() {
           <div className="text-xs font-mono text-[#8D8982] uppercase tracking-wider mb-2">
             02 // AUTOMATED PARSER TRANSFORMATION
           </div>
-          <div className="p-6 rounded-xl bg-[#151311] border border-[rgba(201,196,186,0.10)] text-left relative overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
-            <div className="flex items-center justify-between pb-3 border-b border-[rgba(201,196,186,0.08)] mb-4">
-              <span className="font-mono text-xs text-[#AD956C] uppercase tracking-wider font-semibold">
+          <div className="p-6 rounded-xl rc-glass-smoked-elevated border border-[rgba(220,210,190,0.12)] text-left relative overflow-hidden shadow-[0_16px_48px_rgba(8,7,6,0.75)]">
+            <div className="flex items-center justify-between pb-3 border-b border-[rgba(220,210,190,0.08)] mb-4">
+              <span className="font-mono text-xs text-[#C7AF7B] uppercase tracking-wider font-semibold">
                 Syntactic Boundary Deconstruction
               </span>
-              <span className="text-[10px] font-mono text-[#718A79] bg-[#718A79]/10 px-2 py-0.5 rounded border border-[#718A79]/30">
+              <span className="text-[10px] font-mono text-[#8BA894] bg-[#718A79]/15 px-2 py-0.5 rounded border border-[#718A79]/35">
                 Deterministic
               </span>
             </div>
 
             <div className="space-y-4 text-xs font-mono">
-              <div className="p-3.5 rounded-lg bg-[#100E0D] border border-[rgba(201,196,186,0.08)]">
+              <div className="p-3.5 rounded-lg bg-[#10100F] border border-[rgba(220,210,190,0.08)]">
                 <div className="text-[10px] text-[#8D8982] uppercase tracking-wider mb-1">Normalized Legal Entity</div>
                 <div className="text-[#F7F4EC] font-bold">HIGH_RISK_AI_OPERATOR // ARTICLE_09</div>
               </div>

@@ -121,14 +121,14 @@ export function TopNav() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-[#080706]/90 backdrop-blur-md border-b border-[rgba(201,196,186,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.7)]'
+            ? 'rc-glass-smoked border-b border-[rgba(220,210,190,0.10)] shadow-[0_8px_32px_rgba(8,7,6,0.7)]'
             : 'bg-transparent border-b border-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-14 sm:h-16">
           {/* Brand Wordmark */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-[6px] bg-[#151311] border border-[rgba(201,196,186,0.08)] flex items-center justify-center p-1 shadow-sm shrink-0">
+            <div className="w-7 h-7 rounded-[6px] bg-[#171716] border border-[rgba(220,210,190,0.12)] flex items-center justify-center p-1 shadow-sm shrink-0 group-hover:border-[rgba(185,164,122,0.35)] transition-colors">
               <Image
                 src="/icon.png"
                 alt="RegCompiler Logo"
@@ -139,10 +139,10 @@ export function TopNav() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-sans font-bold text-sm tracking-tight text-[#F7F4EC]">
+              <span className="font-sans font-bold text-sm tracking-tight text-[#F4F0E8] group-hover:text-white transition-colors">
                 RegCompiler
               </span>
-              <span className="font-mono text-[9px] tracking-wider text-[#8D8982] uppercase leading-none">
+              <span className="font-mono text-[9px] tracking-wider text-[#B7B4AC] uppercase leading-none">
                 REGULATION AS CODE
               </span>
             </div>
@@ -150,22 +150,22 @@ export function TopNav() {
 
           {/* Center: Editorial Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs text-[#C9C4BA] font-medium tracking-wide">
-            <a href="#product" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#product" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               Product
             </a>
-            <a href="#problem" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#problem" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               The Problem
             </a>
-            <a href="#how-it-works" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#how-it-works" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               How It Works
             </a>
-            <a href="#architecture" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#architecture" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               Architecture
             </a>
-            <a href="#security" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#security" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               Security
             </a>
-            <a href="#use-cases" className="hover:text-[#F7F4EC] transition-colors">
+            <a href="#use-cases" className="hover:text-[#F4F0E8] transition-colors relative py-1">
               Use Cases
             </a>
           </nav>
@@ -176,9 +176,9 @@ export function TopNav() {
               <UsageIndicator />
               <Link href="/dashboard">
                 <button
-                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs active:scale-[0.98] shadow-sm border border-[#4B6982]/30"
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs"
                 >
-                  <LayoutDashboard className="w-3.5 h-3.5 text-[#AD956C]" />
+                  <LayoutDashboard className="w-3.5 h-3.5 text-[#C7AF7B]" />
                   <span>Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#C9C4BA]" />
                 </button>
@@ -188,13 +188,13 @@ export function TopNav() {
 
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-                <button className="text-xs text-[#C9C4BA] hover:text-[#F7F4EC] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
+                <button className="text-xs text-[#C9C4BA] hover:text-[#F4F0E8] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
                   Sign In
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <button
-                  className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium transition-all px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs"
                 >
                   <span>Start Compiling</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -205,7 +205,7 @@ export function TopNav() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-[#C9C4BA] hover:text-[#F7F4EC] rounded-[6px] hover:bg-white/[0.04] transition-colors"
+              className="lg:hidden p-1.5 text-[#C9C4BA] hover:text-[#F4F0E8] rounded-[6px] hover:bg-white/[0.04] transition-colors"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -291,12 +291,12 @@ export function TopNav() {
   // 2. STANDARD APPLICATION NAVIGATION (Dashboard, Regulations, Admin, etc.)
   // =========================================================================
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(201,196,186,0.08)] bg-[#080706]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(220,210,190,0.10)] rc-glass-smoked shadow-[0_4px_24px_rgba(8,7,6,0.6)]">
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex h-14 items-center justify-between">
         {/* Left: Logo/Wordmark & Telemetry */}
         <div className="flex items-center gap-5">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 rounded-[6px] overflow-hidden flex items-center justify-center p-1 bg-[#151311] border border-[rgba(201,196,186,0.08)] shrink-0">
+            <div className="w-7 h-7 rounded-[6px] overflow-hidden flex items-center justify-center p-1 bg-[#171716] border border-[rgba(220,210,190,0.12)] shrink-0 group-hover:border-[rgba(185,164,122,0.35)] transition-colors">
               <Image
                 src="/logo-icon.png"
                 alt="RegCompiler Logo"
@@ -539,7 +539,7 @@ export function TopNav() {
             <UsageIndicator />
             <Link href="/regulations/new">
               <button 
-                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-xs px-3 py-1.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
+                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-xs px-3 py-1.5 h-8 flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Upload Regulation</span>
               </button>
@@ -549,13 +549,13 @@ export function TopNav() {
 
           <Show when="signed-out">
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-              <button className="text-xs text-[#C9C4BA] hover:text-[#F7F4EC] px-2.5 py-1.5 transition-colors cursor-pointer font-medium">
+              <button className="text-xs text-[#C9C4BA] hover:text-[#F4F0E8] px-2.5 py-1.5 transition-colors cursor-pointer font-medium">
                 Sign In
               </button>
             </SignInButton>
             <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
               <button
-                className="bg-[#3F5C74] hover:bg-[#344D63] text-[#F7F4EC] rounded-[6px] font-medium text-xs px-3.5 h-8 flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#4B6982]/30 active:scale-[0.98]"
+                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-xs px-3.5 h-8 flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Start Free</span>
               </button>

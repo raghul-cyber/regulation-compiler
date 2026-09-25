@@ -21,26 +21,26 @@ export function HeroProductPreview() {
   };
 
   return (
-    <div ref={ref} className={`landing-reveal ${isRevealed ? 'revealed' : ''} w-full max-w-4xl mx-auto mt-12 rounded-[8px] bg-[#151311] border border-[rgba(201,196,186,0.12)] shadow-[0_24px_64px_rgba(0,0,0,0.7)] overflow-hidden text-left transition-colors hover:border-[rgba(201,196,186,0.2)]`}>
+    <div ref={ref} className={`landing-reveal ${isRevealed ? 'revealed' : ''} w-full max-w-4xl mx-auto mt-12 rounded-[8px] rc-glass-smoked-elevated border border-[rgba(220,210,190,0.14)] shadow-[0_32px_80px_rgba(8,7,6,0.85)] overflow-hidden text-left transition-all hover:border-[rgba(185,164,122,0.3)]`}>
       {/* Top Window Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D0B0A] border-b border-[rgba(201,196,186,0.08)]">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0B0A09]/95 border-b border-[rgba(220,210,190,0.08)]">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)] border border-[rgba(201,196,186,0.06)]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)] border border-[rgba(201,196,186,0.06)]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(201,196,186,0.14)] border border-[rgba(201,196,186,0.06)]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(220,210,190,0.18)] border border-[rgba(220,210,190,0.08)]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(220,210,190,0.18)] border border-[rgba(220,210,190,0.08)]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[rgba(220,210,190,0.18)] border border-[rgba(220,210,190,0.08)]" />
           <span className="ml-3 font-mono text-[11px] text-[#C9C4BA]">
             COMPILER_STUDIO // EU_AI_ACT_ART9.ast
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] text-[#718A79] bg-[#718A79]/10 px-2 py-0.5 rounded-[4px] border border-[#718A79]/30 flex items-center gap-1.5 font-medium">
+          <span className="font-mono text-[10px] text-[#8BA894] bg-[#718A79]/15 px-2 py-0.5 rounded-[4px] border border-[#718A79]/35 flex items-center gap-1.5 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-[#718A79]" />
             COMPILED &amp; VERIFIED
           </span>
           <button
             onClick={handleCopy}
-            className="p-1 rounded text-[#8D8982] hover:text-[#F1EEE7] hover:bg-white/[0.05] transition-colors cursor-pointer"
+            className="p-1 rounded text-[#8D8982] hover:text-[#F4F0E8] hover:bg-white/[0.05] transition-colors cursor-pointer"
             title="Copy AST definition"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#718A79]" /> : <Copy className="w-3.5 h-3.5" />}
@@ -49,48 +49,48 @@ export function HeroProductPreview() {
       </div>
 
       {/* Compiler Mode Navigation Tabs */}
-      <div className="relative flex items-center gap-1 px-4 pt-1.5 border-b border-[rgba(201,196,186,0.08)] bg-[#0D0B0A] font-mono text-xs">
+      <div className="relative flex items-center gap-1 px-4 pt-1.5 border-b border-[rgba(220,210,190,0.08)] bg-[#0B0A09]/95 font-mono text-xs">
         <button
           onClick={() => handleTabSwitch('input')}
           className={`px-3 py-2 border-b-2 font-medium transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'input'
-              ? 'border-[#AD956C] text-[#F7F4EC] bg-[#1B1815]'
+              ? 'border-[#C7AF7B] text-[#F4F0E8] bg-[#171716]'
               : 'border-transparent text-[#8D8982] hover:text-[#C9C4BA]'
           }`}
         >
-          <FileCode2 className="w-3.5 h-3.5 text-[#AD956C]" />
+          <FileCode2 className="w-3.5 h-3.5 text-[#C7AF7B]" />
           <span>01. Statutory Input</span>
         </button>
         <button
           onClick={() => handleTabSwitch('analysis')}
           className={`px-3 py-2 border-b-2 font-medium transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'analysis'
-              ? 'border-[#AD956C] text-[#F7F4EC] bg-[#1B1815]'
+              ? 'border-[#C7AF7B] text-[#F4F0E8] bg-[#171716]'
               : 'border-transparent text-[#8D8982] hover:text-[#C9C4BA]'
           }`}
         >
-          <Cpu className="w-3.5 h-3.5 text-[#AD956C]" />
+          <Cpu className="w-3.5 h-3.5 text-[#C7AF7B]" />
           <span>02. Semantic Extraction</span>
         </button>
         <button
           onClick={() => handleTabSwitch('compiled')}
           className={`px-3 py-2 border-b-2 font-medium transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'compiled'
-              ? 'border-[#AD956C] text-[#F7F4EC] bg-[#1B1815]'
+              ? 'border-[#C7AF7B] text-[#F4F0E8] bg-[#171716]'
               : 'border-transparent text-[#8D8982] hover:text-[#C9C4BA]'
           }`}
         >
-          <Terminal className="w-3.5 h-3.5 text-[#AD956C]" />
+          <Terminal className="w-3.5 h-3.5 text-[#C7AF7B]" />
           <span>03. Executable AST Logic</span>
         </button>
         {/* Progress bar on tab switch */}
         <div className="absolute bottom-0 left-0 right-0">
-          <div key={tabKey} className="landing-tab-progress-bar h-[2px] bg-[#AD956C]" />
+          <div key={tabKey} className="landing-tab-progress-bar h-[2px] bg-[#C7AF7B]" />
         </div>
       </div>
 
       {/* Code / Content Area with Line Numbers */}
-      <div className="p-5 font-mono text-xs leading-relaxed min-h-[200px] bg-[#100E0D]">
+      <div className="p-5 font-mono text-xs leading-relaxed min-h-[200px] bg-[#10100F]">
         {activeTab === 'input' && (
           <div className="text-[#C9C4BA] space-y-2">
             <div className="text-[11px] text-[#8D8982]">// Source: EU Official Journal L 2024/1689 (Regulation (EU) 2024/1689)</div>
