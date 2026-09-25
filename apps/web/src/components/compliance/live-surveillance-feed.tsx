@@ -662,7 +662,14 @@ export function LiveSurveillanceFeed({
                     {/* Direct Navigate to Full Directory if ID exists */}
                     {targetRegId && (
                       <button
-                        onClick={() => router.push(`/regulations/${targetRegId}/requirements`)}
+                        onClick={() => {
+                          const q = new URLSearchParams();
+                          if (evt.id) q.set('signalId', evt.id);
+                          if (evt.title) q.set('title', evt.title);
+                          if (evt.jurisdiction) q.set('jurisdiction', evt.jurisdiction);
+                          const qStr = q.toString() ? `?${q.toString()}` : '';
+                          router.push(`/regulations/${targetRegId}/requirements${qStr}`);
+                        }}
                         className="text-blue-400 hover:text-blue-300 font-medium text-[10px] px-2 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors flex items-center gap-1 cursor-pointer"
                         title="Open in full regulations requirements browser"
                       >
@@ -1080,8 +1087,14 @@ export function LiveSurveillanceFeed({
                     return (
                       <button
                         onClick={() => {
+                          const q = new URLSearchParams();
+                          if (inspectingSignal.id) q.set('signalId', inspectingSignal.id);
+                          if (inspectingSignal.title) q.set('title', inspectingSignal.title);
+                          if (inspectingSignal.jurisdiction) q.set('jurisdiction', inspectingSignal.jurisdiction);
+                          if (inspectingSignal.source_url) q.set('source_url', inspectingSignal.source_url);
+                          const qStr = q.toString() ? `?${q.toString()}` : '';
                           setInspectingSignal(null);
-                          router.push(`/regulations/${targetId}/requirements`);
+                          router.push(`/regulations/${targetId}/requirements${qStr}`);
                         }}
                         className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow"
                       >

@@ -1,7 +1,28 @@
 import { auth } from '@clerk/nextjs/server';
 
-const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
-const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '');
+function getCandidateBaseUrls(): string[] {
+  const pubUrl = process.env.NEXT_PUBLIC_API_URL;
+  const isProd = process.env.VERCEL || process.env.NODE_ENV === 'production';
+  const list: string[] = [];
+
+  // 1. If explicit valid external URL is configured, use it first
+  if (pubUrl && !pubUrl.includes('127.0.0.1') && !pubUrl.includes('localhost')) {
+    list.push(pubUrl.replace(/\/+$/, ''));
+  }
+
+  // 2. Production Render cloud deployment
+  list.push('https://regulation-compiler.onrender.com/api/v1');
+
+  // 3. Local URL (first in dev mode, last resort in production)
+  const localUrl = (pubUrl || 'http://127.0.0.1:8080/api/v1').replace(/\/+$/, '');
+  if (!isProd) {
+    list.unshift(localUrl);
+  } else {
+    list.push(localUrl);
+  }
+
+  return Array.from(new Set(list));
+}
 
 async function getAuthToken() {
   try {
@@ -28,32 +49,32 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   }
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const candidateUrls = getCandidateBaseUrls();
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(8000),
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
+  for (const baseUrl of candidateUrls) {
+    try {
+      const response = await fetch(`${baseUrl}${cleanEndpoint}`, {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(6500),
+        ...options,
+        headers: {
+          ...headers,
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      console.warn(`API Error [${endpoint}]: ${response.status} ${response.statusText}`);
-      return null;
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (err: any) {
+      if (err?.digest === 'DYNAMIC_SERVER_USAGE') {
+        throw err;
+      }
+      // Continue to next candidate URL
     }
-
-    return await response.json();
-  } catch (err: any) {
-    if (err?.digest === 'DYNAMIC_SERVER_USAGE') {
-      throw err;
-    }
-    console.warn(`Fetch error for [${endpoint}]:`, err?.message || err);
-    return null;
   }
 
+  return null;
 }
 
 
@@ -66,7 +87,30 @@ export async function getRegulations() {
 
 
 export async function getRegulation(regulationId: string) {
-  return fetchWithAuth(`/regulations/${regulationId}`);
+  const res = await fetchWithAuth(`/regulations/${regulationId}`);
+  if (res && res.id) return res;
+
+  // Fallback 1: Query global regulations list and match by ID or Name
+  try {
+    const allRegs = await getRegulations();
+    if (Array.isArray(allRegs) && allRegs.length > 0) {
+      const matched = allRegs.find((r: any) => 
+        r.id === regulationId || 
+        r.name?.toLowerCase().includes(regulationId.toLowerCase()) ||
+        regulationId.toLowerCase().includes((r.jurisdiction || '').toLowerCase())
+      );
+      if (matched) return matched;
+    }
+  } catch {}
+
+  // Fallback 2: Direct compliance signal resolution
+  const sigRes = await fetchWithAuth(`/compliance/signals/${regulationId}`);
+  if (sigRes && sigRes.regulation_id) {
+    const regRes = await fetchWithAuth(`/regulations/${sigRes.regulation_id}`);
+    if (regRes && regRes.id) return regRes;
+  }
+
+  return res;
 }
 
 export async function getDashboardSummary(regulationId: string) {
@@ -85,12 +129,14 @@ export async function getRequirements(regulationId: string, searchParams?: Recor
     });
   }
   const queryString = query.toString() ? `?${query.toString()}` : '';
+
+  // 1. Direct regulation requirements
   const res = await fetchWithAuth(`/regulations/${regulationId}/requirements${queryString}`);
   if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
     return res;
   }
 
-  // Fallback to direct signal endpoints
+  // 2. Direct signal endpoints
   const sigRes = await fetchWithAuth(`/signals/${regulationId}/requirements${queryString}`);
   if (sigRes?.data && Array.isArray(sigRes.data) && sigRes.data.length > 0) {
     return sigRes;
