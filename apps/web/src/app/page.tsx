@@ -32,7 +32,7 @@ export default function LandingPage() {
         {/* Laser Section Divider */}
         <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[#17222C] to-transparent pointer-events-none" />
 
-        {/* Section 03B — Automated Website Compliance Auditor (Autonomous Zero-Mock Agent) */}
+        {/* Section 03B — Automated Website Compliance Auditor (Autonomous Statutory Agent) */}
         <WebsiteAuditorSection />
 
         {/* Laser Section Divider */}

@@ -105,7 +105,7 @@ def test_user_three_actions_lockout_and_login_persistence():
                 user=user,
                 operation_type="website_audit",
                 operation_id=f"audit_{uuid.uuid4().hex}",
-                source="compliance_crawler",
+                source="compliance_auditor",
                 metadata={"target_url": "https://blocked.com"}
             )
 

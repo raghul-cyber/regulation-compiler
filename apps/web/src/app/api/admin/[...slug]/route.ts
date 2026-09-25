@@ -308,7 +308,7 @@ let lastAdminCacheTime = 0;
 
 /**
  * Directly queries Clerk's live REST API to get all authentic registered users.
- * Guaranteed zero-mock execution.
+ * Guaranteed statutory live execution.
  */
 async function fetchLiveClerkUsers(): Promise<ClerkUserRecord[]> {
   const resp = await fetch('https://api.clerk.com/v1/users?limit=100&order_by=-created_at', {
