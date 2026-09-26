@@ -82,11 +82,11 @@ export function WhoItsForSection() {
   return (
     <section 
       id="use-cases" 
-      className="w-full max-w-5xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
+      className="w-full max-w-5xl mx-auto px-3 sm:px-6 pointer-events-auto scroll-mt-24 relative"
     >
       {/* Background Atmosphere */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[360px] rounded-full blur-[140px] pointer-events-none -z-10"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[680px] h-[180px] sm:h-[360px] rounded-full blur-[90px] sm:blur-[140px] pointer-events-none -z-10 overflow-hidden"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(168, 135, 82, 0.12) 0%, rgba(77, 120, 160, 0.08) 50%, transparent 80%)',
         }}
@@ -96,18 +96,18 @@ export function WhoItsForSection() {
       {/* Header */}
       <div 
         ref={titleRef} 
-        className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-10`}
+        className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-6 sm:mb-10`}
       >
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-[11px] sm:text-xs font-mono font-medium uppercase tracking-wider mb-2.5 sm:mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
           <Users className="w-3.5 h-3.5 text-[#BCA77B]" />
           <span>Use Cases</span>
         </div>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-snug sm:leading-tight px-2">
           Built for teams that need compliance clarity.
         </h2>
 
-        <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed max-w-2xl mx-auto">
+        <p className="mt-2.5 sm:mt-4 text-sm sm:text-base md:text-lg text-[#C7CCD2] leading-relaxed max-w-2xl mx-auto px-2">
           Whether you build software, safeguard infrastructure, or manage risk, RegCompiler eliminates manual legal overhead.
         </p>
       </div>
@@ -115,16 +115,16 @@ export function WhoItsForSection() {
       {/* Interactive Horizontal Tab Selector */}
       <div 
         ref={contentRef} 
-        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} space-y-6`}
+        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} space-y-4 sm:space-y-6`}
       >
-        <div className="flex items-center justify-center gap-2 p-1.5 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.12)] max-w-2xl mx-auto flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-1.5 p-1 sm:p-1.5 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.12)] max-w-2xl mx-auto overflow-x-auto scrollbar-none flex-nowrap justify-start sm:justify-center">
           {PERSONAS.map((p) => {
             const isSelected = selectedPersonaId === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => setSelectedPersonaId(p.id)}
-                className={`flex-1 min-w-[120px] py-2.5 px-4 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer text-center ${
+                className={`shrink-0 whitespace-nowrap py-2 sm:py-2.5 px-3.5 sm:px-4 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer text-center min-h-[40px] flex items-center justify-center ${
                   isSelected
                     ? 'bg-[#171C23] text-[#FAF9F5] shadow-[0_4px_16px_rgba(9,11,15,0.6)] border border-[rgba(188,167,123,0.35)]'
                     : 'text-[#969DA6] hover:text-[#C7CCD2] hover:bg-[#12161C]'
@@ -137,57 +137,57 @@ export function WhoItsForSection() {
         </div>
 
         {/* Selected Persona Card */}
-        <div className="rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-6 sm:p-9 shadow-[0_32px_80px_rgba(9,11,15,0.85)] relative overflow-hidden transition-all text-left">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div className="space-y-4 max-w-2xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.12)] flex items-center justify-center text-[#BCA77B]">
-                  <Icon className="w-5 h-5" />
+        <div className="rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-4 sm:p-6 md:p-8 shadow-[0_32px_80px_rgba(9,11,15,0.85)] relative overflow-hidden transition-all text-left">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 sm:gap-6">
+            <div className="space-y-3 sm:space-y-4 max-w-2xl">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.12)] flex items-center justify-center text-[#BCA77B] shrink-0">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div>
                   <span className="font-mono text-[10px] text-[#BCA77B] font-bold uppercase tracking-wider block">
                     {selectedPersona.tag}
                   </span>
-                  <span className="text-xs text-[#969DA6]">
+                  <span className="text-[11px] sm:text-xs text-[#969DA6]">
                     Optimized Workflow
                   </span>
                 </div>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold text-[#FAF9F5] leading-snug">
+              <h3 className="text-base sm:text-xl md:text-2xl font-bold text-[#FAF9F5] leading-snug">
                 {selectedPersona.title}
               </h3>
 
-              <p className="text-sm text-[#C7CCD2] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#C7CCD2] leading-relaxed">
                 {selectedPersona.benefit}
               </p>
 
-              <div className="p-3.5 rounded-lg bg-[#0C0F14] border border-[rgba(199,204,210,0.08)] text-xs text-[#969DA6] leading-relaxed">
+              <div className="p-3 sm:p-3.5 rounded-lg bg-[#0C0F14] border border-[rgba(199,204,210,0.08)] text-xs text-[#969DA6] leading-relaxed">
                 <b className="text-[#FAF9F5]">The Challenge: </b> {selectedPersona.problem}
               </div>
             </div>
 
             {/* Right Badge Column */}
-            <div className="md:w-64 shrink-0 flex flex-col justify-between space-y-4 pt-2 md:pt-0 border-t md:border-t-0 md:border-l border-[rgba(199,204,210,0.08)] md:pl-6">
+            <div className="md:w-64 shrink-0 flex flex-col justify-between space-y-3 sm:space-y-4 pt-3 sm:pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-[rgba(199,204,210,0.08)] md:pl-6">
               <div>
                 <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block mb-1">
                   Practical Outcome
                 </span>
-                <span className="text-sm font-bold text-[#76937F] flex items-center gap-1.5">
+                <span className="text-xs sm:text-sm font-bold text-[#76937F] flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{selectedPersona.keyFeature}</span>
                 </span>
               </div>
 
               <div>
-                <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block mb-2">
+                <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block mb-1.5 sm:mb-2">
                   Relevant Frameworks
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedPersona.frameworks.map((fw) => (
                     <span 
                       key={fw}
-                      className="px-2 py-0.5 rounded bg-[#12161C] border border-[rgba(199,204,210,0.08)] text-[11px] font-mono text-[#C7CCD2]"
+                      className="px-2 py-0.5 rounded bg-[#12161C] border border-[rgba(199,204,210,0.08)] text-[10px] sm:text-[11px] font-mono text-[#C7CCD2]"
                     >
                       {fw}
                     </span>

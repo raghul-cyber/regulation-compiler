@@ -90,7 +90,7 @@ export default function RootLayout({
               <EntitlementGuard />
             </Suspense>
             <TopNav />
-            <main className="flex-1 w-full py-8 relative z-10">
+            <main className="flex-1 w-full py-3 sm:py-6 md:py-8 relative z-10">
               <PageContainer>
                 {children}
               </PageContainer>

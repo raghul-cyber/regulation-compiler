@@ -87,14 +87,14 @@ export function WebsiteAuditorSection() {
   return (
     <section 
       id="website-audit" 
-      className="w-full max-w-5xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
+      className="w-full max-w-5xl mx-auto px-3 sm:px-6 pointer-events-auto scroll-mt-24 relative"
     >
       {/* Anchor alias for backwards compatibility */}
       <div id="website-auditor" className="absolute -top-24 left-0 pointer-events-none" />
 
       {/* Background Framing Atmosphere */}
       <div 
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[720px] h-[360px] rounded-full blur-[140px] pointer-events-none -z-10"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-full max-w-[720px] h-[180px] sm:h-[360px] rounded-full blur-[90px] sm:blur-[140px] pointer-events-none -z-10 overflow-hidden"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(168, 135, 82, 0.12) 0%, rgba(77, 120, 160, 0.08) 50%, transparent 80%)',
         }}
@@ -104,18 +104,18 @@ export function WebsiteAuditorSection() {
       {/* Section Header */}
       <div 
         ref={titleRef} 
-        className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-10`}
+        className={`landing-reveal ${titleRevealed ? 'revealed' : ''} text-center max-w-3xl mx-auto mb-6 sm:mb-10`}
       >
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-[11px] sm:text-xs font-mono font-medium uppercase tracking-wider mb-2.5 sm:mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
           <Globe className="w-3.5 h-3.5 text-[#BCA77B]" />
           <span>Website Audit</span>
         </div>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-snug sm:leading-tight px-2">
           Check your website before someone else does.
         </h2>
 
-        <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed max-w-2xl mx-auto">
+        <p className="mt-2.5 sm:mt-4 text-sm sm:text-base md:text-lg text-[#C7CCD2] leading-relaxed max-w-2xl mx-auto px-2">
           Paste your website URL and evaluate it against relevant compliance, security, and accessibility requirements.
         </p>
       </div>
@@ -123,25 +123,25 @@ export function WebsiteAuditorSection() {
       {/* Interactive Audit Input & Results Card */}
       <div 
         ref={contentRef} 
-        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-6 sm:p-8 shadow-[0_32px_80px_rgba(9,11,15,0.85)] relative overflow-hidden`}
+        className={`landing-reveal ${contentRevealed ? 'revealed' : ''} rounded-2xl rc-glass-smoked-elevated border border-[rgba(199,204,210,0.14)] p-4 sm:p-6 md:p-8 shadow-[0_32px_80px_rgba(9,11,15,0.85)] relative overflow-hidden`}
       >
         {/* Interactive URL Input Bar */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
               handleRunAudit();
             }}
-            className="flex flex-col sm:flex-row items-center gap-3"
+            className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3"
           >
             <div className="relative flex-1 w-full">
-              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#969DA6]" />
+              <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#969DA6]" />
               <input
                 type="text"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="Enter any website URL or domain (e.g. yourcompany.com)"
-                className="w-full h-12 pl-11 pr-4 rounded-lg bg-[#0C0F14] border border-[rgba(199,204,210,0.14)] text-[#FAF9F5] placeholder-[#656C74] text-sm focus:outline-none focus:border-[#BCA77B] transition-colors"
+                placeholder="Enter any website URL or domain (e.g. stripe.com)"
+                className="w-full h-12 min-h-[48px] pl-10 pr-4 rounded-lg bg-[#0C0F14] border border-[rgba(199,204,210,0.14)] text-[#FAF9F5] placeholder-[#656C74] text-base sm:text-sm focus:outline-none focus:border-[#BCA77B] transition-colors"
                 disabled={isAuditing}
               />
             </div>
@@ -149,7 +149,7 @@ export function WebsiteAuditorSection() {
             <button
               type="submit"
               disabled={isAuditing}
-              className="w-full sm:w-auto h-12 px-7 rounded-lg rc-btn-sapphire-metal font-medium text-sm flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)] shrink-0 transition-transform active:scale-[0.98] disabled:opacity-50"
+              className="w-full sm:w-auto h-12 min-h-[48px] px-7 rounded-lg rc-btn-sapphire-metal font-medium text-sm flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)] shrink-0 transition-transform active:scale-[0.98] disabled:opacity-50"
             >
               {isAuditing ? (
                 <>
@@ -166,8 +166,8 @@ export function WebsiteAuditorSection() {
           </form>
 
           {/* Quick presets */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-[#969DA6]">Try a popular example:</span>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
+            <span className="text-[#969DA6] text-[11px] sm:text-xs">Try a popular example:</span>
             {POPULAR_TARGETS.map((t) => (
               <button
                 key={t}
@@ -177,7 +177,7 @@ export function WebsiteAuditorSection() {
                   handleRunAudit(t);
                 }}
                 disabled={isAuditing}
-                className="px-2.5 py-1 rounded bg-[#12161C] border border-[rgba(199,204,210,0.10)] text-[#C7CCD2] hover:text-[#FAF9F5] hover:border-[#BCA77B]/40 transition-colors font-mono text-[11px] cursor-pointer"
+                className="px-2.5 py-1 min-h-[32px] rounded bg-[#12161C] border border-[rgba(199,204,210,0.10)] text-[#C7CCD2] hover:text-[#FAF9F5] hover:border-[#BCA77B]/40 transition-colors font-mono text-[11px] cursor-pointer"
               >
                 {t}
               </button>
@@ -186,7 +186,7 @@ export function WebsiteAuditorSection() {
 
           {/* Error Message */}
           {error && (
-            <div className="p-3.5 rounded-lg bg-[#30232F]/80 border border-[#BCA77B]/40 text-[#FAF9F5] text-xs flex items-center gap-2">
+            <div className="p-3 sm:p-3.5 rounded-lg bg-[#30232F]/80 border border-[#BCA77B]/40 text-[#FAF9F5] text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-[#BCA77B] shrink-0" />
               <span>{error}</span>
             </div>
@@ -195,12 +195,12 @@ export function WebsiteAuditorSection() {
 
         {/* Live Loading State */}
         {isAuditing && (
-          <div className="mt-8 pt-8 border-t border-[rgba(199,204,210,0.08)] text-center py-10 space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-[#BCA77B] mx-auto" />
-            <div className="text-base font-bold text-[#FAF9F5]">
+          <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-[rgba(199,204,210,0.08)] text-center py-6 sm:py-10 space-y-3 sm:space-y-4">
+            <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-[#BCA77B] mx-auto" />
+            <div className="text-sm sm:text-base font-bold text-[#FAF9F5]">
               Auditing {urlInput || 'website'}...
             </div>
-            <p className="text-xs text-[#969DA6] max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-[#969DA6] max-w-md mx-auto leading-relaxed px-2">
               Inspecting transport encryption, HTTP defense headers, cookie privacy policies, and accessibility standards.
             </p>
           </div>
@@ -208,11 +208,11 @@ export function WebsiteAuditorSection() {
 
         {/* Real Results Display (User-First Outcome Presentation) */}
         {!isAuditing && auditResult && (
-          <div className="mt-8 pt-8 border-t border-[rgba(199,204,210,0.08)] space-y-6">
+          <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-[rgba(199,204,210,0.08)] space-y-4 sm:space-y-6">
             {/* Top Verdict Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.10)]">
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-lg flex items-center justify-center font-black text-2xl font-mono ${
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-xl bg-[#0C0F14] border border-[rgba(199,204,210,0.10)]">
+              <div className="flex items-center gap-3.5 sm:gap-4">
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center font-black text-xl sm:text-2xl font-mono shrink-0 ${
                   auditResult.grade.startsWith('A') 
                     ? 'bg-[#76937F]/20 text-[#76937F] border border-[#76937F]/40' 
                     : auditResult.grade.startsWith('B')
@@ -222,13 +222,13 @@ export function WebsiteAuditorSection() {
                   {auditResult.grade}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-[#FAF9F5]">{auditResult.domain}</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-base sm:text-lg font-bold text-[#FAF9F5]">{auditResult.domain}</span>
                     <span className="font-mono text-xs text-[#76937F] bg-[#76937F]/15 px-2 py-0.5 rounded border border-[#76937F]/30 font-semibold">
                       {auditResult.score}/100 Score
                     </span>
                   </div>
-                  <p className="text-xs text-[#969DA6] mt-1">
+                  <p className="text-xs text-[#969DA6] mt-0.5 sm:mt-1">
                     Evaluated against GDPR, SOC 2, HIPAA, WCAG, and DORA standards in {auditResult.execution_time_ms}ms.
                   </p>
                 </div>
@@ -236,7 +236,7 @@ export function WebsiteAuditorSection() {
 
               <Link
                 href="/dashboard?tab=website_auditor"
-                className="rc-btn-sapphire-metal px-4 py-2 rounded-[6px] text-xs font-mono font-medium flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
+                className="w-full sm:w-auto rc-btn-sapphire-metal px-4 py-2.5 min-h-[44px] rounded-[6px] text-xs font-mono font-medium flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <span>Full Audit in Studio</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#BCA77B]" />
@@ -244,28 +244,28 @@ export function WebsiteAuditorSection() {
             </div>
 
             {/* Checkpoint Summary Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+              <div className="p-3 sm:p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
                 <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block">Total Checks</span>
-                <div className="text-xl font-bold font-mono text-[#FAF9F5] mt-1">
+                <div className="text-lg sm:text-xl font-bold font-mono text-[#FAF9F5] mt-1">
                   {auditResult.summary.total_checkpoints}
                 </div>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+              <div className="p-3 sm:p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
                 <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block">Passed</span>
-                <div className="text-xl font-bold font-mono text-[#76937F] mt-1">
+                <div className="text-lg sm:text-xl font-bold font-mono text-[#76937F] mt-1">
                   {auditResult.summary.passed}
                 </div>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+              <div className="p-3 sm:p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
                 <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block">High Attention</span>
-                <div className="text-xl font-bold font-mono text-[#BCA77B] mt-1">
+                <div className="text-lg sm:text-xl font-bold font-mono text-[#BCA77B] mt-1">
                   {auditResult.summary.critical + auditResult.summary.high}
                 </div>
               </div>
-              <div className="p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
+              <div className="p-3 sm:p-3.5 rounded-lg bg-[#12161C] border border-[rgba(199,204,210,0.08)]">
                 <span className="text-[10px] font-mono text-[#969DA6] uppercase tracking-wider block">Low / Info</span>
-                <div className="text-xl font-bold font-mono text-[#969DA6] mt-1">
+                <div className="text-lg sm:text-xl font-bold font-mono text-[#969DA6] mt-1">
                   {auditResult.summary.medium + auditResult.summary.low}
                 </div>
               </div>
@@ -273,13 +273,13 @@ export function WebsiteAuditorSection() {
 
             {/* Priority Finding & Actionable Next Step */}
             {priorityIssue && (
-              <div className="p-5 rounded-xl bg-[#12161C] border border-[rgba(199,204,210,0.10)] space-y-4">
+              <div className="p-4 sm:p-5 rounded-xl bg-[#12161C] border border-[rgba(199,204,210,0.10)] space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#30232F] text-[#BCA77B] border border-[rgba(188,167,123,0.35)]">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#30232F] text-[#BCA77B] border border-[rgba(188,167,123,0.35)] shrink-0">
                       {priorityIssue.severity} ATTENTION
                     </span>
-                    <h4 className="text-sm font-bold text-[#FAF9F5]">{priorityIssue.title}</h4>
+                    <h4 className="text-xs sm:text-sm font-bold text-[#FAF9F5]">{priorityIssue.title}</h4>
                   </div>
                   <span className="text-xs font-mono text-[#969DA6]">{priorityIssue.framework}</span>
                 </div>
@@ -290,14 +290,14 @@ export function WebsiteAuditorSection() {
 
                 {/* Drop-in Remediation Code If Available */}
                 {priorityIssue.remediation && (
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs">
+                  <div className="space-y-2 pt-1 sm:pt-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                       <span className="font-mono text-[#969DA6] flex items-center gap-1.5">
                         <Zap className="w-3.5 h-3.5 text-[#BCA77B]" />
                         <span>Suggested Next Step &bull; Drop-In Code Fix</span>
                       </span>
 
-                      <div className="flex items-center gap-1 bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] p-0.5 rounded-md font-mono text-xs">
+                      <div className="flex items-center gap-1 bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] p-0.5 rounded-md font-mono text-xs self-start sm:self-auto">
                         <button
                           type="button"
                           onClick={() => setActiveCodeTab('nextjs')}
@@ -321,7 +321,7 @@ export function WebsiteAuditorSection() {
 
                     <div className="rounded-lg bg-[#0C0F14] border border-[rgba(199,204,210,0.10)] overflow-hidden font-mono text-xs">
                       <div className="flex items-center justify-between px-3 py-1.5 border-b border-[rgba(199,204,210,0.08)] text-[11px] text-[#969DA6]">
-                        <span>Configuration Snippet</span>
+                        <span className="truncate pr-2">Configuration Snippet</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -330,7 +330,7 @@ export function WebsiteAuditorSection() {
                               : (priorityIssue.remediation?.nginx || priorityIssue.remediation?.description || '');
                             handleCopyCode(code);
                           }}
-                          className="flex items-center gap-1 text-[#969DA6] hover:text-[#FAF9F5] transition-colors cursor-pointer"
+                          className="flex items-center gap-1 text-[#969DA6] hover:text-[#FAF9F5] transition-colors cursor-pointer shrink-0"
                         >
                           {copied ? (
                             <>
@@ -345,7 +345,7 @@ export function WebsiteAuditorSection() {
                           )}
                         </button>
                       </div>
-                      <pre className="p-3 text-[#F3F4F2] overflow-x-auto text-[11px] leading-relaxed">
+                      <pre className="p-3 text-[#F3F4F2] overflow-x-auto text-[11px] leading-relaxed max-w-full">
                         <code>
                           {activeCodeTab === 'nextjs'
                             ? (priorityIssue.remediation.nextjs || priorityIssue.remediation.description)
@@ -359,14 +359,14 @@ export function WebsiteAuditorSection() {
             )}
 
             {/* Audit Again Footnote */}
-            <div className="flex items-center justify-between pt-2 text-xs text-[#969DA6]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-2 gap-2 text-xs text-[#969DA6]">
               <button
                 type="button"
                 onClick={() => {
                   setAuditResult(null);
                   setUrlInput('');
                 }}
-                className="hover:text-[#FAF9F5] flex items-center gap-1 cursor-pointer font-mono"
+                className="hover:text-[#FAF9F5] flex items-center gap-1 cursor-pointer font-mono py-1"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Run another scan</span>
@@ -374,7 +374,7 @@ export function WebsiteAuditorSection() {
 
               <Link
                 href="/dashboard?tab=website_auditor"
-                className="text-[#BCA77B] hover:text-[#FAF9F5] font-mono flex items-center gap-1"
+                className="text-[#BCA77B] hover:text-[#FAF9F5] font-mono flex items-center gap-1 py-1"
               >
                 <span>Export PDF compliance report</span>
                 <ExternalLink className="w-3 h-3" />
@@ -385,8 +385,8 @@ export function WebsiteAuditorSection() {
 
         {/* Pre-Run Explanatory Strip (When user hasn't run yet) */}
         {!isAuditing && !auditResult && (
-          <div className="mt-8 pt-6 border-t border-[rgba(199,204,210,0.08)] flex flex-wrap items-center justify-between gap-4 text-xs text-[#969DA6]">
-            <div className="flex items-center gap-4 flex-wrap">
+          <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-[rgba(199,204,210,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#969DA6]">
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               <span className="flex items-center gap-1.5 text-[#C7CCD2]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#76937F]" />
                 <span>SSL/TLS &amp; Transport Security</span>

@@ -54,12 +54,14 @@ export function LuxuryCinematicBackground() {
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let dpr = window.innerWidth < 768 ? 1 : Math.min(window.devicePixelRatio || 1, 2);
 
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isMobile = width < 768;
+      // On mobile viewports, 1x DPR cuts pixel rendering operations by 75%, preserving 60fps and saving battery
+      dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
@@ -108,10 +110,12 @@ export function LuxuryCinematicBackground() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // ========================================================================
-    // LAYER 8: MICRO GOLDEN DUST (Strictly 16 motes drifting in light)
+    // LAYER 8: MICRO GOLDEN DUST (Strictly 16 motes on desktop, 8 on mobile)
     // ========================================================================
+    const isMobileViewport = width < 768;
+    const particleCount = isMobileViewport ? 8 : 16;
     const particles: Particle[] = [];
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,

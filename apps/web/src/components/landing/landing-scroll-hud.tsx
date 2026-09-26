@@ -39,13 +39,13 @@ export function LandingScrollHUD() {
         />
       </div>
 
-      {/* Scroll To Top Quick Button (Fixed bottom-6 right-6) */}
+      {/* Scroll To Top Quick Button (Fixed bottom-4 right-4 sm:bottom-6 sm:right-6) */}
       {isScrolled && (
-        <div className="fixed bottom-6 right-6 z-40 pointer-events-auto font-mono">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 pointer-events-auto font-mono">
           <button
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="p-2.5 rounded-[8px] bg-[#080A0E]/85 hover:bg-[#141922] border border-white/[0.08] hover:border-white/[0.16] text-[#9CA3AF] hover:text-[#F4F6F8] transition-all duration-200 backdrop-blur-md shadow-xl cursor-pointer"
+            className="w-11 h-11 flex items-center justify-center rounded-[8px] bg-[#080A0E]/85 hover:bg-[#141922] border border-white/[0.08] hover:border-white/[0.16] text-[#9CA3AF] hover:text-[#F4F6F8] transition-all duration-200 backdrop-blur-md shadow-xl cursor-pointer active:scale-95"
           >
             <ArrowUp className="w-4 h-4" />
           </button>

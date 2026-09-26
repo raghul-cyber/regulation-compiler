@@ -206,7 +206,7 @@ export function TopNav() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-[#C7CCD2] hover:text-[#FAF9F5] rounded-[6px] hover:bg-white/[0.04] transition-colors"
+              className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[#C7CCD2] hover:text-[#FAF9F5] rounded-[6px] hover:bg-white/[0.04] transition-colors"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -216,44 +216,44 @@ export function TopNav() {
 
         {/* Mobile Menu Drawer for Landing */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-[rgba(168,135,82,0.20)] bg-[#0B0A08]/98 backdrop-blur-xl px-5 py-4 space-y-2 text-xs font-medium text-[#C7CCD2] shadow-2xl">
+          <div className="lg:hidden border-b border-[rgba(168,135,82,0.20)] bg-[#0B0A08]/98 backdrop-blur-xl px-5 py-3 space-y-1 text-sm font-medium text-[#C7CCD2] shadow-2xl">
             <a
               href="#product"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
+              className="min-h-[44px] flex items-center text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Product
             </a>
             <a
               href="#benefits"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
+              className="min-h-[44px] flex items-center text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Benefits
             </a>
             <a
               href="#website-audit"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
+              className="min-h-[44px] flex items-center text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Website Audit
             </a>
             <a
               href="#use-cases"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
+              className="min-h-[44px] flex items-center text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Use Cases
             </a>
 
-            <div className="pt-3 border-t border-[rgba(168,135,82,0.15)] flex flex-col gap-2">
+            <div className="pt-3 border-t border-[rgba(168,135,82,0.15)] flex flex-col gap-2.5 pb-2">
               <Show when="signed-in">
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-xs flex items-center justify-center gap-1.5"
+                  className="h-12 min-h-[48px] text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-sm flex items-center justify-center gap-2"
                 >
-                  <LayoutDashboard className="w-3.5 h-3.5 text-[#BCA77B]" />
+                  <LayoutDashboard className="w-4 h-4 text-[#BCA77B]" />
                   <span>Open Dashboard</span>
                 </Link>
               </Show>
@@ -261,10 +261,10 @@ export function TopNav() {
                 <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full h-12 min-h-[48px] text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>Try RegCompiler</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#BCA77B]" />
+                    <ArrowRight className="w-4 h-4 text-[#BCA77B]" />
                   </button>
                 </SignInButton>
               </Show>
@@ -553,7 +553,8 @@ export function TopNav() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-[#C9C4BA] hover:text-[#F7F4EC] rounded-[6px] hover:bg-[#1B1815] transition-colors"
+            className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[#C9C4BA] hover:text-[#F7F4EC] rounded-[6px] hover:bg-[#1B1815] transition-colors"
+            aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

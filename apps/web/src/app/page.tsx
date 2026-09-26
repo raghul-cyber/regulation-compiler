@@ -13,7 +13,7 @@ export default function LandingPage() {
       <LandingScrollHUD />
 
       {/* Streamlined, User-First 6-Section Story Container */}
-      <div className="relative z-10 w-full min-h-screen space-y-24 sm:space-y-32 pb-24">
+      <div className="relative z-10 w-full space-y-10 sm:space-y-16 md:space-y-20 lg:space-y-28 pb-10 sm:pb-20">
         {/* 01 — HERO: Value Proposition, Approved Copy, CTAs, Hero Compliance Preview */}
         <HeroSection />
 

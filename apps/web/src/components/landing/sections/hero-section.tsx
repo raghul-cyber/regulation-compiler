@@ -84,20 +84,20 @@ export function HeroSection() {
   return (
     <section 
       id="product" 
-      className="w-full flex flex-col items-center text-center pt-24 sm:pt-28 md:pt-32 scroll-mt-28 relative"
+      className="w-full flex flex-col items-center text-center pt-4 sm:pt-12 md:pt-20 lg:pt-24 scroll-mt-24 relative"
     >
       {/* Central Hero Atmospheric Framing Light */}
       <div 
-        className="absolute top-16 left-1/2 -translate-x-1/2 w-[760px] h-[360px] rounded-full blur-[110px] pointer-events-none -z-10 reveal-hero-bg"
+        className="absolute top-8 sm:top-16 left-1/2 -translate-x-1/2 w-full max-w-[760px] h-[180px] sm:h-[320px] md:h-[360px] rounded-full blur-[80px] sm:blur-[110px] pointer-events-none -z-10 reveal-hero-bg overflow-hidden"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(197, 166, 110, 0.16) 0%, rgba(143, 95, 50, 0.08) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
 
-      <div ref={heroRef} className={`landing-reveal ${heroRevealed ? 'revealed' : ''} flex flex-col items-center max-w-4xl px-4 relative`}>
+      <div ref={heroRef} className={`landing-reveal ${heroRevealed ? 'revealed' : ''} flex flex-col items-center max-w-4xl px-3 sm:px-4 relative w-full`}>
         {/* Eyebrow: Regulatory Intelligence for Modern Teams */}
-        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-[4px] bg-[#171C23]/90 border border-[rgba(199,204,210,0.14)] text-xs font-medium text-[#C7CCD2] mb-7 shadow-[0_4px_16px_rgba(9,11,15,0.6)] tracking-wide backdrop-blur-md reveal-label">
+        <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-[4px] bg-[#171C23]/90 border border-[rgba(199,204,210,0.14)] text-[10px] sm:text-xs font-medium text-[#C7CCD2] mb-4 sm:mb-6 shadow-[0_4px_16px_rgba(9,11,15,0.6)] tracking-wide backdrop-blur-md reveal-label max-w-full">
           <div className="w-3.5 h-3.5 rounded-[2px] overflow-hidden flex items-center justify-center shrink-0 opacity-95">
             <Image 
               src="/logo-icon.png" 
@@ -108,32 +108,32 @@ export function HeroSection() {
               priority
             />
           </div>
-          <span className="text-[#FAF9F5] font-mono text-[11px] uppercase tracking-wider font-semibold">RegCompiler</span>
+          <span className="text-[#FAF9F5] font-mono text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold shrink-0">RegCompiler</span>
           <span className="text-[#656C74] font-mono">|</span>
-          <span className="text-[#BCA77B] font-mono tracking-wider text-[11px] font-medium">
+          <span className="text-[#BCA77B] font-mono tracking-wider text-[10px] sm:text-[11px] font-medium truncate">
             Regulatory Intelligence for Modern Teams
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#BCA77B] ml-0.5 shadow-[0_0_6px_rgba(188,167,123,0.5)]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#BCA77B] ml-0.5 shadow-[0_0_6px_rgba(188,167,123,0.5)] shrink-0 hidden sm:inline-block" />
         </div>
 
         {/* Main Headline with Clean Enterprise Typography in Warm Ivory */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#FAF9F5] max-w-3xl mx-auto leading-[1.15] reveal-headline">
+        <h1 className="text-[26px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-[#FAF9F5] max-w-3xl mx-auto leading-[1.12] sm:leading-[1.15] reveal-headline">
           <TypingHeadline delay={150} speed={28} />
         </h1>
 
         {/* Supporting Copy in Warm Grey: User Benefit */}
-        <p className="mt-6 text-base sm:text-lg md:text-xl text-[#C7CCD2] max-w-2xl font-normal leading-relaxed reveal-body">
+        <p className="mt-3.5 sm:mt-5 text-sm sm:text-base md:text-xl text-[#C7CCD2] max-w-2xl font-normal leading-relaxed reveal-body px-2">
           Turn complex regulations into clear, actionable compliance checks for your website and systems.
         </p>
 
         {/* Action CTAs — Primary & Secondary */}
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-3.5 pointer-events-auto reveal-cta">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto max-w-sm sm:max-w-none mx-auto pointer-events-auto reveal-cta">
           <Show when="signed-in">
-            <Link href="/dashboard">
+            <Link href="/dashboard" className="w-full sm:w-auto">
               <button 
                 ref={magneticPrimaryRef as any}
                 style={magneticPrimaryStyle}
-                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)]"
+                className="w-full sm:w-auto rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-12 min-h-[48px] flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)]"
               >
                 <span>Try RegCompiler</span>
                 <ArrowRight className="w-4 h-4 text-[#BCA77B]" />
@@ -146,7 +146,7 @@ export function HeroSection() {
               <button 
                 ref={magneticPrimaryRef as any}
                 style={magneticPrimaryStyle}
-                className="rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-11 flex items-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)]"
+                className="w-full sm:w-auto rc-btn-sapphire-metal rounded-[6px] font-medium text-sm px-6 h-12 min-h-[48px] flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_20px_rgba(9,11,15,0.7)]"
               >
                 <span>Try RegCompiler</span>
                 <ArrowRight className="w-4 h-4 text-[#BCA77B]" />
@@ -156,7 +156,7 @@ export function HeroSection() {
 
           <button 
             onClick={scrollToWebsiteAuditor}
-            className="rc-btn-graphite-metal rounded-[6px] font-medium px-5 h-11 flex items-center gap-2 text-sm cursor-pointer"
+            className="w-full sm:w-auto rc-btn-graphite-metal rounded-[6px] font-medium px-5 h-12 min-h-[48px] flex items-center justify-center gap-2 text-sm cursor-pointer"
           >
             <Globe className="w-4 h-4 text-[#BCA77B]" />
             <span>Run a Website Audit</span>
@@ -164,14 +164,14 @@ export function HeroSection() {
 
           <button 
             onClick={scrollToBenefits}
-            className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#AAB1BA] hover:text-[#FAF9F5] border border-[rgba(199,204,210,0.14)] hover:border-[rgba(188,167,123,0.35)] hover:bg-[#171C23]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
+            className="w-full sm:w-auto rounded-[6px] font-medium px-5 h-12 min-h-[48px] bg-transparent text-[#AAB1BA] hover:text-[#FAF9F5] border border-[rgba(199,204,210,0.14)] hover:border-[rgba(188,167,123,0.35)] hover:bg-[#171C23]/60 transition-all cursor-pointer flex items-center justify-center gap-2 text-sm active:scale-[0.98]"
           >
             <span>Explore the Product</span>
           </button>
         </div>
 
         {/* 3 Outcome Signals — Compact reassurance badges */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-5 text-xs text-[#969DA6]">
+        <div className="mt-5 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-5 text-xs text-[#969DA6]">
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#76937F]" />
             <span>Continuous Regulatory Monitoring</span>

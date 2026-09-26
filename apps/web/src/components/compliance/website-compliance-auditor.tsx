@@ -566,7 +566,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
               }}
               placeholder={isLimitReached ? "Account Action Locked — 3/3 Free Uses Consumed (Upgrade to Pro)" : "example.com or client-portal.org"}
               disabled={isAuditing || isLimitReached}
-              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-sm font-mono placeholder:text-[#656C74] focus:outline-none transition-all ${
+              className={`w-full pl-22 pr-4 py-2.5 rounded-lg border text-base sm:text-sm font-mono placeholder:text-[#656C74] focus:outline-none transition-all ${
                 isLimitReached 
                   ? 'bg-[#12161C] border-[#BCA77B]/30 text-[#BCA77B]/60 cursor-not-allowed' 
                   : 'bg-[#090B0F] border-[rgba(199,204,210,0.12)] text-[#FAF9F5] focus:border-[#BCA77B]'
@@ -1178,7 +1178,7 @@ export function WebsiteComplianceAuditor({ initialUrl = '' }: { initialUrl?: str
                     placeholder="Search findings, clauses..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 pr-3 py-1.5 rounded-lg bg-[#151311] border border-[#211D19] text-xs text-[#F1EEE7] placeholder:text-[#625F5A] focus:outline-none focus:border-[#AD956C] w-44 sm:w-56 transition-colors"
+                    className="pl-9 pr-3 py-1.5 rounded-lg bg-[#151311] border border-[#211D19] text-base sm:text-xs text-[#F1EEE7] placeholder:text-[#625F5A] focus:outline-none focus:border-[#AD956C] w-full sm:w-56 transition-colors"
                   />
                 </div>
 
