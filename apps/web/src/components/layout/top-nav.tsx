@@ -311,7 +311,7 @@ export function TopNav() {
                 RegCompiler
               </span>
               <span className="text-[9px] text-[#969DA6] font-mono tracking-wider uppercase leading-none hidden sm:inline-block">
-                STATUTORY COMPILER
+                REGULATION AS CODE
               </span>
             </div>
           </Link>
