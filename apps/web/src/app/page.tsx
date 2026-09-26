@@ -1,14 +1,9 @@
 import { LandingScrollHUD } from '@/components/landing/landing-scroll-hud';
 import { HeroSection } from '@/components/landing/sections/hero-section';
-import { CapabilitySignal } from '@/components/landing/sections/capability-signal';
+import { WhatItDoesSection } from '@/components/landing/sections/what-it-does-section';
 import { WebsiteAuditorSection } from '@/components/landing/sections/website-auditor-section';
-import { ProblemSection } from '@/components/landing/sections/problem-section';
-import { TransformationSection } from '@/components/landing/sections/transformation-section';
-import { HowItWorksSection } from '@/components/landing/sections/how-it-works-section';
-import { InteractiveCompilation } from '@/components/landing/sections/interactive-compilation';
-import { ArchitectureSection } from '@/components/landing/sections/architecture-section';
-import { SecurityTraceability } from '@/components/landing/sections/security-traceability';
-import { UseCasesSection } from '@/components/landing/sections/use-cases-section';
+import { SimpleWorkflowSection } from '@/components/landing/sections/simple-workflow-section';
+import { WhoItsForSection } from '@/components/landing/sections/who-its-for-section';
 import { FinalCTASection } from '@/components/landing/sections/final-cta-section';
 
 export default function LandingPage() {
@@ -17,66 +12,39 @@ export default function LandingPage() {
       {/* Precision Reading Progress & Return Indicator */}
       <LandingScrollHUD />
 
-      {/* 12-Section Continuous Story Narrative Container (Dimension from Light, Typography & Materials) */}
-      <div className="relative z-10 w-full min-h-[150vh] space-y-28 pb-24">
-        {/* Section 02 — Hero Entry & Product Preview */}
+      {/* Streamlined, User-First 6-Section Story Container */}
+      <div className="relative z-10 w-full min-h-screen space-y-24 sm:space-y-32 pb-24">
+        {/* 01 — HERO: Value Proposition, Approved Copy, CTAs, Hero Compliance Preview */}
         <HeroSection />
 
-        {/* Section 03 — Slim Technical Capability Signal */}
-        <CapabilitySignal />
+        {/* Atmospheric Light Bridge */}
+        <div className="w-full max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.25)] to-transparent pointer-events-none" />
 
-        {/* Atmospheric Section Transition: Dark Gold Light Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.30)] to-transparent pointer-events-none" />
+        {/* 02 — WHAT YOU CAN DO: Compliance without paperwork (Understand, Check, Act) */}
+        <WhatItDoesSection />
 
-        {/* Section 03B — Automated Website Compliance Auditor (Autonomous Statutory Agent) */}
+        {/* Atmospheric Light Bridge */}
+        <div className="w-full max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(140,107,66,0.20)] to-transparent pointer-events-none" />
+
+        {/* 03 — WEBSITE AUDIT: Check your website before someone else does (Real Interactive Audit) */}
         <WebsiteAuditorSection />
 
-        {/* Atmospheric Section Transition: Antique Bronze & Graphite Depth Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(140,107,66,0.25)] to-transparent pointer-events-none" />
+        {/* Atmospheric Light Bridge */}
+        <div className="w-full max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.25)] to-transparent pointer-events-none" />
 
-        {/* Section 04 — The Regulation Problem */}
-        <ProblemSection />
+        {/* 04 — HOW IT HELPS: Simple 3-step workflow (Input -> Result -> Action) */}
+        <SimpleWorkflowSection />
 
-        {/* Atmospheric Section Transition: Warm Champagne Highlight Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.30)] to-transparent pointer-events-none" />
+        {/* Atmospheric Light Bridge */}
+        <div className="w-full max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(143,95,50,0.20)] to-transparent pointer-events-none" />
 
-        {/* Section 05 — Regulation → Structured Logic Transformation */}
-        <TransformationSection />
+        {/* 05 — WHO IT'S FOR: Interactive tab switcher (Developers, Security, Compliance, Founders) */}
+        <WhoItsForSection />
 
-        {/* Atmospheric Section Transition: Warm Amber & Titanium Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(143,95,50,0.25)] to-transparent pointer-events-none" />
+        {/* Atmospheric Light Bridge */}
+        <div className="w-full max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.25)] to-transparent pointer-events-none" />
 
-        {/* Section 06 — How The Compiler Works (5 Stages) */}
-        <HowItWorksSection />
-
-        {/* Atmospheric Section Transition: Champagne Reflection Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.28)] to-transparent pointer-events-none" />
-
-        {/* Section 07 — Interactive Compilation Environment */}
-        <InteractiveCompilation />
-
-        {/* Atmospheric Section Transition: Muted Gold Control Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.25)] to-transparent pointer-events-none" />
-
-        {/* Section 08 — Enterprise Architecture Layer */}
-        <ArchitectureSection />
-
-        {/* Atmospheric Section Transition: Deep Bronze Vault Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(118,92,58,0.28)] to-transparent pointer-events-none" />
-
-        {/* Section 09 — Security & Cryptographic Traceability */}
-        <SecurityTraceability />
-
-        {/* Atmospheric Section Transition: Executive Bronze & Champagne Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.28)] to-transparent pointer-events-none" />
-
-        {/* Section 10 — High-Stakes Use Cases */}
-        <UseCasesSection />
-
-        {/* Atmospheric Section Transition: Dual Gold & Champagne Halo Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.30)] to-transparent pointer-events-none" />
-
-        {/* Section 11 — Final Calmer CTA */}
+        {/* 06 — FINAL VALUE & CTA: From regulation to action */}
         <FinalCTASection />
       </div>
     </>
