@@ -121,14 +121,14 @@ export function TopNav() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 reveal-nav ${
           isScrolled
-            ? 'rc-glass-smoked border-b border-[rgba(199,204,210,0.10)] shadow-[0_8px_32px_rgba(9,11,15,0.7)]'
-            : 'bg-transparent border-b border-transparent'
+            ? 'bg-[#090B0F]/92 backdrop-blur-md border-b border-[rgba(168,135,82,0.22)] shadow-[0_8px_32px_rgba(7,7,6,0.85)]'
+            : 'bg-transparent border-b border-[rgba(168,135,82,0.14)]'
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-14 sm:h-16">
           {/* Brand Wordmark */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-[6px] bg-[#171C23] border border-[rgba(199,204,210,0.14)] flex items-center justify-center p-1 shadow-sm shrink-0 group-hover:border-[rgba(188,167,123,0.4)] transition-colors">
+            <div className="w-7 h-7 rounded-[6px] bg-[#12161C] border border-[rgba(168,135,82,0.25)] flex items-center justify-center p-1 shadow-sm shrink-0 group-hover:border-[rgba(188,167,123,0.5)] transition-colors">
               <Image
                 src="/icon.png"
                 alt="RegCompiler Logo"
@@ -142,41 +142,35 @@ export function TopNav() {
               <span className="font-sans font-bold text-sm tracking-tight text-[#FAF9F5] group-hover:text-white transition-colors">
                 RegCompiler
               </span>
-              <span className="font-mono text-[9px] tracking-wider text-[#AAB1BA] uppercase leading-none">
-                REGULATION AS CODE
+              <span className="font-mono text-[9px] tracking-wider text-[#A88752] uppercase leading-none font-medium">
+                REGULATORY INTELLIGENCE
               </span>
             </div>
           </Link>
 
-          {/* Center: Editorial Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs text-[#C7CCD2] font-medium tracking-wide">
+          {/* Center: Simplified 4-Link Navigation */}
+          <nav className="hidden lg:flex items-center gap-8 text-xs text-[#BDB8AE] font-medium tracking-wide">
             <a href="#product" className="hover:text-[#FAF9F5] transition-colors relative py-1">
               Product
             </a>
-            <a href="#problem" className="hover:text-[#FAF9F5] transition-colors relative py-1">
-              The Problem
+            <a href="#benefits" className="hover:text-[#FAF9F5] transition-colors relative py-1">
+              Benefits
             </a>
-            <a href="#how-it-works" className="hover:text-[#FAF9F5] transition-colors relative py-1">
-              How It Works
-            </a>
-            <a href="#architecture" className="hover:text-[#FAF9F5] transition-colors relative py-1">
-              Architecture
-            </a>
-            <a href="#security" className="hover:text-[#FAF9F5] transition-colors relative py-1">
-              Security
+            <a href="#website-audit" className="hover:text-[#FAF9F5] transition-colors relative py-1">
+              Website Audit
             </a>
             <a href="#use-cases" className="hover:text-[#FAF9F5] transition-colors relative py-1">
               Use Cases
             </a>
           </nav>
 
-          {/* Right: Auth & CTA Buttons */}
+          {/* Right: Auth & Primary CTA Buttons */}
           <div className="flex items-center gap-2.5">
             <Show when="signed-in">
               <UsageIndicator />
               <Link href="/dashboard">
                 <button
-                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs"
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-4 h-8.5 flex items-center gap-1.5 cursor-pointer text-xs shadow-[0_2px_12px_rgba(9,11,15,0.6)]"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5 text-[#BCA77B]" />
                   <span>Dashboard</span>
@@ -188,15 +182,15 @@ export function TopNav() {
 
             <Show when="signed-out">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
-                <button className="text-xs text-[#C7CCD2] hover:text-[#FAF9F5] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
+                <button className="text-xs text-[#BDB8AE] hover:text-[#FAF9F5] px-2.5 py-1.5 transition-colors cursor-pointer font-medium hidden sm:inline-block">
                   Sign In
                 </button>
               </SignInButton>
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                 <button
-                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-3.5 h-8 flex items-center gap-1.5 cursor-pointer text-xs"
+                  className="rc-btn-sapphire-metal rounded-[6px] font-medium px-4 h-8.5 flex items-center gap-1.5 cursor-pointer text-xs shadow-[0_2px_12px_rgba(9,11,15,0.6)]"
                 >
-                  <span>Start Compiling</span>
+                  <span>Try RegCompiler</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#BCA77B]" />
                 </button>
               </SignInButton>
@@ -213,53 +207,39 @@ export function TopNav() {
           </div>
         </div>
 
-        {/* Mobile Menu Overlay for Landing */}
+        {/* Mobile Menu Drawer for Landing */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-[rgba(200,180,135,0.12)] bg-[#12161C]/98 backdrop-blur-xl px-4 py-4 space-y-2 text-xs font-medium text-[#C7CCD2] shadow-2xl">
+          <div className="lg:hidden border-b border-[rgba(168,135,82,0.20)] bg-[#0B0A08]/98 backdrop-blur-xl px-5 py-4 space-y-2 text-xs font-medium text-[#C7CCD2] shadow-2xl">
             <a
               href="#product"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
+              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Product
             </a>
             <a
-              href="#problem"
+              href="#benefits"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
+              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
-              The Problem
+              Benefits
             </a>
             <a
-              href="#how-it-works"
+              href="#website-audit"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
+              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
-              How It Works
-            </a>
-            <a
-              href="#architecture"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
-            >
-              Architecture
-            </a>
-            <a
-              href="#security"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
-            >
-              Security
+              Website Audit
             </a>
             <a
               href="#use-cases"
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 hover:text-[#FAF9F5]"
+              className="block py-2 text-[#FAF9F5] hover:text-[#BCA77B] transition-colors"
             >
               Use Cases
             </a>
 
-            <div className="pt-3 border-t border-[rgba(200,180,135,0.12)] flex flex-col gap-2">
+            <div className="pt-3 border-t border-[rgba(168,135,82,0.15)] flex flex-col gap-2">
               <Show when="signed-in">
                 <Link
                   href="/dashboard"
@@ -274,9 +254,10 @@ export function TopNav() {
                 <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-xs"
+                    className="w-full py-2.5 text-center rounded-[6px] rc-btn-sapphire-metal text-[#FAF9F5] font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    Start Compiling
+                    <span>Try RegCompiler</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[#BCA77B]" />
                   </button>
                 </SignInButton>
               </Show>

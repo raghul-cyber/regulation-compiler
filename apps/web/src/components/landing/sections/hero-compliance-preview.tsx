@@ -36,7 +36,7 @@ export function HeroCompliancePreview() {
   };
 
   const scrollToAuditor = () => {
-    const el = document.getElementById('website-auditor');
+    const el = document.getElementById('website-audit') || document.getElementById('website-auditor');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

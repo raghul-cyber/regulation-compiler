@@ -81,7 +81,7 @@ export function WhoItsForSection() {
 
   return (
     <section 
-      id="solutions" 
+      id="use-cases" 
       className="w-full max-w-5xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
     >
       {/* Background Atmosphere */}
@@ -100,7 +100,7 @@ export function WhoItsForSection() {
       >
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
           <Users className="w-3.5 h-3.5 text-[#BCA77B]" />
-          <span>Who It&apos;s For</span>
+          <span>Use Cases</span>
         </div>
 
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">

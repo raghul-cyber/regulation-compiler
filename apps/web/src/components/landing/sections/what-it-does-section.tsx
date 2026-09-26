@@ -50,7 +50,7 @@ export function WhatItDoesSection() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const scrollToWebsiteAuditor = () => {
-    const el = document.getElementById('website-auditor');
+    const el = document.getElementById('website-audit') || document.getElementById('website-auditor');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -58,7 +58,7 @@ export function WhatItDoesSection() {
 
   return (
     <section 
-      id="what-it-does" 
+      id="benefits" 
       className="w-full max-w-6xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
     >
       {/* Background Framing Atmosphere */}
@@ -77,7 +77,7 @@ export function WhatItDoesSection() {
       >
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
           <ShieldCheck className="w-3.5 h-3.5 text-[#BCA77B]" />
-          <span>Product Value</span>
+          <span>Benefits</span>
         </div>
 
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">

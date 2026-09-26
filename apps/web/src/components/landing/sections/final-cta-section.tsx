@@ -9,7 +9,7 @@ export function FinalCTASection() {
   const { ref: magneticRef, style: magneticStyle } = useMagneticCTA(3);
 
   const scrollToWebsiteAuditor = () => {
-    const el = document.getElementById('website-auditor');
+    const el = document.getElementById('website-audit') || document.getElementById('website-auditor');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

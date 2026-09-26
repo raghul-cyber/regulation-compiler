@@ -67,15 +67,15 @@ export function HeroSection() {
   const { ref: heroRef, isRevealed: heroRevealed } = useScrollReveal({ threshold: 0.05 });
   const { ref: magneticPrimaryRef, style: magneticPrimaryStyle } = useMagneticCTA(3);
 
-  const scrollToWhatItDoes = () => {
-    const el = document.getElementById('what-it-does');
+  const scrollToBenefits = () => {
+    const el = document.getElementById('benefits') || document.getElementById('what-it-does');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   const scrollToWebsiteAuditor = () => {
-    const el = document.getElementById('website-auditor');
+    const el = document.getElementById('website-audit') || document.getElementById('website-auditor');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -163,7 +163,7 @@ export function HeroSection() {
           </button>
 
           <button 
-            onClick={scrollToWhatItDoes}
+            onClick={scrollToBenefits}
             className="rounded-[6px] font-medium px-5 h-11 bg-transparent text-[#AAB1BA] hover:text-[#FAF9F5] border border-[rgba(199,204,210,0.14)] hover:border-[rgba(188,167,123,0.35)] hover:bg-[#171C23]/60 transition-all cursor-pointer flex items-center gap-2 text-sm active:scale-[0.98]"
           >
             <span>Explore the Product</span>

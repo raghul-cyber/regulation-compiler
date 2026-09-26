@@ -86,9 +86,12 @@ export function WebsiteAuditorSection() {
 
   return (
     <section 
-      id="website-auditor" 
+      id="website-audit" 
       className="w-full max-w-5xl mx-auto px-4 md:px-6 pointer-events-auto scroll-mt-24 relative"
     >
+      {/* Anchor alias for backwards compatibility */}
+      <div id="website-auditor" className="absolute -top-24 left-0 pointer-events-none" />
+
       {/* Background Framing Atmosphere */}
       <div 
         className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[720px] h-[360px] rounded-full blur-[140px] pointer-events-none -z-10"
@@ -105,7 +108,7 @@ export function WebsiteAuditorSection() {
       >
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171C23] border border-[rgba(199,204,210,0.14)] text-[#BCA77B] text-xs font-mono font-medium uppercase tracking-wider mb-4 shadow-[0_4px_16px_rgba(9,11,15,0.5)] backdrop-blur-md">
           <Globe className="w-3.5 h-3.5 text-[#BCA77B]" />
-          <span>Live Compliance Auditor</span>
+          <span>Website Audit</span>
         </div>
 
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#FAF9F5] tracking-tight leading-tight">
@@ -113,7 +116,7 @@ export function WebsiteAuditorSection() {
         </h2>
 
         <p className="mt-4 text-base md:text-lg text-[#C7CCD2] leading-relaxed max-w-2xl mx-auto">
-          Enter your website URL and get a clear compliance overview in minutes. Check security headers, cookie directives, and statutory standards automatically.
+          Paste your website URL and evaluate it against relevant compliance, security, and accessibility requirements.
         </p>
       </div>
 
