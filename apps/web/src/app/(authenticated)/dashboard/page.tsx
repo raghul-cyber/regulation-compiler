@@ -42,7 +42,7 @@ export default function DashboardPage() {
 
   // Tab list includes Website Audits first (before Global Monitoring), 24/7 Actions and MiroFish Swarm Traffic
   const tabs = [
-    { id: 'website_auditor', label: 'Website Audits', isNew: true },
+    { id: 'website_auditor', label: 'Website Audits' },
     { id: 'coverage', label: 'Global Monitoring' },
     { id: 'actions_24_7', label: '24/7 Actions' },
     ...(isAdmin ? [{ id: 'swarm', label: 'MiroFish Swarm Traffic', adminOnly: true }] : []),
@@ -120,11 +120,6 @@ export default function DashboardPage() {
               }`}
             >
               <span>{tab.label}</span>
-              {'isNew' in tab && tab.isNew && (
-                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#BCA77B]/20 text-[#BCA77B] border border-[#BCA77B]/35">
-                  NEW
-                </span>
-              )}
               {'adminOnly' in tab && tab.adminOnly && (
                 <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#BCA77B]/20 text-[#BCA77B] border border-[#BCA77B]/35">
                   <ShieldAlert className="w-2.5 h-2.5 inline mr-0.5" />

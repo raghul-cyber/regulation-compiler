@@ -24,13 +24,20 @@ import {
 import { Show, SignInButton, useUser, UserButton } from '@clerk/nextjs';
 import { UsageIndicator } from '@/components/billing/usage-indicator';
 
-const DASHBOARD_VIEWS = [
+interface DashboardViewItem {
+  title: string;
+  description: string;
+  href: string;
+  icon: any;
+  badge?: string;
+}
+
+const DASHBOARD_VIEWS: DashboardViewItem[] = [
   {
     title: 'Website Audits',
     description: 'Live URL scan & deterministic scorecard',
     href: '/dashboard?tab=website_auditor',
     icon: Search,
-    badge: 'NEW',
   },
   {
     title: 'Global Monitoring',
