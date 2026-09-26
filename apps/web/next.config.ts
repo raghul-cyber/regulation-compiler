@@ -56,6 +56,20 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: "/dashboard",
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: "/dashboard",
   },
+  async rewrites() {
+    const rawBackend = process.env.INTERNAL_API_URL || process.env.API_URL || "https://regulation-compiler.onrender.com/api/v1";
+    const backendBase = rawBackend.replace(/\/+$/, "");
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: `${backendBase}/:path*`,
+      },
+      {
+        source: "/backend-api/:path*",
+        destination: `${backendBase}/:path*`,
+      },
+    ];
+  },
   async headers() {
     return [
       {

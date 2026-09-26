@@ -131,16 +131,23 @@ app.add_middleware(RequestTimeoutMiddleware, timeout_seconds=60.0)
 app.add_middleware(IdempotencyGuardMiddleware)
 
 # 8. CORS Middleware
+DEFAULT_ALLOWED_ORIGINS = [
+    "https://www.regcompiler.app",
+    "https://regcompiler.app",
+    "https://clerk.regcompiler.app",
+    "https://regulation-compiler-web.vercel.app",
+    "https://regulation-compiler.onrender.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+]
+_env_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+ALLOWED_ORIGINS = list(dict.fromkeys(DEFAULT_ALLOWED_ORIGINS + _env_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://regulation-compiler-web.vercel.app",
-        "https://regulation-compiler.onrender.com",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=['*'],
@@ -149,21 +156,37 @@ app.add_middleware(
     max_age=86400,
 )
 
+def _get_cors_headers(request: Request) -> dict:
+    """Helper to return compliant CORS headers that respect W3C credentials specification."""
+    origin = request.headers.get("origin")
+    if origin:
+        return {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Vary": "Origin",
+        }
+    return {"Access-Control-Allow-Origin": "*"}
+
 # Explicit global preflight OPTIONS handler guaranteeing 200 OK with CORS on any endpoint
 @app.options("/{full_path:path}")
 async def preflight_options_handler(full_path: str, request: Request):
-    origin = request.headers.get("origin") or "*"
+    origin = request.headers.get("origin")
     req_headers = request.headers.get("access-control-request-headers") or "*"
+    headers = {
+        "Access-Control-Allow-Methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+        "Access-Control-Allow-Headers": req_headers,
+        "Access-Control-Max-Age": "86400",
+    }
+    if origin:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+        headers["Vary"] = "Origin"
+    else:
+        headers["Access-Control-Allow-Origin"] = "*"
     return Response(
         content="OK",
         status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
-            "Access-Control-Allow-Headers": req_headers,
-            "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Max-Age": "86400",
-        }
+        headers=headers
     )
 
 app.state.limiter = limiter
@@ -173,7 +196,8 @@ app.state.limiter = limiter
 # -------------------------------------------------------------
 @app.exception_handler(RateLimitExceeded)
 async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    origin = request.headers.get("origin", "*")
+    headers = _get_cors_headers(request)
+    headers["Retry-After"] = "60"
     return JSONResponse(
         status_code=429,
         content={
@@ -184,16 +208,11 @@ async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
                 "details": exc.detail if hasattr(exc, "detail") else "Too many requests"
             }
         },
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Credentials": "true",
-            "Retry-After": "60",
-        }
+        headers=headers
     )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    origin = request.headers.get("origin", "*")
     errors = []
     for err in exc.errors():
         loc = " -> ".join([str(x) for x in err.get("loc", [])])
@@ -208,10 +227,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
                 "details": errors
             }
         },
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Credentials": "true",
-        }
+        headers=_get_cors_headers(request)
     )
 
 @app.exception_handler(Exception)
@@ -220,7 +236,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.exception(f"Unhandled exception on {request.method} {request.url.path} (Trace: {corr_id}): {exc}")
     is_dev = os.getenv("ENVIRONMENT", "").lower() in ["development", "dev", "local"]
     detail = str(exc) if is_dev else "An unexpected server error occurred."
-    origin = request.headers.get("origin", "*")
     return JSONResponse(
         status_code=500,
         content={
@@ -232,10 +247,7 @@ async def global_exception_handler(request: Request, exc: Exception):
                 "path": request.url.path
             }
         },
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Credentials": "true",
-        }
+        headers=_get_cors_headers(request)
     )
 
 # -------------------------------------------------------------

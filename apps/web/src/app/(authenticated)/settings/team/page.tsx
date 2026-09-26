@@ -28,6 +28,19 @@ const ROLES = [
   { id: 'auditor', label: 'Auditor', desc: 'Strict read-only access to historical data' },
 ];
 
+const getTeamApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local');
+    if (isLocal) {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+    }
+    // Remote domain: Use same-origin /api/v1 rewrite to eliminate CORS
+    return '/api/v1';
+  }
+  return '/api/v1';
+};
+
 export default function TeamSettingsPage() {
   const { getToken } = useAuth();
   const toast = useToast();
@@ -48,7 +61,7 @@ export default function TeamSettingsPage() {
   const fetchTeamAndInvites = async () => {
     try {
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getTeamApiUrl();
       
       const [membersRes, invitesRes] = await Promise.all([
         fetch(`${apiUrl}/team/`, { headers: { 'Authorization': `Bearer ${token}` } }),
@@ -75,7 +88,7 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(userId);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getTeamApiUrl();
       const res = await fetch(`${apiUrl}/team/${userId}/role`, {
         method: 'PATCH',
         headers: { 
@@ -100,7 +113,7 @@ export default function TeamSettingsPage() {
     try {
       setUpdating("invite");
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getTeamApiUrl();
       const res = await fetch(`${apiUrl}/team/invite`, {
         method: 'POST',
         headers: { 
@@ -127,7 +140,7 @@ export default function TeamSettingsPage() {
     try {
       setUpdating(inviteId);
       const token = await getToken();
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+      const apiUrl = getTeamApiUrl();
       const res = await fetch(`${apiUrl}/team/invite/${inviteId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

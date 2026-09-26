@@ -26,15 +26,10 @@ const getApiUrl = () => {
     if (isLocal) {
       return process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
     }
-    // Remote domain (e.g. Vercel)
-    if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1') && !process.env.NEXT_PUBLIC_API_URL.includes('localhost')) {
-      return process.env.NEXT_PUBLIC_API_URL;
-    }
-    return 'https://regulation-compiler.onrender.com/api/v1';
+    // Remote domain (e.g. www.regcompiler.app): Use same-origin /api/v1 rewrite to eliminate all CORS & preflight errors
+    return '/api/v1';
   }
-  return (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('127.0.0.1'))
-    ? process.env.NEXT_PUBLIC_API_URL
-    : 'https://regulation-compiler.onrender.com/api/v1';
+  return '/api/v1';
 };
 
 export default function NewRegulationPage() {
@@ -98,27 +93,47 @@ export default function NewRegulationPage() {
       setLoadingFrameworks(true);
       setError(null);
 
-      // Prefer Server Action first: executes on Next.js server, completely bypassing browser CSP and CORS limitations
+      // 1. Prefer Server Action first: executes on Next.js server, completely bypassing browser CSP and CORS limitations
       try {
         const res = await getFrameworksAction();
-        if (res?.success && Array.isArray(res.data)) {
+        if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
           setFrameworks(res.data);
           return;
         }
       } catch (saErr) {
-        console.warn('[Frameworks] Server action fallback to client fetch', saErr);
+        console.warn('[Frameworks] Server action fallback to internal route fetch', saErr);
       }
 
+      // 2. Try same-origin Next.js API route: eliminates CORS and preflight checks
       const token = await getToken();
-      const apiUrl = getApiUrl();
       const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch(`${apiUrl}/regulations/frameworks`, { headers });
-      if (!res.ok) throw new Error("Failed to load frameworks");
-      const data = await res.json();
-      setFrameworks(data);
+
+      try {
+        const res = await fetch(`/api/regulations/frameworks`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setFrameworks(data);
+            return;
+          }
+        }
+      } catch (apiErr) {
+        console.warn('[Frameworks] Same-origin API route fallback to /api/v1 rewrite', apiErr);
+      }
+
+      // 3. Fallback to /api/v1 same-origin rewrite
+      const apiUrl = getApiUrl();
+      const directRes = await fetch(`${apiUrl}/regulations/frameworks`, { headers });
+      if (!directRes.ok) throw new Error("Failed to load frameworks");
+      const data = await directRes.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setFrameworks(data);
+      } else {
+        throw new Error("No frameworks returned");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
