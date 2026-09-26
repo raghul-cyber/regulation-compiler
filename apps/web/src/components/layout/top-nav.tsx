@@ -150,7 +150,7 @@ export function TopNav() {
                 RegCompiler
               </span>
               <span className="font-mono text-[9px] tracking-wider text-[#A88752] uppercase leading-none font-medium">
-                REGULATORY INTELLIGENCE
+                REGULATION AS CODE
               </span>
             </div>
           </Link>
