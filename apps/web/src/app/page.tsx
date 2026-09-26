@@ -25,56 +25,56 @@ export default function LandingPage() {
         {/* Section 03 — Slim Technical Capability Signal */}
         <CapabilitySignal />
 
-        {/* Atmospheric Section Transition: Deep Sapphire Light Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(77,120,160,0.35)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Dark Gold Light Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.30)] to-transparent pointer-events-none" />
 
         {/* Section 03B — Automated Website Compliance Auditor (Autonomous Statutory Agent) */}
         <WebsiteAuditorSection />
 
-        {/* Atmospheric Section Transition: Dusky Plum & Graphite Depth Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(48,35,47,0.40)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Antique Bronze & Graphite Depth Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(140,107,66,0.25)] to-transparent pointer-events-none" />
 
         {/* Section 04 — The Regulation Problem */}
         <ProblemSection />
 
         {/* Atmospheric Section Transition: Warm Champagne Highlight Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(188,167,123,0.35)] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.30)] to-transparent pointer-events-none" />
 
         {/* Section 05 — Regulation → Structured Logic Transformation */}
         <TransformationSection />
 
-        {/* Atmospheric Section Transition: Dark Graphite & Titanium Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(77,120,160,0.25)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Warm Amber & Titanium Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(143,95,50,0.25)] to-transparent pointer-events-none" />
 
         {/* Section 06 — How The Compiler Works (5 Stages) */}
         <HowItWorksSection />
 
         {/* Atmospheric Section Transition: Champagne Reflection Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(188,167,123,0.30)] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.28)] to-transparent pointer-events-none" />
 
         {/* Section 07 — Interactive Compilation Environment */}
         <InteractiveCompilation />
 
-        {/* Atmospheric Section Transition: Deep Sapphire Control Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(77,120,160,0.35)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Muted Gold Control Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.25)] to-transparent pointer-events-none" />
 
         {/* Section 08 — Enterprise Architecture Layer */}
         <ArchitectureSection />
 
-        {/* Atmospheric Section Transition: Sage Cryptographic Vault Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(118,147,127,0.30)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Deep Bronze Vault Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(118,92,58,0.28)] to-transparent pointer-events-none" />
 
         {/* Section 09 — Security & Cryptographic Traceability */}
         <SecurityTraceability />
 
         {/* Atmospheric Section Transition: Executive Bronze & Champagne Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(188,167,123,0.30)] to-transparent pointer-events-none" />
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(197,166,110,0.28)] to-transparent pointer-events-none" />
 
         {/* Section 10 — High-Stakes Use Cases */}
         <UseCasesSection />
 
-        {/* Atmospheric Section Transition: Dual Sapphire & Champagne Halo Bridge */}
-        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(77,120,160,0.35)] to-transparent pointer-events-none" />
+        {/* Atmospheric Section Transition: Dual Gold & Champagne Halo Bridge */}
+        <div className="w-full max-w-5xl mx-auto h-px bg-gradient-to-r from-transparent via-[rgba(168,135,82,0.30)] to-transparent pointer-events-none" />
 
         {/* Section 11 — Final Calmer CTA */}
         <FinalCTASection />

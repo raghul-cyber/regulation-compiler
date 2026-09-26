@@ -91,11 +91,11 @@ export function HeroSection() {
       id="product" 
       className="w-full flex flex-col items-center text-center pt-24 sm:pt-28 md:pt-32 scroll-mt-28 relative"
     >
-      {/* Central Hero Atmospheric Framing Light (Soft champagne halo above headline, sapphire depth below) */}
+      {/* Central Hero Atmospheric Framing Light (Soft champagne halo above headline, warm bronze depth below) */}
       <div 
         className="absolute top-16 left-1/2 -translate-x-1/2 w-[760px] h-[360px] rounded-full blur-[110px] pointer-events-none -z-10 reveal-hero-bg"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(188, 167, 123, 0.16) 0%, rgba(77, 120, 160, 0.10) 50%, transparent 80%)',
+          background: 'radial-gradient(ellipse at center, rgba(197, 166, 110, 0.16) 0%, rgba(143, 95, 50, 0.08) 50%, transparent 80%)',
         }}
         aria-hidden="true"
       />
